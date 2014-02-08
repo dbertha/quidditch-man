@@ -1,0 +1,115 @@
+\documentclass{article}
+ 
+\usepackage{pslatex}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+
+\title{Procès-verbal de la réunion du vendredi 13 Décembre 2013 du Groupe 4 dans le cadre du projet INFOF209}
+
+\author{David Bertha}
+
+\begin{document}
+
+\maketitle
+ 
+\pagestyle{empty}
+
+% \section*{Membres  absents~:}
+% \begin{itemize}
+% \item 
+% \end{itemize}
+
+
+\section{Bilan de la réunion~:}
+   Les Use Cases commencent à être définis. Encore de grosses interrogations sur la structure des classes,
+    notamment sur la différence de structure des joueurs au niveau de la gestion ou au niveau du match.
+
+\section{Sujets abordés~:}
+  \subsection{Les différents bâtiments}
+  \begin{itemize}
+    \item Terrain : 
+      \begin{itemize}
+      \item Niveau : détermine le nombre de places
+      \item Action : commencer un match; (gestion équipe : à décider)
+      \end{itemize}
+    \item Direction : 
+      \begin{itemize}
+      \item Niveau : détermine les marchés de joueurs accessibles : régional, national, international
+      \item Action : achat/vente de joueurs
+      \end{itemize}
+    \item Magasin/remise à balais : 
+      \begin{itemize}
+      \item Niveau : idem direction mais pour les balais
+      \item Action : idem direction mais pour les balais
+      \end{itemize}
+    \item Fanshop : 
+      \begin{itemize}
+      \item Niveau : détermine la recette supplémentaire apportée par les supporters de l'équipe qui reçoit
+      \item Action : Aucune
+      \end{itemize}
+    \item Buvette : 
+      \begin{itemize}
+      \item Niveau : détermine la recette supplémentaire apportée par les supporters restants à la buvette pour l'équipe qui se déplace
+      \item Action : Dans le cas d'un match à l'extérieure : gestion de l'incitation des supporters 
+      à aller voir l'équipe en extérieur (booste les caract des joueurs)
+      ou bien à rester à la buvette voir la match projeté (booster la recette par les consommations)
+      \end{itemize}
+    \item Centre d'entraînement
+      \begin{itemize}
+        \item Niveau : détermine la qualité des entrainements
+        \item Action : choisir différents entrainements possibles pour chaque joueur (séparément)
+      \end{itemize}    
+    \item Agence de publicité : 
+      \begin{itemize}
+      \item Niveau : idem que le centre d'entrainement mais par rapport à la popularité
+      \item Action : idem que le centre d'entrainement mais par rapport à la popularité
+      \end{itemize}
+    \item Infirmerie : 
+      \begin{itemize}
+      \item Niveau : qualité/rapidité des soins
+      \item Action : soigner un joueur blessé pendant un match
+      \end{itemize}       
+  \end{itemize}
+  
+  \subsection{Interactions avec le client à la connexion}
+    Au début du programme, on propose à l'utilisateur le choix entre le création d'un nouveau compte ou l'identification à partir d'un compte existant.
+    À la création d'un compte, on lui demande plusieurs informations :
+    \begin{itemize}
+      \item Nom du Manager = login
+      \item Nom du club
+      \item (Nom et Prénom inGame ?)
+      \item (Sexe ?)
+      \item (Nationalité ?) Permettrait une catégorisation en cas de championnats régionaux/nationaux
+      \item (écusson ?) à décider quand interface graphique
+    \end{itemize}
+    Une seule sauvegarde sera faite de la situation du club d'un manager, il ne serait pas cohérent de permettre des retours en arrières avec un système de tour par tour en ligne
+    
+    Une équipe de 7 mauvais joueurs (où on retrouve tous les rôles dans les proportions données par les règles du jeu) est attribuée au nouveau manager. Génération des prénoms/noms depuis une liste prédéfinie. Valeurs de base en fonction du profil (attrapeur, batteur, poursuiveur, gardien)
+  
+  \subsection{La/les classe(s) joueur}
+    Nous sommes partis sur une interface joueur contenant les caractéristiques (et leur getters/setters) et le balai, puis nous avons discuté de la distinction entre un
+    joueur en match et un joueur au niveau de la gestion. Nous ne sommes pas arrivés à un accord.
+
+\section{Points qui posent problèmes~:}
+    \begin{itemize}
+      \item À quel bâtiment associer la gestion de l'équipe
+      \item Préciser les caractéristiques demandées à la création d'un nouveau compte
+      \item Le principal : éclaircir la structure des classes pour les joueurs
+      \item Au niveau des blessures : gérer une barre de vie ? Malus pendant le match ?
+    \end{itemize}
+
+
+\section{Décisions prises~:}
+  \begin{itemize}
+  \item Un joueur ne doit pas être spécialisé au niveau de la gestion (remarque : ceci se remet en cause dans les dernières discussions)
+  \item Accord sur trois bâtiments supplémentaire : buvette, remise à balais, agence de pub
+  \end{itemize}
+
+\section{Actions à entreprendre~:}
+
+  Y réfléchir séparément, en rediscuter sur le pad, en rediscuter au cours d'une prochaine réunion
+
+\section*{Prochaine réunion~:}
+  Lundi 16 ou mardi 17.
+
+\end{document}

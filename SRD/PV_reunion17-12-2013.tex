@@ -1,0 +1,54 @@
+%%% pv20001214.tex ---
+\documentclass{article}
+
+\usepackage{pslatex}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+
+\title{Procès-verbal de la réunion du mardi 17 décembre 2013 du Groupe 4 dans le cadre du projet INFOF209}
+
+\author{Hélène plisnier}
+
+
+\begin{document}
+
+\maketitle
+
+\pagestyle{empty}
+
+% \section*{Membres  absents~:}
+% \begin{itemize}
+% \item 
+% \end{itemize}
+
+
+\section{Bilan de la réunion~:}
+   La définition des Uses Cases et leur nombre se précise. Encore de grosses interrogations sur la structure des classes,
+    notamment sur la différence de structure des joueurs au niveau de la gestion ou au niveau du match (toujours valable).
+
+\section{Sujets abordés~:}
+\begin{enumerate}
+  \item La découpe du programme en classes;
+  \item Le fonctionnement de la partie "client-serveur";
+  \item Les Uses Cases;
+\end{enumerate}
+
+\section{Points qui posent problèmes~:}
+Le point concernant la structure des classes amènent à des divergences d'opinions (pour le moment) sans issues. En effet, le problème se révèle complexe: un joueur/pion doit à la fois pouvoir être manipulé sur un terrain de Quidditch, et dans un contexte de gestion. D'après le contexte "où il se trouve", certaines méthodes du joueur n'auront plus aucune utilité, car propres à l'autre contexte partageant le joueur. Il faudrait donc trouver un moyen de scinder la classe représentant le joueur ainsi que l'ensemble de ses méthodes, afin de conserver le sens ainsi que limiter les dépendances entre modules. 
+Sans compter qu'il y a plusieurs rôles, postes possibles assignables à un joueur, et avec ces différents postes viennent des "actions spéciales", propres au poste.
+Il n'a pas encore été décidé s'il fallait également envisager la possibilité qu'en plus des caractéristiques de base, les joueurs puissent avoir de caractéristiques propres à leur fonction. Ce choix est déterminant pour la conversion du joueur d'un poste à un autre, si cette possibilité doit être offerte au Manager.
+
+
+\section{Décisions prises~:}
+Il a été décidé que la partie du SRD portant sur le découpage du programme en classes serait écrite par David et Audry. Manon et Hélène, quant à elles, se chargeront des Uses Cases et Uses Cases Diagrams.
+Le nombre de Uses Cases a été déterminé, compte tenu du degré de précision choisi.  
+La liste des différents bâtiments et de leurs fonctions a été mise au point.
+
+\section{Actions à entreprendre~:}
+\begin{enumerate}
+  \item Se mettre d'accord une bonne fois pour toute sur la structure générale des classes;
+  \item Relire à tour de rôle le travail fourni par chacun, commenter voire approuver dans le but d'...
+  \item Avancer dans la rédaction du SRD.
+\end{enumerate}
+
+\end{document}
