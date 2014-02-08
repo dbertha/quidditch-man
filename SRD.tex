@@ -577,7 +577,7 @@
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Inclut Choisir la composition d’équipe
         \item \textbf{Pré-conditions} : C’est un jour de match et l’adversaire est également connecté.
         \item \textbf{Post-conditions} : Il y a un gagnant et un perdant.
-        \item \textbf{Cas général} : Pour savoir si c'est un jour de match, on vérifie en checkant le \gls{calendrier} \index{calendrier} des matches. S'il y a bien un match de prévu, le Manager est connecté en même temps que son adversaire du jour. Ils doivent donc jouer le match dont la date a été prédéterminée.
+        \item \textbf{Cas général} : Pour savoir si c'est un jour de match, le programmme vérifie en checkant le \gls{calendrier} \index{calendrier} des matches. S'il y a bien un match de prévu, le Manager est connecté en même temps que son adversaire du jour. Ils doivent donc jouer le match dont la date a été prédéterminée.
         \item \textbf{Cas exceptionnels} : 
           \begin{itemize}
             \item L’adversaire ne se connecte jamais. Le Manager jouera contre l’équipe de son adversaire qui suivra une stratégie automatique minimaliste (Intelligence Artificielle).
@@ -633,62 +633,85 @@
     Ce diagramme représente le fonctionnement de base du jeu avec la répartition des "tâches" au niveau serveur et client.
     \subsubsection{Se connecter}
       \begin{itemize}
+        \item \textbf{Acteur} : Client.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
-        \item \textbf{Pré-conditions} : Néant.
+        \item \textbf{Pré-conditions} : Le serveur doit être connecté.
         \item \textbf{Post-conditions} : Client et serveur sont reliés par le réseau.
         \item \textbf{Cas général} : Le client se connecte au serveur du jeu pour pouvoir jouer. 
-        \item \textbf{Cas exceptionnels} : Néant.
+        \item \textbf{Cas exceptionnels} : 
+        \begin{itemize}
+            \item La connexion au serveur échoue. Le programme le signale à l'utilisateur. Ceci termine ce use case.
+          \end{itemize}
       \end{itemize}
     \subsubsection{S'identifier}
       \begin{itemize}
+        \item \textbf{Acteur} : Client.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
-        \item \textbf{Pré-conditions} : Néant.
-        \item \textbf{Post-conditions} : Néant.
+        \item \textbf{Pré-conditions} : Le client est connecté au serveur.
+        \item \textbf{Post-conditions} : Le client a accès à sa partie.
         \item \textbf{Cas général} : Le client crée une nouvelle \gls{partie}\index{partie} ou en charge une existante pour s’identifier auprès du serveur. Si le client charge une partie existante, le serveur va récupérer le fichier de sauvegarde approprié, sinon, il va en créer un nouveau.
-        \item \textbf{Cas exceptionnels} : Néant.
+        \item \textbf{Cas exceptionnels} : 
+         \begin{itemize}
+            \item Le client entre un identifiant ou un mot de passe déjà utilisé. Le programme le signale à l'utilisateur et lui redemande de s'identifier.
+          \end{itemize}
       \end{itemize}
     \subsubsection{Charger partie}
       \begin{itemize}
+        \item \textbf{Acteur}  : Serveur.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
-        \item \textbf{Pré-conditions} : Néant.
-        \item \textbf{Post-conditions} : Néant.
+        \item \textbf{Pré-conditions} : La connexion et l'authentification d'un client se sont déroulés sans encombre.
+        \item \textbf{Post-conditions} : La partie est chargée.
         \item \textbf{Cas général} : Le serveur va charger les informations de la partie à laquelle va accéder le client.
-        \item \textbf{Cas exceptionnels} : Néant.
+        \item \textbf{Cas exceptionnels} : 
+        \begin{itemize}
+            \item Le client ne possède pas encore de partie. Le serveur lui en crée une.
+          \end{itemize}
       \end{itemize}
     \subsubsection{Sauvegarder}
       \begin{itemize}
+        \item \textbf{Acteur}  : Serveur.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
-        \item \textbf{Pré-conditions} : Néant.
-        \item \textbf{Post-conditions} : Néant.
+        \item \textbf{Pré-conditions} : Des informations relatives à la partie d'un client ont été modifiées et nécessitent d'être sauvées.
+        \item \textbf{Post-conditions} : Les changements sont sauvegardés dans le fichier de sauvegarde dédié au client.
         \item \textbf{Cas général} : Le serveur sauvegarde les informations de la partie. L’état actuel de la partie du client est sauvegardée dans un fichier de sauvegarde.
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
     \subsubsection{Afficher actions possibles}
       \begin{itemize}
+        \item \textbf{Acteur}  : Client.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
-        \item \textbf{Pré-conditions} : Néant.
+        \item \textbf{Pré-conditions} : Le client est connecté au serveur.
         \item \textbf{Post-conditions} : Néant.
         \item \textbf{Cas général} : Le client affiche tout ce qu’il est possible de faire d’un point de vue gestion.
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
     \subsubsection{Choisir action}
       \begin{itemize}
+        \item \textbf{Acteur}  : Client.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
-        \item \textbf{Pré-conditions} : Néant.
-        \item \textbf{Post-conditions} : Néant.
+        \item \textbf{Pré-conditions} : Le client est connecté au serveur.
+        \item \textbf{Post-conditions} : La requête a été envoyée au serveur.
         \item \textbf{Cas général} : Le client a choisi une action de gestion à effectuer (amélioration bâtiment, entraînement, publicité, achat, vente, gestion d’équipe). Il doit maintenant attendre que le serveur exécute cette action.
-        \item \textbf{Cas exceptionnels} : Néant.
+        \item \textbf{Cas exceptionnels} : 
+        \begin{itemize}
+            \item L'envoi échoue. Le programme le signale à l'utilisateur.
+          \end{itemize}
       \end{itemize}
     \subsubsection{Réaliser action}
       \begin{itemize}
+        \item \textbf{Acteur}  : Serveur.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
-        \item \textbf{Pré-conditions} : Néant.
-        \item \textbf{Post-conditions} : Néant.
+        \item \textbf{Pré-conditions} : Client et serveur sont connectés.
+        \item \textbf{Post-conditions} : La requête a été traitée par le serveur.
         \item \textbf{Cas général} : Le client a choisi de faire une action de gestion (amélioration bâtiment, entraînement, publicité, achat, vente, gestion d’équipe). Le serveur va se charger de faire les modifications liées à cette action.
-        \item \textbf{Cas exceptionnels} : Néant.
+        \item \textbf{Cas exceptionnels} :
+        \begin{itemize}
+            \item La réception échoue. Le programme le signale à l'utilisateur.
+          \end{itemize} 
       \end{itemize}
     \subsubsection{Jouer match}
       \begin{itemize}
+        \item \textbf{Acteur}  : Client.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
         \item \textbf{Pré-conditions} : La date et le moment de la journée correspondent à un match prévu dans le championnat.
         \item \textbf{Post-conditions} : Ce \index{match}match est retiré du \gls{calendrier}\index{calendrier} des matches.
@@ -697,6 +720,7 @@
       \end{itemize}
     \subsubsection{Lancer match}
       \begin{itemize}
+        \item \textbf{Acteur}  : Serveur.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
         \item \textbf{Pré-conditions} : Au moins un des clients qui doivent s’affronter lors de ce match est connecté.
         \item \textbf{Post-conditions} : Néant.
@@ -709,37 +733,43 @@
       \end{itemize}
     \subsubsection{Choisir action pour joueur}
       \begin{itemize}
+        \item \textbf{Acteur}  : Client.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
         \item \textbf{Pré-conditions} : Le joueur sélectionné est encore libre de faire une action.
-        \item \textbf{Post-conditions} : Néant.
-        \item \textbf{Cas général} : Le client choisit quoi faire pour un joueur. Cela peut-être un déplacement et/ou une action particulière comme passer le \index{balle!souafle}souafle ou tirer aux buts. Le client doit faire cela pour chacun de ses joueurs ou indiquer au serveur qu’il a fini de choisir ses actions (s’il souhaite par exemple que des joueurs ne fassent rien).
-        \item \textbf{Cas exceptionnels} : Néant.
+        \item \textbf{Post-conditions} : L'action choisie est réalisée par ce joueur lors du tour.
+        \item \textbf{Cas général} : Le client choisit l'action que devra réaliser le joueur lors du tour. Cela peut-être un déplacement et/ou une action particulière comme passer le \index{balle!souafle}souafle ou tirer aux buts. Le client doit faire cela pour chacun de ses joueurs ou indiquer au serveur qu’il a fini de choisir ses actions (s’il souhaite par exemple que des joueurs ne fassent rien).
+        \item \textbf{Cas exceptionnels} : 
+        \begin{itemize}
+         \item Le client ne donne aucune instruction au joueur. Le joueur reste sur place.
       \end{itemize}
     \subsubsection{Réaliser action des joueurs}
       \begin{itemize}
+        \item \textbf{Acteur}  : Serveur.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
-        \item \textbf{Pré-conditions} : Néant.
-        \item \textbf{Post-conditions} : Néant.
-        \item \textbf{Cas général} : A chaque tour, le serveur attend de recevoir les actions que les clients ont choisies pour chacun de leurs joueurs. Une fois l’ensemble de ces actions reçues, le serveur les exécute puis envoie la nouvelle situation aux clients (pour qu’ils affichent le terrain et redemandent les actions à exécuter).
+        \item \textbf{Pré-conditions} : Cette action se déroule dans le cadre d'un match.
+        \item \textbf{Post-conditions} : La situation sur le terrain a évolué.
+        \item \textbf{Cas général} : A chaque tour, le serveur attend de recevoir les actions que les clients ont choisies pour chacun de leurs joueurs. Une fois l’ensemble de ces actions reçues, le serveur les exécute puis envoie la nouvelle situation aux clients. Les clients affichent alors le terrain et redemandent les actions à exécuter aux utilisateurs.
         \item \textbf{Cas exceptionnels} : 
           \begin{itemize}
-            \item Si un des clients ne s’est pas connecté pour le match, le serveur n’attendra pas d’actions de la part de ce client. Ses joueurs suivront une stratégie minimaliste prise en charge par le serveur.
+            \item Si un des clients ne s’est pas connecté pour le match, le serveur n’attendra pas d’actions de la part de ce client. Ses joueurs suivront une stratégie automatique minimaliste prise en charge par le serveur.
           \end{itemize}  
       \end{itemize}
     \subsubsection{Afficher terrain}
       \begin{itemize}
+        \item \textbf{Acteur}  : Client.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
-        \item \textbf{Pré-conditions} : Néant.
+        \item \textbf{Pré-conditions} : Le client est connecté au serveur et un match a lieu.
         \item \textbf{Post-conditions} : Néant.
         \item \textbf{Cas général} : Le client reçoit les informations relatives au \index{terrain}terrain de la part du serveur et l’affiche pour permettre au client de facilement visualiser la situation actuelle du jeu.
         \item \textbf{Cas exceptionnels} : Néant. 
       \end{itemize}
     \subsubsection{Envoyer résultat}
       \begin{itemize}
+        \item \textbf{Acteur}  : Serveur.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
         \item \textbf{Pré-conditions} : Le match est terminé.
         \item \textbf{Post-conditions} : Le client dispose des informations à afficher après un match.
-        \item \textbf{Cas général} : Le match est terminé. Le serveur va calculer combien le client a gagné (en fonction des bâtiments \gls{fanshop}\index{bâtiment!FanShop} (match à domicile) ou \gls{buvette}\index{bâtiment!Buvette} (match en extérieur)). En fonction de la situation de fin de match, victoire ou défaite, le serveur va également déterminer combien d’argent et de popularité le manager a gagné ou perdu. Toutes ses informations sont envoyées au client.
+        \item \textbf{Cas général} : Le match est terminé. Le serveur va calculer combien le Manager a gagné (en fonction des bâtiments \gls{fanshop}\index{bâtiment!FanShop} (match à domicile) ou \gls{buvette}\index{bâtiment!Buvette} (match en extérieur)). En fonction de la situation de fin de match, victoire ou défaite, le serveur va également déterminer combien d’argent et de popularité le Manager a gagné ou perdu. Toutes ses informations sont envoyées au client.
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
 
@@ -751,8 +781,8 @@
   Au niveau du réseau, le problème de la synchronisation n'est pas préoccupant, 
   car le client ne sera qu'une interface d'affichage et d'interaction. 
   Pour ce qui est de la quantité d'informations échangées, 
-  elles ne devraient pas être très importantes pour autant, 
-  les éléments à afficher et leur diversité étant relativement assez réduits.
+  elle ne devrait pas être très importante pour autant, 
+  les éléments à afficher et leur diversité étant relativement réduits.
   
   Il faudra veiller à ce que l'interaction avec l'utilisateur soit transparente 
   au niveau du serveur, à travers une classe de message générique, 
