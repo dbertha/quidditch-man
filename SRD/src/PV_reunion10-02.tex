@@ -1,0 +1,58 @@
+%%% pv20001214.tex ---
+\documentclass{article}
+
+\usepackage{pslatex}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+
+\title{Procès-verbal de la réunion du 10 février 2014 du Groupe 4 dans le cadre du projet INFOF209}
+
+\author{Hélène Plisnier}
+
+
+\begin{document}
+
+\maketitle
+
+\pagestyle{empty}
+
+% \section*{Membres  absents~:}
+% \begin{itemize}
+% \item 
+% \end{itemize}
+
+
+\section{Bilan de la réunion~:}
+   Le déroulement d'une vente d'un joueur avec un système d'enchères n'est pas encore clairement défini. Les tâches ont été réparties au sein de l'équipe.
+
+\section{Sujets abordés~:}
+  \begin{itemize}
+    \item Les déroulements possibles d'une vente aux enchères. 
+    \item Les modifications à apporter au SRD post correction de la Phase 1.
+    \item Les éléments indispensables (et donc à implémenter impérativement) pour la réalisation de la Phase 2.
+  \end{itemize}
+
+\section{Points qui posent problèmes~:}
+  Les déroulements possibles d'une vente aux enchères. Les possibilités sont 
+   \begin{itemize}
+     \item la mise à jour du prix courant en directe (à chaque enchère émise par un Manager intéressé);
+     \item la mise à jour du prix courant à chaque tour (soit toutes les 30 secondes).
+   \end{itemize}
+     Idéalement pour l'utilisateur, la première solution devrait être choisie. Il pourrait ainsi voir sur son écran l'évolution en direct du prix du joueur mis en vente. Mais cette solution nécessite un système de rafraîchissement régulier (toutes les secondes) de l'affichage. Ce qui risque de se révéler compliqué et long à implémenter. De plus, la notion de tour perdrait toute son utilité potentielle.\\
+  Une solution intermédiaire est la suivante: le prix courant est mis à jour à la demande de l'utilisateur. Le client envoie donc une requête au serveur pour récupérer le prix courant, il n'attend pas les mises à jour régulières envoyées par le serveur.
+
+\section{Décisions prises~:}
+  Les tâches ont été distribuées. Il a été décidé que:
+  \begin{itemize}
+     \item la partie Gestion (classes et actions relatives au management) sera implémentée par Manon;
+     \item Manon et Audry se partageront la partie Match (classes et actions relatives au déroulement d'un match amical de Quidditch);
+     \item la partie Réseau (communication client/serveur) sera implémentée par Hélène et David.
+   \end{itemize}
+
+\section{Actions à entreprendre~:}
+Définir le déroulement d'une vente aux enchères.
+
+\section*{Prochaine réunion~:}
+  ???
+
+\end{document}
