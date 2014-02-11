@@ -13,17 +13,27 @@ class Player {
     string _lastName;
 
     int _capacities[5];
+    int _popularity;
+    bool _blocked;
 
     int _life; //Calculé à partir de la résistance, donc pas un attribut propre.
     Broomstick _broomstick;
 
+
  public:
 
-    Player(string playerSaveFile);
+    Player(string& playerSaveFile);
 
     string getFirstName();
     string getLastName();
     int getCapacity(int capacityNumber);
+
+    int getPopularity();
+    void setPopularity(int popularity);
+
+    void lockPlayer();
+    void unlockPlayer();
+    bool isBlocked();
 
     int getLife();
     Broomstick getBroomstick();
@@ -34,7 +44,7 @@ class Player {
 
     void setLife(int life);
     void setBroomstick(Broomstick broomstick);
-
+    void gainPopularity();
 
 };
 

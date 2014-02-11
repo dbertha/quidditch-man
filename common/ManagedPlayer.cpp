@@ -7,14 +7,11 @@
 
 using namespace std;
 
-ManagedPlayer::ManagedPlayer(string playerSaveFile): Player(playerSaveFile) {}
-
-int ManagedPlayer::getPopularity() {return _popularity;}
-void ManagedPlayer::setPopularity(int popularity) {_popularity = popularity;}
-
-void ManagedPlayer::lockPlayer() {_blocked = true;}
-void ManagedPlayer::unlockPlayer() {_blocked = false;}
-bool ManagedPlayer::isBlocked() {return _blocked;}
+ManagedPlayer::ManagedPlayer(string playerSaveFile): Player(playerSaveFile) {
+	for (int i=0;i<5;++i){
+		_trainingLeft[i] = this->getCapacity(i) - 1;
+	}
+}
 
 void ManagedPlayer::train(int capacityNumber){
 	_trainingLeft[capacityNumber] -= 1;
@@ -24,7 +21,6 @@ void ManagedPlayer::train(int capacityNumber){
 	}
 }
 void ManagedPlayer::updateLife() {}
-void ManagedPlayer::gainPopularity() {}
 int ManagedPlayer::getEstimatedValue() {return 0;}
 
-void ManagedPlayer::heal() {_life += 1;}
+void ManagedPlayer::heal() {this->setLife(this->getLife()+1);}
