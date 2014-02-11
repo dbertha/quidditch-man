@@ -1,11 +1,7 @@
 % Installation environnement de compilation et packages : 
-% sudo apt-get install texlive-base texlive-lang-french texlive-latex-extra
+% sudo apt-get install texlive-base texlive-lang-french texlive-latex-extra texlive-latex-recommended 
 % Compilation :
-% pdflatex SRD.tex 
-% Si modification de l'index ou du glossaire, faire aussi :
-% makeindex -s SRD.ist -t SRD.glg -o SRD.gls SRD.glo
-% pdflatex SRD.tex 
-% pdflatex SRD.tex 
+% make
 
 \let\pagebreakORIG\pagebreak
 \let\clearpageORIG\clearpage
