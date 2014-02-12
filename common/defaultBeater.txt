@@ -1,9 +1,16 @@
 John
 Doe
-4
-7
-5
-3
-6
-0
-0
+4 #Speed
+7 #Strength
+5 #Precision
+3 #Reflex
+6 #Resistance
+3 #Training left to up speed
+6 #Training left to up strength
+4 #Training left to up precision
+2 #Training left to up reflex
+5 #Training left to up resistancr
+10 #Popularity
+0 #Blocked?
+0 #Capacity boosted by broomstick
+0 #Bonus granted by broomstick
