@@ -6,6 +6,7 @@
 #include "Player.hpp"
 #include "Broomstick.hpp"
 
+typedef int gold;
 
 class ManagedPlayer : public Player {
 
@@ -16,15 +17,10 @@ class ManagedPlayer : public Player {
  	ManagedPlayer(string playerSaveFile);
 
     void train(int capacityNumber);
-
     void updateLife(); //A QUOI SERT CETTE METHODE? (Je ne me souviens plus)
-
-    int getEstimatedValue(); //Renvoie l'estimation du prix du joueur, calculé selon ses attributs
-
- private:
+    gold getEstimatedValue(); //Renvoie l'estimation du prix du joueur, calculé selon ses attributs
 
     void heal();
-
 
 };
 

@@ -7,20 +7,27 @@
 
 using namespace std;
 
-ManagedPlayer::ManagedPlayer(string playerSaveFile): Player(playerSaveFile) {
-	for (int i=0;i<5;++i){
-		_trainingLeft[i] = this->getCapacity(i) - 1;
-	}
-}
+
+#define PRICESCALE 10000
+typedef int gold;
+
+ManagedPlayer::ManagedPlayer(string playerSaveFile): Player(playerSaveFile) {}
 
 void ManagedPlayer::train(int capacityNumber){
-	_trainingLeft[capacityNumber] -= 1;
-	if (_trainingLeft[capacityNumber] == 0) {
+	this->setTrainingLeft(capacityNumber,this->getTrainingLeft(capacityNumber)-1);
+	if (this->getTrainingLeft(capacityNumber) == 0) {
 		this->up(capacityNumber);
-		_trainingLeft[capacityNumber] = this->getCapacity(capacityNumber)-1;
+		this->setTrainingLeft(capacityNumber,this->getCapacity(capacityNumber)-1);
 	}
 }
 void ManagedPlayer::updateLife() {}
-int ManagedPlayer::getEstimatedValue() {return 0;}
+gold ManagedPlayer::getEstimatedValue() {
+	int index=0; //Déterminé par les capacités et l'avancement de leur entraînement
+	for (int i=0;i<5;++i){
+
+	}
+
+	return index*PRICESCALE;
+}
 
 void ManagedPlayer::heal() {this->setLife(this->getLife()+1);}

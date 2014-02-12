@@ -13,6 +13,7 @@ class Player {
     string _lastName;
 
     int _capacities[5];
+    int _trainingLeft[5];
     int _popularity;
     bool _blocked;
 
@@ -26,7 +27,12 @@ class Player {
 
     string getFirstName();
     string getLastName();
+    void verifyName();
+    bool isNameTaken();
+
     int getCapacity(int capacityNumber);
+    int getTrainingLeft(int capacityNumber);
+    void setTrainingLeft(int capacityNumber, int value);
 
     int getPopularity();
     void setPopularity(int popularity);
