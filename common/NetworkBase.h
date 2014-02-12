@@ -1,7 +1,7 @@
 /* Module réseau en C, gère la communication basique entre serveur et clients */
-
-/* TODO : vérifier si modules inutiles 
-#include <stdio.h>
+#ifndef NETWORKBASE_H
+#define NETWORKBASE_H
+/* TODO : vérifier si modules inutiles */
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
@@ -9,57 +9,42 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <netinet/in.h>
-#include <sys/socket.h>*/
+#include <sys/socket.h>
 
 #include "Defines.h"
-#include "NetworkBase.h"
+
+#define SERIALISATION_MAXSIZE 1025
+#define SUCESS 1
 
 /* recv(socket, *message, sizeToWrite, 0) return sizeWriten if ok
 //send(socket, *message, sizeToRead, 0) return sizeRead if ok */
 
-void initialize(SerializedObjectList *toInit){
-    toInit->paquet = NULL;
-    toInit->next = NULL;
-}
+typedef struct {
+    /* on manipule des short et des long pour correspondre aux fonction htonl/ntohl et htons/ntohs
+    //on suppose que les types de bases sont de taille identique sur chaque machine */
+    short typeOfInfos;
+    short senderId; /* serveur ou identifiant du client : utile ?*/
+    short numInSequence; /*  si > 0, fait partie d'une séquence d'infos */
+    short nbOfFollowing;
+    /*long numericData;  ou vecteur ? si on ne doit transmettre que des infos numériques... ==> distinguer un struct d'infos numériques/string ? */
+    char stringData[SERIALISATION_MAXSIZE];
+} SerializedObject;
+
+typedef struct SerializedObjectList_P {
+    SerializedObject *paquet;
+    struct SerializedObjectList_P *next;
+} SerializedObjectList;
+
+void initialize(SerializedObjectList *toInit);
 
 /* TODO : detruire list par "free"
 
 //TODO : si on sait quelle taille peut faire la + grande info à faire circuler d'une fois sur le réseau, on peut éviter la gestion d'une liste.
 //mais cette gestion permet de ne pas avoir un gros paquet à transmettre quand l'info est petite */
 
-int sendOverNetwork(int socket_fd, SerializedObjectList *listToSend){
-    /*envoie la séquence de paquet formée par la liste listToSend
-    //TODO : conversion des valeurs avec htonl/ntohl et htons/ntohs */
-    while(listToSend != NULL){
-        if(send(socket_fd, listToSend->paquet, sizeof(SerializedObject), 0) != sizeof(SerializedObject)){
-            return ERROR;
-        }
-        listToSend = listToSend->next;
-    }
-    return SUCESS;
-}
+int sendOverNetwork(int socket_fd, SerializedObjectList *listToSend);
 
-int receiveOverNetwork(int socket_fd, SerializedObjectList *listWhereToReceive){
-    /* on suppose la liste vide, cette fonction va la remplir */
-    SerializedObjectList *currentPosition = listWhereToReceive; /* on commence à la tête de liste*/
-    SerializedObjectList *newPosition;
-    int stillPaquetsRemaining = 1;
-    while(stillPaquetsRemaining){
-        if(recv(socket_fd, currentPosition->paquet, sizeof(SerializedObject), 0) != sizeof(SerializedObject)){
-            return ERROR;
-        }
-        /* TODO : conversion des valeurs avec htonl/ntohl et htons/ntohs */
-        stillPaquetsRemaining = currentPosition->paquet->nbOfFollowing; /* 0 si pas de suivants */
-        /* TODO : test que nbOfFollowing baisse bien de 1 à chaque fois */
-        if(stillPaquetsRemaining){
-            newPosition = malloc(sizeof(SerializedObjectList));
-            initialize(newPosition);
-            currentPosition->next = newPosition;
-            currentPosition = newPosition;
-        }
-    }
-    return SUCESS;
-}
+int receiveOverNetwork(int socket_fd, SerializedObjectList *listWhereToReceive);
         
     
 /*format type de la sérialisation d'un objet C++ en un struct à envoyer sur le réseau :
@@ -95,4 +80,4 @@ deserialize(const SerializedObjectList *listReceived) {
 }
 */
 
-
+#endif
