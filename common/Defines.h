@@ -3,3 +3,4 @@
 #define TRUE 1
 #define FALSE 0
 #define ERROR -1
+#define INPUTSIZE 100 /*taille du message envoyé du client vers le serveur */
