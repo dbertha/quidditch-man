@@ -8,44 +8,57 @@
 #include <stdlib.h>     /* atoi */
 #include <ctime>
 #include <cstdlib> 
+#include <stdio.h>
+#include <string.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 using namespace std;
 
-Player::Player(string& playerSaveFile) {
-	ifstream file(playerSaveFile.c_str());
-	if (!file) {
+Player::Player(string playerSaveFile) {
+	int fd = open(playerSaveFile.c_str(),O_RDONLY);
+	if (fd==-1) {
 		cerr<<"Error while opening file\n";
 		return;
 	}
-	getline(file,_firstName);
-	getline(file,_lastName);
+	
+	char first[200];
+	int bytes;
+	bytes = read(fd,first,sizeof(first));
+	first[bytes]='\0';
+
+	_firstName = strtok(first,"\n");
+	_lastName = strtok(NULL,"\n");
 
 	string tmp;
 	for (int i=0;i<5;++i){
-		getline(file,tmp);
+		tmp = strtok(NULL,"\n");
 		_capacities[i] = atoi(tmp.c_str());
 	}
 
 	for (int i=0;i<5;++i){
-		getline(file,tmp);
+		tmp = strtok(NULL,"\n");
 		_trainingLeft[i] = atoi(tmp.c_str());
 	}
 
-	getline(file,tmp);
+	tmp = strtok(NULL,"\n");
 	_popularity = atoi(tmp.c_str());
 
-	getline(file,tmp);
+	tmp = strtok(NULL,"\n");
 	_blocked = atoi(tmp.c_str());
 
-	getline(file,tmp);
+	tmp = strtok(NULL,"\n");
 	int broomstickCapacity = atoi(tmp.c_str());
 
-	getline(file,tmp);
+	tmp = strtok(NULL,"\n");
 	int broomstickBonus = atoi(tmp.c_str());
 
 	_broomstick = Broomstick(broomstickCapacity,broomstickBonus);
 
-	file.close();
+	close(fd);
 
 	if ((_firstName=="John")&&(_lastName=="Doe")) verifyName();
 }
@@ -59,39 +72,94 @@ void Player::verifyName() {
 		firstNameIndex = rand()%100 +1;
 		lastNameIndex = rand()%100 +1;
 
-		string tmp;
-		ifstream file("firstNames.txt");
-		for (int i=0;i<firstNameIndex;++i) {
-			getline(file,tmp);
-		}
-		file.close();
-		_firstName = tmp;
-		file.open("lastNames.txt");
-		for (int i=0;i<lastNameIndex;++i) {
-			getline(file,tmp);
-		}
-		_lastName = tmp;
-		file.close();
+		_firstName = getRandomName("firstNames.txt",firstNameIndex);
+		_lastName = getRandomName("lastNames.txt",lastNameIndex);
+
 	} while (isNameTaken());
-	ofstream file("namesTaken.txt",fstream::app);
-	file<<_firstName;
-	file<<"\n";
-	file<<_lastName;
-	file<<"\n";
-	file.close();
+	
+	int fd = open("namesTaken.txt",O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
+	if (fd==-1){
+		cerr<<"Error while opening file\n";
+	}
+
+	const char * firstName = _firstName.c_str();
+	const char * lastName = _lastName.c_str();
+	cout<<"test : "<<firstName<<" "<<lastName<<endl;
+
+	write(fd,_firstName.c_str(),_firstName.size());
+	write(fd," ",1);
+	write(fd,_lastName.c_str(),_lastName.size());
+	write(fd,"\n",1);
+	close(fd);
+	
 }
 bool Player::isNameTaken(){
-	ifstream file("namesTaken.txt");
-	if (!file) return 0;
-	string first, last;
-	while (getline(file,first)&&getline(file,last)){
-		if ((_firstName==first)&&(_lastName==last)) {
-			file.close();
+	int fd = open("namesTaken.txt",O_RDONLY);
+	if (fd==-1){
+		cerr<<"Error while opening file\n";
+		return 0;
+	}
+	int size = lseek(fd, 0, SEEK_END); //Taille du fichier, pour être sûr de tout parcourir
+	lseek(fd, 0, SEEK_SET);
+
+	char tmp[size];
+
+	int byte = read(fd,tmp,size);
+
+	int i = 0;
+	string first,last;
+	first = "";
+	last = "";
+	while (i<byte) {
+		while ((i<byte)&&(tmp[i]!=' ')){
+			first+=tmp[i];
+			++i;
+		}
+		++i;
+		while ((i<byte)&&(tmp[i]!='\n')){
+			last+=tmp[i];
+			++i;
+		}
+		++i;
+
+		if ((first==_firstName)&&(last==_lastName)) {
+			cout<<"Name taken : "<<first<<" "<<last<<endl;
 			return 1;
 		}
+		first="";
+		last="";
 	}
-	file.close();
+
+	close(fd);
 	return 0;
+}
+
+string Player::getRandomName(string fileName,int line){
+		char buffer[12*line]; //Le plus long nom/prénom est de 12. On s'assure d'avoir la ligne voulue dans le buffer
+
+		int fd;
+		fd = open(fileName.c_str(),O_RDONLY);
+		if (fd==-1) {
+			cerr<<"Error while opening file\n";
+			return "Error";
+		}
+		int byte = read(fd,buffer,sizeof(buffer));
+		buffer[byte]='\0';
+
+		int i = 1; //Indique la ligne
+		int j = 0;
+		while ((i!=line)&&(j<byte)){
+			if (buffer[j]=='\n') ++i;
+			++j;
+		}
+		string name = "";
+		while ((j<byte)&&(buffer[j]!='\n')) {
+			name+=buffer[j];
+			++j;
+		}
+		close(fd);
+		return name;
+
 }
 
 int Player::getCapacity(int capacityNumber) {return _capacities[capacityNumber];}

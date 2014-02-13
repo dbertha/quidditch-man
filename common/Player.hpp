@@ -23,12 +23,13 @@ class Player {
 
  public:
 
-    Player(string& playerSaveFile);
+    Player(string playerSaveFile);
 
     string getFirstName();
     string getLastName();
     void verifyName();
     bool isNameTaken();
+    string getRandomName(string fileName, int line);
 
     int getCapacity(int capacityNumber);
     int getTrainingLeft(int capacityNumber);
