@@ -1,23 +1,10 @@
 #include "NetworkBase.h"
+#include "Serialisator.hpp"
 #include <iostream>
 
 #define OBJECTTOTRANSMIT 11
 
 //TODO : tester retour malloc
-class ObjectToTransmit {
-public :
-    int attribut1;
-    long attribut2;
-    char attribut3[10];
-    ObjectToTransmit() : attribut1(5), attribut2(100L) {
-        for(int i = 0; i < 9 ; ++i){
-            attribut3[i] = 'a';
-        }
-        attribut3[9] = '\0';
-    }
-    SerializedObjectList* serialize(){
-
-};
 
 int main(int argc, char** argv) {
     ObjectToTransmit toPass;
@@ -28,9 +15,9 @@ int main(int argc, char** argv) {
     std::cout << "Long : " << toPass.attribut2 << std::endl;
     std::cout << "Char[10] : " << toPass.attribut3 << std::endl;
     std::cout << "Sérialisation... " << std::endl;
-    serialized = toPass.serialize();
+    serialized = Serialisator::serialize(toPass);
     std::cout << "Dé-sérialisation... " << std::endl;
-    ObjectToTransmit received(serialized);
+    ObjectToTransmit received = Serialisator::deserialize(serialized);
     std::cout << "Attributs l'objet dé-sérialisé: " << std::endl;
     std::cout << "Entier : " << received.attribut1 << std::endl;
     std::cout << "Long : " << received.attribut2 << std::endl;
