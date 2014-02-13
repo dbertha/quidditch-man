@@ -20,7 +20,7 @@
 //send(socket, *message, sizeToRead, 0) return sizeRead if ok */
 
 typedef struct {
-    /* on manipule des short et des long pour correspondre aux fonction htonl/ntohl et htons/ntohs
+    /* on manipule des short pour correspondre aux fonctions et htons/ntohs
     //on suppose que les types de bases sont de taille identique sur chaque machine */
     short typeOfInfos;
     short senderId; /* serveur ou identifiant du client : utile ?*/
