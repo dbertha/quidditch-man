@@ -8,8 +8,9 @@ class TrainingCenter : public ImprovementBuilding {
 
  public:
 
-    void trainSpeed(ManagedPlayer& player);
+    void train(ManagedPlayer& player, int capacityNumber);
 
+/*
     void trainStrength(ManagedPlayer& player);
 
     void trainPrecision(ManagedPlayer& player);
@@ -17,10 +18,10 @@ class TrainingCenter : public ImprovementBuilding {
     void trainReflex(ManagedPlayer& player);
 
     void trainResistance(ManagedPlayer& player);
+*/
 
-    int getPriceToTrainCaract(ManagedPlayer& player);
-
-    int getPriceForNextLevel();
+    int getPriceToTrainCaract(ManagedPlayer& player, int capacityNumber);
+	void setPriceForNextlevel();
 
     void getInfos();
 };

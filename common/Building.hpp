@@ -10,10 +10,11 @@ class Building {
 
 	Building(int lvl=0);
 //	Building();
-	void upgradeLevel();
+	virtual void upgradeLevel();
+	virtual int getLevel();
 //    virtual void getInfos()  = 0;
-	int getPriceForNextLevel();
-
+	virtual int getPriceForNextLevel();
+	virtual void setPriceForNextlevel();
 };
 
 #endif // Building_hpp

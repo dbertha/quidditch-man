@@ -18,11 +18,19 @@ Building::Building(int lvl):_level(lvl), _priceForNextLevel(lvl+1) {
 
 void Building::upgradeLevel(){
 	++ _level;
-	++ _priceForNextLevel;
+	this->setPriceForNextlevel();
+//	++ _priceForNextLevel;
 }
 
 int Building::getPriceForNextLevel(){
 	return _priceForNextLevel;
-	
+}
 
+int Building::getLevel(){
+	return _level;
+	}
+
+//a rendre virtual pur?
+void Building::setPriceForNextlevel(){
+	++ _priceForNextLevel;
 }
