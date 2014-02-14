@@ -10,7 +10,8 @@ Building::Building( ){
 	cout<<"test debil"<<endl;
 	}
 */
-Building::Building(int lvl):_level(lvl), _priceForNextLevel(lvl+1) {
+Building::Building(int lvl):_level(lvl){
+	this->setPriceForNextlevel();
 	cout<<"*** Batiment cree"<<endl;
 	cout<<"*** lvl = "<<_level<<endl;
 	cout<<"*** prix prochain lvl = "<<_priceForNextLevel<<endl;
@@ -32,5 +33,5 @@ int Building::getLevel(){
 
 //a rendre virtual pur?
 void Building::setPriceForNextlevel(){
-	++ _priceForNextLevel;
+	_priceForNextLevel=_level+1;
 }
