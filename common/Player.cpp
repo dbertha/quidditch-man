@@ -2,7 +2,6 @@
 #include "Player.hpp"
 #include "Broomstick.hpp"
 
-#include <fstream>
 #include <string> 
 #include <iostream>
 #include <stdlib.h>     /* atoi */
@@ -18,6 +17,10 @@
 
 using namespace std;
 
+Player::Player() : _offset(0) {
+	for (int i=0;i<5;++i) _capacities[i]=0;
+}
+
 Player::Player(string playerSaveFile) {
 	int fd = open(playerSaveFile.c_str(),O_RDONLY);
 	if (fd==-1) {
@@ -25,38 +28,21 @@ Player::Player(string playerSaveFile) {
 		return;
 	}
 	
-	char first[200];
+	char buffer[100];
 	int bytes;
-	bytes = read(fd,first,sizeof(first));
-	first[bytes]='\0';
+	bytes = read(fd,buffer,sizeof(buffer));
+	buffer[bytes]='\0';
 
-	_firstName = strtok(first,"\n");
+	_firstName = strtok(buffer,"\n");
 	_lastName = strtok(NULL,"\n");
+	_offset = _firstName.size()+1 + _lastName.size()+1; //+1 pour chaque '\n'
 
 	string tmp;
 	for (int i=0;i<5;++i){
 		tmp = strtok(NULL,"\n");
+		_offset+= tmp.size()+1;
 		_capacities[i] = atoi(tmp.c_str());
 	}
-
-	for (int i=0;i<5;++i){
-		tmp = strtok(NULL,"\n");
-		_trainingLeft[i] = atoi(tmp.c_str());
-	}
-
-	tmp = strtok(NULL,"\n");
-	_popularity = atoi(tmp.c_str());
-
-	tmp = strtok(NULL,"\n");
-	_blocked = atoi(tmp.c_str());
-
-	tmp = strtok(NULL,"\n");
-	int broomstickCapacity = atoi(tmp.c_str());
-
-	tmp = strtok(NULL,"\n");
-	int broomstickBonus = atoi(tmp.c_str());
-
-	_broomstick = Broomstick(broomstickCapacity,broomstickBonus);
 
 	close(fd);
 
@@ -72,8 +58,8 @@ void Player::verifyName() {
 		firstNameIndex = rand()%100 +1;
 		lastNameIndex = rand()%100 +1;
 
-		_firstName = getRandomName("firstNames.txt",firstNameIndex);
-		_lastName = getRandomName("lastNames.txt",lastNameIndex);
+		_firstName = getRandomFirstName(firstNameIndex);
+		_lastName = getRandomLastName(lastNameIndex);
 
 	} while (isNameTaken());
 	
@@ -81,10 +67,6 @@ void Player::verifyName() {
 	if (fd==-1){
 		cerr<<"Error while opening file\n";
 	}
-
-	const char * firstName = _firstName.c_str();
-	const char * lastName = _lastName.c_str();
-	cout<<"test : "<<firstName<<" "<<lastName<<endl;
 
 	write(fd,_firstName.c_str(),_firstName.size());
 	write(fd," ",1);
@@ -163,23 +145,10 @@ string Player::getRandomName(string fileName,int line){
 }
 
 int Player::getCapacity(int capacityNumber) {return _capacities[capacityNumber];}
-int Player::getTrainingLeft(int capacityNumber) {return _trainingLeft[capacityNumber];}
-void Player::setTrainingLeft(int capacityNumber, int value) {_trainingLeft[capacityNumber] = value;}
 
-int Player::getPopularity() {return _popularity;}
-void Player::setPopularity(int popularity) {_popularity = popularity;}
-
-void Player::lockPlayer() {_blocked = true;}
-void Player::unlockPlayer() {_blocked = false;}
-bool Player::isBlocked() {return _blocked;}
-
-int Player::getLife() {return _life;}
-Broomstick Player::getBroomstick() {return _broomstick;}
+string Player::getRandomFirstName(int line) {return getRandomName("firstNames.txt",line);}
+string Player::getRandomLastName(int line) { return getRandomName("lastNames.txt",line);}
 
 void Player::setFirstName(string firstName) {_firstName = firstName;}
 void Player::setLastName(string lastName) {_lastName = lastName;}
 void Player::up(int capacityNumber) {_capacities[capacityNumber]+=1;}
-
-void Player::setLife(int life) {_life = life;}
-void Player::setBroomstick(Broomstick broomstick) {_broomstick = broomstick;}
-void Player::gainPopularity() {this->setPopularity(this->getPopularity()+this->getPopularity()/10);} //Augmentation de 10%

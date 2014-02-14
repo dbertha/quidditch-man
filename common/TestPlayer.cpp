@@ -14,8 +14,8 @@ int main() {
 	for (int i=0;i<5;++i){
 		cout<<player.getCapacity(i)<<endl;
 	}
-	cout<<player.getPopularity()<<endl;
-	cout<<player.isBlocked()<<endl;
+	cout<<"Popularity : "<<player.getPopularity()<<endl;
+	cout<<"Is blocked ? "<<player.isBlocked()<<endl;
 
 	cout<<"Training capacity"<<endl;
 	player.train(1);
@@ -39,6 +39,8 @@ int main() {
 	cout<<"\nBroomstick capacity = "<<broomstick.getCapacityBoosted()<<endl;
 	cout<<"Broomstick bonus = "<<broomstick.getBonus()<<endl;
 	cout<<"Broomstick value = "<<broomstick.getValue()<<endl;
+
+	cout<<"\nPlayer value = "<<player.getEstimatedValue()<<endl;
 
 
 	return 0;
