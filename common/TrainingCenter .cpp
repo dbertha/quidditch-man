@@ -1,9 +1,24 @@
 #include "ImprovementBuilding.hpp"
 #include "ManagedPlayer.hpp"
 
+#define SPEED 0
+#define STRENGTH 1
+#define PRECISION 2
+#define REFLEX 3
+#define RESISTANCE 4
 
-TrainingCenter::trainSpeed(ManagedPlayer& player){
-	player.train(int capacityNumber);
+
+void TrainingCenter::trainSpeed(ManagedPlayer& player){
+	player.lockPlayer();
+	player.setTrainingLeft(SPEED,1);
+	
+	
+	}
+
+void TrainingCenter::getPriceToTrainCaract(ManagedPlayer& player){
+	
+	
+	
 	
 	
 	}
