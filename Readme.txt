@@ -1,0 +1,31 @@
+Considérations préliminaires et choix :
+- Comme tout middleware, la communication réseau ne doit pas connaître les formats internes des messages échangés;
+- Au démarrage,  le serveur crée une instance de la classe Game, destinée à gérer initialisation et clôture des activités fonctionnelles sur le serveur;
+- Lors d'une nouvelle connexion, le serveur crée une instance de la classe User;
+- Tout nouveau message reçu par le serveur est confié à la méthode cmdHandler de l'objet User;
+- Aucune des méthodes de celui-ci n'étant bloquante pendant plus d'une fraction de seconde (pas ou peu d'I/O) et compte tenu des délais très courts pour la mise en oeuvre, nous avons opté à ce stade pour une solution mono-thread;
+- Travailler avec un seul thread supprime la nécessité de devoir gérer l'accès concurrent aux données (en mémoire ou sur disque) et la communication entre threads (arrêt du serveur par exemple);
+- On utilise donc la fonction select();
+- On peut gérer le terminal du serveur avec cette même fonction (pour commander l'arrêt du serveur par exemple ou obtenir la liste des utilisateurs connectés...);
+- Une solution multi-threads rendrait la gestion de ressources communes par les fonctions applicatives plus complexe (sérialisation de sections critiques), tout en étant beaucoup plus gourmande en ressources CPU et présentant des risques de deadlocks (tests plus délicats à réaliser!);
+- Si nécessaire, une solution multi-threads sera adoptée par la suite;
+- Seul le déroulement d'une vente aux enchères devra être accompagné par un thread de cadencement (un par vente) (thread pooling ?).
+
+En pratique :
+- Les messages ne peuvent selon moi pas contenir d'informations binaires (pas de int et autres float...); mais vous pouvez toujours essayer...
+- La taille des messages envoyés des clients au serveur ne peut dépasser INPUTSIZE, défini dans defines.h et Defines.hpp : c'est la taille du buffer msg (défini dans Server.h);
+- En principe, Server.c ne doit pas être modifié : tout doit se passer dans User.cpp et Game.cpp, avec l'aide éventuelle des méthodes publiques de Server.c;
+- C'est User.cpp qui répond au client à l'aide de sendToClient() :
+- Si le message est de longueur fixe prévisible, msg peut alors être utilisé de part et d'autre;
+- Sinon (par exemple pour une liste), deux solutions sont possibles :
+- Un message par ligne de la liste;
+- Utiliser de part et d'autre des zones de mémoire allouées dynamiquement et envoyer tout en un seul message, après un premier message indiquant au client la taille du buffer.
+- Le port de communication (3495) est défini dans Defines.hpp et defines.h.
+- Le code utilise la variable __DEBUG pour générer une trace.
+- Les routines pour le client sont dans le fichier sendToServer.c.
+- Un programme de test client.c permet de tester la communication et les méthodes de User.cpp (à condition que les messages soient en ASCII);
+- On peut aussi utiliser telnet; exemple : telnet 127.0.1.1 3495 (à la même condition).
+- Pour l'instant, le code n'est pas portable vers Windows (mais une version compatible est réalisable...).
+- compilation du serveur : g++ -g -Wall Defines.hpp Server.hpp User.hpp ServerMain.cpp Server.cpp User.cpp Game.cpp Game.hpp -o Server
+- compilation du client : make
+- améliorations prévues dans le futur : gestion du terminal du serveur, détection des sockets morts (clients qui n'ont pas fait disconnect suite à un crash par ex.), ...
