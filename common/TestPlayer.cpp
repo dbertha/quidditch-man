@@ -52,6 +52,10 @@ int main() {
 
 	cout<<"Manager creation : "<<endl;
 	Manager manager("Manager");
+	for (int i=0;i<manager.getNumberOfPlayers();++i){
+		manager.getPlayer(i).displayInformations(); //Pas très AMI mais juste pour tester et vérifier
+		cout<<""<<endl;
+	}
 
 
 	return 0;
