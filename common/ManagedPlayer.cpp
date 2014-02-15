@@ -21,6 +21,11 @@ using namespace std;
 #define PRICESCALE 1000
 typedef int gold;
 
+ManagedPlayer::ManagedPlayer() : _popularity(0), _blocked(0), _life(0) {
+	for (int i=0;i<5;++i) _trainingLeft[i] = 0;
+	_broomstick = Broomstick(0,0);
+}
+
 ManagedPlayer::ManagedPlayer(string playerSaveFile): Player(playerSaveFile) {
 	int fd = open(playerSaveFile.c_str(),O_RDONLY);
 	if (fd==-1) {
@@ -28,7 +33,6 @@ ManagedPlayer::ManagedPlayer(string playerSaveFile): Player(playerSaveFile) {
 		return;
 	}
 	lseek(fd,_offset,SEEK_SET);
-	
 	char buffer[100];
 	int bytes;
 	bytes = read(fd,buffer,sizeof(buffer));
@@ -58,19 +62,33 @@ ManagedPlayer::ManagedPlayer(string playerSaveFile): Player(playerSaveFile) {
 	_broomstick = Broomstick(broomstickCapacity,broomstickBonus);
 
 	close(fd);
+
 }
 
-int ManagedPlayer::getTrainingLeft(int capacityNumber) {return _trainingLeft[capacityNumber];}
+ManagedPlayer& ManagedPlayer::operator= (const ManagedPlayer& player) {
+	for (int i=0;i<5;++i) {
+		this->setCapacity(i,player.getCapacity(i));
+		_trainingLeft[i] = player.getTrainingLeft(i);
+	}
+	this->setFirstName(player.getFirstName());
+	this->setLastName(player.getLastName());
+	_popularity = player.getPopularity();
+	_blocked = player.isBlocked();
+	_life = player.getLife();
+	return *this;
+}
+
+int ManagedPlayer::getTrainingLeft(int capacityNumber) const {return _trainingLeft[capacityNumber];}
 void ManagedPlayer::setTrainingLeft(int capacityNumber, int value) {_trainingLeft[capacityNumber] = value;}
 
-int ManagedPlayer::getPopularity() {return _popularity;}
+int ManagedPlayer::getPopularity() const {return _popularity;}
 void ManagedPlayer::setPopularity(int popularity) {_popularity = popularity;}
 
 void ManagedPlayer::lockPlayer() {_blocked = true;}
 void ManagedPlayer::unlockPlayer() {_blocked = false;}
-bool ManagedPlayer::isBlocked() {return _blocked;}
+bool ManagedPlayer::isBlocked() const {return _blocked;}
 
-int ManagedPlayer::getLife() {return _life;}
+int ManagedPlayer::getLife() const {return _life;}
 Broomstick ManagedPlayer::getBroomstick() {return _broomstick;}
 
 
@@ -96,3 +114,16 @@ gold ManagedPlayer::getEstimatedValue() {
 }
 
 void ManagedPlayer::heal() {this->setLife(this->getLife()+1);}
+
+void ManagedPlayer::displayInformations() {
+	cout<<"------------------ "<<this->getFirstName()<<" "<<this->getLastName()<<" ------------------"<<endl;
+	cout<<"Capacities :"<<endl;
+	cout<<"Speed : "<<this->getCapacity(0)<<endl;
+	cout<<"Strength : "<<this->getCapacity(1)<<endl;
+	cout<<"Precision : "<<this->getCapacity(2)<<endl;
+	cout<<"Reflex : "<<this->getCapacity(3)<<endl;
+	cout<<"Resistance : "<<this->getCapacity(4)<<endl;
+	cout<<"\nPopularity : "<<_popularity<<endl;
+	cout<<"\nIs the player blocked ? "<<_blocked<<endl;
+	cout<<"\nBroomstick bonus is "<<_broomstick.getBonus()<<" for capacity "<<_broomstick.getCapacityBoosted()<<endl;
+}

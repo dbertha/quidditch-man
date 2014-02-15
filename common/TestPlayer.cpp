@@ -1,5 +1,7 @@
+#include "Manager.hpp"
 #include "Player.hpp"
 #include "ManagedPlayer.hpp"
+#include "PlayingPlayer.hpp"
 #include "Broomstick.hpp"
 
 #include <iostream>
@@ -41,6 +43,15 @@ int main() {
 	cout<<"Broomstick value = "<<broomstick.getValue()<<endl;
 
 	cout<<"\nPlayer value = "<<player.getEstimatedValue()<<endl;
+
+
+	cout<<"PlayingPlayer Creation : "<<endl;
+	PlayingPlayer playingPlayer(player);
+	cout<<"Capacities of the playing player : "<<endl;
+	for (int i=0;i<5;++i) cout<<playingPlayer.getCapacity(i)<<endl;
+
+	cout<<"Manager creation : "<<endl;
+	Manager manager("Manager");
 
 
 	return 0;

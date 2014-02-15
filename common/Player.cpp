@@ -24,6 +24,7 @@ Player::Player() : _offset(0) {
 Player::Player(string playerSaveFile) {
 	int fd = open(playerSaveFile.c_str(),O_RDONLY);
 	if (fd==-1) {
+		perror("Fuck1");
 		cerr<<"Error while opening file\n";
 		return;
 	}
@@ -49,8 +50,14 @@ Player::Player(string playerSaveFile) {
 	if ((_firstName=="John")&&(_lastName=="Doe")) verifyName();
 }
 
-string Player::getFirstName() {return _firstName;}
-string Player::getLastName() {return _lastName;}
+Player& Player::operator= (const Player& player){
+	for (int i=0;i<5;++i) _capacities[i] = player.getCapacity(i);
+	return *this;
+}
+
+string Player::getFirstName() const {return _firstName;}
+string Player::getLastName() const {return _lastName;}
+
 void Player::verifyName() {
 	srand(time(0));
 	do {
@@ -144,7 +151,8 @@ string Player::getRandomName(string fileName,int line){
 
 }
 
-int Player::getCapacity(int capacityNumber) {return _capacities[capacityNumber];}
+int Player::getCapacity(int capacityNumber) const {return _capacities[capacityNumber];}
+void Player::setCapacity(int capacityNumber, int value) {_capacities[capacityNumber] = value;}
 
 string Player::getRandomFirstName(int line) {return getRandomName("firstNames.txt",line);}
 string Player::getRandomLastName(int line) { return getRandomName("lastNames.txt",line);}

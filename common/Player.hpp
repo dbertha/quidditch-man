@@ -22,15 +22,18 @@ class Player {
     Player();
     Player(string playerSaveFile);
 
-    string getFirstName();
-    string getLastName();
+    Player& operator= (const Player&);
+
+    string getFirstName() const ;
+    string getLastName() const ;
     void verifyName();
     bool isNameTaken();
     string getRandomName(string fileName, int line);
     string getRandomFirstName(int line);
     string getRandomLastName(int line);
 
-    int getCapacity(int capacityNumber);
+    int getCapacity(int capacityNumber) const;
+    void setCapacity(int capacityNumber, int value);
 
     void setFirstName(string firstName);
     void setLastName(string lastName);

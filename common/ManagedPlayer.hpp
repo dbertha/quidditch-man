@@ -19,19 +19,22 @@ class ManagedPlayer : public Player {
 
  public:
 
+ 	ManagedPlayer();
  	ManagedPlayer(string playerSaveFile);
 
- 	int getTrainingLeft(int capacityNumber);
+ 	ManagedPlayer& operator= (const ManagedPlayer&);
+
+ 	int getTrainingLeft(int capacityNumber) const;
     void setTrainingLeft(int capacityNumber, int value);
 
-    int getPopularity();
+    int getPopularity() const;
     void setPopularity(int popularity);
 
     void lockPlayer();
     void unlockPlayer();
-    bool isBlocked();
+    bool isBlocked() const;
 
-    int getLife();
+    int getLife() const;
     Broomstick getBroomstick();
 
     void setLife(int life);
@@ -43,6 +46,8 @@ class ManagedPlayer : public Player {
     gold getEstimatedValue(); //Renvoie l'estimation du prix du joueur, calculé selon ses attributs
 
     void heal();
+
+    void displayInformations();
 
 };
 
