@@ -6,6 +6,6 @@
 #define TRUE 1
 #define FALSE 0
 #define ERROR -1
-#define __DEBUG 1
+#define __DEBUG
 
 #endif

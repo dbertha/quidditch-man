@@ -18,7 +18,7 @@
 #include <arpa/inet.h>
 
 class User;
-class Game;
+class CommonMgr;
 class Server {
 public:
 	Server(int);
@@ -27,7 +27,7 @@ public:
 	std::vector<User*> GetUsersList();
 
 private:
-	Game* game_;
+	CommonMgr* commonMgr_;
 	int port_;
 	int max_; //nombre de connections
 	int sockfd_; //socket d'écoute du serveur

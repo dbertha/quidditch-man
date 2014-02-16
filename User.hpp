@@ -3,9 +3,10 @@
 
 #include <iostream>
 class Server;
+class CommonMgr;
 class User {
 public:
-	User(Server *, int);
+	User(Server *, CommonMgr *, int);
 	void cmdHandler(char *, const int);
 	void setDisconnection();
 	bool isDisconnecting();
@@ -14,6 +15,7 @@ public:
 
 private:
 	Server* server_;
+	CommonMgr* commonMgr_;
 	int sockfd_; //socket de communication du client
 	std::string userId_;
 	bool disconnecting_;

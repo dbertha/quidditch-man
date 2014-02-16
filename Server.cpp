@@ -1,9 +1,9 @@
 #include "Server.hpp"
-#include "Game.hpp"
+#include "CommonMgr.hpp"
 #include "User.hpp"
 
 // Documentation : voir Readme.txt
-Server::Server(int port): game_(new Game(this)), port_(port), max_(0) {}
+Server::Server(int port): commonMgr_(new CommonMgr(this)), port_(port), max_(0) {}
 // initialisations dans le constructeur
 void Server::run() {
 	std::cout<<"Server started to listen on port "<<port_<<std::endl;
@@ -124,7 +124,7 @@ int Server::newUser() {
 		std::cerr<<"Accept error"<<std::endl;
 		return EXIT_FAILURE;
 	}
-	User * user = new User(this,clientSockfd_);
+	User * user = new User(this,commonMgr_,clientSockfd_);
 	usersList_.push_back(user);
 	FD_SET(clientSockfd_,&FDSet_);
 	if(clientSockfd_>max_) max_= clientSockfd_;
@@ -139,7 +139,7 @@ int Server::receive(User * aUser, char * buf, const int len) {
 	else {
 		buf[length]='\0';
 #ifdef __DEBUG
-		std::cout<<"**got "<<length<<"char. on "<<clientSockfd_<<" : "<<buf<<std::endl;
+		std::cout<<"**got "<<length<<"char. on "<<clientSockfd_<<" : "<<buf<<"**"<<std::endl;
 #endif
 	}
 	return length;
@@ -153,7 +153,7 @@ int Server::sendToClient(User * aUser, char * buf, const int length) {
 	}
 	else {
 #ifdef __DEBUG
-		std::cout<<"**sent on "<<clientSockfd_<<" : "<<buf<<std::endl;
+		std::cout<<"**sent on "<<clientSockfd_<<" : "<<buf<<"**"<<std::endl;
 #endif
 		return EXIT_SUCCESS;
 	}
@@ -161,6 +161,7 @@ int Server::sendToClient(User * aUser, char * buf, const int length) {
 
 void Server::removeUser(int pos) {
 	close(usersList_[pos]->getSockfd());
+	usersList_[pos]->setDisconnection();
 	usersList_.erase(usersList_.begin()+pos);
 }
 

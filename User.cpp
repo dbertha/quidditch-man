@@ -1,6 +1,7 @@
 #include "User.hpp"
 #include "Server.hpp"
-User::User(Server * server, int sockfd): server_(server), sockfd_(sockfd), userId_(""), disconnecting_(false) {}
+#include "CommonMgr.hpp"
+User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), userId_(""), disconnecting_(false) {}
 
 void User::cmdHandler(char * msg, const int length) {
 //traitement du message et
