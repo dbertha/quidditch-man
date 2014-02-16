@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm> //max()
 #include <cstring>
+#include <iomanip> //setw
 
 HexagonalField::HexagonalField(){
     //-2 : hors de la grille hexagonale
@@ -20,8 +21,15 @@ HexagonalField::HexagonalField(){
     }
 }
 
-int HexagonalField::getOccupant(AxialCoordinates coord){
+int HexagonalField::getOccupant(AxialCoordinates coord) const{
     return matrix[coord.getLineOnMatrix()][coord.getColOnMatrix()];
+}
+
+bool HexagonalField::setOccupant(AxialCoordinates coord, objectIndex_t object){
+    if(coord.isOnMatrix()){
+        matrix[coord.getLineOnMatrix()][coord.getColOnMatrix()] = object;
+    }
+    return coord.isOnMatrix();
 }
 
 void HexagonalField::display() {
@@ -30,7 +38,7 @@ void HexagonalField::display() {
         std::string decalage(abs(indexRow - (MATRIX_SIZE/2)) * 3, space);
         std::cout << decalage;
         for(int indexCol = std::max(0,((MATRIX_SIZE/2) - indexRow)); indexCol < (MATRIX_SIZE - std::max(0, indexRow - (MATRIX_SIZE /2))); ++indexCol){
-            std::cout << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+            std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
         }
         std::cout << std::endl;
     }

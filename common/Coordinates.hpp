@@ -62,6 +62,10 @@ public :
         return (getSecondAxis() + (MATRIX_SIZE / 2));
     }
     
+    bool isOnMatrix(){
+        return abs(getFirstAxis() + getSecondAxis()) < (MATRIX_SIZE/2);
+    }
+    
     
     
     
