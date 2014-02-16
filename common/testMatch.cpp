@@ -8,8 +8,8 @@ int main(){
     //~ std::cout << axialCoord.isNeighborOf(axialCoord2) << std::endl;
     //~ std::cout << axialCoord.isNeighborOf(axialCoord3) << std::endl;
     //~ std::cout << axialCoord.isNeighborOf(axialCoord4) << std::endl;
-    int direction[2] = {1, 0};
-    AxialCoordinates axialCoord5 = axialCoord.getNeighbor(direction);
+    //int direction[2] = {1, 0};
+    //AxialCoordinates axialCoord5 = axialCoord.getNeighbor(direction);
     
     //~ std::cout << axialCoord.isNeighborOf(axialCoord5) << std::endl;
     //~ 
@@ -24,9 +24,12 @@ int main(){
     HexagonalField field;
     field.display();
     
-    field.setOccupant(AxialCoordinates(0,0), CHASER1TEAM1);
-    std::cout << field.setOccupant(AxialCoordinates(0,1), CHASER2TEAM1) << std::endl;
-    std::cout << field.setOccupant(AxialCoordinates(5,-5), CHASER1TEAM2) << std::endl;
+    field.setOccupant(AxialCoordinates(0,0), TEAM1_CHASER1);
+    std::cout << field.setOccupant(AxialCoordinates(0,1), TEAM1_CHASER2) << std::endl;
+    std::cout << field.setOccupant(AxialCoordinates(5,-5), TEAM2_CHASER1) << std::endl;
     field.display();
+    field.display(AxialCoordinates(0,0), 2);
+    
+    field.display(AxialCoordinates(5,-5), 3);
     
 }

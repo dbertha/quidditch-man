@@ -44,3 +44,32 @@ void HexagonalField::display() {
     }
 }
     
+void HexagonalField::display(AxialCoordinates selected, int distance){
+    std::string startColoring = "\033[31m";
+    std::string stopColoring = "\033[0m";
+    char space = ' ';
+    for (int indexRow = 0; indexRow < MATRIX_SIZE; ++indexRow){
+        std::string decalage(abs(indexRow - (MATRIX_SIZE/2)) * 3, space);
+        std::cout << decalage;
+        if((indexRow >= (selected.getLineOnMatrix() - distance)) and (indexRow <= (selected.getLineOnMatrix() + distance))){
+            //lignes dont une partie doit être coloriée
+            for(int indexCol = std::max(0,((MATRIX_SIZE/2) - indexRow)); indexCol < (MATRIX_SIZE - std::max(0, indexRow - (MATRIX_SIZE /2))); ++indexCol){
+                if(indexCol == selected.getColOnMatrix() - distance + std::max(0, selected.getLineOnMatrix() - indexRow)){
+                    //colonne du début de la coloration
+                    std::cout << startColoring;
+                }
+                std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+                if(indexCol == selected.getColOnMatrix() + distance - std::max(0, indexRow - selected.getLineOnMatrix())){
+                    //colonne de fin de la coloration
+                    std::cout << stopColoring;
+                }
+            }
+        }else{
+            for(int indexCol = std::max(0,((MATRIX_SIZE/2) - indexRow)); indexCol < (MATRIX_SIZE - std::max(0, indexRow - (MATRIX_SIZE /2))); ++indexCol){
+                std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
