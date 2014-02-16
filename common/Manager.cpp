@@ -1,5 +1,6 @@
 
 #include <string> 
+#include <vector>
 #include <sys/stat.h>
 #include <iostream>
 #include <stdlib.h>     /* atoi */
@@ -14,6 +15,7 @@
 #include <unistd.h>
 
 #include "ManagedPlayer.hpp"
+#include "Saver.hpp"
 //#include "Broomstick.hpp"
 
 #include "Manager.hpp"
@@ -44,9 +46,9 @@ void Manager::loadManager(string managerLogin) {
 	tmp = strtok(buffer,"\n");
 	_numberOfPlayers = atoi(tmp.c_str());
 
-	tmp = strtok(NULL,"\n");
-	_numberMaxOfPlayers = atoi(tmp.c_str());
-	_players = new ManagedPlayer[_numberMaxOfPlayers];
+	//tmp = strtok(NULL,"\n");
+	//_numberMaxOfPlayers = atoi(tmp.c_str());
+	//_players = new ManagedPlayer[_numberMaxOfPlayers];
 
 
 	tmp = strtok(NULL,"\n");
@@ -57,7 +59,7 @@ void Manager::loadManager(string managerLogin) {
 
 	close(fd);
 	
-	_players = new ManagedPlayer[7];
+
 	string playerList = "Saves/"+managerLogin+"/Players/players.txt";
 	int fd2 = open(playerList.c_str(),O_RDONLY);
 	if (fd2==-1) {
@@ -75,13 +77,9 @@ void Manager::loadManager(string managerLogin) {
 	string playerFile= "";
 
 	int i=0;
-	int j=0;
 	while (buffer2[i]!='\0'){
 		if (buffer2[i]=='\n') {
-			_players[j] = ManagedPlayer(path+playerFile);
-			_players[j].displayInformations();
-			++j;
-			
+			_players.push_back(ManagedPlayer(path+playerFile));			
 			playerFile="";
 		}
 		else playerFile+=buffer2[i];
@@ -91,13 +89,39 @@ void Manager::loadManager(string managerLogin) {
 	close(fd2);
 
 }
-void Manager::createNewManager(string managerLogin) {}
+void Manager::createNewManager(string managerLogin) {
+	_numberOfPlayers = 7;
+	//_numberMaxOfPlayers = 7;
+	_money = 500000;
+	_numberOfFans = 666;
+
+	_players.push_back(ManagedPlayer("Saves/defaultKeeper.txt"));
+	_players.push_back(ManagedPlayer("Saves/defaultSeeker.txt"));
+	for (int i=0;i<2;++i) _players.push_back(ManagedPlayer("Saves/defaultBeater.txt"));
+	for (int i=0;i<3;++i) _players.push_back(ManagedPlayer("Saves/defaultChaser.txt"));
+
+	Saver saver;
+	saver.saveManager(managerLogin,*this);
+
+	string directory = "Saves/"+managerLogin+"/Players";
+	mkdir(directory.c_str(),0777);
+	saver.savePlayersList(managerLogin,_players);
+	for (unsigned i=0;i<_players.size();++i) saver.savePlayer(managerLogin,_players[i]);
+	
+
+}
 
 
 int Manager::getNumberOfPlayers() {return _numberOfPlayers;}
-int Manager::getNumberMaxOfPlayers() {return _numberMaxOfPlayers;}
+//int Manager::getNumberMaxOfPlayers() {return _numberMaxOfPlayers;}
 int Manager::getMoney() {return _money;}
 int Manager::getNumberOfFans() {return _numberOfFans;}
+
+
+void Manager::setNumberOfPlayers(int number) {_numberOfPlayers=number;}
+void Manager::addMoney(int amount) {_money+=amount;}
+void Manager::pay(int amount) {_money-=amount;}
+void Manager::setNumberOfFans(int number) {_numberOfFans=number;}
 
 ManagedPlayer Manager::getPlayer(int index) {
 	if (index>=_numberOfFans) throw "Index out of range";

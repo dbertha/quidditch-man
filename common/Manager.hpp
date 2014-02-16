@@ -2,6 +2,7 @@
 #define Manager_hpp
 
 #include <string> 
+#include <vector>
 
 #include "Broomstick.hpp"
 //#include "Building.hpp"
@@ -11,10 +12,10 @@
 
 class Manager {
 
-	ManagedPlayer* _players;
+	vector<ManagedPlayer> _players;
 	//Building[] _buildings;
 	int _numberOfPlayers;
-	int _numberMaxOfPlayers;
+	//int _numberMaxOfPlayers;
 	int _money;
 	int _numberOfFans;
 
@@ -23,9 +24,14 @@ class Manager {
  	Manager(string managerLogin);
 
  	int getNumberOfPlayers();
- 	int getNumberMaxOfPlayers();
+ 	//int getNumberMaxOfPlayers();
  	int getMoney();
  	int getNumberOfFans();
+
+ 	void setNumberOfPlayers(int number);
+ 	void addMoney(int amount);
+ 	void pay(int amount);
+ 	void setNumberOfFans(int number);
 
  	ManagedPlayer getPlayer(int index);
 

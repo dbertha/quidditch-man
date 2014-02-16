@@ -3,6 +3,7 @@
 #include "ManagedPlayer.hpp"
 #include "PlayingPlayer.hpp"
 #include "Broomstick.hpp"
+#include "Saver.hpp"
 
 #include <iostream>
 
@@ -57,6 +58,16 @@ int main() {
 		cout<<""<<endl;
 	}
 
+	Saver saver;
+
+	saver.saveManager("Manager",manager);
+	saver.savePlayer("Manager",manager.getPlayer(4));
+
+	Manager manager2("Manager2");
+	for (int i=0;i<manager2.getNumberOfPlayers();++i){
+		manager2.getPlayer(i).displayInformations(); //Pas très AMI mais juste pour tester et vérifier
+		cout<<i<<endl;
+	}
 
 	return 0;
 }
