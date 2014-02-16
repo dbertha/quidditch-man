@@ -5,7 +5,7 @@
 #include <cmath> //floor()
 #include <algorithm> //min() 
 
-#define MATRIX_SIZE 21
+#define MATRIX_SIZE 21 // nombre impair pour obtenir un centre unique en [MATRIX_SIZE/2][MATRIX_SIZE/2], qui correspondra à [0][0] en coordonnées axiales
 
 //Q : classe parente pour utiliser le polymorphisme ?
 
@@ -101,7 +101,7 @@ public :
 };
 
 
-AxialCoordinates::AxialCoordinates(CubicCoordinates cubicCoord) : __firstAxis(cubicCoord.getZCoord()), __secondAxis(cubicCoord.getXCoord()) {}
+//AxialCoordinates::AxialCoordinates(CubicCoordinates cubicCoord) : __firstAxis(cubicCoord.getZCoord()), __secondAxis(cubicCoord.getXCoord()) {}
 
 
 #endif

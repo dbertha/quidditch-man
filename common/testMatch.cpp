@@ -1,4 +1,5 @@
 #include "Coordinates.hpp"
+#include "HexagonalField.hpp"
 #include <iostream>
 
 int main(){
@@ -20,5 +21,6 @@ int main(){
     
     std::cout << axialCoord4.getLineOnMatrix() << " " << axialCoord4.getColOnMatrix() << std::endl;
     
-    
+    HexagonalField field;
+    field.display();
 }
