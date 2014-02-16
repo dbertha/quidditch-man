@@ -62,8 +62,10 @@ public :
         return (getSecondAxis() + (MATRIX_SIZE / 2));
     }
     
-    bool isOnMatrix(){
-        return abs(getFirstAxis() + getSecondAxis()) < (MATRIX_SIZE/2);
+    bool isOnField(){
+        return (abs(getFirstAxis() + getSecondAxis()) < (MATRIX_SIZE/2)) //sur la partie de la matrice utilisée
+        and (abs(getFirstAxis()) < (MATRIX_SIZE/2)) //out of range
+        and (abs(getSecondAxis()) < (MATRIX_SIZE/2));
     }
     
     

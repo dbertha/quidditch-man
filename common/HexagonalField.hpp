@@ -3,6 +3,8 @@
 
 #include "Coordinates.hpp"
 
+#define NOT_ON_HEX_GRID -2
+#define FREE_SPACE -1
 #define TEAM1_KEEPER 0
 #define TEAM1_SEEKER 1
 #define TEAM1_CHASER1 2
@@ -52,6 +54,7 @@ public :
     bool setOccupant(AxialCoordinates coord, objectIndex_t object);
     void display();
     void display(AxialCoordinates selected, int distance);
+    bool isFree(AxialCoordinates toTest);
 };
 
 #endif

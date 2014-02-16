@@ -10,13 +10,13 @@ HexagonalField::HexagonalField(){
     //>= 0 : objet
     for (int indexRow = 0; indexRow < MATRIX_SIZE; ++indexRow){
         for(int indexCol = 0; indexCol < std::max(0,((MATRIX_SIZE/2) - indexRow)); ++indexCol){
-            matrix[indexRow][indexCol] = -2;
+            matrix[indexRow][indexCol] = NOT_ON_HEX_GRID;
         }
         for(int indexCol = std::max(0,((MATRIX_SIZE/2) - indexRow)); indexCol < (MATRIX_SIZE - std::max(0, indexRow - (MATRIX_SIZE /2))); ++indexCol){
-            matrix[indexRow][indexCol] = -1;
+            matrix[indexRow][indexCol] = FREE_SPACE;
         }
         for(int indexCol = (MATRIX_SIZE - std::max(0, indexRow - (MATRIX_SIZE /2))); indexCol < MATRIX_SIZE; ++indexCol){
-            matrix[indexRow][indexCol] = -2;
+            matrix[indexRow][indexCol] = NOT_ON_HEX_GRID;
         }
     }
 }
@@ -26,10 +26,10 @@ int HexagonalField::getOccupant(AxialCoordinates coord) const{
 }
 
 bool HexagonalField::setOccupant(AxialCoordinates coord, objectIndex_t object){
-    if(coord.isOnMatrix()){
+    if(coord.isOnField()){
         matrix[coord.getLineOnMatrix()][coord.getColOnMatrix()] = object;
     }
-    return coord.isOnMatrix();
+    return coord.isOnField();
 }
 
 void HexagonalField::display() {
@@ -81,3 +81,7 @@ void HexagonalField::display(AxialCoordinates selected, int distance){
     }
 }
 
+
+bool HexagonalField::isFree(AxialCoordinates toTest){
+    return matrix[toTest.getLineOnMatrix()][toTest.getColOnMatrix()] == FREE_SPACE;
+}
