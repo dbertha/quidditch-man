@@ -22,14 +22,20 @@ int main(){
     //~ std::cout << axialCoord4.getLineOnMatrix() << " " << axialCoord4.getColOnMatrix() << std::endl;
     
     HexagonalField field;
-    field.display();
+    //field.display();
     
     field.setOccupant(AxialCoordinates(0,0), TEAM1_CHASER1);
     std::cout << field.setOccupant(AxialCoordinates(0,1), TEAM1_CHASER2) << std::endl;
     std::cout << field.setOccupant(AxialCoordinates(5,-5), TEAM2_CHASER1) << std::endl;
     field.display();
-    field.display(AxialCoordinates(0,0), 2);
+    field.display(AxialCoordinates(0,1), 2);
     
-    field.display(AxialCoordinates(5,-5), 3);
+    std::cout << axialCoord.getDistanceTo(AxialCoordinates(0,1)) << std::endl; // doit donner 1
+    std::cout << axialCoord.getDistanceTo(AxialCoordinates(1,1)) << std::endl; // doit donner 2
+    std::cout << axialCoord3.getDistanceTo(AxialCoordinates(1,1)) << std::endl; // doit donner 0
+    std::cout << axialCoord3.getDistanceTo(axialCoord) << std::endl; // doit donner 2
+    std::cout << axialCoord.getDistanceTo(AxialCoordinates(-1,-1)) << std::endl; // doit donner 2
+    std::cout << axialCoord.getDistanceTo(AxialCoordinates(-2,-1)) << std::endl; // doit donner 3
+    //field.display(AxialCoordinates(5,-5), 3);
     
 }

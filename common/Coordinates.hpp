@@ -68,6 +68,17 @@ public :
         and (abs(getSecondAxis()) < (MATRIX_SIZE/2));
     }
     
+    int getDistanceTo(AxialCoordinates destination){
+        //calcul des coordonnées cubiques => méthodes de CubicCoord ?
+        int x1 = getSecondAxis();
+        int z1 = getFirstAxis();
+        int x2 = destination.getSecondAxis();
+        int z2 = destination.getFirstAxis();
+        int y1 = -(x1 + z1);
+        int y2 = -(x2 + z2);
+        return (abs(x1 - x2) + abs(y1 - y2) + abs(z1 - z2)) / 2;
+    }
+    
     
     
     
