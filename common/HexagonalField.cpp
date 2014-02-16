@@ -45,8 +45,9 @@ void HexagonalField::display() {
 }
     
 void HexagonalField::display(AxialCoordinates selected, int distance){
-    std::string startColoring = "\033[31m";
-    std::string stopColoring = "\033[0m";
+    std::string startColoring = "\033[31m"; //31 : rouge
+    std::string stopColoring = "\033[0m"; // 0 : reset 
+    std::string colorCenter = "\033[1;32m"; // 1 : gras, 32 : vert
     char space = ' ';
     for (int indexRow = 0; indexRow < MATRIX_SIZE; ++indexRow){
         std::string decalage(abs(indexRow - (MATRIX_SIZE/2)) * 3, space);
@@ -58,7 +59,14 @@ void HexagonalField::display(AxialCoordinates selected, int distance){
                     //colonne du début de la coloration
                     std::cout << startColoring;
                 }
+                if((indexRow == selected.getLineOnMatrix()) and (indexCol == selected.getColOnMatrix())){
+                    std::cout << colorCenter; //coloration particulière pour le centre
+                }
                 std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+                if((indexRow == selected.getLineOnMatrix()) and (indexCol == selected.getColOnMatrix())){
+                    std::cout << stopColoring;
+                    std::cout << startColoring; // une fois le centre passé, on reprend la coloration normale
+                }
                 if(indexCol == selected.getColOnMatrix() + distance - std::max(0, indexRow - selected.getLineOnMatrix())){
                     //colonne de fin de la coloration
                     std::cout << stopColoring;
