@@ -1,4 +1,5 @@
 #include "NetworkBase.h"
+#include "NetworkInterface.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +18,8 @@ int main(int argc, char *argv[]){
   int att2;
   long att3;
   char att4[43];
+  char username[30];
+  char password[30];
   char * position;
   SerializedObject toReceiveFromServer;
   int sockfd;
@@ -68,38 +71,44 @@ int main(int argc, char *argv[]){
     return 0;
   }
   
-  if(recv(sockfd, &toReceiveFromServer, sizeof(SerializedObject), 0) != sizeof(SerializedObject)){
-    printf("%s\n", "Erreur dans la reception des données");
-    return ERROR;
-  }
+  //~ if(recv(sockfd, &toReceiveFromServer, sizeof(SerializedObject), 0) != sizeof(SerializedObject)){
+    //~ printf("%s\n", "Erreur dans la reception des données");
+    //~ return ERROR;
+  //~ }
   
-  printf("%s\n", "Contenu du buffer reçu du le réseau :");
+  //~ printf("%s\n", "Contenu du buffer reçu du le réseau :");
+  //~ 
+  //~ toReceiveFromServer.typeOfInfos = ntohs(toReceiveFromServer.typeOfInfos);
+  //~ printf("%s : %d\n", "type of infos", toReceiveFromServer.typeOfInfos);
+  //~ toReceiveFromServer.senderId = ntohs(toReceiveFromServer.senderId);
+  //~ printf("%s : %d\n", "sender ID", toReceiveFromServer.senderId);
+  //~ toReceiveFromServer.numInSequence = ntohs(toReceiveFromServer.numInSequence);
+  //~ printf("%s : %d\n", "num in sequence", toReceiveFromServer.numInSequence);
+  //~ toReceiveFromServer.nbOfFollowing = ntohs(toReceiveFromServer.nbOfFollowing);
+  //~ printf("%s : %d\n", "num of following", toReceiveFromServer.nbOfFollowing);
+//~ 
+//~ 
+  //~ position = toReceiveFromServer.stringData;
+  //~ memcpy(&att1, position, sizeof(att1));
+  //~ position += sizeof(att1);
+  //~ memcpy(&att2, position, sizeof(att2));
+  //~ position += sizeof(att2);
+  //~ memcpy(&att3, position, sizeof(att3));
+  //~ position += sizeof(att3);
+  //~ memcpy(&att4, position, sizeof(att4));
+  //~ printf("%s\n", "attribut séquentialisés : ");
+  //~ printf("%s : %d\n", "Entier 1 ", att1);
+  //~ printf("%s : %d\n", "Entier 2 ", att2);
+  //~ printf("%s : %d\n", "Long ", att3);
+  //~ printf("%s : %s\n", "char[43] :  ", att4);
   
-  toReceiveFromServer.typeOfInfos = ntohs(toReceiveFromServer.typeOfInfos);
-  printf("%s : %d\n", "type of infos", toReceiveFromServer.typeOfInfos);
-  toReceiveFromServer.senderId = ntohs(toReceiveFromServer.senderId);
-  printf("%s : %d\n", "sender ID", toReceiveFromServer.senderId);
-  toReceiveFromServer.numInSequence = ntohs(toReceiveFromServer.numInSequence);
-  printf("%s : %d\n", "num in sequence", toReceiveFromServer.numInSequence);
-  toReceiveFromServer.nbOfFollowing = ntohs(toReceiveFromServer.nbOfFollowing);
-  printf("%s : %d\n", "num of following", toReceiveFromServer.nbOfFollowing);
-
-
-  position = toReceiveFromServer.stringData;
-  memcpy(&att1, position, sizeof(att1));
-  position += sizeof(att1);
-  memcpy(&att2, position, sizeof(att2));
-  position += sizeof(att2);
-  memcpy(&att3, position, sizeof(att3));
-  position += sizeof(att3);
-  memcpy(&att4, position, sizeof(att4));
-  printf("%s\n", "attribut séquentialisés : ");
-  printf("%s : %d\n", "Entier 1 ", att1);
-  printf("%s : %d\n", "Entier 2 ", att2);
-  printf("%s : %d\n", "Long ", att3);
-  printf("%s : %s\n", "char[43] :  ", att4);
+  printf("%s\n", "Test du passage des infos de logging :");
+  printf ("Enter your username : (no spaces allowed)");
+  scanf ("%29s",username);  
+  printf ("Enter your password : ");
+  scanf ("%29s",password);  
   
-  
+  sendToServer(sockfd, username, password);
   
   
   return EXIT_SUCCESS;
