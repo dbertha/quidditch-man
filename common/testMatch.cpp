@@ -37,5 +37,17 @@ int main(){
     std::cout << axialCoord.getDistanceTo(AxialCoordinates(-1,-1)) << std::endl; // doit donner 2
     std::cout << axialCoord.getDistanceTo(AxialCoordinates(-2,-1)) << std::endl; // doit donner 3
     //field.display(AxialCoordinates(5,-5), 3);
+    Move firstMove(1,-1), secondMove(axialCoord, axialCoord2);
+    std::cout << firstMove.getDiagDiff() << std::endl; // doit donner 1
+    std::cout << firstMove.getLineDiff() << std::endl; // -1
+    std::cout << secondMove.getDiagDiff() << std::endl; // doit donner 1
+    std::cout << secondMove.getLineDiff() << std::endl; //doit donner 0
+    
+    std::cout << "Test de la récupération des déplacements : " << std::endl;
+    std::list<Move> moves = axialCoord.getMovesTo(AxialCoordinates(-2,4));
+    std::cout << moves.size() << std::endl;
+    for(std::list<Move>::iterator list_iter = moves.begin(); list_iter != moves.end(); list_iter++){
+        std::cout << (*list_iter).getDiagDiff() << " " << (*list_iter).getLineDiff() << std::endl;
+    }
     
 }
