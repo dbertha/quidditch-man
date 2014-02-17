@@ -47,6 +47,8 @@ Player::Player(string playerSaveFile) {
 
 	close(fd);
 
+	_life = _capacities[4]; //Résistance
+
 	if ((_firstName=="John")&&(_lastName=="Doe")) verifyName();
 }
 
@@ -70,7 +72,7 @@ void Player::verifyName() {
 
 	} while (isNameTaken());
 	
-	int fd = open("namesTaken.txt",O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
+	int fd = open("Saves/namesTaken.txt",O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
 	if (fd==-1){
 		cerr<<"Error while opening file\n";
 	}
@@ -83,7 +85,7 @@ void Player::verifyName() {
 	
 }
 bool Player::isNameTaken(){
-	int fd = open("namesTaken.txt",O_RDONLY);
+	int fd = open("Saves/namesTaken.txt",O_RDONLY);
 	if (fd==-1){
 		cerr<<"Error while opening file\n";
 		return 0;
@@ -154,8 +156,12 @@ string Player::getRandomName(string fileName,int line){
 int Player::getCapacity(int capacityNumber) const {return _capacities[capacityNumber];}
 void Player::setCapacity(int capacityNumber, int value) {_capacities[capacityNumber] = value;}
 
-string Player::getRandomFirstName(int line) {return getRandomName("firstNames.txt",line);}
-string Player::getRandomLastName(int line) { return getRandomName("lastNames.txt",line);}
+int Player::getLife() const {return _life;}
+void Player::setLife(int value) {_life = value;}
+void Player::heal() {_life = _capacities[4];}
+
+string Player::getRandomFirstName(int line) {return getRandomName("Saves/firstNames.txt",line);}
+string Player::getRandomLastName(int line) { return getRandomName("Saves/lastNames.txt",line);}
 
 void Player::setFirstName(string firstName) {_firstName = firstName;}
 void Player::setLastName(string lastName) {_lastName = lastName;}

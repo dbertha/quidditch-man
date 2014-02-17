@@ -21,7 +21,7 @@ using namespace std;
 #define PRICESCALE 1000
 typedef int gold;
 
-ManagedPlayer::ManagedPlayer() : _popularity(0), _blocked(0), _life(0) {
+ManagedPlayer::ManagedPlayer() : _blocked(0) {
 	for (int i=0;i<5;++i) _trainingLeft[i] = 0;
 	_broomstick = Broomstick(0,0);
 }
@@ -47,8 +47,8 @@ ManagedPlayer::ManagedPlayer(string playerSaveFile): Player(playerSaveFile) {
 		_trainingLeft[i] = atoi(tmp.c_str());
 	}
 
-	tmp = strtok(NULL,"\n");
-	_popularity = atoi(tmp.c_str());
+	//tmp = strtok(NULL,"\n");
+	//_popularity = atoi(tmp.c_str());
 
 	tmp = strtok(NULL,"\n");
 	_blocked = atoi(tmp.c_str());
@@ -72,30 +72,27 @@ ManagedPlayer& ManagedPlayer::operator= (const ManagedPlayer& player) {
 	}
 	this->setFirstName(player.getFirstName());
 	this->setLastName(player.getLastName());
-	_popularity = player.getPopularity();
+	//_popularity = player.getPopularity();
 	_blocked = player.isBlocked();
-	_life = player.getLife();
+	this->setLife(player.getLife());
 	return *this;
 }
 
 int ManagedPlayer::getTrainingLeft(int capacityNumber) const {return _trainingLeft[capacityNumber];}
 void ManagedPlayer::setTrainingLeft(int capacityNumber, int value) {_trainingLeft[capacityNumber] = value;}
 
-int ManagedPlayer::getPopularity() const {return _popularity;}
-void ManagedPlayer::setPopularity(int popularity) {_popularity = popularity;}
+//int ManagedPlayer::getPopularity() const {return _popularity;}
+//void ManagedPlayer::setPopularity(int popularity) {_popularity = popularity;}
 
 void ManagedPlayer::lockPlayer() {_blocked = true;}
 void ManagedPlayer::unlockPlayer() {_blocked = false;}
 bool ManagedPlayer::isBlocked() const {return _blocked;}
 
-int ManagedPlayer::getLife() const {return _life;}
 Broomstick ManagedPlayer::getBroomstick() {return _broomstick;}
 
-
-void ManagedPlayer::setLife(int life) {_life = life;}
 void ManagedPlayer::setBroomstick(Broomstick broomstick) {_broomstick = broomstick;}
 
-void ManagedPlayer::gainPopularity() {this->setPopularity(this->getPopularity()+this->getPopularity()/10);} //Augmentation de 10%
+//void ManagedPlayer::gainPopularity() {this->setPopularity(this->getPopularity()+this->getPopularity()/10);} //Augmentation de 10%
 void ManagedPlayer::train(int capacityNumber){
 	this->setTrainingLeft(capacityNumber,this->getTrainingLeft(capacityNumber)-1);
 	if (this->getTrainingLeft(capacityNumber) == 0) {
@@ -113,8 +110,6 @@ gold ManagedPlayer::getEstimatedValue() {
 	return index*PRICESCALE + _broomstick.getValue();
 }
 
-void ManagedPlayer::heal() {this->setLife(this->getLife()+1);}
-
 void ManagedPlayer::displayInformations() {
 	cout<<"------------------ "<<this->getFirstName()<<" "<<this->getLastName()<<" ------------------"<<endl;
 	cout<<"Capacities :"<<endl;
@@ -123,7 +118,8 @@ void ManagedPlayer::displayInformations() {
 	cout<<"Precision : "<<this->getCapacity(2)<<endl;
 	cout<<"Reflex : "<<this->getCapacity(3)<<endl;
 	cout<<"Resistance : "<<this->getCapacity(4)<<endl;
-	cout<<"\nPopularity : "<<_popularity<<endl;
+	cout<<"\nLife : "<<this->getLife()<<endl;
+	//cout<<"\nPopularity : "<<_popularity<<endl;
 	cout<<"\nIs the player blocked ? "<<_blocked<<endl;
 	cout<<"\nBroomstick bonus is "<<_broomstick.getBonus()<<" for capacity "<<_broomstick.getCapacityBoosted()<<endl;
 }

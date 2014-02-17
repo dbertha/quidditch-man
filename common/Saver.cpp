@@ -75,11 +75,11 @@ void Saver::savePlayer(string managerLogin, ManagedPlayer player) {
 		write(fd,toWrite.c_str(),toWrite.size());
 		write(fd,"\n",1);
 	}
-
+/*
 	toWrite = intToString(player.getPopularity());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
-
+*/
 	toWrite = intToString(player.isBlocked());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
