@@ -4,26 +4,19 @@
 #include "ImprovementBuilding.hpp"
 #include "ManagedPlayer.hpp"
 
+typedef int gold;
+
 class TrainingCenter : public ImprovementBuilding {
 
  public:
 
+ 	TrainingCenter(int level, gold price, int time);
+
     void train(ManagedPlayer& player, int capacityNumber);
 
-/*
-    void trainStrength(ManagedPlayer& player);
+    
 
-    void trainPrecision(ManagedPlayer& player);
-
-    void trainReflex(ManagedPlayer& player);
-
-    void trainResistance(ManagedPlayer& player);
-*/
-
-    int getPriceToTrainCaract(ManagedPlayer& player, int capacityNumber);
-	void setPriceForNextlevel();
-
-    void getInfos();
+   // void getInfos();
 };
 
-#endif // TrainingCenter_hpp
+#endif //TrainingCenter_hpp

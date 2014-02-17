@@ -1,20 +1,24 @@
 #ifndef Building_hpp
 #define Building_hpp
 
+typedef int gold;
+
 class Building {
- public: //a mettre priver
+
+ protected:
     int _level;
-    int _priceForNextLevel;
+	const gold _priceForConstruction;
     
  public:
 
-	Building(int lvl=0);
+	Building(int lvl=0, gold price=100000);
 //	Building();
-	virtual void upgradeLevel();
+	virtual void upgradeBuilding();
 	virtual int getLevel();
-//    virtual void getInfos()  = 0;
-	virtual int getPriceForNextLevel();
-	virtual void setPriceForNextlevel();
+	//virtual void getInfos() = 0;
+	virtual gold getPriceForNextLevel() = 0;
 };
 
+
 #endif // Building_hpp
+
