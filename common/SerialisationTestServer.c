@@ -1,4 +1,5 @@
 #include "NetworkBase.h"
+#include "NetworkInterface.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +17,7 @@
 
 int main()
 {
-  SerializedObject toSendToClient;
+  SerializedObject toSendToClient, received;
   int sockfd, new_fd;
   
         // listen on sock_fd, new connection on new_fd
@@ -82,41 +83,57 @@ int main()
       int att2 = 12750;
       long att3 = 18956078;
       char att4[43] = "Bonjour cher client ! Comment allez-vous ?";
+      char username[30], password[30];
       char * position;
       /* this is the child process */
-      printf("%s\n", "Contenu du buffer passé sur le réseau :");
-      toSendToClient.typeOfInfos = 1;
-      printf("%s : %d\n", "type of infos", toSendToClient.typeOfInfos);
-      toSendToClient.typeOfInfos = htons(toSendToClient.typeOfInfos);
-      toSendToClient.senderId = 111;
-      printf("%s : %d\n", "sender ID", toSendToClient.senderId);
-      toSendToClient.senderId = htons(toSendToClient.senderId);
+      //~ printf("%s\n", "Contenu du buffer passé sur le réseau :");
+      //~ toSendToClient.typeOfInfos = 1;
+      //~ printf("%s : %d\n", "type of infos", toSendToClient.typeOfInfos);
+      //~ toSendToClient.typeOfInfos = htons(toSendToClient.typeOfInfos);
+      //~ toSendToClient.senderId = 111;
+      //~ printf("%s : %d\n", "sender ID", toSendToClient.senderId);
+      //~ toSendToClient.senderId = htons(toSendToClient.senderId);
+      //~ 
+      //~ toSendToClient.numInSequence = 1;
+      //~ printf("%s : %d\n", "num in sequence", toSendToClient.numInSequence);
+      //~ toSendToClient.numInSequence = htons(toSendToClient.numInSequence);
+      //~ toSendToClient.nbOfFollowing = 0;
+      //~ printf("%s : %d\n", "num of following", toSendToClient.nbOfFollowing);
+      //~ toSendToClient.nbOfFollowing = htons(toSendToClient.nbOfFollowing);
+      //~ printf("%s\n", "attribut séquentialisés : ");
+      //~ printf("%s : %d\n", "Entier 1 ", att1);
+      //~ printf("%s : %d\n", "Entier 2 ", att2);
+      //~ printf("%s : %d\n", "Long ", att3);
+      //~ printf("%s : %s\n", "char[43] :  ", att4);
+      //~ position = toSendToClient.stringData;
+      //~ memcpy(position, &att1, sizeof(att1));
+      //~ position += sizeof(att1);
+      //~ memcpy(position, &att2, sizeof(att2));
+      //~ position += sizeof(att2);
+      //~ memcpy(position, &att3, sizeof(att3));
+      //~ position += sizeof(att3);
+      //~ printf("%s : %d\n", "Taille du char[] : ", sizeof(att4));
+      //~ memcpy(position, &att4, sizeof(att4));
+      //~ 
+      //~ if(send(new_fd, &toSendToClient, sizeof(SerializedObject), 0) != sizeof(SerializedObject)){
+        //~ printf("%s\n", "Erreur dans l'envoi des données");
+        //~ return ERROR;
+      //~ }
       
-      toSendToClient.numInSequence = 1;
-      printf("%s : %d\n", "num in sequence", toSendToClient.numInSequence);
-      toSendToClient.numInSequence = htons(toSendToClient.numInSequence);
-      toSendToClient.nbOfFollowing = 0;
-      printf("%s : %d\n", "num of following", toSendToClient.nbOfFollowing);
-      toSendToClient.nbOfFollowing = htons(toSendToClient.nbOfFollowing);
-      printf("%s\n", "attribut séquentialisés : ");
-      printf("%s : %d\n", "Entier 1 ", att1);
-      printf("%s : %d\n", "Entier 2 ", att2);
-      printf("%s : %d\n", "Long ", att3);
-      printf("%s : %s\n", "char[43] :  ", att4);
-      position = toSendToClient.stringData;
-      memcpy(position, &att1, sizeof(att1));
-      position += sizeof(att1);
-      memcpy(position, &att2, sizeof(att2));
-      position += sizeof(att2);
-      memcpy(position, &att3, sizeof(att3));
-      position += sizeof(att3);
-      printf("%s : %d\n", "Taille du char[] : ", sizeof(att4));
-      memcpy(position, &att4, sizeof(att4));
       
-      if(send(new_fd, &toSendToClient, sizeof(SerializedObject), 0) != sizeof(SerializedObject)){
-        printf("%s\n", "Erreur dans l'envoi des données");
-        return ERROR;
+      printf("%s\n", "Test du passage des infos de logging");
+      received = receiveOnSocket(new_fd);
+      if(received.typeOfInfos == LOGIN){
+        printf("%s\n", "Tentative de login reçue");
+        position = received.stringData;
+        memcpy(&username, position, sizeof(username)); //sizeof(char array[10]) = 10
+        position += sizeof(username);
+        memcpy(&password, position, sizeof(password));
+        printf("User : %s\n", username);
+        printf("Password : %s\n", password);
       }
+        
+      
       
 
       printf("%s\n", "Fin de la connexion.");

@@ -14,37 +14,39 @@
 #include "Defines.h"
 
 #define SERIALISATION_MAXSIZE 1025
-#define SUCESS 1
+#define SUCCESS 1
 
 /* recv(socket, *message, sizeToWrite, 0) return sizeWriten if ok
 //send(socket, *message, sizeToRead, 0) return sizeRead if ok */
 
 typedef struct {
     /* on manipule des short pour correspondre aux fonctions et htons/ntohs
-    //on suppose que les types de bases sont de taille identique sur chaque machine */
+    on suppose que les types de bases sont de taille identique sur chaque machine */
     short typeOfInfos;
-    short senderId; /* serveur ou identifiant du client : utile ?*/
-    short numInSequence; /*  si > 0, fait partie d'une séquence d'infos */
-    short nbOfFollowing;
-    /*long numericData;  ou vecteur ? si on ne doit transmettre que des infos numériques... ==> distinguer un struct d'infos numériques/string ? */
     char stringData[SERIALISATION_MAXSIZE];
 } SerializedObject;
 
-typedef struct SerializedObjectList_P {
-    SerializedObject *paquet;
-    struct SerializedObjectList_P *next;
-} SerializedObjectList;
+int sendOnSocket(int socketfd, SerializedObject toSend);
 
-void initialize(SerializedObjectList *toInit);
+SerializedObject receiveOnSocket(int socketfd);
+        
+    
+
+//~ typedef struct SerializedObjectList_P {
+    //~ SerializedObject *paquet;
+    //~ struct SerializedObjectList_P *next;
+//~ } SerializedObjectList;
+//~ 
+//~ void initialize(SerializedObjectList *toInit);
 
 /* TODO : detruire list par "free"
 
 //TODO : si on sait quelle taille peut faire la + grande info à faire circuler d'une fois sur le réseau, on peut éviter la gestion d'une liste.
 //mais cette gestion permet de ne pas avoir un gros paquet à transmettre quand l'info est petite */
 
-int sendOverNetwork(int socket_fd, SerializedObjectList *listToSend);
-
-int receiveOverNetwork(int socket_fd, SerializedObjectList *listWhereToReceive);
+//~ int sendOverNetwork(int socket_fd, SerializedObjectList *listToSend);
+//~ 
+//~ int receiveOverNetwork(int socket_fd, SerializedObjectList *listWhereToReceive);
         
     
 /*format type de la sérialisation d'un objet C++ en un struct à envoyer sur le réseau :
