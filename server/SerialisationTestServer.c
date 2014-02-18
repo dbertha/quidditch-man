@@ -1,5 +1,5 @@
-#include "NetworkBase.h"
-#include "NetworkInterface.hpp"
+#include "../common/NetworkBase.h"
+#include "../common/NetworkInterface.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

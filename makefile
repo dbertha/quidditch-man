@@ -1,10 +1,22 @@
-TARGET=client
-OBJS=client.o sendToServer.o
-normal: $(TARGET)
+COMMONDIR= common/
+SERVERDIR= server/
+CLIENTDIR= client/
+COMMONHEADERS= NetworkInterface.hpp 
+#COMMONCPP= 
 
-client : client.c sendToServer.c defines.h sendToServer.h
-	gcc -g -Wall sendToServer.c client.c -o client
+all : Client.out Server.out
 
-clean:
-	$(RM) $(TARGET)
-	$(RM) $(OBJS)
+
+#NetworkBaseTest.out : NetworkBase.o NetworkBaseTest.cpp
+#	g++ -Wall -Wextra NetworkBase.o NetworkBaseTest.cpp -o NetworkBaseTest.out
+
+Client.out : NetworkBase.o ${CLIENTDIR}SerialisationTestClient.c ${COMMONDIR}${COMMONHEADERS}
+	gcc -Wall -Wextra NetworkBase.o ${CLIENTDIR}SerialisationTestClient.c -o Client.out
+
+Server.out : NetworkBase.o ${SERVERDIR}SerialisationTestServer.c ${COMMONDIR}${COMMONHEADERS}
+	gcc -Wall -Wextra NetworkBase.o ${SERVERDIR}SerialisationTestServer.c -o Server.out
+
+NetworkBase.o : ${COMMONDIR}NetworkBase.c ${COMMONDIR}NetworkBase.h
+	gcc -c -Wall -Wextra ${COMMONDIR}NetworkBase.c -o NetworkBase.o
+
+
