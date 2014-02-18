@@ -35,3 +35,5 @@
 #define CURRENTPRICE 26
 #define BID 27
 #define BID_CONFIRM 28
+#define TRAIN_PLAYER 29
+#define TRAINING_STARTED 30

@@ -13,9 +13,12 @@
 
 
 //Q : méthodes membres statiques d'une classe ?
+//TODO : renommage + adapté, "ask serveur" != "ask client"
+
+//TODO : récupérer les méthodes dans la classe client, paramètre socketfd = attribut de la classe
 
 //appelée dans login() du client :
-int sendToServer(int sockfd, char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]){
+int sendLoginToServer(int sockfd, char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]){
     //REM : les param reçu ne sont pas des char[N] (sizeof() = N) mais des char * (sizeof() = taille pointeur)
     //TODO : define size
     SerializedObject serialized;
@@ -29,24 +32,36 @@ int sendToServer(int sockfd, char username[USERNAME_LENGTH], char password[PASSW
     return sendOnSocket(sockfd, serialized);
 }
 
+int askForBuildingInfos(int sockfd, int buildingID){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = GETBUILDINGINFOS;
+    memcpy(position, &buildingID, sizeof(buildingID));
+    return sendOnSocket(sockfd, serialized);
+}
+
+int askForBuildingUpgrade(int sockfd, int buildingID){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = UPGRADE_BUILDING;
+    memcpy(position, &buildingID, sizeof(buildingID));
+    return sendOnSocket(sockfd, serialized);
+}
+
+int proposeMatchTo(int sockfd, int userID){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = PROPOSEMATCH;
+    memcpy(position, &userID, sizeof(userID));
+    return sendOnSocket(sockfd, serialized);
+}
+
+
+
+
 //Serveur lit le SerializedObject et le transmet à commandHandler de User
     
-    
-    
 
-
-//TODO : répartir les sendToClient et sendToServer dans les dossiers server/ et client/ ?
-
-//Ces fonctions construisent le struct à passer sur le réseau et l'envoient
-
-//~ int sendToClient(const Client &client, const Building &building);
-//~ 
-//~ int sendToClient(const Client &client, const Player &player);
-//~ 
-//~ int sendToClient(const Client &client, const Field &field);
-//~ 
-//~ //
-//~ int sendToServer(const Message &msg);
 
 
 #endif

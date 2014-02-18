@@ -39,6 +39,10 @@ int sendOnSocket(int socketfd, SerializedObject toSend){
     result =  send(socketfd, &toSend, sizeof(SerializedObject), 0);
     if(result != sizeof(SerializedObject)){
         printf("%s\n", "SendOnSocket : Erreur dans l'envoi des données"); //TODO : sur le flux err
+    }else{
+#ifdef __DEBUG
+    printf("%s\n", "SendOnSocket : Paquet envoyé");
+#endif
     }
     return result;
 }

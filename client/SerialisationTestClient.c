@@ -15,7 +15,7 @@
 #define DIM 100
 
 int main(int argc, char *argv[]){
-  int att1;
+  int buildingID;
   int att2;
   long att3;
   char att4[43];
@@ -109,7 +109,19 @@ int main(int argc, char *argv[]){
   printf ("Enter your password : ");
   scanf ("%29s",password);  
   
-  sendToServer(sockfd, username, password);
+  sendLoginToServer(sockfd, username, password);
+  
+  printf("%s\n", "Test du passage des infos de bâtiments :");
+  printf ("indice du bâtiment demandé : ");
+  scanf ("%d",&buildingID);  
+  
+  askForBuildingInfos(sockfd, buildingID);
+  
+  printf("%s\n", "Test du passage d'une demande d'upgrade de bâtiments :");
+  printf ("indice du bâtiment demandé : ");
+  scanf ("%d",&buildingID);  
+  
+  askForBuildingUpgrade(sockfd, buildingID);
   
   
   return EXIT_SUCCESS;
