@@ -3,6 +3,7 @@
 
 /* Interface réseau en C++ qui fera appel au module C */
 #include "NetworkBase.h" //SerializedObject
+#include "Defines.hpp" 
 
 //pour le test en c :
 #include <stdio.h>
@@ -11,23 +12,19 @@
 
 
 
-
-
-
-
 //Q : méthodes membres statiques d'une classe ?
 
 //appelée dans login() du client :
-int sendToServer(int sockfd, char username[30], char password[30]){
+int sendToServer(int sockfd, char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]){
     //REM : les param reçu ne sont pas des char[N] (sizeof() = N) mais des char * (sizeof() = taille pointeur)
     //TODO : define size
     SerializedObject serialized;
     char * position;
     serialized.typeOfInfos = LOGIN;
     position = serialized.stringData;
-    memcpy(position, username, 30);
-    position += 30;
-    memcpy(position, password, 30);
+    memcpy(position, username, USERNAME_LENGTH);
+    position += USERNAME_LENGTH;
+    memcpy(position, password, PASSWORD_LENGTH);
     //position += sizeof(password);
     return sendOnSocket(sockfd, serialized);
 }

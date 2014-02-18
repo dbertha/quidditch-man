@@ -1,5 +1,6 @@
 #include "../common/NetworkBase.h"
 #include "../common/NetworkInterface.hpp"
+#include "../common/Defines.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,8 +19,8 @@ int main(int argc, char *argv[]){
   int att2;
   long att3;
   char att4[43];
-  char username[30];
-  char password[30];
+  char username[USERNAME_LENGTH];
+  char password[PASSWORD_LENGTH];
   char * position;
   SerializedObject toReceiveFromServer;
   int sockfd;

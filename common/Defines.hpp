@@ -4,6 +4,9 @@
 #define INPUTSIZE 100 //taille du message envoyé du client vers le serveur
 #define __DEBUG
 
+#define USERNAME_LENGTH 30
+#define PASSWORD_LENGTH 30
+
 #define LOGIN 1
 #define LOGIN_CONFIRM 2
 #define GETBUILDINGINFOS 3

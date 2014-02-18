@@ -7,7 +7,7 @@ class CommonMgr;
 class User {
 public:
 	User(Server *, CommonMgr *, int);
-	void cmdHandler(const SerializedObject *);
+	void cmdHandler(SerializedObject *);
 	void setDisconnection();
 	bool isDisconnecting();
 	int getSockfd();

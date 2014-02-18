@@ -5,15 +5,28 @@
 
 User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), userId_(""), disconnecting_(false) {}
 
-void User::cmdHandler(const SerializedObject *received) {
+void User::cmdHandler(SerializedObject *received) {
 	SerializedObject answer;
 	//traitement du message et
 	switch(received->typeOfInfos){
 		//TODO : solution + élégante
 		case LOGIN :
+			char * position;
+			char username[USERNAME_LENGTH], password[PASSWORD_LENGTH];
+			position = received->stringData;
+			memcpy(&username, position, sizeof(username)); //sizeof(char array[10]) = 10
+			position += sizeof(username);
+			memcpy(&password, position, sizeof(password));
+#ifdef __DEBUG
+			std::cout<<"Demande de login reçue sur socket "<<getSockfd()<<std::endl;
+			std::cout<<"Username reçu :  "<<username <<std::endl;
+			std::cout<<"Password reçu :  "<<password <<std::endl;
+#endif
 			//handle demand
+			
 			//construct answer
 			answer.typeOfInfos = LOGIN_CONFIRM;
+			
 			break;
 		case GETBUILDINGINFOS :
 			//handle demand
