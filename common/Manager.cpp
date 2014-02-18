@@ -17,6 +17,13 @@
 #include "ManagedPlayer.hpp"
 #include "Saver.hpp"
 //#include "Broomstick.hpp"
+#include "Building.hpp"
+#include "ImprovementBuilding.hpp"
+#include "Stadium.hpp"
+#include "TrainingCenter.hpp"
+#include "Hospital.hpp"
+#include "FanShop.hpp"
+#include "RecruitmentCenter.hpp"
 
 #include "Manager.hpp"
 
@@ -31,74 +38,18 @@ Manager::Manager(string managerLogin): _login(managerLogin) {
 }
 
 void Manager::loadManager() {
-	string saveFile = "Saves/"+_login+"/"+_login+".txt";
-	int fd = open("Saves/Manager/Manager.txt",O_RDONLY);
-	if (fd==-1) {
-		cerr<<"Error while opening file\n";
-		return;
-	}
-
-	char buffer[100];
-	int byte = read(fd,buffer,sizeof(buffer));
-	buffer[byte]='\0';
-
-	string tmp;
-	tmp = strtok(buffer,"\n");
-	_numberOfPlayers = atoi(tmp.c_str());
-
-	//tmp = strtok(NULL,"\n");
-	//_numberMaxOfPlayers = atoi(tmp.c_str());
-	//_players = new ManagedPlayer[_numberMaxOfPlayers];
-
-
-	tmp = strtok(NULL,"\n");
-	_money = atoi(tmp.c_str());
-
-	tmp = strtok(NULL,"\n");
-	_numberOfFans = atoi(tmp.c_str());
-
-	close(fd);
-	
-
-	string playerList = "Saves/"+_login+"/Players/players.txt";
-	int fd2 = open(playerList.c_str(),O_RDONLY);
-	if (fd2==-1) {
-		cerr<<"Error while opening file\n";
-		return;
-	}
-
-	char buffer2[400];
-
-	int byte2 = read(fd,buffer2,400);
-	buffer2[byte2]='\0';
-
-	
-	string path = "Saves/"+_login+"/Players/";
-	string playerFile= "";
-
-	int i=0;
-	while (buffer2[i]!='\0'){
-		if (buffer2[i]=='\n') {
-			_players.push_back(ManagedPlayer(path+playerFile));			
-			playerFile="";
-		}
-		else playerFile+=buffer2[i];
-		++i;
-	}
-	
-	close(fd2);
+	setManagerInfos("Saves/"+_login+"/"+_login+".txt");
+	cout<<"setManagerInfos done"<<endl;
+	setPlayers("Saves/"+_login+"/Players/");
+	cout<<"setPlayers done"<<endl;
+	setBuildings("Saves/"+_login+"/buildings.txt");
+	cout<<"setBuildings done"<<endl;
 }
 
 void Manager::createNewManager() {
-	_numberOfPlayers = 7;
-	//_numberMaxOfPlayers = 7;
-	_money = 500000;
-	_numberOfFans = 666;
-
-	_players.push_back(ManagedPlayer("Saves/defaultKeeper.txt"));
-	_players.push_back(ManagedPlayer("Saves/defaultSeeker.txt"));
-	for (int i=0;i<2;++i) _players.push_back(ManagedPlayer("Saves/defaultBeater.txt"));
-	for (int i=0;i<3;++i) _players.push_back(ManagedPlayer("Saves/defaultChaser.txt"));
+	setManagerInfos("Saves/defaultManager.txt");
+	setPlayers("Saves/");
+	setBuildings("Saves/defaultBuildings.txt");
 
 	string directory = "Saves/"+_login+"/Players";
 	mkdir(directory.c_str(),0777);
@@ -155,5 +106,113 @@ void Manager::save(){
 	saver.saveManager(_login,*this);
 	for (unsigned i=0;i<_players.size();++i) saver.savePlayer(_login,_players[i]);
 	saver.savePlayersList(_login,_players);
+	saver.saveBuildings(_login,_stadium,_trainingCenter,_hospital,_fanShop,_recruitmentCenter);
 }
 
+void Manager::setManagerInfos(string file) {
+	int fd = open(file.c_str(),O_RDONLY);
+	if (fd==-1) {
+		cerr<<"Error while opening file\n";
+		return;
+	}
+
+	char buffer[100];
+	int byte = read(fd,buffer,sizeof(buffer));
+	buffer[byte]='\0';
+
+	string tmp;
+	tmp = strtok(buffer,"\n");
+	_numberOfPlayers = atoi(tmp.c_str());
+
+	tmp = strtok(NULL,"\n");
+	_money = atoi(tmp.c_str());
+
+	tmp = strtok(NULL,"\n");
+	_numberOfFans = atoi(tmp.c_str());
+
+	close(fd);
+}
+
+void Manager::setPlayers(string path) {
+	string file = path + "players.txt";
+	int fd = open(file.c_str(),O_RDONLY);
+	if (fd==-1) {
+		cerr<<"Error while opening file\n";
+		return;
+	}
+	int size = lseek(fd,0,SEEK_END);
+	lseek(fd,0,SEEK_SET);
+	char buffer[size+1];
+
+	int byte = read(fd,buffer,size);
+	buffer[byte]='\0';
+
+	string playerFile;
+	int i=0;
+	while (buffer[i]!='\0'){
+		if (buffer[i]=='\n') {
+			_players.push_back(ManagedPlayer(path+playerFile));			
+			playerFile="";
+		}
+		else playerFile+=buffer[i];
+		++i;
+	}
+	
+	close(fd);
+}
+
+void Manager::setBuildings(string file) {
+	int fd = open(file.c_str(),O_RDONLY);
+	if (fd==-1) {
+		cerr<<"Error while opening file\n";
+		return;
+	}
+	int size = lseek(fd,0,SEEK_END);
+	lseek(fd,0,SEEK_SET);
+	char buffer[size+1];
+
+	int byte = read(fd,buffer,size);
+	buffer[byte]='\0';
+
+	string tmp1,tmp2,tmp3;
+	int param1,param2,param3;
+	tmp1 = strtok(buffer,"\n");
+	param1 = atoi(tmp1.c_str());
+	tmp2 = strtok(NULL,"\n");
+	param2 = atoi(tmp2.c_str());
+	tmp3 = strtok(NULL,"\n");
+	param3 = atoi(tmp3.c_str());
+	_stadium = Stadium(param1,param2,param3);
+
+	tmp1 = strtok(NULL,"\n");
+	param1 = atoi(tmp1.c_str());
+	tmp2 = strtok(NULL,"\n");
+	param2 = atoi(tmp2.c_str());
+	tmp3 = strtok(NULL,"\n");
+	param3 = atoi(tmp3.c_str());
+	_trainingCenter = TrainingCenter(param1,param2,param3);
+
+	tmp1 = strtok(NULL,"\n");
+	param1 = atoi(tmp1.c_str());
+	tmp2 = strtok(NULL,"\n");
+	param2 = atoi(tmp2.c_str());
+	tmp3 = strtok(NULL,"\n");
+	param3 = atoi(tmp3.c_str());
+	_hospital = Hospital(param1,param2,param3);
+
+	tmp1 = strtok(NULL,"\n");
+	param1 = atoi(tmp1.c_str());
+	tmp2 = strtok(NULL,"\n");
+	param2 = atoi(tmp2.c_str());
+	tmp3 = strtok(NULL,"\n");
+	param3 = atoi(tmp3.c_str());
+	_fanShop = FanShop(param1,param2,param3);
+
+	tmp1 = strtok(NULL,"\n");
+	param1 = atoi(tmp1.c_str());
+	tmp2 = strtok(NULL,"\n");
+	param2 = atoi(tmp2.c_str());
+	_recruitmentCenter = RecruitmentCenter(param1,param2);
+
+	close(fd);
+}

@@ -10,7 +10,7 @@ class TrainingCenter : public ImprovementBuilding {
 
  public:
 
- 	TrainingCenter(int level, gold price, int time);
+ 	TrainingCenter(int level=0, gold price=0, int time=0);
 
     void train(ManagedPlayer& player, int capacityNumber);
 

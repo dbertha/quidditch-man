@@ -2,7 +2,6 @@
 #define FanShop_hpp
 
 #include "Building.hpp"
-#include "Manager.hpp"
 
 typedef int gold;
 
@@ -12,12 +11,15 @@ class FanShop : public Building {
 
  public:
 
- 	FanShop(int level, gold price, int maxClients);
+ 	FanShop(int level=0, gold price=0, int maxClients=0);
 
-    void getIncome(Manager& manager);
+    gold getIncome();
     int getMaxClients();
+    int getMaxClientsAtFirstLevel();
     gold getPriceForNextLevel();
+    
+    void displayInformations();
     //void getInfos();
 };
 
-#endif // FanShop_hpp
+#endif //FanShop_hpp

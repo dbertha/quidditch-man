@@ -113,6 +113,69 @@ void Saver::savePlayersList(string managerLogin, vector<ManagedPlayer> players) 
 	close(fd);
 }
 
+void Saver::saveBuildings(string managerLogin, Stadium stadium, TrainingCenter trainingCenter, Hospital hospital, FanShop fanShop,\
+ 							 RecruitmentCenter recruitmentCenter) {
+	string file = "Saves/"+managerLogin+"/buildings.txt";
+	int fd = open(file.c_str(),O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+	if (fd==-1){
+		cerr<<"Error while opening file\n";
+	}
+	string toWrite;
+	cout<<"prout"<<endl;
+	toWrite=intToString(stadium.getLevel());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+	toWrite=intToString(stadium.getPriceForConstruction());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+	toWrite=intToString(stadium.getMaxPlacesAtFirstLevel());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+
+	cout<<"prout"<<endl;
+	toWrite=intToString(trainingCenter.getLevel());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+	toWrite=intToString(trainingCenter.getPriceForConstruction());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+	toWrite=intToString(trainingCenter.getTimeRequiredAtFirstLevel());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+
+	cout<<"prout"<<endl;
+	toWrite=intToString(hospital.getLevel());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+	toWrite=intToString(hospital.getPriceForConstruction());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+	toWrite=intToString(hospital.getTimeRequiredAtFirstLevel());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+
+	cout<<"prout"<<endl;
+	toWrite=intToString(fanShop.getLevel());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+	toWrite=intToString(fanShop.getPriceForConstruction());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+	toWrite=intToString(fanShop.getMaxClientsAtFirstLevel());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+
+	cout<<"prout"<<endl;
+	toWrite=intToString(recruitmentCenter.getLevel());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+	toWrite=intToString(recruitmentCenter.getPriceForConstruction());
+	write(fd,toWrite.c_str(),toWrite.size());
+	
+	cout<<"prout"<<endl;
+	close(fd);
+}
+
 string Saver::intToString(int value) {
 	char buffer[20];
 	sprintf(buffer,"%d",value);

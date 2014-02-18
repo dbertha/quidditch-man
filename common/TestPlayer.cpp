@@ -1,9 +1,18 @@
-#include "Manager.hpp"
+
 #include "Player.hpp"
 #include "ManagedPlayer.hpp"
 #include "PlayingPlayer.hpp"
 #include "Broomstick.hpp"
 #include "Saver.hpp"
+#include "Building.hpp"
+#include "ImprovementBuilding.hpp"
+#include "Stadium.hpp"
+#include "TrainingCenter.hpp"
+#include "Hospital.hpp"
+#include "FanShop.hpp"
+#include "RecruitmentCenter.hpp"
+
+#include "Manager.hpp"
 
 #include <iostream>
 
@@ -11,13 +20,24 @@ using namespace std;
 
 
 int main() {
-	
-	ManagedPlayer player("defaultSeeker.txt");
+
+
+	Manager manager("Manager");
+
+	manager._stadium.displayInformations();
+	manager._trainingCenter.displayInformations();
+	manager._hospital.displayInformations();
+	manager._fanShop.displayInformations();
+	manager._recruitmentCenter.displayInformations();
+
+	Manager manager2("Manager2");
+/*
+	ManagedPlayer player("Saves/defaultSeeker.txt");
 	cout<<player.getFirstName()<<" "<<player.getLastName()<<endl;
 	for (int i=0;i<5;++i){
 		cout<<player.getCapacity(i)<<endl;
 	}
-	cout<<"Popularity : "<<player.getPopularity()<<endl;
+	//cout<<"Popularity : "<<player.getPopularity()<<endl;
 	cout<<"Is blocked ? "<<player.isBlocked()<<endl;
 
 	cout<<"Training capacity"<<endl;
@@ -33,10 +53,6 @@ int main() {
 	player.train(1);
 	cout<<"5th training, capacity = "<<player.getCapacity(1)<<endl;
 
-	cout<<"\nGain popularity"<<endl;
-	cout<<"Popularity = "<<player.getPopularity()<<endl;
-	player.gainPopularity();
-	cout<<"After gainPopularity = "<<player.getPopularity()<<endl;
 
 	Broomstick broomstick = player.getBroomstick();
 	cout<<"\nBroomstick capacity = "<<broomstick.getCapacityBoosted()<<endl;
@@ -68,6 +84,6 @@ int main() {
 		manager2.getPlayer(i).displayInformations(); //Pas très AMI mais juste pour tester et vérifier
 		cout<<i<<endl;
 	}
-
+*/
 	return 0;
 }

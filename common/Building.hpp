@@ -7,14 +7,15 @@ class Building {
 
  protected:
     int _level;
-	const gold _priceForConstruction;
+	gold _priceForConstruction;
     
  public:
 
-	Building(int lvl=0, gold price=100000);
+	Building(int lvl, gold price);
 //	Building();
 	virtual void upgradeBuilding();
 	virtual int getLevel();
+	virtual gold getPriceForConstruction();
 	//virtual void getInfos() = 0;
 	virtual gold getPriceForNextLevel() = 0;
 };

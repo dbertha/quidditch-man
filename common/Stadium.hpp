@@ -8,15 +8,16 @@ typedef int gold;
 
 class Stadium : public Building {
 
-	const int _maxPlacesAtFirstLevel;
+	int _maxPlacesAtFirstLevel;
 
  public:
 
- 	Stadium(int level, int priceForConstruction, int maxPlaces);
+ 	Stadium(int level=0, gold priceForConstruction=0, int maxPlaces=0);
 
     gold getPriceForNextLevel();
     int getMaxPlaces();
-
+    int getMaxPlacesAtFirstLevel();
+    void displayInformations();
     //void getInfos();
 
 

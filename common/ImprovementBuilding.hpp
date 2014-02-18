@@ -8,14 +8,18 @@ typedef int gold;
 class ImprovementBuilding : public Building {
 
  protected:
-	const int _timeRequired;
+	int _timeRequired;
 
  public:
 
- 	ImprovementBuilding(int level, gold price, int timeRequired);
+ 	ImprovementBuilding(int level=0, gold price=0, int timeRequired=0);
  	
  	gold getPriceForNextLevel();
  	int getTimeRequired();
+ 	int getTimeRequiredAtFirstLevel();
+
+ 	
+    void displayInformations();
 };
 
 #endif //ImprovementBuilding_hpp

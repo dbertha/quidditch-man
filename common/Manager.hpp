@@ -4,23 +4,32 @@
 #include <string> 
 #include <vector>
 
-#include "Broomstick.hpp"
-//#include "Building.hpp"
-//#include "Calendar.hpp"
-//#include "ClientHandler.hpp"
+
 #include "ManagedPlayer.hpp"
+#include "Broomstick.hpp"
+#include "Building.hpp"
+#include "ImprovementBuilding.hpp"
+#include "Stadium.hpp"
+#include "TrainingCenter.hpp"
+#include "Hospital.hpp"
+#include "FanShop.hpp"
+#include "RecruitmentCenter.hpp"
 
 class Manager {
 
-	std::string _login;
+	string _login;
 	vector<ManagedPlayer> _players;
-	//Building[] _buildings;
+
 	int _numberOfPlayers;
-	//int _numberMaxOfPlayers;
 	int _money;
 	int _numberOfFans;
 
  public:
+ 	Stadium _stadium;
+	TrainingCenter _trainingCenter;
+	Hospital _hospital;
+	FanShop _fanShop;
+	RecruitmentCenter _recruitmentCenter;
 
  	Manager(string managerLogin);
 
@@ -45,6 +54,10 @@ class Manager {
 
  	void loadManager();
  	void createNewManager();
+
+ 	void setManagerInfos(string file);
+ 	void setPlayers(string path);
+ 	void setBuildings(string file);
 
 };
 
