@@ -1,6 +1,10 @@
 #include "Server.hpp"
 #include "CommonMgr.hpp"
 #include "User.hpp"
+#include <netinet/in.h> //htons()  ntohs()
+#include "../common/NetworkBase.h"
+
+//TODO : pas de EXIT_SUCCESS ou EXIT_FAILURE pour d'autres méthodes que main()
 
 // Documentation : voir Readme.txt
 Server::Server(int port): commonMgr_(new CommonMgr(this)), port_(port), max_(0) {}
@@ -57,6 +61,7 @@ void Server::disconnect() {
 }
 
 int Server::mainLoop() {
+	SerializedObject received;
 	max_=sockfd_;
 #ifdef __DEBUG
 	std::cout<<"**mon socket : "<<sockfd_<<std::endl;
@@ -85,14 +90,14 @@ int Server::mainLoop() {
 		else {
 			for (unsigned int i=0;i<usersList_.size();++i) {
 				if (FD_ISSET(usersList_[i]->getSockfd(),&FDSet_)) {
-					int length = receive(usersList_[i],msg,sizeof(msg));
+					int length = receive(usersList_[i],&received); //TODO : tester valeur
 					if(usersList_[i]->isDisconnecting()) {
 						std::cout<<"User "<<usersList_[i]->getUserId()<<" disappeared from socket "
 										<<usersList_[i]->getSockfd()<<std::endl;
 						removeUser(i);
 					}
 					else //traitement du message et envoi de la réponse
-						usersList_[i]->cmdHandler(msg,length);
+						usersList_[i]->cmdHandler(&received);
 				}
 			}
 		}
@@ -131,29 +136,30 @@ int Server::newUser() {
 	return EXIT_SUCCESS;
 }
 
-int Server::receive(User * aUser, char * buf, const int len) {
-	int length=recv(aUser->getSockfd(),buf,len,0);
+int Server::receive(User * aUser, SerializedObject * received) {
+	int length=recv(aUser->getSockfd(),received,sizeof(SerializedObject),0);
 	if(length==0 || length==ERROR) {
 		aUser->setDisconnection();
 	}
 	else {
-		buf[length]='\0';
+		received->typeOfInfos = ntohs(received->typeOfInfos);
 #ifdef __DEBUG
-		std::cout<<"**got "<<length<<"char. on "<<clientSockfd_<<" : "<<buf<<"**"<<std::endl;
+		std::cout<<"**got a SerializedObject on "<<clientSockfd_<<std::endl;
 #endif
 	}
 	return length;
 }
 
-int Server::sendToClient(User * aUser, char * buf, const int length) {
-	if(send(aUser->getSockfd(),buf,length,0)==ERROR) {
+int Server::sendToClient(User * aUser, SerializedObject * toSend) {
+	toSend->typeOfInfos = htons(toSend->typeOfInfos);
+	if(send(aUser->getSockfd(),toSend,sizeof(SerializedObject),0)==ERROR) {
 		std::cerr<<aUser->getUserId()<<" message send error on socket "
 				<<aUser->getSockfd()<<std::endl;
 		return EXIT_FAILURE;
 	}
 	else {
 #ifdef __DEBUG
-		std::cout<<"**sent on "<<clientSockfd_<<" : "<<buf<<"**"<<std::endl;
+		std::cout<<"**sent a SerializedObject to "<<clientSockfd_<<std::endl;
 #endif
 		return EXIT_SUCCESS;
 	}

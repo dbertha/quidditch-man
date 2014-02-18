@@ -1,13 +1,13 @@
 #ifndef USER_H
 #define USER_H
-
+#include "../common/NetworkBase.h"
 #include <iostream>
 class Server;
 class CommonMgr;
 class User {
 public:
 	User(Server *, CommonMgr *, int);
-	void cmdHandler(char *, const int);
+	void cmdHandler(const SerializedObject *);
 	void setDisconnection();
 	bool isDisconnecting();
 	int getSockfd();

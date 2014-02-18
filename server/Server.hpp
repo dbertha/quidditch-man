@@ -2,6 +2,7 @@
 #define SERVER_H
 
 #include "../common/Defines.hpp"
+#include "../common/NetworkBase.h"
 #include <iostream>
 #include <set>
 #include <vector>
@@ -23,7 +24,7 @@ class Server {
 public:
 	Server(int);
 	void run();
-	int sendToClient(User *, char *, const int);
+	int sendToClient(User *, SerializedObject *); //TODO : transformer la modélisation pour conserver en private ou protected
 	std::vector<User*> GetUsersList();
 
 private:
@@ -46,7 +47,7 @@ private:
 	bool isNewConnection();
 	bool keyboard();
 	int newUser();
-	int receive(User *, char *, const int);
+	int receive(User *, SerializedObject *);
 	void removeUser(int);
 	void removeAllUsers();
 };

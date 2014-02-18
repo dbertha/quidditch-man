@@ -11,7 +11,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-#include "Defines.h"
+#include "Defines.hpp"
 
 #define SERIALISATION_MAXSIZE 1025
 #define SUCCESS 1

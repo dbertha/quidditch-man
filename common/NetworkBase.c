@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Defines.h"
+#include "Defines.hpp"
 #include "NetworkBase.h"
 
 /* recv(socket, *message, sizeToWrite, 0) return sizeWriten if ok
