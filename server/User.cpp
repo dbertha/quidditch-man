@@ -74,11 +74,24 @@ void User::cmdHandler(SerializedObject *received) {
 			break;
 		case ACCEPTMATCH :
 			//reading details
+			int confirmation; //temporary for gcc compiler (testing only). Change to bool when compiled with g++
 			position = received->stringData;
 			memcpy(&targetedUser, position, sizeof(targetedUser)); 
+			position += sizeof(targetedUser);
+			memcpy(&confirmation, position, sizeof(confirmation)); 
 #ifdef __DEBUG
 			std::cout<<"Demande d'acceptation d'un match reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"userID reçu : "<<targetedUser<<std::endl;
+			std::cout<<"confirmation : "<<confirmation<<std::endl;
+#endif
+			//handle demand
+			//construct answer
+			break;
+		case IS_MATCH_WAITING :
+			//no details to read
+			//on suppose qu'un seul match sera demandé à la fois
+#ifdef __DEBUG
+			std::cout<<"Demande si match demandé reçue sur socket "<<getSockfd()<<std::endl;
 #endif
 			//handle demand
 			//construct answer

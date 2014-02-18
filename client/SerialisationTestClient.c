@@ -1,6 +1,8 @@
+#define _BSD_SOURCE
 #include "../common/NetworkBase.h"
 #include "../common/NetworkInterface.hpp"
 #include "../common/Defines.hpp"
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,11 +13,13 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <sys/unistd.h>
 
 #define DIM 100
 
 int main(int argc, char *argv[]){
-  int buildingID;
+  int buildingID, userID;
+  int confirm, price, moves[7][3];
   int att2;
   long att3;
   char att4[43];
@@ -103,26 +107,101 @@ int main(int argc, char *argv[]){
   //~ printf("%s : %d\n", "Long ", att3);
   //~ printf("%s : %s\n", "char[43] :  ", att4);
   
-  printf("%s\n", "Test du passage des infos de logging :");
-  printf ("Enter your username : (no spaces allowed)");
-  scanf ("%29s",username);  
-  printf ("Enter your password : ");
-  scanf ("%29s",password);  
+  //~ printf("%s\n", "Test du passage des infos de logging :");
+  //~ printf ("Enter your username : (no spaces allowed)");
+  //~ scanf ("%29s",username);  
+  //~ printf ("Enter your password : ");
+  //~ scanf ("%29s",password);  
+  //~ 
+  //~ sendLoginToServer(sockfd, username, password);
+  //~ 
+  //~ printf("%s\n", "Test du passage des infos de bâtiments :");
+  //~ printf ("indice du bâtiment demandé : ");
+  //~ scanf ("%d",&buildingID);  
+  //~ 
+  //~ askForBuildingInfos(sockfd, buildingID);
+  //~ 
+  //~ printf("%s\n", "Test du passage d'une demande d'upgrade de bâtiments :");
+  //~ printf ("indice du bâtiment demandé : ");
+  //~ scanf ("%d",&buildingID);  
+  //~ 
+  //~ askForBuildingUpgrade(sockfd, buildingID);
+  //~ 
+  //~ printf("%s\n", "Test du passage d'une proposition de match :");
+  //~ printf ("indice de l'adversaire : ");
+  //~ scanf ("%d",&userID);  
+  //~ 
+  //~ proposeMatchTo(sockfd, userID);
+  //~ 
+  //~ printf("%s\n", "Test d'une réponse à une proposition de match :");
+  //~ printf ("indice du demandeur : ");
+  //~ scanf ("%d",&userID);  
+  //~ printf ("confirmation 0/1 : ");
+  //~ scanf ("%d",&confirm);  
+  //~ 
+  //~ answerMatchProposal(sockfd, userID, confirm);
+  //~ 
+  //~ printf("%s\n", "Test si match en attente :");
+  //~ 
+  //~ isMatchWaiting(sockfd);
+  //~ 
+  //~ printf("%s\n", "Test du démarrage d'une vente aux enchères :");
+  //~ printf ("indice du joueur à vendre : ");
+  //~ scanf ("%d",&userID);  
+  //~ printf ("prix de départ : ");
+  //~ scanf ("%d",&price);  
+  //~ 
+  //~ sellPlayer(sockfd, userID, price);
+  //~ 
+  //~ printf("%s\n", "Test de la participation à une vente aux enchères :");
+  //~ printf ("indice de l'enchère à rejoindre : ");
+  //~ scanf ("%d",&userID);  
+  //~ 
+  //~ joinAuction(sockfd, userID);
+  //~ 
+  //~ printf("%s\n", "Test passage demande list joueurs :");
+  //~ 
+  //~ getManagersList(sockfd);
+//~ 
+  //~ printf("%s\n", "Test passage demande list enchères :");
+  //~ 
+  //~ getAuctionsList(sockfd);
+  //~ 
+  //~ printf("%s\n", "Test passage demande ensemble des positions sur le terrain :");
+  //~ 
+  //~ getAllPositions(sockfd);
+  //~ 
+  //~ printf("%s\n", "Test du passage de la sélection d'un joueur :");
+  //~ printf ("indice du joueur : ");
+  //~ scanf ("%d",&userID);  
+  //~ selectPlayer(sockfd, userID);
+  //~ 
+  //~ printf("%s\n", "Test du passage d'une demande d'entrainement :");
+  //~ printf ("indice du joueur à entrainer : ");
+  //~ scanf ("%d",&userID);  
+  //~ printf ("indice de la capacité à entrainer : ");
+  //~ scanf ("%d",&buildingID); 
+  //~ trainPlayer(sockfd, userID, buildingID);
   
-  sendLoginToServer(sockfd, username, password);
+  printf("%s\n", "Test du passage d'une liste de mouvement de 7 joueurs :");
+  for(int i = 0; i < 7; ++i){
+    printf ("indice du joueur à déplacer : ");
+    scanf ("%d",&userID);  
+    printf ("indice de la diagonale de la destination : ");
+    scanf ("%d",&buildingID); 
+    printf ("indice de la ligne de la destination : ");
+    scanf ("%d",&price); 
+    moves[i][0] = userID;
+    moves[i][1] = buildingID;
+    moves[i][2] = price;
+    printf("%s : %d %d %d\n", "playerID diagDest lineDest", userID, buildingID, price);
+    printf("%s : %d %d %d\n", "playerID diagDest lineDest", moves[i][0], moves[i][1], moves[i][2]);
+  }
+  trainPlayer(sockfd, userID, buildingID);
   
-  printf("%s\n", "Test du passage des infos de bâtiments :");
-  printf ("indice du bâtiment demandé : ");
-  scanf ("%d",&buildingID);  
+  sendMoves(sockfd, moves);
   
-  askForBuildingInfos(sockfd, buildingID);
-  
-  printf("%s\n", "Test du passage d'une demande d'upgrade de bâtiments :");
-  printf ("indice du bâtiment demandé : ");
-  scanf ("%d",&buildingID);  
-  
-  askForBuildingUpgrade(sockfd, buildingID);
-  
+
   
   return EXIT_SUCCESS;
 } 
