@@ -4,7 +4,7 @@
 #include "Building.hpp"
 #include "FanShop.hpp"
 
-#define SELLINGRICE 50
+#define SELLINGPRICE 50
 
 typedef int gold;
 
@@ -13,7 +13,7 @@ using namespace std;
 FanShop::FanShop(int level, gold price, int maxClients): Building(level,price), _maxClientsAtFirstLevel(maxClients) {}
 
 gold FanShop::getIncome() {
-	gold amount = SELLINGRICE * this->getMaxClients();
+	gold amount = SELLINGPRICE * this->getMaxClients();
 	return amount;
 }
 

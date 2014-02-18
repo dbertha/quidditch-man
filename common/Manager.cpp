@@ -27,6 +27,10 @@
 
 #include "Manager.hpp"
 
+#define TICKETPRICE 40
+#define VICTORYBONUS 35000
+
+typedef int gold;
 
 using namespace std;
 
@@ -100,6 +104,19 @@ ManagedPlayer Manager::getPlayer(int index) {
 	if (index>=_numberOfFans) throw "Index out of range";
 	return _players[index];
 }
+
+gold Manager::getIncomeFromMatch(bool hasWon,bool wasHost) {
+	gold money=0;
+	if (wasHost) {
+		if (_numberOfFans<_stadium.getMaxPlaces()) money+=_numberOfFans*TICKETPRICE;
+		else money+=_stadium.getMaxPlaces()*TICKETPRICE;
+	}
+	if (hasWon) money+=VICTORYBONUS;
+	return money;
+}
+void Manager::trainPlayer(int playerID, int capacityNumber) {_trainingCenter.train(_players[playerID],capacityNumber);}
+void Manager::healPlayer(int playerID) {_hospital.heal(_players[playerID]);}
+gold Manager::getIncomeFromFanShop() {return _fanShop.getIncome();}
 
 void Manager::save(){
 	Saver saver;

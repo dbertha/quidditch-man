@@ -121,7 +121,6 @@ void Saver::saveBuildings(string managerLogin, Stadium stadium, TrainingCenter t
 		cerr<<"Error while opening file\n";
 	}
 	string toWrite;
-	cout<<"prout"<<endl;
 	toWrite=intToString(stadium.getLevel());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
@@ -132,7 +131,6 @@ void Saver::saveBuildings(string managerLogin, Stadium stadium, TrainingCenter t
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
 
-	cout<<"prout"<<endl;
 	toWrite=intToString(trainingCenter.getLevel());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
@@ -143,7 +141,6 @@ void Saver::saveBuildings(string managerLogin, Stadium stadium, TrainingCenter t
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
 
-	cout<<"prout"<<endl;
 	toWrite=intToString(hospital.getLevel());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
@@ -154,7 +151,6 @@ void Saver::saveBuildings(string managerLogin, Stadium stadium, TrainingCenter t
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
 
-	cout<<"prout"<<endl;
 	toWrite=intToString(fanShop.getLevel());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
@@ -165,14 +161,12 @@ void Saver::saveBuildings(string managerLogin, Stadium stadium, TrainingCenter t
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
 
-	cout<<"prout"<<endl;
 	toWrite=intToString(recruitmentCenter.getLevel());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
 	toWrite=intToString(recruitmentCenter.getPriceForConstruction());
 	write(fd,toWrite.c_str(),toWrite.size());
 	
-	cout<<"prout"<<endl;
 	close(fd);
 }
 

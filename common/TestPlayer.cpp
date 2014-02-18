@@ -31,6 +31,10 @@ int main() {
 	manager._recruitmentCenter.displayInformations();
 
 	Manager manager2("Manager2");
+
+	cout<<manager.getIncomeFromMatch(true,true)<<endl;
+	cout<<manager.getIncomeFromFanShop()<<endl;
+
 /*
 	ManagedPlayer player("Saves/defaultSeeker.txt");
 	cout<<player.getFirstName()<<" "<<player.getLastName()<<endl;

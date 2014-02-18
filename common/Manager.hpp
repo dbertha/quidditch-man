@@ -15,6 +15,8 @@
 #include "FanShop.hpp"
 #include "RecruitmentCenter.hpp"
 
+typedef int gold;
+
 class Manager {
 
 	string _login;
@@ -47,6 +49,12 @@ class Manager {
  	void removePlayer(ManagedPlayer& player);
 
  	ManagedPlayer getPlayer(int index);
+
+ 	gold getIncomeFromMatch(bool hasWon,bool wasHost);
+ 	void trainPlayer(int playerID, int capacityNumber);
+ 	void healPlayer(int playerID);
+ 	gold getIncomeFromFanShop();
+
 
  	void save();
 
