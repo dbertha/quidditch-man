@@ -23,15 +23,15 @@
 
 using namespace std;
 
-Manager::Manager(string managerLogin) {
+Manager::Manager(string managerLogin): _login(managerLogin) {
 	string directory = "Saves/"+managerLogin;
 	int result = mkdir(directory.c_str(),0777);
-	if (result==-1) loadManager(managerLogin); //Directory already exists.
-	else createNewManager(managerLogin);
+	if (result==-1) loadManager(); //Directory already exists.
+	else createNewManager();
 }
 
-void Manager::loadManager(string managerLogin) {
-	string saveFile = "Saves/"+managerLogin+"/"+managerLogin+".txt";
+void Manager::loadManager() {
+	string saveFile = "Saves/"+_login+"/"+_login+".txt";
 	int fd = open("Saves/Manager/Manager.txt",O_RDONLY);
 	if (fd==-1) {
 		cerr<<"Error while opening file\n";
@@ -60,7 +60,7 @@ void Manager::loadManager(string managerLogin) {
 	close(fd);
 	
 
-	string playerList = "Saves/"+managerLogin+"/Players/players.txt";
+	string playerList = "Saves/"+_login+"/Players/players.txt";
 	int fd2 = open(playerList.c_str(),O_RDONLY);
 	if (fd2==-1) {
 		cerr<<"Error while opening file\n";
@@ -73,7 +73,7 @@ void Manager::loadManager(string managerLogin) {
 	buffer2[byte2]='\0';
 
 	
-	string path = "Saves/"+managerLogin+"/Players/";
+	string path = "Saves/"+_login+"/Players/";
 	string playerFile= "";
 
 	int i=0;
@@ -87,9 +87,9 @@ void Manager::loadManager(string managerLogin) {
 	}
 	
 	close(fd2);
-
 }
-void Manager::createNewManager(string managerLogin) {
+
+void Manager::createNewManager() {
 	_numberOfPlayers = 7;
 	//_numberMaxOfPlayers = 7;
 	_money = 500000;
@@ -100,31 +100,60 @@ void Manager::createNewManager(string managerLogin) {
 	for (int i=0;i<2;++i) _players.push_back(ManagedPlayer("Saves/defaultBeater.txt"));
 	for (int i=0;i<3;++i) _players.push_back(ManagedPlayer("Saves/defaultChaser.txt"));
 
-	Saver saver;
-	saver.saveManager(managerLogin,*this);
-
-	string directory = "Saves/"+managerLogin+"/Players";
+	string directory = "Saves/"+_login+"/Players";
 	mkdir(directory.c_str(),0777);
-	saver.savePlayersList(managerLogin,_players);
-	for (unsigned i=0;i<_players.size();++i) saver.savePlayer(managerLogin,_players[i]);
-	
 
+	save();
 }
 
-
 int Manager::getNumberOfPlayers() {return _numberOfPlayers;}
+void Manager::setNumberOfPlayers(int number) {_numberOfPlayers=number;}
 //int Manager::getNumberMaxOfPlayers() {return _numberMaxOfPlayers;}
 int Manager::getMoney() {return _money;}
-int Manager::getNumberOfFans() {return _numberOfFans;}
-
-
-void Manager::setNumberOfPlayers(int number) {_numberOfPlayers=number;}
 void Manager::addMoney(int amount) {_money+=amount;}
 void Manager::pay(int amount) {_money-=amount;}
+
+int Manager::getNumberOfFans() {return _numberOfFans;}
 void Manager::setNumberOfFans(int number) {_numberOfFans=number;}
+
+void Manager::addPlayer(ManagedPlayer& player) {
+	_players.push_back(player);
+	++ _numberOfPlayers;
+	save();
+}
+void Manager::removePlayer(ManagedPlayer& player) {
+	string playerName = player.getFirstName() + player.getLastName();
+	string tmp;
+	int index=-1;
+	for (unsigned i=0;i<_players.size();++i){
+		tmp = _players[i].getFirstName() + _players[i].getLastName();
+		if (tmp==playerName) {
+			index=i;
+			i=_players.size();
+		}
+	}
+	if (index!=-1){
+		_players.erase(_players.begin()+index);
+
+		-- _numberOfPlayers;
+		string file = "Saves/"+_login+"/Players/"+playerName+".txt";
+		remove(file.c_str());
+		save();
+	}
+	else {
+		throw "Player not found";
+	}
+}
 
 ManagedPlayer Manager::getPlayer(int index) {
 	if (index>=_numberOfFans) throw "Index out of range";
 	return _players[index];
+}
+
+void Manager::save(){
+	Saver saver;
+	saver.saveManager(_login,*this);
+	for (unsigned i=0;i<_players.size();++i) saver.savePlayer(_login,_players[i]);
+	saver.savePlayersList(_login,_players);
 }
 

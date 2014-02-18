@@ -6,16 +6,16 @@
 
 #define SELLINGRICE 50
 
-typedef int gold
+typedef int gold;
 
-FanShop::FanShop(int level, gold price, int maxClients) : Building(level,price), _maxClientsAtFirstLevel(maxClients) {}
+FanShop::FanShop(int level, gold price, int maxClients): Building(level,price), _maxClientsAtFirstLevel(maxClients) {}
 
 void FanShop::getIncome(Manager& manager) {
 	int amount = SELLINGRICE * this->getMaxClients();
 	manager.addMoney(amount);
 }
 
-int FanShop::getMaxClients() {return _maxClientsAtFirstLevel * 2**((this->_level)-1);}
+int FanShop::getMaxClients() {return _maxClientsAtFirstLevel * pow(2,(this->_level)-1);}
 
 gold FanShop::getPriceForNextLevel() {
 	int priceScale = _priceForConstruction/3;

@@ -98,6 +98,7 @@ void Saver::savePlayer(string managerLogin, ManagedPlayer player) {
 
 void Saver::savePlayersList(string managerLogin, vector<ManagedPlayer> players) {
 	string file = "Saves/"+managerLogin+"/Players/players.txt";
+	remove(file.c_str());
 	int fd = open(file.c_str(),O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
 	if (fd==-1){
 		cerr<<"Error while opening file\n";

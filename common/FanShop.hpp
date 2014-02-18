@@ -12,7 +12,7 @@ class FanShop : public Building {
 
  public:
 
- 	FanShop(int level, gold price, int maxClients)
+ 	FanShop(int level, gold price, int maxClients);
 
     void getIncome(Manager& manager);
     int getMaxClients();

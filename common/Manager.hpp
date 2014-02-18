@@ -12,6 +12,7 @@
 
 class Manager {
 
+	std::string _login;
 	vector<ManagedPlayer> _players;
 	//Building[] _buildings;
 	int _numberOfPlayers;
@@ -24,21 +25,26 @@ class Manager {
  	Manager(string managerLogin);
 
  	int getNumberOfPlayers();
+ 	void setNumberOfPlayers(int number);
  	//int getNumberMaxOfPlayers();
  	int getMoney();
- 	int getNumberOfFans();
-
- 	void setNumberOfPlayers(int number);
  	void addMoney(int amount);
  	void pay(int amount);
+
+ 	int getNumberOfFans();
  	void setNumberOfFans(int number);
+
+ 	void addPlayer(ManagedPlayer& player);
+ 	void removePlayer(ManagedPlayer& player);
 
  	ManagedPlayer getPlayer(int index);
 
+ 	void save();
+
  private:
 
- 	void loadManager(string managerLogin);
- 	void createNewManager(string managerLogin);
+ 	void loadManager();
+ 	void createNewManager();
 
 };
 
