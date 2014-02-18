@@ -1,7 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include "Defines.hpp"
+#include "../common/Defines.hpp"
 #include <iostream>
 #include <set>
 #include <vector>

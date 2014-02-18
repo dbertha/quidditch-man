@@ -1,5 +1,5 @@
 #include "Server.hpp"
-#include "Defines.hpp"
+#include "../common/Defines.hpp"
 
 int main(int argc, char* argv[]) {
 	Server ourServer=Server(PORT);
