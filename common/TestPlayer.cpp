@@ -11,6 +11,7 @@
 #include "Hospital.hpp"
 #include "FanShop.hpp"
 #include "RecruitmentCenter.hpp"
+#include "Calendar.hpp"
 
 #include "Manager.hpp"
 
@@ -21,7 +22,6 @@ using namespace std;
 
 int main() {
 
-
 	Manager manager("Manager");
 
 	manager._stadium.displayInformations();
@@ -30,11 +30,21 @@ int main() {
 	manager._fanShop.displayInformations();
 	manager._recruitmentCenter.displayInformations();
 
+	manager.getPlayer(1).displayInformations();
+	manager.trainPlayer(1,1);
+
+	Calendar calendar(manager);
+
+	calendar.update();
+	manager.getPlayer(1).displayInformations();
+	manager.save();
+
+/*
 	Manager manager2("Manager2");
 
 	cout<<manager.getIncomeFromMatch(true,true)<<endl;
 	cout<<manager.getIncomeFromFanShop()<<endl;
-
+*/
 /*
 	ManagedPlayer player("Saves/defaultSeeker.txt");
 	cout<<player.getFirstName()<<" "<<player.getLastName()<<endl;

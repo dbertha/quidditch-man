@@ -8,6 +8,7 @@
 #include <cstdlib> 
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -114,9 +115,74 @@ gold Manager::getIncomeFromMatch(bool hasWon,bool wasHost) {
 	if (hasWon) money+=VICTORYBONUS;
 	return money;
 }
-void Manager::trainPlayer(int playerID, int capacityNumber) {_trainingCenter.train(_players[playerID],capacityNumber);}
-void Manager::healPlayer(int playerID) {_hospital.heal(_players[playerID]);}
+void Manager::trainPlayer(int playerID, int capacityNumber) {
+	_trainingCenter.train(_players[playerID],capacityNumber);
+	string name = _players[playerID].getFirstName() + " " + _players[playerID].getLastName();
+	lockInCalendar(name,true);
+}
+void Manager::lockInCalendar(string name,bool isTraining) {
+	string file = "Saves/"+_login+"/calendar.txt";
+	int timeRequired;
+	if (isTraining) timeRequired = _trainingCenter.getTimeRequired();
+	else timeRequired = _hospital.getTimeRequired();
+
+	time_t secondes;
+	struct tm instant;
+	time(&secondes);
+	instant=*localtime(&secondes);
+
+	Saver saver; //pour intToString
+
+	string date = saver.intToString(instant.tm_mday)+":"+saver.intToString(instant.tm_mon+1)+":"+\
+	saver.intToString(instant.tm_hour)+":"+saver.intToString(instant.tm_min);
+
+	string timeBlock = saver.intToString(timeRequired);
+
+	int fd = open(file.c_str(),O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
+	if (fd==-1){
+		cerr<<"Error while opening file\n";
+		return;
+	}
+	write(fd,name.c_str(),name.size());
+	write(fd,"#",1);
+	write(fd,date.c_str(),date.size());
+	write(fd,"#",1);
+	write(fd,timeBlock.c_str(),timeBlock.size());
+	write(fd,"#",1);
+	write(fd,"\n",1);
+
+	close(fd);
+
+
+}
+void Manager::unlockPlayer(string name) {
+	string tmp;
+	for (unsigned i=0;i<_players.size();++i){
+		tmp = _players[i].getFirstName() + " " + _players[i].getLastName();
+		if (tmp==name) {
+			_players[i].unlockPlayer();
+		}
+	}
+}
+bool Manager::isPlayerBlocked(int playerID) {return _players[playerID].isBlocked();}
+bool Manager::isPlayerBlocked(string name) {
+	string tmp;
+	for (unsigned i=0;i<_players.size();++i){
+		tmp = _players[i].getFirstName() + " " + _players[i].getLastName();
+		if (tmp==name) {
+			return _players[i].isBlocked();
+		}
+	}
+	return false;
+}
+void Manager::healPlayer(int playerID) {
+	_hospital.heal(_players[playerID]);
+	string name = _players[playerID].getFirstName() + " " + _players[playerID].getLastName();
+	lockInCalendar(name,false);
+}
 gold Manager::getIncomeFromFanShop() {return _fanShop.getIncome();}
+
+string Manager::getLogin() {return _login;}
 
 void Manager::save(){
 	Saver saver;
