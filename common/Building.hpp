@@ -13,7 +13,7 @@ class Building {
 
 	Building(int lvl, gold price);
 //	Building();
-	virtual void upgradeBuilding();
+	virtual void upgrade();
 	virtual int getLevel();
 	virtual gold getPriceForConstruction();
 	//virtual void getInfos() = 0;

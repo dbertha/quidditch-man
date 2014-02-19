@@ -14,7 +14,9 @@ class Calendar {
  public:
  	Calendar(Manager& manager);
  	void update();
- 	bool checkBlock(char* line);
+ 	void updateCalendar(string file, bool isBlockCalendar);
+ 	bool checkTime(char* line, bool isBlockCalendar);
+ 	bool compareToCurrentDate(int day, int month, int hour, int minute); //true if current date is later in time, false otherwise
 
 };
 

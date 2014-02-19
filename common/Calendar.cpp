@@ -23,7 +23,13 @@ using namespace std;
 Calendar::Calendar(Manager& manager): _manager(manager) {}
 
 void Calendar::update() {
-	string file = "Saves/"+_manager.getLogin()+"/calendar.txt";
+	string file = "Saves/"+_manager.getLogin()+"/constructionCalendar.txt";
+	updateCalendar(file,false);
+	file = "Saves/"+_manager.getLogin()+"/blockCalendar.txt";
+	updateCalendar(file,true);
+}
+
+void Calendar::updateCalendar(string file, bool isBlockCalendar) {
 	int fd = open(file.c_str(),O_RDONLY);
 	if (fd==-1){
 		cerr<<"Error while opening file"<<endl;
@@ -51,10 +57,9 @@ void Calendar::update() {
 	char* line = strtok(buffer,"\n");
 	if (line!=NULL){ 
 		string toWrite = line;
-		if (checkBlock(line)) change=true;
+		if (checkTime(line,isBlockCalendar)) change=true;
 		while ((line=strtok(NULL,"\n"))!=NULL) {
-			if (!checkBlock(line)){
-				cout<<"Still blocked"<<endl;
+			if (!checkTime(line,isBlockCalendar)){
 				write(fd_tmp,toWrite.c_str(),toWrite.size());
 				write(fd_tmp,"\n",1);
 			}
@@ -73,16 +78,14 @@ void Calendar::update() {
 
 }
 
-bool Calendar::checkBlock(char* line) {
+bool Calendar::checkTime(char* line, bool isBlockCalendar) {
 	string name;
 	char* date;
 	string blockTime;
 	name = strtok(line,"#");
 	date = strtok(NULL,"#");
 	blockTime = strtok(NULL,"#");
-	cout<<date<<endl;
-	if (_manager.isPlayerBlocked(name)) {
-
+	if ( (isBlockCalendar&&(_manager.isPlayerBlocked(name))) || (!isBlockCalendar) ) {
 		string sMonth, sDay, sHour, sMinute;
 		int month, day, hour, minute;
 		sDay = strtok(date,":");
@@ -112,23 +115,10 @@ bool Calendar::checkBlock(char* line) {
 				}
 			}
 		}
-		time_t secondes;
-	    struct tm instant;
-	    time(&secondes);
-	    instant=*localtime(&secondes);
-	    bool hasTimedPassed = false;
-	    if (month<=instant.tm_mon+1){
-	    	if (day<=instant.tm_mday){
-	    		if (hour<=instant.tm_hour){
-	    			if (minute<=instant.tm_min){
-	    				hasTimedPassed=true;
-	    			}
-	    		}
-	    	}
-	    }
 
-	    if (hasTimedPassed) {
-	    	_manager.unlockPlayer(name);
+	    if (compareToCurrentDate(day,month,hour,minute)) {
+	    	if (isBlockCalendar) _manager.unlockPlayer(name);
+	    	else _manager.upgradeBuilding(name);
 	    	return true;
 	    }
 	}
@@ -136,6 +126,25 @@ bool Calendar::checkBlock(char* line) {
 
 }
 
+bool Calendar::compareToCurrentDate(int day, int month, int hour, int minute) {
+		time_t secondes;
+	    struct tm instant;
+	    time(&secondes);
+	    instant=*localtime(&secondes);
+	    bool hasTimePassed = false;
+	    if (month==instant.tm_mon+1){
+	    	if (day==instant.tm_mday){
+	    		if (hour==instant.tm_hour){
+	    			if (minute<=instant.tm_min) hasTimePassed=true;
+	    		}
+	    		else if (hour<instant.tm_hour) hasTimePassed=true;
+	    	}
+	    	else if (day<instant.tm_mday) hasTimePassed=true;
+	    }
+	    else if (month<instant.tm_mon+1) hasTimePassed=true;
+
+	   return hasTimePassed;
+}
 
 /*
 int main(void)

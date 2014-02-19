@@ -52,12 +52,22 @@ class Manager {
 
  	gold getIncomeFromMatch(bool hasWon,bool wasHost);
  	void trainPlayer(int playerID, int capacityNumber);
- 	void lockInCalendar(string name,bool isTraining);
+ 	void writeBlockInCalendar(string name,bool isTraining);
  	void unlockPlayer(string name);
  	bool isPlayerBlocked(int playerID);
  	bool isPlayerBlocked(string name);
  	void healPlayer(int playerID);
  	gold getIncomeFromFanShop();
+
+ 	void startStadiumConstruction();
+ 	void startTrainingCenterConstruction();
+	void startHospitalConstruction();
+	void startFanShopConstruction();
+	void startRecruitmentCenterConstruction();
+
+	void upgradeBuilding(string buildingName);
+
+	void writeInCalendar(string file, string name, int timeRequired);
 
  	string getLogin();
 

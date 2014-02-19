@@ -30,13 +30,15 @@ int main() {
 	manager._fanShop.displayInformations();
 	manager._recruitmentCenter.displayInformations();
 
-	manager.getPlayer(1).displayInformations();
-	manager.trainPlayer(1,1);
+	//manager.startStadiumConstruction();
+
+	//manager.getPlayer(1).displayInformations();
+	//manager.trainPlayer(1,1);
 
 	Calendar calendar(manager);
 
 	calendar.update();
-	manager.getPlayer(1).displayInformations();
+	//manager.getPlayer(1).displayInformations();
 	manager.save();
 
 /*
