@@ -3,6 +3,7 @@
 
 #include "../common/Defines.hpp"
 #include "../common/NetworkBase.h"
+#include "../common/commAPI.hpp"
 #include <iostream>
 #include <set>
 #include <vector>

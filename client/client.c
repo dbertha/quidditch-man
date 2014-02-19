@@ -1,4 +1,5 @@
 #include "../common/Defines.hpp"
+//#include "../common/commAPI.hpp" //erreur, pb de librairies c++ à passer au compilateur c
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

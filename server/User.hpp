@@ -2,6 +2,10 @@
 #define USER_H
 #include "../common/NetworkBase.h"
 #include <iostream>
+#include <pthread.h>
+#include <string>
+#include <sstream>
+#include <iostream>
 class Server;
 class CommonMgr;
 class User {
@@ -12,13 +16,21 @@ public:
 	bool isDisconnecting();
 	int getSockfd();
 	std::string getUserId();
+	//int sendAnswer(User *, const char cmd, std::string); cf NetworkBase.cpp
+	void* createMatch();
+	enum Status {INIT,FREE,MATCH_LIST,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING};
+//	Status getState();
+	Status state_;
+	pthread_t thread; // thread utilisé pour la gestion d'un match ou de tout autre activité spécifique
 
 private:
 	Server* server_;
 	CommonMgr* commonMgr_;
+	User* opponent_;
 	int sockfd_; //socket de communication du client
 	std::string userId_;
-	bool disconnecting_;
+	//std::string answer_;
+	std::string dataRequest_;
 };
 
 #endif
