@@ -110,12 +110,14 @@ gold Manager::getIncomeFromMatch(bool hasWon,bool wasHost) {
 }
 
 void Manager::displayTrainingCenterInformations() {_trainingCenter.displayInformations();}
-void Manager::trainPlayer(int playerID, int capacityNumber) {
+bool Manager::trainPlayer(int playerID, int capacityNumber) {
+	if (isPlayerBlocked(playerID)) return false;
 	if (playerID>=_numberOfPlayers) throw "IPlayer index out of range";
 	if (capacityNumber>=5) throw "Capacity index out of range";
 	_trainingCenter.train(_players[playerID],capacityNumber);
 	string name = _players[playerID].getFirstName() + " " + _players[playerID].getLastName();
 	writeBlockInCalendar(name,true);
+	return true;
 }
 void Manager::unlockPlayer(string name) {
 	string tmp;
@@ -142,11 +144,13 @@ bool Manager::isPlayerBlocked(string name) {
 }
 
 void Manager::displayHospitalInformations() {_hospital.displayInformations();}
-void Manager::healPlayer(int playerID) {
+bool Manager::healPlayer(int playerID) {
+	if (isPlayerBlocked(playerID)) return false;
 	if (playerID>=_numberOfPlayers) throw "Index out of range";
 	_hospital.heal(_players[playerID]);
 	string name = _players[playerID].getFirstName() + " " + _players[playerID].getLastName();
 	writeBlockInCalendar(name,false);
+	return true;
 }
 
 void Manager::displayFanShopInformations() {_fanShop.displayInformations();}
@@ -154,30 +158,40 @@ gold Manager::getIncomeFromFanShop() {return _fanShop.getIncome();}
 
 void Manager::displayRecruitmentCenterInformations() {_recruitmentCenter.displayInformations();}
 
-void Manager::startStadiumConstruction() {
+bool Manager::startStadiumConstruction() {
+	if (_money<_stadium.getPriceForNextLevel()) return false;
 	pay(_stadium.getPriceForNextLevel());
 	string file = "Saves/"+_login+"/constructionCalendar.txt";
 	writeInCalendar(file,"Stadium", TIMESCALECONSTRUCTION*(7-_stadium.getLevel()));
+	return true;
 }
-void Manager::startTrainingCenterConstruction() {
+bool Manager::startTrainingCenterConstruction() {
+	if (_money<_trainingCenter.getPriceForNextLevel()) return false;
 	pay(_trainingCenter.getPriceForNextLevel());
 	string file = "Saves/"+_login+"/constructionCalendar.txt";
 	writeInCalendar(file,"TrainingCenter", TIMESCALECONSTRUCTION*(7-_trainingCenter.getLevel()));
+	return true;
 }
-void Manager::startHospitalConstruction() {
+bool Manager::startHospitalConstruction() {
+	if (_money<_hospital.getPriceForNextLevel()) return false;
 	pay(_hospital.getPriceForNextLevel());
 	string file = "Saves/"+_login+"/constructionCalendar.txt";
 	writeInCalendar(file,"Hospital", TIMESCALECONSTRUCTION*(7-_hospital.getLevel()));
+	return true;
 }
-void Manager::startFanShopConstruction() {
+bool Manager::startFanShopConstruction() {
+	if (_money<_fanShop.getPriceForNextLevel()) return false;
 	pay(_fanShop.getPriceForNextLevel());
 	string file = "Saves/"+_login+"/constructionCalendar.txt";
 	writeInCalendar(file,"FanShop", TIMESCALECONSTRUCTION*(7-_fanShop.getLevel()));
+	return true;
 }
-void Manager::startRecruitmentCenterConstruction() {
+bool Manager::startRecruitmentCenterConstruction() {
+	if (_money<_recruitmentCenter.getPriceForNextLevel()) return false;
 	pay(_recruitmentCenter.getPriceForNextLevel());
 	string file = "Saves/"+_login+"/constructionCalendar.txt";
 	writeInCalendar(file,"RecruitmentCenter", TIMESCALECONSTRUCTION*(7-_recruitmentCenter.getLevel()));
+	return true;
 }
 
 void Manager::upgradeBuilding(string buildingName) {

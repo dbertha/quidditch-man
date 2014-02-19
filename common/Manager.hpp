@@ -56,24 +56,24 @@ class Manager {
  	gold getIncomeFromMatch(bool hasWon,bool wasHost);
 
  	void displayTrainingCenterInformations();
- 	void trainPlayer(int playerID, int capacityNumber);
+ 	bool trainPlayer(int playerID, int capacityNumber);
  	void unlockPlayer(string name);
  	bool isPlayerBlocked(int playerID);
  	bool isPlayerBlocked(string name);
 
  	void displayHospitalInformations();
- 	void healPlayer(int playerID);
+ 	bool healPlayer(int playerID);
 
  	void displayFanShopInformations();
  	gold getIncomeFromFanShop();
 
  	void displayRecruitmentCenterInformations();
 
- 	void startStadiumConstruction();
- 	void startTrainingCenterConstruction();
-	void startHospitalConstruction();
-	void startFanShopConstruction();
-	void startRecruitmentCenterConstruction();
+ 	bool startStadiumConstruction();
+ 	bool startTrainingCenterConstruction();
+	bool startHospitalConstruction();
+	bool startFanShopConstruction();
+	bool startRecruitmentCenterConstruction();
 
 	void upgradeBuilding(string buildingName);
 
