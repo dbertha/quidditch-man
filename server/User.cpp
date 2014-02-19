@@ -3,6 +3,19 @@
 #include "CommonMgr.hpp"
 #include "../common/NetworkBase.h"
 
+#include <sys/stat.h>
+#include <iostream>
+#include <stdlib.h>     /* atoi */
+#include <ctime>
+#include <cstdlib> 
+#include <stdio.h>
+#include <string.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
 User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), userId_(""), disconnecting_(false) {}
 
 void User::cmdHandler(SerializedObject *received) {
@@ -30,8 +43,9 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Username reçu :  "<<username <<std::endl;
 			std::cout<<"Password reçu :  "<<password <<std::endl;
 #endif
-			//handle demand
-			
+			//handle demand:
+			if (checkLoginAndPassword(username,password)) std::cout<<"LOGIN OK"<<std::endl;
+			else std::cout<<"WRONG LOGIN"<<std::endl;
 			//construct answer
 			answer.typeOfInfos = LOGIN_CONFIRM;
 			
@@ -230,4 +244,39 @@ int User::getSockfd() {return sockfd_;}
 
 std::string User::getUserId() {return userId_;}
 
+bool User::checkLoginAndPassword(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]) {
+	int fd = open("..common/Saves/managers.txt",O_RDONLY);
+	if (fd==-1){
+		std::cerr<<"Error while opening file\n";
+		return -1;
+	}
 
+	int size = lseek(fd,0,SEEK_END);
+	lseek(fd,0,SEEK_SET);
+
+	char buffer[size+1];
+
+	int byte = read(fd,buffer,size);
+	buffer[byte]='\0';
+
+	char *line, *login, *pass, *context1, *context2;
+
+	if ( (line=strtok_r(buffer,"\n",&context1))!=NULL) {
+		do {
+			std::cout<<line<<std::endl;
+			login = strtok_r(line,"#",&context2);
+			pass = strtok_r(NULL,"#",&context2);
+			if (strcmp(login,username)==0) {
+				if (strcmp(pass,password)==0){
+					return 1;
+				}
+				
+			}
+		} while ( (line=strtok_r(NULL,"\n",&context1))!=NULL)  ;
+	}
+
+	close(fd);
+	return 0;
+
+
+}
