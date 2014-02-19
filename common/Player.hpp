@@ -13,44 +13,36 @@ class Player {
     string _lastName;
 
     int _capacities[5];
-    int _trainingLeft[5];
-    int _popularity;
-    bool _blocked;
+    int _life;
 
-    int _life; //Calculé à partir de la résistance, donc pas un attribut propre.
-    Broomstick _broomstick;
-
+ protected:
+    long _offset;
 
  public:
 
-    Player(string& playerSaveFile);
+    Player();
+    Player(string playerSaveFile);
 
-    string getFirstName();
-    string getLastName();
+    Player& operator= (const Player&);
+
+    string getFirstName() const ;
+    string getLastName() const ;
     void verifyName();
     bool isNameTaken();
+    string getRandomName(string fileName, int line);
+    string getRandomFirstName(int line);
+    string getRandomLastName(int line);
 
-    int getCapacity(int capacityNumber);
-    int getTrainingLeft(int capacityNumber);
-    void setTrainingLeft(int capacityNumber, int value);
+    int getCapacity(int capacityNumber) const;
+    void setCapacity(int capacityNumber, int value);
 
-    int getPopularity();
-    void setPopularity(int popularity);
-
-    void lockPlayer();
-    void unlockPlayer();
-    bool isBlocked();
-
-    int getLife();
-    Broomstick getBroomstick();
+    int getLife() const;
+    void setLife(int value);
+    void heal();
 
     void setFirstName(string firstName);
     void setLastName(string lastName);
-    void up(int capacityNumber); //Incrémente la capacité correspondante
-
-    void setLife(int life);
-    void setBroomstick(Broomstick broomstick);
-    void gainPopularity();
+    void up(int capacityNumber); //Increases by one the capacity concerned 
 
 };
 
