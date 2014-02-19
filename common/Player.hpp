@@ -42,7 +42,7 @@ class Player {
 
     void setFirstName(string firstName);
     void setLastName(string lastName);
-    void up(int capacityNumber); //Incrémente la capacité correspondante
+    void up(int capacityNumber); //Increases by one the capacity concerned 
 
 };
 

@@ -12,12 +12,10 @@ class Building {
  public:
 
 	Building(int lvl, gold price);
-//	Building();
 	virtual void upgrade();
 	virtual int getLevel();
 	virtual gold getPriceForConstruction();
-	//virtual void getInfos() = 0;
-	virtual gold getPriceForNextLevel() = 0;
+	virtual gold getPriceForNextLevel() = 0; //calcul is not the same for every building
 };
 
 

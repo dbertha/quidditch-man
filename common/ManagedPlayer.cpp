@@ -21,18 +21,39 @@ using namespace std;
 #define PRICESCALE 1000
 typedef int gold;
 
-ManagedPlayer::ManagedPlayer() : _blocked(0) {
+ManagedPlayer::ManagedPlayer() : _blocked(0) { //default constructor. This ManagedPlayer will never be used
 	for (int i=0;i<5;++i) _trainingLeft[i] = 0;
 	_broomstick = Broomstick(0,0);
 }
 
 ManagedPlayer::ManagedPlayer(string playerSaveFile): Player(playerSaveFile) {
+	/*
+	The format of a player save file is :
+		First Name (used by the constructor of Player)
+		Last Name (used by the constructor of Player)
+		Speed (used by the constructor of Player)
+		Strength (used by the constructor of Player)
+		Precision (used by the constructor of Player)
+		Reflex (used by the constructor of Player)
+		Resistance (used by the constructor of Player)
+		Training left to do to up speed
+		Training left to do to up strength
+		Training left to do to up precision
+		Training left to do to up reflex
+		Training left to do to up resistance
+		1 if player is blocked (by the training center or the hospital) or 0 if not
+		Number of the capacity boosted by the broomstick
+		Bonus granted by the broomstick
+
+	The first part of the file will be read by the constructor of Player. Player has a protected attribute _offset
+	_offset indicates to ManagedPlayer where he has to start reading the file.
+	*/
 	int fd = open(playerSaveFile.c_str(),O_RDONLY);
 	if (fd==-1) {
 		cerr<<"Error while opening file\n";
 		return;
 	}
-	lseek(fd,_offset,SEEK_SET);
+	lseek(fd,this->_offset,SEEK_SET);
 	char buffer[100];
 	int bytes;
 	bytes = read(fd,buffer,sizeof(buffer));
@@ -46,9 +67,6 @@ ManagedPlayer::ManagedPlayer(string playerSaveFile): Player(playerSaveFile) {
 		tmp = strtok(NULL,"\n");
 		_trainingLeft[i] = atoi(tmp.c_str());
 	}
-
-	//tmp = strtok(NULL,"\n");
-	//_popularity = atoi(tmp.c_str());
 
 	tmp = strtok(NULL,"\n");
 	_blocked = atoi(tmp.c_str());
@@ -72,7 +90,6 @@ ManagedPlayer& ManagedPlayer::operator= (const ManagedPlayer& player) {
 	}
 	this->setFirstName(player.getFirstName());
 	this->setLastName(player.getLastName());
-	//_popularity = player.getPopularity();
 	_blocked = player.isBlocked();
 	this->setLife(player.getLife());
 	return *this;
@@ -80,9 +97,6 @@ ManagedPlayer& ManagedPlayer::operator= (const ManagedPlayer& player) {
 
 int ManagedPlayer::getTrainingLeft(int capacityNumber) const {return _trainingLeft[capacityNumber];}
 void ManagedPlayer::setTrainingLeft(int capacityNumber, int value) {_trainingLeft[capacityNumber] = value;}
-
-//int ManagedPlayer::getPopularity() const {return _popularity;}
-//void ManagedPlayer::setPopularity(int popularity) {_popularity = popularity;}
 
 void ManagedPlayer::lockPlayer() {_blocked = true;}
 void ManagedPlayer::unlockPlayer() {_blocked = false;}
@@ -92,7 +106,6 @@ Broomstick ManagedPlayer::getBroomstick() {return _broomstick;}
 
 void ManagedPlayer::setBroomstick(Broomstick broomstick) {_broomstick = broomstick;}
 
-//void ManagedPlayer::gainPopularity() {this->setPopularity(this->getPopularity()+this->getPopularity()/10);} //Augmentation de 10%
 void ManagedPlayer::train(int capacityNumber){
 	this->setTrainingLeft(capacityNumber,this->getTrainingLeft(capacityNumber)-1);
 	if (this->getTrainingLeft(capacityNumber) == 0) {
@@ -100,14 +113,14 @@ void ManagedPlayer::train(int capacityNumber){
 		this->setTrainingLeft(capacityNumber,this->getCapacity(capacityNumber)-1);
 	}
 }
-void ManagedPlayer::updateLife() {}
+
 gold ManagedPlayer::getEstimatedValue() {
-	int index=0; //Déterminé par les capacités et l'avancement de leur entraînement
+	int index=0; //Index for value depends on the capacities and the number of trainings left for each capacity
 	for (int i=0;i<5;++i){
 		index+=2*this->getCapacity(i) - _trainingLeft[i];
 	}
 
-	return index*PRICESCALE + _broomstick.getValue();
+	return index*PRICESCALE + _broomstick.getValue(); //Value of player is the index * the price scale + the value of the broomstick
 }
 
 void ManagedPlayer::displayInformations() {
@@ -119,7 +132,6 @@ void ManagedPlayer::displayInformations() {
 	cout<<"Reflex : "<<this->getCapacity(3)<<endl;
 	cout<<"Resistance : "<<this->getCapacity(4)<<endl;
 	cout<<"\nLife : "<<this->getLife()<<endl;
-	//cout<<"\nPopularity : "<<_popularity<<endl;
 	cout<<"\nIs the player blocked ? "<<_blocked<<endl;
 	cout<<"\nBroomstick bonus is "<<_broomstick.getBonus()<<" for capacity "<<_broomstick.getCapacityBoosted()<<endl;
 }

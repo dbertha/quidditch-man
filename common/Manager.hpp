@@ -4,7 +4,6 @@
 #include <string> 
 #include <vector>
 
-
 #include "ManagedPlayer.hpp"
 #include "Broomstick.hpp"
 #include "Building.hpp"
@@ -15,7 +14,7 @@
 #include "FanShop.hpp"
 #include "RecruitmentCenter.hpp"
 
-typedef int gold;
+typedef int gold; //gold will be used instead of int everytime an int represents an amount of money
 
 class Manager {
 
@@ -26,18 +25,21 @@ class Manager {
 	int _money;
 	int _numberOfFans;
 
- public:
  	Stadium _stadium;
 	TrainingCenter _trainingCenter;
 	Hospital _hospital;
 	FanShop _fanShop;
 	RecruitmentCenter _recruitmentCenter;
 
+ public:
+
  	Manager(string managerLogin);
+
+ 	string getLogin();
 
  	int getNumberOfPlayers();
  	void setNumberOfPlayers(int number);
- 	//int getNumberMaxOfPlayers();
+
  	int getMoney();
  	void addMoney(int amount);
  	void pay(int amount);
@@ -47,17 +49,25 @@ class Manager {
 
  	void addPlayer(ManagedPlayer& player);
  	void removePlayer(ManagedPlayer& player);
-
  	ManagedPlayer getPlayer(int index);
+ 	void displayPlayerInformations(int playerID);
 
+ 	void displayStadiumInformations();
  	gold getIncomeFromMatch(bool hasWon,bool wasHost);
+
+ 	void displayTrainingCenterInformations();
  	void trainPlayer(int playerID, int capacityNumber);
- 	void writeBlockInCalendar(string name,bool isTraining);
  	void unlockPlayer(string name);
  	bool isPlayerBlocked(int playerID);
  	bool isPlayerBlocked(string name);
+
+ 	void displayHospitalInformations();
  	void healPlayer(int playerID);
+
+ 	void displayFanShopInformations();
  	gold getIncomeFromFanShop();
+
+ 	void displayRecruitmentCenterInformations();
 
  	void startStadiumConstruction();
  	void startTrainingCenterConstruction();
@@ -67,9 +77,8 @@ class Manager {
 
 	void upgradeBuilding(string buildingName);
 
+ 	void writeBlockInCalendar(string name,bool isTraining);
 	void writeInCalendar(string file, string name, int timeRequired);
-
- 	string getLogin();
 
  	void save();
 

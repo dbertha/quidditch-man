@@ -14,8 +14,6 @@ class TrainingCenter : public ImprovementBuilding {
 
     void train(ManagedPlayer& player, int capacityNumber);
 
-
-   // void getInfos();
 };
 
 #endif //TrainingCenter_hpp

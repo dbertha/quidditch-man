@@ -19,7 +19,6 @@ class FanShop : public Building {
     gold getPriceForNextLevel();
     
     void displayInformations();
-    //void getInfos();
 };
 
 #endif //FanShop_hpp

@@ -17,7 +17,7 @@ gold Stadium::getPriceForNextLevel() {
 
 	return priceForNextLevel;
 }
-
+//Number of max places in the stadium is multiplied by 2 with every upgrade.
 int Stadium::getMaxPlaces() {
 	int maxPlaces =  _maxPlacesAtFirstLevel * pow(2,(this->_level)-1);
 	return maxPlaces;

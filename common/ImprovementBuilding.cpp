@@ -17,7 +17,8 @@ gold ImprovementBuilding::getPriceForNextLevel() {
 
 	return priceForNextLevel;
 }
-
+//timeRequired is in fact just a number. At each level, timeRequired decreases by 1.
+//The time required, in minutes, is timeRequired multiplied by TIMESCALE 
 int ImprovementBuilding::getTimeRequired(){return TIMESCALE*(_timeRequired-(this->_level-1));}
 int ImprovementBuilding::getTimeRequiredAtFirstLevel() {return _timeRequired;}
 

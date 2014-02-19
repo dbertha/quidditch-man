@@ -17,7 +17,6 @@
 
 #include "ManagedPlayer.hpp"
 #include "Saver.hpp"
-//#include "Broomstick.hpp"
 #include "Building.hpp"
 #include "ImprovementBuilding.hpp"
 #include "Stadium.hpp"
@@ -39,39 +38,17 @@ using namespace std;
 Manager::Manager(string managerLogin): _login(managerLogin) {
 	string directory = "Saves/"+managerLogin;
 	int result = mkdir(directory.c_str(),0777);
-	if (result==-1) loadManager(); //Directory already exists.
-	else createNewManager();
+	if (result==-1) loadManager(); //Directory already exists so need to load a manager
+	else createNewManager(); //else, manager need to be created
 }
 
-void Manager::loadManager() {
-	setManagerInfos("Saves/"+_login+"/"+_login+".txt");
-	cout<<"setManagerInfos done"<<endl;
-	setPlayers("Saves/"+_login+"/Players/");
-	cout<<"setPlayers done"<<endl;
-	setBuildings("Saves/"+_login+"/buildings.txt");
-	cout<<"setBuildings done"<<endl;
-}
-
-void Manager::createNewManager() {
-	setManagerInfos("Saves/defaultManager.txt");
-	setPlayers("Saves/");
-	setBuildings("Saves/defaultBuildings.txt");
-
-	string directory = "Saves/"+_login+"/Players";
-	mkdir(directory.c_str(),0777);
-
-	string calendar = "Saves/"+_login+"/constructionCalendar.txt";
-	int fd = open(calendar.c_str(),O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
-	close(fd);
-	calendar = "Saves/"+_login+"/blockCalendar.txt";
-	fd = open("Saves/namesTaken.txt",O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
-	close(fd);
-	save();
-}
+////////////////////////////// METHODS ON ATTRIBUTES //////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+string Manager::getLogin() {return _login;}
 
 int Manager::getNumberOfPlayers() {return _numberOfPlayers;}
 void Manager::setNumberOfPlayers(int number) {_numberOfPlayers=number;}
-//int Manager::getNumberMaxOfPlayers() {return _numberMaxOfPlayers;}
+
 int Manager::getMoney() {return _money;}
 void Manager::addMoney(int amount) {_money+=amount;}
 void Manager::pay(int amount) {_money-=amount;}
@@ -79,6 +56,8 @@ void Manager::pay(int amount) {_money-=amount;}
 int Manager::getNumberOfFans() {return _numberOfFans;}
 void Manager::setNumberOfFans(int number) {_numberOfFans=number;}
 
+/////////////////////////////// METHODS ON PLAYERS ////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
 void Manager::addPlayer(ManagedPlayer& player) {
 	_players.push_back(player);
 	++ _numberOfPlayers;
@@ -107,35 +86,36 @@ void Manager::removePlayer(ManagedPlayer& player) {
 		throw "Player not found";
 	}
 }
-
 ManagedPlayer Manager::getPlayer(int index) {
-	if (index>=_numberOfFans) throw "Index out of range";
+	if (index>=_numberOfPlayers) throw "Index out of range";
 	return _players[index];
 }
+void Manager::displayPlayerInformations(int playerID) {
+	if (playerID>=_numberOfPlayers) throw "Index out of range";
+	_players[playerID].displayInformations();
+}
 
+////////////////////////////// METHODS ON BUILDINGS ///////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+void Manager::displayStadiumInformations() {_stadium.displayInformations();}
 gold Manager::getIncomeFromMatch(bool hasWon,bool wasHost) {
 	gold money=0;
-	if (wasHost) {
+	if (wasHost) { //Income from ticket sale. If manager has more fans than places in the stadium
+		//Stadium will always be full
 		if (_numberOfFans<_stadium.getMaxPlaces()) money+=_numberOfFans*TICKETPRICE;
 		else money+=_stadium.getMaxPlaces()*TICKETPRICE;
 	}
 	if (hasWon) money+=VICTORYBONUS;
 	return money;
 }
+
+void Manager::displayTrainingCenterInformations() {_trainingCenter.displayInformations();}
 void Manager::trainPlayer(int playerID, int capacityNumber) {
+	if (playerID>=_numberOfPlayers) throw "IPlayer index out of range";
+	if (capacityNumber>=5) throw "Capacity index out of range";
 	_trainingCenter.train(_players[playerID],capacityNumber);
 	string name = _players[playerID].getFirstName() + " " + _players[playerID].getLastName();
 	writeBlockInCalendar(name,true);
-}
-void Manager::writeBlockInCalendar(string name,bool isTraining) {
-	string file = "Saves/"+_login+"/blockCalendar.txt";
-	int timeRequired;
-	if (isTraining) timeRequired = _trainingCenter.getTimeRequired();
-	else timeRequired = _hospital.getTimeRequired();
-
-	writeInCalendar(file,name,timeRequired);
-
-
 }
 void Manager::unlockPlayer(string name) {
 	string tmp;
@@ -146,7 +126,10 @@ void Manager::unlockPlayer(string name) {
 		}
 	}
 }
-bool Manager::isPlayerBlocked(int playerID) {return _players[playerID].isBlocked();}
+bool Manager::isPlayerBlocked(int playerID) {
+	if (playerID>=_numberOfPlayers) throw "Index out of range";
+	return _players[playerID].isBlocked();
+}
 bool Manager::isPlayerBlocked(string name) {
 	string tmp;
 	for (unsigned i=0;i<_players.size();++i){
@@ -157,14 +140,19 @@ bool Manager::isPlayerBlocked(string name) {
 	}
 	return false;
 }
+
+void Manager::displayHospitalInformations() {_hospital.displayInformations();}
 void Manager::healPlayer(int playerID) {
+	if (playerID>=_numberOfPlayers) throw "Index out of range";
 	_hospital.heal(_players[playerID]);
 	string name = _players[playerID].getFirstName() + " " + _players[playerID].getLastName();
 	writeBlockInCalendar(name,false);
 }
 
-
+void Manager::displayFanShopInformations() {_fanShop.displayInformations();}
 gold Manager::getIncomeFromFanShop() {return _fanShop.getIncome();}
+
+void Manager::displayRecruitmentCenterInformations() {_recruitmentCenter.displayInformations();}
 
 void Manager::startStadiumConstruction() {
 	pay(_stadium.getPriceForNextLevel());
@@ -200,6 +188,19 @@ void Manager::upgradeBuilding(string buildingName) {
 	else if (buildingName=="RecruitmentCenter") _recruitmentCenter.upgrade();
 }
 
+
+////////////////////////////// METHODS ON CALENDARS ///////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+void Manager::writeBlockInCalendar(string name,bool isTraining) {
+	string file = "Saves/"+_login+"/blockCalendar.txt";
+	int timeRequired; //in minutes
+	if (isTraining) timeRequired = _trainingCenter.getTimeRequired();
+	else timeRequired = _hospital.getTimeRequired();
+
+	writeInCalendar(file,name,timeRequired);
+
+
+}
 void Manager::writeInCalendar(string file, string name, int timeRequired) {
 	time_t secondes;
 	struct tm instant;
@@ -208,6 +209,7 @@ void Manager::writeInCalendar(string file, string name, int timeRequired) {
 
 	Saver saver; //pour intToString
 
+	//Get string for date. Format = day:month:hour:minute
 	string date = saver.intToString(instant.tm_mday)+":"+saver.intToString(instant.tm_mon+1)+":"+\
 	saver.intToString(instant.tm_hour)+":"+saver.intToString(instant.tm_min);
 
@@ -218,6 +220,8 @@ void Manager::writeInCalendar(string file, string name, int timeRequired) {
 		cerr<<"Error while opening file\n";
 		return;
 	}
+
+	//Now, we write the line for the calendar. Format = PlayerOrBuilding#StartingDate#timeRequiredInMinutes#
 	write(fd,name.c_str(),name.size());
 	write(fd,"#",1);
 	write(fd,date.c_str(),date.size());
@@ -229,8 +233,9 @@ void Manager::writeInCalendar(string file, string name, int timeRequired) {
 	close(fd);
 }
 
-string Manager::getLogin() {return _login;}
 
+//////////////////////////// METHOD TO SAVE THE MANAGER ///////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
 void Manager::save(){
 	Saver saver;
 	saver.saveManager(_login,*this);
@@ -239,7 +244,47 @@ void Manager::save(){
 	saver.saveBuildings(_login,_stadium,_trainingCenter,_hospital,_fanShop,_recruitmentCenter);
 }
 
+
+////////////////////////////// LOAD/CREATE A MANAGER //////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+void Manager::loadManager() {
+	setManagerInfos("Saves/"+_login+"/"+_login+".txt");
+	setPlayers("Saves/"+_login+"/Players/");
+	setBuildings("Saves/"+_login+"/buildings.txt");
+}
+
+void Manager::createNewManager() {
+	//"Create" a new manager is loading a default Manager whom files are in Saves/
+	setManagerInfos("Saves/defaultManager.txt");
+	setPlayers("Saves/"); //SetPlayers just need a path, not a precise file. Since we're not supposed to know how many players there are
+	setBuildings("Saves/defaultBuildings.txt");
+
+	//The directory for the Manager, which is "Saves/ManagerLogin" has already been created in the constructor
+	string directory = "Saves/"+_login+"/Players"; //So we just need to create the repertory Players in the manager repertory
+	mkdir(directory.c_str(),0777);
+
+	//We create the files for the calendars (currently empty)
+	string calendar = "Saves/"+_login+"/constructionCalendar.txt";
+	int fd = open(calendar.c_str(),O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
+	close(fd);
+	calendar = "Saves/"+_login+"/blockCalendar.txt";
+	fd = open(calendar.c_str(),O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
+	close(fd);
+	//And by calling the save method, the informations of the new manager (buildings, players, etc) will be saved in the manager repertory
+	save();
+}
+
+
+///////////////////////// GET INFORMATIONS FROM SAVEFILES /////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
 void Manager::setManagerInfos(string file) {
+	/*
+	This method reads the manager informations in the Manager.txt file..
+	This file format is :
+		NumberOfPlayers
+		Money
+		NumberOfFans
+	*/
 	int fd = open(file.c_str(),O_RDONLY);
 	if (fd==-1) {
 		cerr<<"Error while opening file\n";
@@ -264,6 +309,12 @@ void Manager::setManagerInfos(string file) {
 }
 
 void Manager::setPlayers(string path) {
+	/*
+	This method reads all the players informations. Each player has its own save file "FirstNameLastName.txt".
+	Since we don't know the players names, the name of each player save file is written in the "players.txt" file
+	In this file, each line is the name of a player save file. So by reading players.txt, we're able to get the informations
+	 of every player.
+*/
 	string file = path + "players.txt";
 	int fd = open(file.c_str(),O_RDONLY);
 	if (fd==-1) {
@@ -277,11 +328,11 @@ void Manager::setPlayers(string path) {
 	int byte = read(fd,buffer,size);
 	buffer[byte]='\0';
 
-	string playerFile;
+	string playerFile; // player save file; "FirstNameLastName.txt"
 	int i=0;
 	while (buffer[i]!='\0'){
 		if (buffer[i]=='\n') {
-			_players.push_back(ManagedPlayer(path+playerFile));			
+			_players.push_back(ManagedPlayer(path+playerFile));	//ManagedPlayer constructor will read the needed informations in the file		
 			playerFile="";
 		}
 		else playerFile+=buffer[i];
@@ -292,6 +343,29 @@ void Manager::setPlayers(string path) {
 }
 
 void Manager::setBuildings(string file) {
+	/*
+	This method reads the buildings informations in the buildings.txt file..
+	This file format is :
+		Level of the stadium
+		Price to build the stadium (construction is the upgrade from level 0 to level 1)
+		Max places in the stadium at level 1
+		Level of the training center
+		Price to build the training center
+		Time required to finish a training session at level 1
+		Level of the hospital
+		Price to build the hospital
+		Time required to heal a player at level 1
+		Level of the fan shop
+		Price to build the fan shop
+		Max clients in the fan shop at level 1
+		Level of the recruitment center
+		Price to build the recruitment center
+	The price to upgrade a building is calculated by the building itself and depends on the price of construction and the current level
+	The special attribute of the stadium, the training center, the hospital and the fan shop is calculated by the building and depends
+	 on the current level
+	*/
+
+
 	int fd = open(file.c_str(),O_RDONLY);
 	if (fd==-1) {
 		cerr<<"Error while opening file\n";

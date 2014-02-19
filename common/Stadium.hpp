@@ -18,7 +18,6 @@ class Stadium : public Building {
     int getMaxPlaces();
     int getMaxPlacesAtFirstLevel();
     void displayInformations();
-    //void getInfos();
 
 
 };

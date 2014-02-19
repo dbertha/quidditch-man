@@ -11,7 +11,6 @@ typedef int gold;
 class ManagedPlayer : public Player {
 
     int _trainingLeft[5];
-   // int _popularity;
     bool _blocked;
 
     Broomstick _broomstick;
@@ -26,9 +25,6 @@ class ManagedPlayer : public Player {
  	int getTrainingLeft(int capacityNumber) const;
     void setTrainingLeft(int capacityNumber, int value);
 
-    //int getPopularity() const;
-    //void setPopularity(int popularity);
-
     void lockPlayer();
     void unlockPlayer();
     bool isBlocked() const;
@@ -37,10 +33,8 @@ class ManagedPlayer : public Player {
 
     void setBroomstick(Broomstick broomstick);
 
-    //void gainPopularity();
     void train(int capacityNumber);
-    void updateLife(); //A QUOI SERT CETTE METHODE? (Je ne me souviens plus)
-    gold getEstimatedValue(); //Renvoie l'estimation du prix du joueur, calculé selon ses attributs
+    gold getEstimatedValue();
 
     void displayInformations();
 

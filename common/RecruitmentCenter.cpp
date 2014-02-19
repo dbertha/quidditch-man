@@ -1,9 +1,7 @@
 #include <iostream>
 
 #include "Building.hpp"
-//#include "ManagedPlayer.hpp"
 #include "RecruitmentCenter.hpp"
-//#include "Manager.hpp"
 
 typedef int gold;
 
@@ -17,20 +15,7 @@ gold RecruitmentCenter::getPriceForNextLevel(){
 
 	return priceForNextLevel;
 }
-/*
-void RecruitmentCenter::buyPlayer(Manager& manager, ManagedPlayer& player, gold price){
-	manager.pay(price);
-	manager.addPlayer(player);
-}
 
-void RecruitmentCenter::sellPlayer(Manager& manager, ManagedPlayer& player, gold price){
-	try {
-
-		manager.addMoney(price);
-		manager.removePlayer(player);
-	} catch (const char err[]) {cout<<err<<endl;}
-}
-*/
 void RecruitmentCenter::displayInformations() {
 	cout<<"----------- RECRUITMENT CENTER -----------"<<endl;
 	cout<<"Level : "<<this->_level<<endl;

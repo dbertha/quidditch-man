@@ -21,14 +21,14 @@ using namespace std;
 
 
 int main() {
-
+/*
 	Manager manager("Manager");
 
-	manager._stadium.displayInformations();
-	manager._trainingCenter.displayInformations();
-	manager._hospital.displayInformations();
-	manager._fanShop.displayInformations();
-	manager._recruitmentCenter.displayInformations();
+	manager.displayStadiumInformations();
+	manager.displayTrainingCenterInformations();
+	manager.displayHospitalInformations();
+	manager.displayFanShopInformations();
+	manager.displayRecruitmentCenterInformations();
 
 	//manager.startStadiumConstruction();
 
@@ -47,7 +47,7 @@ int main() {
 	cout<<manager.getIncomeFromMatch(true,true)<<endl;
 	cout<<manager.getIncomeFromFanShop()<<endl;
 */
-/*
+
 	ManagedPlayer player("Saves/defaultSeeker.txt");
 	cout<<player.getFirstName()<<" "<<player.getLastName()<<endl;
 	for (int i=0;i<5;++i){
@@ -100,6 +100,6 @@ int main() {
 		manager2.getPlayer(i).displayInformations(); //Pas très AMI mais juste pour tester et vérifier
 		cout<<i<<endl;
 	}
-*/
+
 	return 0;
 }
