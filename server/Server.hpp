@@ -24,7 +24,7 @@ class Server {
 public:
 	Server(int);
 	void run();
-	int sendToClient(User *, char *, const int);
+	int sendToClient(User *, SerializedObject *); //TODO : transformer la modélisation pour conserver en private ou protected
 	std::vector<User*> usersList_;
 	std::vector<User*> GetUsersList();
 
