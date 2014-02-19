@@ -22,29 +22,7 @@ std::vector<User*> Server::GetUsersList() {return usersList_;}
 
 int Server::connect() {
 	//initialisation du socket et mise sur écoute :
-	sockfd_=socket(PF_INET,SOCK_STREAM,0);
-	if (sockfd_ == ERROR) {
-		std::cerr<<"Socket descriptor initialization error"<<std::endl;
-		return EXIT_FAILURE;
-	}
-	int yes=1; //autorise deux binds successifs
-	if (setsockopt(sockfd_, SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==ERROR) {
-		std::cerr<<"Socket descriptor options initialization error"<<std::endl;
-		return EXIT_FAILURE;
-	}
-	int n;
-	unsigned int m = sizeof(n);
-	getsockopt(sockfd_,SOL_SOCKET,SO_RCVBUF,(void *)&n, &m);
-	std::cout<<"TCP buffer size : "<<n<<std::endl;
-	sockAddress_.sin_family=AF_INET;
-	sockAddress_.sin_port=htons(port_);
-	sockAddress_.sin_addr.s_addr=INADDR_ANY;
-	memset(&sockAddress_.sin_zero,'\0',8);
-
-	if (bind(sockfd_,(struct sockaddr*)&sockAddress_,sizeof(struct sockaddr))==ERROR) {
-		std::cerr<<"Socket bind error"<<std::endl;
-		return EXIT_FAILURE;
-	}
+	sockfd_=buildConnection (port_);
 
 	//attente des clients :
 	if (listen(sockfd_,BACKLOG)==ERROR) {
@@ -61,7 +39,6 @@ void Server::disconnect() {
 }
 
 int Server::mainLoop() {
-	SerializedObject received;
 	max_=sockfd_;
 #ifdef __DEBUG
 	std::cout<<"**mon socket : "<<sockfd_<<std::endl;
@@ -73,8 +50,7 @@ int Server::mainLoop() {
 			return EXIT_FAILURE;
 		}
 		if(keyboard()) {
-		//ajouter ici une gestion de commandes pour le serveur
-		//pour l'instant, tout Enter provoque son arrêt
+
 			std::cout<<"Server stops"<<std::endl;
 			break;
 		}
@@ -90,14 +66,14 @@ int Server::mainLoop() {
 		else {
 			for (unsigned int i=0;i<usersList_.size();++i) {
 				if (FD_ISSET(usersList_[i]->getSockfd(),&FDSet_)) {
-					int length = receive(usersList_[i],&received); //TODO : tester valeur
+					int length = receive(usersList_[i],msg,sizeof(msg));
 					if(usersList_[i]->isDisconnecting()) {
 						std::cout<<"User "<<usersList_[i]->getUserId()<<" disappeared from socket "
 										<<usersList_[i]->getSockfd()<<std::endl;
 						removeUser(i);
 					}
 					else //traitement du message et envoi de la réponse
-						usersList_[i]->cmdHandler(&received);
+						usersList_[i]->cmdHandler(msg,length);
 				}
 			}
 		}
@@ -115,7 +91,8 @@ void Server::loadFDSet() {
 	FD_SET(sockfd_,&FDSet_); //le socket du serveur pour accepter de nouvelles connexions
 	FD_SET(STDIN_FILENO,&FDSet_); //le file descriptor de l'input pour accepter des commandes du clavier du serveur
 	for (unsigned int i=0;i<usersList_.size();++i)
-		FD_SET(usersList_[i]->getSockfd(),&FDSet_);
+		if(usersList_[i]->state_!=User::MATCH_INGAME)
+			FD_SET(usersList_[i]->getSockfd(),&FDSet_);
 }
 
 bool Server::isNewConnection() {return FD_ISSET(sockfd_,&FDSet_);}

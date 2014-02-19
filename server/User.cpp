@@ -229,3 +229,5 @@ bool User::isDisconnecting() {return disconnecting_;}
 int User::getSockfd() {return sockfd_;}
 
 std::string User::getUserId() {return userId_;}
+
+
