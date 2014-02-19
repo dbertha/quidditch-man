@@ -39,6 +39,7 @@ void Server::disconnect() {
 }
 
 int Server::mainLoop() {
+    SerializedObject received;
 	max_=sockfd_;
 #ifdef __DEBUG
 	std::cout<<"**mon socket : "<<sockfd_<<std::endl;
@@ -66,14 +67,14 @@ int Server::mainLoop() {
 		else {
 			for (unsigned int i=0;i<usersList_.size();++i) {
 				if (FD_ISSET(usersList_[i]->getSockfd(),&FDSet_)) {
-					int length = receive(usersList_[i],msg,sizeof(msg));
+					int length = receive(usersList_[i],&received); //TODO : tester valeur
 					if(usersList_[i]->isDisconnecting()) {
 						std::cout<<"User "<<usersList_[i]->getUserId()<<" disappeared from socket "
 										<<usersList_[i]->getSockfd()<<std::endl;
 						removeUser(i);
 					}
 					else //traitement du message et envoi de la réponse
-						usersList_[i]->cmdHandler(msg,length);
+						usersList_[i]->cmdHandler(&received);
 				}
 			}
 		}

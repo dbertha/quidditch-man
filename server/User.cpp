@@ -3,6 +3,7 @@
 #include "CommonMgr.hpp"
 #include "../common/NetworkBase.h"
 
+<<<<<<< HEAD
 #include <sys/stat.h>
 #include <iostream>
 #include <stdlib.h>     /* atoi */
@@ -18,6 +19,10 @@
 
 User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), userId_(""), disconnecting_(false) {}
 
+=======
+User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), state_(INIT), userId_("") {}
+//TODO : initialisation dans le bon ordre
+>>>>>>> 505aa8608c1c738b3699abb8d61788a974a6c271
 void User::cmdHandler(SerializedObject *received) {
 	SerializedObject answer;
 	char * position;
@@ -235,11 +240,10 @@ void User::cmdHandler(SerializedObject *received) {
 
 void User::setDisconnection() {
 	//ajouter ici les actions à prendre en cas de déconnection
-	disconnecting_=true;
+	state_=DISCONNECTING;
 }
 
-bool User::isDisconnecting() {return disconnecting_;}
-
+bool User::isDisconnecting() {return (state_==DISCONNECTING);}
 int User::getSockfd() {return sockfd_;}
 
 std::string User::getUserId() {return userId_;}
