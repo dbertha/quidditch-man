@@ -11,7 +11,7 @@ typedef int gold;
 
 using namespace std;
 
-FanShop::FanShop(int level, gold price, int maxClients): Building(level,price), _maxClientsAtFirstLevel(maxClients) {}
+FanShop::FanShop(int level, gold price, int maxClients, bool isUpgrading): Building(level,price,isUpgrading), _maxClientsAtFirstLevel(maxClients) {}
 
 gold FanShop::getIncome() {
 	gold amount = SELLINGPRICE * this->getMaxClients();
@@ -38,6 +38,7 @@ vector<int> FanShop::getInformations() {
 	tmp.push_back(this->getLevel());
 	tmp.push_back(this->getPriceForNextLevel());
 	tmp.push_back(this->getMaxClients());
+	tmp.push_back(this->isUpgrading());
 
 	return tmp;
 }

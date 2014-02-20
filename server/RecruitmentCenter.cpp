@@ -8,7 +8,7 @@ typedef int gold;
 
 using namespace std;
 
-RecruitmentCenter::RecruitmentCenter(int level, gold price): Building(level,price) {}
+RecruitmentCenter::RecruitmentCenter(int level, gold price, bool isUpgrading): Building(level,price, isUpgrading) {}
 
 gold RecruitmentCenter::getPriceForNextLevel(){
 	int priceScale = 2*_priceForConstruction/5;
@@ -25,6 +25,7 @@ vector<int> RecruitmentCenter::getInformations() {
 	vector<int> tmp;
 	tmp.push_back(this->getLevel());
 	tmp.push_back(this->getPriceForNextLevel());
+	tmp.push_back(this->isUpgrading());
 
 	return tmp;
 }

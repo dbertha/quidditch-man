@@ -3,6 +3,7 @@
 #include "CommonMgr.hpp"
 #include "../common/NetworkBase.h"
 #include "../server/Manager.hpp"
+#include "../server/Calendar.hpp"
 
 #include <sys/stat.h>
 #include <iostream>
@@ -11,13 +12,22 @@
 #include <cstdlib> 
 #include <stdio.h>
 #include <string.h>
+#include <vector>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 
-User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), state_(INIT), userId_(""), manager_(NULL) {}
+#define STADIUM 1
+#define TRAININGCENTER 2
+#define HOSPITAL 3
+#define FANSHOP 4
+#define CONSTRUCTIONSTARTED 1
+#define ALREADYINCONSTRUCTION 2
+#define NOTENOUGHMONEY 3
+
+User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), state_(INIT), userId_(""), manager_(NULL), calendar_(NULL) {}
 //TODO : initialisation dans le bon ordre
 void User::cmdHandler(SerializedObject *received) {
 	SerializedObject answer;
@@ -25,6 +35,10 @@ void User::cmdHandler(SerializedObject *received) {
 	int targetedBuilding;
 	int targetedUser;
 	int targetedPlayer;
+	int resultOfUpgrade;
+	bool resultOfTraining;
+	vector<int> infos;
+	vector<string> playersList;
 	position = received->stringData;
 #ifdef __DEBUG
 	std::cout<<"En-tête reçu : "<<received->typeOfInfos<<std::endl;
@@ -45,15 +59,96 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Password reçu :  "<<password <<std::endl;
 #endif
 			//handle demand:
-			if (checkLoginAndPassword(username,password)) {
+			if (checkLoginAndPassword(username,password)==1) {
 				std::cout<<"LOGIN OK"<<std::endl;
 				manager_ = new Manager(username);
+				calendar_ = new Calendar(manager_);
+				calendar_->update();
+				manager_->save();
 			}
 			else std::cout<<"WRONG LOGIN/PASSWORD"<<std::endl;
 			//construct answer
 			answer.typeOfInfos = LOGIN_CONFIRM;
 			
 			break;
+
+		case CREATE_MANAGER :
+			//reading details
+			//char username[USERNAME_LENGTH], password[PASSWORD_LENGTH];
+			position = received->stringData;
+			memcpy(&username, position, sizeof(username)); //sizeof(char array[10]) = 10
+			position += sizeof(username);
+			memcpy(&password, position, sizeof(password));
+#ifdef __DEBUG
+			std::cout<<"Nouveau login reçue sur socket "<<getSockfd()<<std::endl;
+			std::cout<<"Username reçu :  "<<username <<std::endl;
+			std::cout<<"Password reçu :  "<<password <<std::endl;
+#endif
+			//handle demand:
+			if (checkLoginAndPassword(username,password)==-1) { //This Manager login already exists
+				std::cout<<"LOGIN ALREADY TAKEN"<<std::endl;
+			}
+			else {
+				std::cout<<"CREATING MANAGER..."<<std::endl;
+				addManager(username,password);
+				manager_ = new Manager(username);
+				manager_->save();
+				calendar_ = new Calendar(manager_);
+			}
+			//construct answer
+			answer.typeOfInfos = LOGIN_CONFIRM;
+			
+			break;
+
+		case GETMANAGERINFOS :
+			//no detail to read
+#ifdef __DEBUG
+			std::cout<<"Demande des infos du manager reçue sur socket "<<getSockfd()<<std::endl;
+#endif
+			//handle demand: nothing to handle
+
+			calendar_->update();
+			manager_->save();
+			std::cout<<"Number of players : "<<manager_->getNumberOfPlayers()<<std::endl;
+			std::cout<<"Money : "<<manager_->getMoney()<<std::endl;
+			std::cout<<"Number of fans : "<<manager_->getNumberOfFans()<<std::endl;
+			calendar_->update();
+			manager_->save();
+			//construct answer with manager_->getNumberOfPlayers() manager_->getMoney() et manager_->getNumberOfFans();
+			
+			break;
+
+		case GETPLAYERSLIST :
+			//no detail to read
+#ifdef __DEBUG
+			std::cout<<"Demande de la liste des joueurs reçue sur socket "<<getSockfd()<<std::endl;
+#endif
+			//handle demand: nothing to handle
+
+			calendar_->update();
+			manager_->save();
+			playersList = manager_->getPlayersList();
+			for (int i=0;i<playersList.size();i+=2) {std::cout<<playersList[i]<<" "<<playersList[i+1]<<std::endl; }
+			calendar_->update();
+			manager_->save();
+			//construct answer 
+			
+			break;
+
+		case GETPLAYERINFOS :
+			//reading details
+			memcpy(&targetedPlayer, position, sizeof(targetedPlayer)); 
+#ifdef __DEBUG
+			std::cout<<"Demande d'informations pour un joueur reçue sur le socket "<<getSockfd()<<std::endl;
+			std::cout<<"targetedPlayer reçu : "<<targetedPlayer<<std::endl;
+#endif
+			infos= manager_->getPlayerInformations(targetedPlayer);
+			for (int i=0;i<infos.size();++i) {std::cout<<infos[i]<<std::endl;}
+			calendar_->update();
+			manager_->save();
+			//construct answer
+			break;
+
 		case GETBUILDINGINFOS :
 			//reading details
 			position = received->stringData;
@@ -63,8 +158,18 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"BuildingID reçu : "<<targetedBuilding<<std::endl;
 			
 #endif
-			//handle demand
+			//handle demand:
+			calendar_->update();
+			manager_->save();
+			if (targetedBuilding==STADIUM) infos=manager_->getStadiumInformations();
+			else if (targetedBuilding==TRAININGCENTER) infos=manager_->getTrainingCenterInformations();
+			else if (targetedBuilding==HOSPITAL) infos=manager_->getHospitalInformations();
+			else if (targetedBuilding==FANSHOP) infos=manager_->getFanShopInformations();
 			
+			for (int i=0;i<4;++i) {std::cout<<infos[i]<<std::endl;}
+			calendar_->update();
+			manager_->save();
+
 			//construct answer
 			
 			break;
@@ -76,7 +181,18 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Demande d'infos d'upgrade de bâtiment reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"BuildingID reçu : "<<targetedBuilding<<std::endl;
 #endif
-			//handle demand
+			//handle demand:
+			calendar_->update();
+			manager_->save();
+			if (targetedBuilding==STADIUM) resultOfUpgrade=manager_->startStadiumConstruction();
+			else if (targetedBuilding==TRAININGCENTER) resultOfUpgrade=manager_->startTrainingCenterConstruction();
+			else if (targetedBuilding==HOSPITAL) resultOfUpgrade=manager_->startHospitalConstruction();
+			else if (targetedBuilding==FANSHOP) resultOfUpgrade=manager_->startFanShopConstruction();
+			if (resultOfUpgrade==ALREADYINCONSTRUCTION) std::cout<<"Already in construction !"<<std::endl;
+			else if (resultOfUpgrade==NOTENOUGHMONEY) std::cout<<"Not enough money !"<<std::endl;
+			else std::cout<<"Construction started !"<<std::endl;
+			calendar_->update();
+			manager_->save();
 			//construct answer
 			break;
 		case PROPOSEMATCH :
@@ -188,6 +304,13 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"capacityToTrain reçu : "<<capacityToTrain<<std::endl;
 #endif
 			//handle demand
+			calendar_->update();
+			manager_->save();
+			resultOfTraining = manager_->trainPlayer(targetedPlayer,capacityToTrain);
+			if (!resultOfTraining) std::cout<<"This player is already blocked by a training or the hospital"<<std::endl;
+			calendar_->update();
+			manager_->save();
+
 			//construct answer
 			break;
 		case MAKEMOVES :
@@ -247,7 +370,7 @@ int User::getSockfd() {return sockfd_;}
 
 std::string User::getUserId() {return userId_;}
 
-bool User::checkLoginAndPassword(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]) {
+int User::checkLoginAndPassword(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]) {
 	int fd = open("server/Saves/managers.txt",O_RDONLY);
 	if (fd==-1){
 		std::cerr<<"Error while opening file\n";
@@ -270,9 +393,29 @@ bool User::checkLoginAndPassword(char username[USERNAME_LENGTH], char password[P
 		do {
 			login = strtok_r(line,"#",&context2);
 			pass = strtok_r(NULL,"#",&context2);
-			if ( (strcmp(login,username)==0)&&(strcmp(pass,password)==0) ) return 1;
+			if (strcmp(login,username)==0) {
+				if (strcmp(pass,password)==0) return 1;
+				else return -1;
+			}
 		} while ( (line=strtok_r(NULL,"\n",&context1))!=NULL ) ;
 	}
 
 	return 0;
+}
+
+void User::addManager(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]) {
+	int fd = open("server/Saves/managers.txt",O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
+	if (fd==-1){
+		std::cerr<<"Error while opening file\n";
+		return;
+	}
+	string user,pass;
+	user=username;
+	pass=password;
+	write(fd,user.c_str(),user.size());
+	write(fd,"#",1);
+	write(fd,pass.c_str(),pass.size());
+	write(fd,"#",1);
+
+	close(fd);
 }

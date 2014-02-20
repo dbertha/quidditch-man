@@ -9,10 +9,11 @@
 
 class Calendar {
 
-	Manager& _manager;
+	Manager* _manager;
 
  public:
- 	Calendar(Manager& manager);
+ 	Calendar();
+ 	Calendar(Manager* manager);
  	void update(); //wil call updateCalendar for constructionCalender and blockCalendar
  	void updateCalendar(string file, bool isBlockCalendar); //will call checkTime for every line in the calendar "file"
  	bool checkTime(char* line, bool isBlockCalendar); //verify a line in a calender (block is bool parameter is true, construction otherwise)

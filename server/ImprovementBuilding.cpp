@@ -11,7 +11,7 @@ typedef int gold;
 
 using namespace std;
 
-ImprovementBuilding::ImprovementBuilding(int level, gold price, int timeRequired) : Building(level, price), _timeRequired(timeRequired) {}
+ImprovementBuilding::ImprovementBuilding(int level, gold price, int timeRequired, bool isUpgrading) : Building(level, price,isUpgrading), _timeRequired(timeRequired) {}
 
 gold ImprovementBuilding::getPriceForNextLevel() {
 	int priceScale = _priceForConstruction/2;
@@ -34,5 +34,6 @@ vector<int> ImprovementBuilding::getInformations() {
 	tmp.push_back(this->getLevel());
 	tmp.push_back(this->getPriceForNextLevel());
 	tmp.push_back(this->getTimeRequired());
+	tmp.push_back(this->isUpgrading());
 	return tmp;
 }

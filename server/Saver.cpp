@@ -21,7 +21,7 @@
 using namespace std;
 
 void Saver::saveManager(string managerLogin, Manager manager) {
-	string file = "Saves/"+managerLogin+"/"+managerLogin+".txt";
+	string file = "server/Saves/"+managerLogin+"/"+managerLogin+".txt";
 	int fd = open(file.c_str(),O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
 	if (fd==-1){
 		cerr<<"Error while opening file\n";
@@ -48,7 +48,7 @@ void Saver::saveManager(string managerLogin, Manager manager) {
 }
 
 void Saver::savePlayer(string managerLogin, ManagedPlayer player) {
-	string file = "Saves/"+managerLogin+"/Players/"+player.getFirstName()+player.getLastName()+".txt";
+	string file = "server/Saves/"+managerLogin+"/Players/"+player.getFirstName()+player.getLastName()+".txt";
 	int fd = open(file.c_str(),O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
 	if (fd==-1){
 		cerr<<"Error while opening file\n";
@@ -97,7 +97,7 @@ void Saver::savePlayer(string managerLogin, ManagedPlayer player) {
 }
 
 void Saver::savePlayersList(string managerLogin, vector<ManagedPlayer> players) {
-	string file = "Saves/"+managerLogin+"/Players/players.txt";
+	string file = "server/Saves/"+managerLogin+"/Players/players.txt";
 	remove(file.c_str());
 	int fd = open(file.c_str(),O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
 	if (fd==-1){
@@ -115,7 +115,7 @@ void Saver::savePlayersList(string managerLogin, vector<ManagedPlayer> players) 
 
 void Saver::saveBuildings(string managerLogin, Stadium stadium, TrainingCenter trainingCenter, Hospital hospital, FanShop fanShop,\
  							 RecruitmentCenter recruitmentCenter) {
-	string file = "Saves/"+managerLogin+"/buildings.txt";
+	string file = "server/Saves/"+managerLogin+"/buildings.txt";
 	int fd = open(file.c_str(),O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
 	if (fd==-1){
 		cerr<<"Error while opening file\n";
@@ -130,6 +130,9 @@ void Saver::saveBuildings(string managerLogin, Stadium stadium, TrainingCenter t
 	toWrite=intToString(stadium.getMaxPlacesAtFirstLevel());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
+	toWrite=intToString(stadium.isUpgrading());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
 
 	toWrite=intToString(trainingCenter.getLevel());
 	write(fd,toWrite.c_str(),toWrite.size());
@@ -138,6 +141,9 @@ void Saver::saveBuildings(string managerLogin, Stadium stadium, TrainingCenter t
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
 	toWrite=intToString(trainingCenter.getTimeRequiredAtFirstLevel());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+	toWrite=intToString(trainingCenter.isUpgrading());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
 
@@ -150,6 +156,9 @@ void Saver::saveBuildings(string managerLogin, Stadium stadium, TrainingCenter t
 	toWrite=intToString(hospital.getTimeRequiredAtFirstLevel());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
+	toWrite=intToString(hospital.isUpgrading());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
 
 	toWrite=intToString(fanShop.getLevel());
 	write(fd,toWrite.c_str(),toWrite.size());
@@ -160,11 +169,17 @@ void Saver::saveBuildings(string managerLogin, Stadium stadium, TrainingCenter t
 	toWrite=intToString(fanShop.getMaxClientsAtFirstLevel());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
+	toWrite=intToString(fanShop.isUpgrading());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
 
 	toWrite=intToString(recruitmentCenter.getLevel());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
 	toWrite=intToString(recruitmentCenter.getPriceForConstruction());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+	toWrite=intToString(recruitmentCenter.isUpgrading());
 	write(fd,toWrite.c_str(),toWrite.size());
 	
 	close(fd);

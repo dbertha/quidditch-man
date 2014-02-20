@@ -7,6 +7,7 @@
 #include <sstream>
 #include <iostream>
 #include "../server/Manager.hpp"
+#include "../server/Calendar.hpp"
 class Server;
 class CommonMgr;
 class User {
@@ -24,7 +25,8 @@ public:
 	Status state_;
 	pthread_t thread; // thread utilisé pour la gestion d'un match ou de tout autre activité spécifique
 
-	bool checkLoginAndPassword(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
+	int checkLoginAndPassword(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
+	void addManager(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
 
 private:
 	Server* server_;
@@ -35,6 +37,7 @@ private:
 	//std::string answer_;
 	std::string dataRequest_;
 	Manager* manager_;
+	Calendar* calendar_;
 };
 
 #endif

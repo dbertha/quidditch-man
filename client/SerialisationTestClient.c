@@ -78,6 +78,7 @@ void displayManageBuildingsMenu(){
 
 int main(int argc, char *argv[]){
   int choice;
+  int result;
   int buildingID, userID;
   int confirm, price, moves[7][3];
   int att2;
@@ -264,14 +265,29 @@ int main(int argc, char *argv[]){
   displayConnexionMenu();
   scanf("%d",&choice);
 
-  if (choice==1) {
+  if (choice!=0) {
     printf("\nlogin : ");
     scanf("%s",username);
     printf("password : ");
     scanf("%s",password);
 
-    sendLoginToServer(sockfd,username,password);
+    if (choice==1) {
+      sendLoginToServer(sockfd,username,password);
+
+      askForManagerInfos(sockfd);
+      askForPlayersList(sockfd);
+
+    }
+
+
+
+    else if (choice==2) sendNewManagerToServer(sockfd,username,password);
+    //result = serverAnswer
   }
+
+  
+
+  
 
   
   return EXIT_SUCCESS;

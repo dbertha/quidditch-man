@@ -12,7 +12,7 @@ class Stadium : public Building {
 
  public:
 
- 	Stadium(int level=0, gold priceForConstruction=0, int maxPlaces=0);
+ 	Stadium(int level=0, gold priceForConstruction=0, int maxPlaces=0, bool isUpgrading=false);
 
     gold getPriceForNextLevel();
     int getMaxPlaces();

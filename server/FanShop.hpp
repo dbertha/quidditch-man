@@ -13,7 +13,7 @@ class FanShop : public Building {
 
  public:
 
- 	FanShop(int level=0, gold price=0, int maxClients=0);
+ 	FanShop(int level=0, gold price=0, int maxClients=0, bool isUpgrading=false);
 
     gold getIncome();
     int getMaxClients();

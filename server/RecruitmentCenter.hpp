@@ -10,7 +10,7 @@ class RecruitmentCenter : public Building {
 
  public:
 
- 	RecruitmentCenter(int level=0, gold price=0);
+ 	RecruitmentCenter(int level=0, gold price=0, bool isUpgrading=false);
 
     gold getPriceForNextLevel();
 

@@ -8,7 +8,7 @@
 
 typedef int gold;
 
-TrainingCenter::TrainingCenter(int level, gold price, int timeRequired): ImprovementBuilding(level,price,timeRequired) {}
+TrainingCenter::TrainingCenter(int level, gold price, int timeRequired, bool isUpgrading): ImprovementBuilding(level,price,timeRequired, isUpgrading) {}
 
 void TrainingCenter::train(ManagedPlayer& player, int capacityNumber) {
 	player.lockPlayer();
