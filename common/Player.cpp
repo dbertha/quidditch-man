@@ -46,7 +46,7 @@ Player::Player(string playerSaveFile) {
 	int fd = open(playerSaveFile.c_str(),O_RDONLY);
 	if (fd==-1) {
 		perror("Fuck1");
-		cerr<<"Error while opening file\n";
+		cerr<<"Error while opening file " << playerSaveFile.c_str() << endl;
 		return;
 	}
 	

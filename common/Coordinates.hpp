@@ -6,7 +6,7 @@
 #include <algorithm> //min() 
 #include <list>
 
-#define MATRIX_SIZE 21 // nombre impair pour obtenir un centre unique en [MATRIX_SIZE/2][MATRIX_SIZE/2], qui correspondra à [0][0] en coordonnées axiales
+#define MATRIX_SIZE 23 // nombre impair pour obtenir un centre unique en [MATRIX_SIZE/2][MATRIX_SIZE/2], qui correspondra à [0][0] en coordonnées axiales
 
 //Q : classe parente pour utiliser le polymorphisme ?
 
@@ -31,7 +31,7 @@ private :
     int __diagAxis;
     int __lineAxis;
 public :
-    AxialCoordinates(int diagAxis, int lineAxis) : __diagAxis(diagAxis), __lineAxis(lineAxis) {} //attention, diagAxis et lineAxis ne sont pas les mêmes que les indices de la matrice, 
+    AxialCoordinates(int diagAxis=0, int lineAxis=0) : __diagAxis(diagAxis), __lineAxis(lineAxis) {} //attention, diagAxis et lineAxis ne sont pas les mêmes que les indices de la matrice, 
     //ici ils désignent le décalage par rapport au centre : 
     //For hexagon shaped maps of radius N, where N = max(abs(x), abs(y), abs(z), we have first_column[row] == -N - min(0, row). 
     //You’d access array[row][col + N + min(0, r)]. However, since we’re starting with some values of r < 0, we also have to offset the row, and use array[row + N][col + N + min(0, r)].
@@ -60,12 +60,12 @@ public :
     }
     
     int getLineOnMatrix() const { // r + N
-        return (getDiagAxis() + (MATRIX_SIZE / 2)); 
+        return (getLineAxis() + (MATRIX_SIZE / 2)); 
         //Q : la division va déjà redonner un entier : quel arrondi ? ==> vers le bas, floor inutile
     }
     
     int getColOnMatrix() const { // q + N (+ min(0, r) : étrange)
-        return (getLineAxis() + (MATRIX_SIZE / 2));
+        return (getDiagAxis() + (MATRIX_SIZE / 2));
     }
     
     bool isOnField(){

@@ -1,6 +1,10 @@
 #include "Coordinates.hpp"
 #include "HexagonalField.hpp"
+#include "ManagedPlayer.hpp"
+#include "PlayingPlayer.hpp"
+#include "Match.hpp"
 #include <iostream>
+#include <vector>
 
 int main(){
     AxialCoordinates axialCoord(0,0);
@@ -49,5 +53,27 @@ int main(){
     for(std::list<Move>::iterator list_iter = moves.begin(); list_iter != moves.end(); list_iter++){
         std::cout << (*list_iter).getDiagDiff() << " " << (*list_iter).getLineDiff() << std::endl;
     }
+    ManagedPlayer chaser("defaultChaser.txt");
+    PlayingPlayer myPlayer(chaser, ROLE_CHASER, axialCoord);
+    std::cout << myPlayer.getMaxDistance() << " " << chaser.getCapacity(SPEED) << std::endl;
+    std::cout << myPlayer.interceptQuaffle(4) << " " << myPlayer.catchGoldenSnitch(3) << std::endl;
+    std::vector<ManagedPlayer> team1, team2;
+    team1.push_back(ManagedPlayer("Saves/defaultKeeper.txt")); //TEAM1_KEEPER
+    team1.push_back(ManagedPlayer("Saves/defaultSeeker.txt")); //TEAM1_SEEKER
+    team1.push_back(ManagedPlayer("Saves/defaultChaser.txt")); //TEAM1_CHASER1
+    team1.push_back(ManagedPlayer("Saves/defaultChaser.txt"));//TEAM1_CHASER2
+    team1.push_back(ManagedPlayer("Saves/defaultChaser.txt")); //TEAM1_CHASER3
+    team1.push_back(ManagedPlayer("Saves/defaultBeater.txt")); //TEAM1_BEATER1
+    team1.push_back(ManagedPlayer("Saves/defaultBeater.txt")); //TEAM1_BEATER2
+    
+    team2.push_back(ManagedPlayer("Saves/defaultKeeper.txt")); //TEAM2_KEEPER
+    team2.push_back(ManagedPlayer("Saves/defaultSeeker.txt")); //TEAM2_SEEKER
+    team2.push_back(ManagedPlayer("Saves/defaultChaser.txt")); //TEAM2_CHASER1
+    team2.push_back(ManagedPlayer("Saves/defaultChaser.txt"));//TEAM2_CHASER2
+    team2.push_back(ManagedPlayer("Saves/defaultChaser.txt")); //TEAM2_CHASER3
+    team2.push_back(ManagedPlayer("Saves/defaultBeater.txt")); //TEAM2_BEATER1
+    team2.push_back(ManagedPlayer("Saves/defaultBeater.txt")); //TEAM2_BEATER2
+    
+    Match theMatch(team1, team2);
     
 }

@@ -1,26 +1,39 @@
 #ifndef PlayingPlayer_hpp
 #define PlayingPlayer_hpp
 
-#include "Field.hpp"
-#include "Match.hpp"
+#include "HexagonalField.hpp"
+#include "Coordinates.hpp"
+//#include "Match.hpp"
 #include "Player.hpp"
-#include "Position.hpp"
+#include "ManagedPlayer.hpp"
+//#include "Position.hpp"
+
+
+#define ROLE_KEEPER 0
+#define ROLE_SEEKER 1
+#define ROLE_CHASER 2
+#define ROLE_BEATER 3
+
 
 class PlayingPlayer : public Player {
 
- public:
+public:
 
- 	Field field;
-    Position position;
+ 	PlayingPlayer(ManagedPlayer& player, int role, AxialCoordinates startingPosition); 
+    //les possibilités des différentes actions spécialisées sont gérées au niveau client, le serveur recevra juste s'il doit
+    //bouger une balle ou un joueur
 
-    void getMaxDistance();
-    void avoidBludger();
-    void move();
+    int getMaxDistance();
+    void handleBludger();
+    bool interceptQuaffle(int distance);
+    bool catchGoldenSnitch(int distance);
+    void moveTo(AxialCoordinates destination); //setter
 
- private:
-
-    void handleDamage();
-
+private:
+    int __role;
+    AxialCoordinates __currentPosition;
+    int __hasBall;
+    void hurted();
 
 };
 

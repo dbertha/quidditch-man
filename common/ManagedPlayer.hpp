@@ -11,16 +11,32 @@ typedef int gold;
 class ManagedPlayer : public Player {
 
     int _trainingLeft[5];
+    bool _blocked;
+
+    Broomstick _broomstick;
 
  public:
 
+ 	ManagedPlayer();
  	ManagedPlayer(string playerSaveFile);
 
-    void train(int capacityNumber);
-    void updateLife(); //A QUOI SERT CETTE METHODE? (Je ne me souviens plus)
-    gold getEstimatedValue(); //Renvoie l'estimation du prix du joueur, calculé selon ses attributs
+ 	ManagedPlayer& operator= (const ManagedPlayer&);
 
-    void heal();
+ 	int getTrainingLeft(int capacityNumber) const;
+    void setTrainingLeft(int capacityNumber, int value);
+
+    void lockPlayer();
+    void unlockPlayer();
+    bool isBlocked() const;
+
+    Broomstick getBroomstick();
+
+    void setBroomstick(Broomstick broomstick);
+
+    void train(int capacityNumber);
+    gold getEstimatedValue();
+
+    void displayInformations();
 
 };
 
