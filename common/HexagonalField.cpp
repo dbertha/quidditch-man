@@ -19,6 +19,26 @@ HexagonalField::HexagonalField(){
             matrix[indexRow][indexCol] = NOT_ON_HEX_GRID;
         }
     }
+    //ordre identique à la liste des joueurs
+    unicodes.push_back(TEAM1_KEEPER_UNICODE);
+    unicodes.push_back(TEAM1_SEEKER_UNICODE);
+    unicodes.push_back(TEAM1_CHASER1_UNICODE);
+    unicodes.push_back(TEAM1_CHASER2_UNICODE);
+    unicodes.push_back(TEAM1_CHASER3_UNICODE);
+    unicodes.push_back(TEAM1_BEATER1_UNICODE);
+    unicodes.push_back(TEAM1_BEATER2_UNICODE);
+    unicodes.push_back(TEAM2_KEEPER_UNICODE);
+    unicodes.push_back(TEAM2_SEEKER_UNICODE);
+    unicodes.push_back(TEAM2_CHASER1_UNICODE);
+    unicodes.push_back(TEAM2_CHASER2_UNICODE);
+    unicodes.push_back(TEAM2_CHASER3_UNICODE);
+    unicodes.push_back(TEAM2_BEATER1_UNICODE);
+    unicodes.push_back(TEAM2_BEATER2_UNICODE);
+    unicodes.push_back(GOLDENSNITCH_UNICODE);
+    unicodes.push_back(BLUDGER1_UNICODE);
+    unicodes.push_back(BLUDGER2_UNICODE);
+    unicodes.push_back(QUAFFLE_UNICODE);
+    
 }
 
 int HexagonalField::getOccupant(AxialCoordinates coord) const{
@@ -38,7 +58,12 @@ void HexagonalField::display() {
         std::string decalage(abs(indexRow - (MATRIX_SIZE/2)) * 3, space);
         std::cout << decalage;
         for(int indexCol = std::max(0,((MATRIX_SIZE/2) - indexRow)); indexCol < (MATRIX_SIZE - std::max(0, indexRow - (MATRIX_SIZE /2))); ++indexCol){
-            std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+            if(matrix[indexRow][indexCol] < 0){
+                std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+            }
+            else{
+                std::cout << std::setw(2) << unicodes[matrix[indexRow][indexCol]] << std::string(4, space); //séparateur
+            }
         }
         std::cout << std::endl;
     }
@@ -62,7 +87,12 @@ void HexagonalField::display(AxialCoordinates selected, int distance){
                 if((indexRow == selected.getLineOnMatrix()) and (indexCol == selected.getColOnMatrix())){
                     std::cout << colorCenter; //coloration particulière pour le centre
                 }
-                std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+                if(matrix[indexRow][indexCol] < 0){
+                    std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+                }
+                else{
+                    std::cout << std::setw(2) << unicodes[matrix[indexRow][indexCol]] << std::string(4, space); //séparateur
+                }
                 if((indexRow == selected.getLineOnMatrix()) and (indexCol == selected.getColOnMatrix())){
                     std::cout << stopColoring;
                     std::cout << startColoring; // une fois le centre passé, on reprend la coloration normale

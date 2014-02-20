@@ -6,6 +6,9 @@
 #include <iostream>
 #include <vector>
 
+//~ g++ -Wall -Wextra HexagonalField.cpp Coordinates.hpp PlayingPlayer.cpp Player.cpp ManagedPlayer.cpp Broomstick.cpp testMatch.cpp Match.cpp -o match.out
+
+
 int main(){
     AxialCoordinates axialCoord(0,0);
     AxialCoordinates axialCoord2(1,0), axialCoord3(1, 1), axialCoord4(-1, 1);
