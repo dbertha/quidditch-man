@@ -6,6 +6,7 @@
 //#include "Match.hpp"
 #include "Player.hpp"
 #include "ManagedPlayer.hpp"
+#include "Ball.hpp"
 //#include "Position.hpp"
 
 
@@ -28,11 +29,15 @@ public:
     bool interceptQuaffle(int distance);
     bool catchGoldenSnitch(int distance);
     void moveTo(AxialCoordinates destination); //setter
+    void loseQuaffle();
+    void carryQuaffle();
+    AxialCoordinates getPosition() {return __currentPosition;}
+    int getRole(){return __role;}
 
 private:
     int __role;
     AxialCoordinates __currentPosition;
-    int __hasBall;
+    bool __hasQuaffle;
     void hurted();
 
 };

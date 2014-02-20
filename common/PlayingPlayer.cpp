@@ -21,7 +21,7 @@
 #include <time.h>       /* time */
 
 
-PlayingPlayer::PlayingPlayer(ManagedPlayer& player, int role, AxialCoordinates startingPosition) : __role(role), __currentPosition(startingPosition){
+PlayingPlayer::PlayingPlayer(ManagedPlayer& player, int role, AxialCoordinates startingPosition) : __role(role), __currentPosition(startingPosition), __hasQuaffle(0){
 	Broomstick broomstick = player.getBroomstick();
 	int tmp;
 	for (int i=0;i<5;++i){
@@ -57,3 +57,11 @@ bool PlayingPlayer::catchGoldenSnitch(int distance){
 void PlayingPlayer::moveTo(AxialCoordinates destination){
     __currentPosition = destination;
 }
+
+void PlayingPlayer::loseQuaffle(){
+    __hasQuaffle = 0;
+}
+void PlayingPlayer::carryQuaffle(){
+    __hasQuaffle = 1;
+}
+

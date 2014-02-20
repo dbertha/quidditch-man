@@ -1,11 +1,13 @@
 #ifndef BALL_HPP
-#define BALL_CPP
+#define BALL_HPP
 
 //~ Rappel, dans HexagonalField.hpp :
 //~ #define GOLDENSNITCH 14
 //~ #define BLUDGER1 15
 //~ #define BLUDGER2 16
 //~ #define QUAFFLE 17
+
+//TODO : role inutile ?
 
 class Ball{
 public :
