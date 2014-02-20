@@ -8,7 +8,7 @@
 #include <iostream>
 #include <stdlib.h>     /* atoi */
 #include <ctime>
-#include <cstdlib> 
+#include <cstdlib>
 #include <stdio.h>
 #include <string.h>
 
@@ -17,7 +17,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), state_(INIT), userId_(""), manager_(NULL) {}
+User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), state_(INIT), userId_(0), userName_(""), manager_(NULL) {}
 //TODO : initialisation dans le bon ordre
 void User::cmdHandler(SerializedObject *received) {
 	SerializedObject answer;
@@ -52,26 +52,26 @@ void User::cmdHandler(SerializedObject *received) {
 			else std::cout<<"WRONG LOGIN/PASSWORD"<<std::endl;
 			//construct answer
 			answer.typeOfInfos = LOGIN_CONFIRM;
-			
+
 			break;
 		case GETBUILDINGINFOS :
 			//reading details
 			position = received->stringData;
-			memcpy(&targetedBuilding, position, sizeof(targetedBuilding)); 
+			memcpy(&targetedBuilding, position, sizeof(targetedBuilding));
 #ifdef __DEBUG
 			std::cout<<"Demande d'infos de batiment reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"BuildingID reçu : "<<targetedBuilding<<std::endl;
-			
+
 #endif
 			//handle demand
-			
+
 			//construct answer
-			
+
 			break;
 		case UPGRADE_BUILDING :
 			//reading details
 			position = received->stringData;
-			memcpy(&targetedBuilding, position, sizeof(targetedBuilding)); 
+			memcpy(&targetedBuilding, position, sizeof(targetedBuilding));
 #ifdef __DEBUG
 			std::cout<<"Demande d'infos d'upgrade de bâtiment reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"BuildingID reçu : "<<targetedBuilding<<std::endl;
@@ -79,33 +79,63 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand
 			//construct answer
 			break;
-		case PROPOSEMATCH :
+		case PROPOSEMATCH : {
 			//reading details
 			position = received->stringData;
-			memcpy(&targetedUser, position, sizeof(targetedUser)); 
+			memcpy(&targetedUser, position, sizeof(targetedUser));
 #ifdef __DEBUG
 			std::cout<<"Demande de proposition d'un match reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"userID reçu : "<<targetedUser<<std::endl;
 #endif
-			//handle demand
-			//construct answer
+						for (unsigned int i=0;i<server_->usersList_.size();++i)
+							if(server_->usersList_[i]->state_==FREE && server_->usersList_[i]->getUserId()==targetedUser) {
+								opponent_=server_->usersList_[i];
+								opponent_->state_=MATCH_INVITED;
+								state_=MATCH_INVITING;
+								answer_+="Le manager "+server_->usersList_[i]->getUserName()+" vous invite à jouer un match amical.";
+//								return sendAnswer(server_->usersList_[i],msg[0],answer_);
+//					TODO		à envoyer au manager invité !
+							}
+						answer_="0Vous n'avez pas sélectionné un joueur disponible.";
 			break;
-		case ACCEPTMATCH :
+			}
+		case ACCEPTMATCH : {
 			//reading details
 			int confirmation; //temporary for gcc compiler (testing only). Change to bool when compiled with g++
 			position = received->stringData;
-			memcpy(&targetedUser, position, sizeof(targetedUser)); 
+			memcpy(&targetedUser, position, sizeof(targetedUser));
 			position += sizeof(targetedUser);
-			memcpy(&confirmation, position, sizeof(confirmation)); 
+			memcpy(&confirmation, position, sizeof(confirmation));
 #ifdef __DEBUG
 			std::cout<<"Demande d'acceptation d'un match reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"userID reçu : "<<targetedUser<<std::endl;
 			std::cout<<"confirmation : "<<confirmation<<std::endl;
 #endif
-			//handle demand
-			//construct answer
+			std::string answer_;
+			if (confirmation) {
+						std::cout<<userId_<<" est d'accord pour rencontrer "<<targetedUser<<" en match amical"<<std::endl;
+						for (unsigned int i=0;i<server_->usersList_.size();++i)
+							if(server_->usersList_[i]->state_==MATCH_INVITING && server_->usersList_[i]->getUserId()==targetedUser) {
+								server_->usersList_[i]->state_=MATCH_INGAME;
+								state_=MATCH_INGAME;
+								answer_=" Ce joueur est d'accord !";
+//			TODO		message à envoyer au manager qui invite :
+//								return sendAnswer(server_->usersList_[i],msg[0],answer_);
+							}
+						state_=FREE;
+						answer_="0Le joueur qui vous invitait n'est plus disponible !";
+					}
+			else {
+						answer_="0Ce joueur n'est pas d'accord.";
+						for (unsigned int i=0;i<server_->usersList_.size();++i)
+							if(server_->usersList_[i]->getUserId()==targetedUser) {
+								server_->usersList_[i]->state_=FREE;
+								state_=FREE;
+							}
+			}
 			break;
-		case IS_MATCH_WAITING :
+		}
+		case IS_MATCH_WAITING ://no more needed
 			//no details to read
 			//on suppose qu'un seul match sera demandé à la fois
 #ifdef __DEBUG
@@ -114,13 +144,13 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand
 			//construct answer
 			break;
-		case CREATEAUCTION :
+		case CREATEAUCTION ://
 			//reading details
 			int startingPrice;
 			position = received->stringData;
-			memcpy(&targetedPlayer, position, sizeof(targetedPlayer)); 
+			memcpy(&targetedPlayer, position, sizeof(targetedPlayer));
 			position += sizeof(targetedPlayer);
-			memcpy(&startingPrice, position, sizeof(startingPrice)); 
+			memcpy(&startingPrice, position, sizeof(startingPrice));
 #ifdef __DEBUG
 			std::cout<<"Demande de création d'une enchère reçue sur le socket "<<getSockfd()<<std::endl;
 			std::cout<<"playerID reçu : "<<targetedPlayer<<std::endl;
@@ -133,7 +163,7 @@ void User::cmdHandler(SerializedObject *received) {
 			//reading details
 			int targetedAuction;
 			position = received->stringData;
-			memcpy(&targetedAuction, position, sizeof(targetedAuction)); 
+			memcpy(&targetedAuction, position, sizeof(targetedAuction));
 #ifdef __DEBUG
 			std::cout<<"Demande de participation à une enchère reçue sur le socket "<<getSockfd()<<std::endl;
 			std::cout<<"targetedAuction reçu : "<<targetedAuction<<std::endl;
@@ -141,14 +171,29 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand
 			//construct answer
 			break;
-		case GETMANAGERSLIST :
+		case GETMANAGERSLIST : {
 			//no details to read
 #ifdef __DEBUG
 			std::cout<<"Demande de la liste des joueurs reçue sur le socket "<<getSockfd()<<std::endl;
 #endif
-			//handle demand
-			//construct answer
+					std::string answer_;
+					std::ostringstream oSStream_;
+					if(state_!=FREE) {
+						answer_="0Internal error : user already busy in a conversation with the server.";
+					}
+					else {
+						state_=MATCH_LIST;
+						answer_=' ';
+						for (unsigned int i=0;i<server_->usersList_.size();++i)
+							if(server_->usersList_[i]->state_==FREE) {
+								oSStream_<<server_->usersList_[i]->userId_;
+								answer_=answer_+oSStream_.str()+" "+server_->usersList_[i]->userName_+"\n";
+								state_=MATCH_LIST;
+							}
+						if(answer_.length()==1) answer_="0Il n'y a pas d'autres managers disponibles.";
+					}
 			break;
+			}
 		case GETAUCTIONSLIST :
 			//no details to read
 #ifdef __DEBUG
@@ -157,7 +202,7 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand
 			//construct answer
 			break;
-		case GETPOSITIONS :
+		case GETPOSITIONS ://
 			//no details to read
 #ifdef __DEBUG
 			std::cout<<"Demande de la liste des positions sur le terrain reçue sur le socket "<<getSockfd()<<std::endl;
@@ -165,10 +210,10 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand
 			//construct answer
 			break;
-		case SELECTPLAYER :
+		case SELECTPLAYER ://
 			//reading details
 			position = received->stringData;
-			memcpy(&targetedPlayer, position, sizeof(targetedPlayer)); 
+			memcpy(&targetedPlayer, position, sizeof(targetedPlayer));
 #ifdef __DEBUG
 			std::cout<<"Sélection d'un joueur sur le terrain reçue sur le socket "<<getSockfd()<<std::endl;
 			std::cout<<"targetedPlayer reçu : "<<targetedPlayer<<std::endl;
@@ -179,9 +224,9 @@ void User::cmdHandler(SerializedObject *received) {
 		case TRAIN_PLAYER :
 			//reading details
 			int capacityToTrain;
-			memcpy(&targetedPlayer, position, sizeof(targetedPlayer)); 
+			memcpy(&targetedPlayer, position, sizeof(targetedPlayer));
 			position += sizeof(targetedPlayer);
-			memcpy(&capacityToTrain, position, sizeof(capacityToTrain)); 
+			memcpy(&capacityToTrain, position, sizeof(capacityToTrain));
 #ifdef __DEBUG
 			std::cout<<"Demande d'un entrainement pour un joueur reçue sur le socket "<<getSockfd()<<std::endl;
 			std::cout<<"targetedPlayer reçu : "<<targetedPlayer<<std::endl;
@@ -198,12 +243,12 @@ void User::cmdHandler(SerializedObject *received) {
 			int diagDest;
 			int lineDest;
 			for(int i = 0; i < 7; ++i){
-				memcpy(&targetedPlayer, position, sizeof(targetedPlayer)); 
+				memcpy(&targetedPlayer, position, sizeof(targetedPlayer));
 				position += sizeof(targetedPlayer);
 				memcpy(&diagDest, position, sizeof(diagDest));
-				position += sizeof(diagDest); 
+				position += sizeof(diagDest);
 				memcpy(&lineDest, position, sizeof(lineDest));
-				position += sizeof(lineDest); 
+				position += sizeof(lineDest);
 				moves[i][0] = targetedPlayer;
 				moves[i][1] = diagDest;
 				moves[i][2] = lineDest;
@@ -231,7 +276,7 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"En-tête inconnu : "<<received->typeOfInfos<<std::endl;
 #endif
 			break;
-		
+
 	}
 	//server_->sendToClient(this,&answer);
 	//envoi de la réponse
@@ -245,7 +290,9 @@ void User::setDisconnection() {
 bool User::isDisconnecting() {return (state_==DISCONNECTING);}
 int User::getSockfd() {return sockfd_;}
 
-std::string User::getUserId() {return userId_;}
+int User::getUserId() {return userId_;}
+
+std::string User::getUserName() {return userName_;}
 
 bool User::checkLoginAndPassword(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]) {
 	int fd = open("server/Saves/managers.txt",O_RDONLY);
@@ -270,7 +317,11 @@ bool User::checkLoginAndPassword(char username[USERNAME_LENGTH], char password[P
 		do {
 			login = strtok_r(line,"#",&context2);
 			pass = strtok_r(NULL,"#",&context2);
-			if ( (strcmp(login,username)==0)&&(strcmp(pass,password)==0) ) return 1;
+			if ( (strcmp(login,username)==0)&&(strcmp(pass,password)==0) ) {
+				userName_=username;
+				userId_=server_->getNewUserId();
+				return 1;
+			}
 		} while ( (line=strtok_r(NULL,"\n",&context1))!=NULL ) ;
 	}
 

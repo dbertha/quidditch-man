@@ -7,7 +7,7 @@
 //TODO : pas de EXIT_SUCCESS ou EXIT_FAILURE pour d'autres méthodes que main()
 
 // Documentation : voir Readme.txt
-Server::Server(int port): commonMgr_(new CommonMgr(this)), port_(port), max_(0) {}
+Server::Server(int port): commonMgr_(new CommonMgr(this)), port_(port), max_(0), userId_(0) {}
 // initialisations dans le constructeur
 void Server::run() {
 	std::cout<<"Server started to listen on port "<<port_<<std::endl;
@@ -155,3 +155,5 @@ void Server::removeAllUsers() {
 #endif
 	for(unsigned int i=0;i<usersList_.size();++i) removeUser(i);
 }
+
+int Server::getNewUserId() {return ++userId_;}

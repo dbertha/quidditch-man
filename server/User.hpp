@@ -16,7 +16,8 @@ public:
 	void setDisconnection();
 	bool isDisconnecting();
 	int getSockfd();
-	std::string getUserId();
+	int getUserId();
+	std::string getUserName();// initialement dans UserId...!
 	//int sendAnswer(User *, const char cmd, std::string); cf NetworkBase.cpp
 	void* createMatch();
 	enum Status {INIT,FREE,MATCH_LIST,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING};
@@ -31,8 +32,9 @@ private:
 	CommonMgr* commonMgr_;
 	User* opponent_;
 	int sockfd_; //socket de communication du client
-	std::string userId_;
-	//std::string answer_;
+	int userId_;
+	std::string userName_;
+	std::string answer_;
 	std::string dataRequest_;
 	Manager* manager_;
 };

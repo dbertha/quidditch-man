@@ -28,6 +28,7 @@ public:
 	int sendToClient(User *, SerializedObject *); //TODO : transformer la modélisation pour conserver en private ou protected
 	std::vector<User*> usersList_;
 	std::vector<User*> GetUsersList();
+	int getNewUserId();
 
 private:
 	CommonMgr* commonMgr_;
@@ -39,6 +40,7 @@ private:
 	unsigned int sin_size;
 	char msg[INPUTSIZE];
 	fd_set FDSet_;
+	int userId_;
 
 	int connect();
 	int mainLoop();
