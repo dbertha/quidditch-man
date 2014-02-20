@@ -28,6 +28,7 @@ public:
 
 	int checkLoginAndPassword(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
 	void addManager(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
+	Manager* getManager();
 
 private:
 	Server* server_;

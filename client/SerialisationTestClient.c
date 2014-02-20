@@ -276,18 +276,24 @@ int main(int argc, char *argv[]){
 
       askForManagerInfos(sockfd);
       askForPlayersList(sockfd);
+      getManagersList(sockfd);
 
+      scanf("%s",username);
+      printf("%s",username);
+      answerMatchProposal(sockfd, 1, 1);
     }
 
 
 
-    else if (choice==2) sendNewManagerToServer(sockfd,username,password);
+    else if (choice==2) {
+      sendNewManagerToServer(sockfd,username,password);
+      proposeMatchTo(sockfd, 0);
     //result = serverAnswer
+    }
+
+  
+
   }
-
-  
-
-  
 
   
   return EXIT_SUCCESS;

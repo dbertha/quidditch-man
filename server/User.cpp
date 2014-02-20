@@ -27,7 +27,7 @@
 #define ALREADYINCONSTRUCTION 2
 #define NOTENOUGHMONEY 3
 
-User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), state_(INIT), userId_(""), manager_(NULL), calendar_(NULL) {}
+User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), state_(INIT), userId_(0), manager_(NULL), calendar_(NULL) {}
 //TODO : initialisation dans le bon ordre
 void User::cmdHandler(SerializedObject *received) {
 	SerializedObject answer;
@@ -62,9 +62,12 @@ void User::cmdHandler(SerializedObject *received) {
 			if (checkLoginAndPassword(username,password)==1) {
 				std::cout<<"LOGIN OK"<<std::endl;
 				manager_ = new Manager(username);
+				userName_=username;
+				userId_=server_->usersList_.size();
 				calendar_ = new Calendar(manager_);
 				calendar_->update();
 				manager_->save();
+				state_=FREE;
 			}
 			else std::cout<<"WRONG LOGIN/PASSWORD"<<std::endl;
 			//construct answer
@@ -92,8 +95,11 @@ void User::cmdHandler(SerializedObject *received) {
 				std::cout<<"CREATING MANAGER..."<<std::endl;
 				addManager(username,password);
 				manager_ = new Manager(username);
+				userName_=username;
+				userId_=server_->usersList_.size();
 				manager_->save();
 				calendar_ = new Calendar(manager_);
+				state_=FREE;
 			}
 			//construct answer
 			answer.typeOfInfos = LOGIN_CONFIRM;
@@ -290,7 +296,7 @@ void User::cmdHandler(SerializedObject *received) {
 		case GETMANAGERSLIST : {
 			//no details to read
 #ifdef __DEBUG
-			std::cout<<"Demande de la liste des joueurs reçue sur le socket "<<getSockfd()<<std::endl;
+			std::cout<<"Demande de la liste des managers reçue sur le socket "<<getSockfd()<<std::endl;
 #endif
 					std::string answer_;
 					std::ostringstream oSStream_;
@@ -308,6 +314,9 @@ void User::cmdHandler(SerializedObject *received) {
 							}
 						if(answer_.length()==1) answer_="0Il n'y a pas d'autres managers disponibles.";
 					}
+					std::cout<<answer_<<std::endl;
+
+					state_=FREE;
 			break;
 			}
 		case GETAUCTIONSLIST :
@@ -417,7 +426,7 @@ int User::getUserId() {return userId_;}
 
 std::string User::getUserName() {return userName_;}
 
-bool User::checkLoginAndPassword(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]) {
+int User::checkLoginAndPassword(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]) {
 	int fd = open("server/Saves/managers.txt",O_RDONLY);
 	if (fd==-1){
 		std::cerr<<"Error while opening file\n";
@@ -440,11 +449,12 @@ bool User::checkLoginAndPassword(char username[USERNAME_LENGTH], char password[P
 		do {
 			login = strtok_r(line,"#",&context2);
 			pass = strtok_r(NULL,"#",&context2);
-			if ( (strcmp(login,username)==0)&&(strcmp(pass,password)==0) ) {
-				userName_=username;
-				userId_=server_->getNewUserId();
-				return 1;
-			}
+			if (strcmp(login,username)==0) {
+ 				if (strcmp(pass,password)==0) {
+ 					return 1;
+ 				}
+				else return -1;
+ 			}
 		} while ( (line=strtok_r(NULL,"\n",&context1))!=NULL ) ;
 	}
 
@@ -467,3 +477,5 @@ void User::addManager(char username[USERNAME_LENGTH], char password[PASSWORD_LEN
 
 	close(fd);
 }
+
+Manager* User::getManager() {return manager_;}
