@@ -207,7 +207,7 @@ int bid(int sockfd){
 
 //réception des donnéés du serveur :
 
-bool getConfirmation(int sockfd){ //valable pour LOGIN_CONFIRM
+bool getConfirmation(int sockfd){ //valable pour LOGIN_CONFIRM, UPGRADE_CONFIRM, TRAINING_STARTED
     bool confirmation;
     SerializedObject received = receiveOnSocket(sockfd);
     char * position = received.stringData;
@@ -273,8 +273,24 @@ std::vector<int> receivePlayerInfo(int sockfd){
 }
         
 
-    
-
+std::vector<int> receiveBuildingInfos(int sockfd){
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    std::vector<int> buildingInfos;
+    if(received.typeOfInfos == BUILDINGINFOS){ //on suppose toujours vrai
+            //int : level
+            //int : pricefornextlevel
+            //int : specialAttribut
+            //int : enTravaux
+        for(int i = 0; i < 4; ++i){
+            int value;
+            memcpy(&value,position, sizeof(value));
+            position += sizeof(value);
+            buildingInfos.push_back(value); //ajout à la liste
+        }
+    }
+    return buildingInfos;
+}
 
 
 

@@ -37,7 +37,7 @@ class ManagedPlayer : public Player {
     void train(int capacityNumber);
     gold getEstimatedValue();
     
-    void serialize(char * stringData);
+    //void serialize(char * stringData); //TODO : insérer les éléments de getInformations dans le buffer pour ne pas le faire dans User
 
     std::vector<int> getInformations();
 

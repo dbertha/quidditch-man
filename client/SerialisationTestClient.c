@@ -291,6 +291,11 @@ int main(int argc, char *argv[]){
       for(unsigned int i = 0; i < playerInfo.size() ; ++i){
         std::cout << playerInfo[i] << std::endl;
       }
+      askForBuildingInfos(sockfd, STADIUM);
+      std::vector<int> buildingInfo = receiveBuildingInfos(sockfd);
+      for(unsigned int i = 0; i < buildingInfo.size() ; ++i){
+        std::cout << buildingInfo[i] << std::endl;
+      }
 
     }
 

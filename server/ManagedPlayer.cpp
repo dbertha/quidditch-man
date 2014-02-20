@@ -147,5 +147,5 @@ vector<int> ManagedPlayer::getInformations() {
 }
 
 
-void ManagedPlayer::serialize(char * stringData){
-}
+//~ void ManagedPlayer::serialize(char * stringData){
+//~ }

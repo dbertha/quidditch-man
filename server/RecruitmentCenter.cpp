@@ -25,7 +25,7 @@ vector<int> RecruitmentCenter::getInformations() {
 	vector<int> tmp;
 	tmp.push_back(this->getLevel());
 	tmp.push_back(this->getPriceForNextLevel());
-	tmp.push_back(this->isUpgrading());
+	tmp.push_back(this->isUpgrading());	
 
 	return tmp;
 }

@@ -19,13 +19,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#define STADIUM 1
-#define TRAININGCENTER 2
-#define HOSPITAL 3
-#define FANSHOP 4
-#define CONSTRUCTIONSTARTED 1
-#define ALREADYINCONSTRUCTION 2
-#define NOTENOUGHMONEY 3
+
 
 
 User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), state_(INIT), userId_(""), manager_(NULL), calendar_(NULL) {}
@@ -225,17 +219,26 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand:
 			calendar_->update();
 			manager_->save();
+			//RecrutmentCenter inutilisé
 			if (targetedBuilding==STADIUM) infos=manager_->getStadiumInformations();
 			else if (targetedBuilding==TRAININGCENTER) infos=manager_->getTrainingCenterInformations();
 			else if (targetedBuilding==HOSPITAL) infos=manager_->getHospitalInformations();
-			else if (targetedBuilding==FANSHOP) infos=manager_->getFanShopInformations();
+			else /*if (targetedBuilding==FANSHOP)*/ infos=manager_->getFanShopInformations();
 			
-			for (int i=0;i<4;++i) {std::cout<<infos[i]<<std::endl;}
+
 			calendar_->update();
 			manager_->save();
-
+	
 			//construct answer
-			
+			answer.typeOfInfos = BUILDINGINFOS;
+			for (unsigned int i=0;i<4;++i) {
+				//std::cout<<infos[i]<<std::endl;
+				int attr;
+				attr = infos[i];
+				memcpy(answerPosition, &attr, sizeof(attr));
+				answerPosition += sizeof(attr);
+			}
+			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 		case UPGRADE_BUILDING :
 			//reading details
@@ -248,16 +251,48 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand:
 			calendar_->update();
 			manager_->save();
+			confirmation = false;
 			if (targetedBuilding==STADIUM) resultOfUpgrade=manager_->startStadiumConstruction();
 			else if (targetedBuilding==TRAININGCENTER) resultOfUpgrade=manager_->startTrainingCenterConstruction();
 			else if (targetedBuilding==HOSPITAL) resultOfUpgrade=manager_->startHospitalConstruction();
 			else if (targetedBuilding==FANSHOP) resultOfUpgrade=manager_->startFanShopConstruction();
 			if (resultOfUpgrade==ALREADYINCONSTRUCTION) std::cout<<"Already in construction !"<<std::endl;
-			else if (resultOfUpgrade==NOTENOUGHMONEY) std::cout<<"Not enough money !"<<std::endl;
-			else std::cout<<"Construction started !"<<std::endl;
+			else if (resultOfUpgrade==NOTENOUGHMONEY) std::cout<<"Not enough money !"<<std::endl; //testé au niveau client
+			else {
+				std::cout<<"Construction started !"<<std::endl;
+				confirmation = true;
+			}
 			calendar_->update();
 			manager_->save();
 			//construct answer
+			answer.typeOfInfos = UPGRADE_CONFIRM;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+			break;
+			
+		case TRAIN_PLAYER :
+			//reading details
+			int capacityToTrain;
+			memcpy(&targetedPlayer, position, sizeof(targetedPlayer)); 
+			position += sizeof(targetedPlayer);
+			memcpy(&capacityToTrain, position, sizeof(capacityToTrain)); 
+#ifdef __DEBUG
+			std::cout<<"Demande d'un entrainement pour un joueur reçue sur le socket "<<getSockfd()<<std::endl;
+			std::cout<<"targetedPlayer reçu : "<<targetedPlayer<<std::endl;
+			std::cout<<"capacityToTrain reçu : "<<capacityToTrain<<std::endl;
+#endif
+			//handle demand
+			calendar_->update();
+			manager_->save();
+			resultOfTraining = manager_->trainPlayer(targetedPlayer,capacityToTrain);
+			if (!resultOfTraining) std::cout<<"This player is already blocked by a training or the hospital"<<std::endl;
+			calendar_->update();
+			manager_->save();
+
+			//construct answer
+			answer.typeOfInfos = TRAINING_STARTED;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 		case PROPOSEMATCH :
 			//reading details
@@ -356,27 +391,7 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand
 			//construct answer
 			break;
-		case TRAIN_PLAYER :
-			//reading details
-			int capacityToTrain;
-			memcpy(&targetedPlayer, position, sizeof(targetedPlayer)); 
-			position += sizeof(targetedPlayer);
-			memcpy(&capacityToTrain, position, sizeof(capacityToTrain)); 
-#ifdef __DEBUG
-			std::cout<<"Demande d'un entrainement pour un joueur reçue sur le socket "<<getSockfd()<<std::endl;
-			std::cout<<"targetedPlayer reçu : "<<targetedPlayer<<std::endl;
-			std::cout<<"capacityToTrain reçu : "<<capacityToTrain<<std::endl;
-#endif
-			//handle demand
-			calendar_->update();
-			manager_->save();
-			resultOfTraining = manager_->trainPlayer(targetedPlayer,capacityToTrain);
-			if (!resultOfTraining) std::cout<<"This player is already blocked by a training or the hospital"<<std::endl;
-			calendar_->update();
-			manager_->save();
 
-			//construct answer
-			break;
 		case MAKEMOVES :
 			//reading details
 			//soit un joueur se déplace, soit un joueur fait se déplacer une balle, soit ne fait rien : nbmax de mouvements = nbtotal de mouvement = nbjoueurs = 7
