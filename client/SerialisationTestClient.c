@@ -15,6 +15,8 @@
 #include <sys/socket.h>
 #include <sys/unistd.h>
 
+#include <iostream>
+
 #define DIM 100
 
 void displayPlayersList() {}
@@ -273,9 +275,17 @@ int main(int argc, char *argv[]){
 
     if (choice==1) {
       sendLoginToServer(sockfd,username,password);
-
+      getConfirmation(sockfd);
       askForManagerInfos(sockfd);
+      int nbPlayers, money, nbFans;
+      receiveManagerInfos(sockfd, &nbPlayers, &money, &nbFans);
+      printf("nbPlayers money nbFans : %d, %d, %d", nbPlayers, money, nbFans);
       askForPlayersList(sockfd);
+      std::vector<std::string> list = receivePlayersList(sockfd);
+      std::cout << list.size() << std::endl;
+      for(unsigned int i = 0; i < list.size() ; ++i){
+        std::cout << list[i] << std::endl;
+      }
 
     }
 

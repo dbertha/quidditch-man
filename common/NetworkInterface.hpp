@@ -9,6 +9,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <string>
+#include <vector>
+#include <iostream>
 
 
 
@@ -94,8 +97,7 @@ int proposeMatchTo(int sockfd, int userID){
     return sendOnSocket(sockfd, serialized);
 }
 
-int answerMatchProposal(int sockfd, int askerID, int confirmation){
-    //TODO : when in c++ code, use bool for confirmation
+int answerMatchProposal(int sockfd, int askerID, bool confirmation){
     SerializedObject serialized;
     char * position = serialized.stringData;
     serialized.typeOfInfos = ACCEPTMATCH;
@@ -203,10 +205,54 @@ int bid(int sockfd){
     return sendOnSocket(sockfd, serialized);
 }
 
+//réception des donnéés du serveur :
 
+bool getConfirmation(int sockfd){ //valable pour LOGIN_CONFIRM
+    bool confirmation;
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    //TODO : vérifier qu'il s'agit bien d'un message de confirmation
+    memcpy(&confirmation,position, sizeof(confirmation));
+    return confirmation;
+}
 
+void receiveManagerInfos(int sockfd, int *nbPlayers, int * money, int * nbFans){
+    //écrit les données sur les objets pointés
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    if(received.typeOfInfos == MANAGERINFOS){
+        memcpy(nbPlayers,position, sizeof(int));
+        position += sizeof(int);
+        memcpy(money,position, sizeof(int));
+        position += sizeof(int);
+        memcpy(nbFans,position, sizeof(int));
+        position += sizeof(int);
+    }
+}
 
-
+std::vector<std::string> receivePlayersList(int sockfd){
+    //pour chaque ManagedPlayer, on reçoit un string firstname et un lastname, de façon ordonnée (indice 0 à 1 : playerID = 0, etc)
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    std::vector<std::string> playersListNames;
+    if(received.typeOfInfos == PLAYERSLIST){ //on suppose toujours vrai
+        int nbNames;
+        memcpy(&nbNames,position, sizeof(nbNames));
+        position += sizeof(nbNames);
+        std::cout << nbNames << std::endl;
+        for(int i = 0; i < nbNames; ++i){
+            char name[USERNAME_LENGTH];
+            std::string strName;
+            memcpy(&name,position, sizeof(name));
+            position += sizeof(name);
+            strName = name; //conversion
+            playersListNames.push_back(strName); //ajout à la liste
+        }
+    }
+    return playersListNames;
+}
+    
+        
 
     
 

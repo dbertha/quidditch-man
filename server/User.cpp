@@ -27,16 +27,19 @@
 #define ALREADYINCONSTRUCTION 2
 #define NOTENOUGHMONEY 3
 
+
 User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), state_(INIT), userId_(""), manager_(NULL), calendar_(NULL) {}
 //TODO : initialisation dans le bon ordre
 void User::cmdHandler(SerializedObject *received) {
 	SerializedObject answer;
 	char * position;
+	char * answerPosition = answer.stringData;
 	int targetedBuilding;
 	int targetedUser;
 	int targetedPlayer;
 	int resultOfUpgrade;
 	bool resultOfTraining;
+	bool confirmation;
 	vector<int> infos;
 	vector<string> playersList;
 	position = received->stringData;
@@ -59,16 +62,22 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Password reçu :  "<<password <<std::endl;
 #endif
 			//handle demand:
-			if (checkLoginAndPassword(username,password)==1) {
+			if (checkLoginAndPassword(username,password) == 1) {
 				std::cout<<"LOGIN OK"<<std::endl;
 				manager_ = new Manager(username);
 				calendar_ = new Calendar(manager_);
 				calendar_->update();
 				manager_->save();
+				confirmation = true;
 			}
-			else std::cout<<"WRONG LOGIN/PASSWORD"<<std::endl;
+			else {
+				std::cout<<"WRONG LOGIN/PASSWORD"<<std::endl;
+				confirmation = false;
+			}
 			//construct answer
 			answer.typeOfInfos = LOGIN_CONFIRM;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			
 			break;
 
@@ -85,6 +94,7 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Password reçu :  "<<password <<std::endl;
 #endif
 			//handle demand:
+			confirmation = false;
 			if (checkLoginAndPassword(username,password)==-1) { //This Manager login already exists
 				std::cout<<"LOGIN ALREADY TAKEN"<<std::endl;
 			}
@@ -94,10 +104,12 @@ void User::cmdHandler(SerializedObject *received) {
 				manager_ = new Manager(username);
 				manager_->save();
 				calendar_ = new Calendar(manager_);
+				confirmation = true;
 			}
 			//construct answer
 			answer.typeOfInfos = LOGIN_CONFIRM;
-			
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 
 		case GETMANAGERINFOS :
@@ -105,17 +117,31 @@ void User::cmdHandler(SerializedObject *received) {
 #ifdef __DEBUG
 			std::cout<<"Demande des infos du manager reçue sur socket "<<getSockfd()<<std::endl;
 #endif
-			//handle demand: nothing to handle
-
+			//handle demand
+			
 			calendar_->update();
 			manager_->save();
+			int nbPlayers;
+			nbPlayers = manager_->getNumberOfPlayers();
+			int money;
+			money = manager_->getMoney();
+			int nbFans;
+			nbFans = manager_->getNumberOfFans();
+#ifdef __DEBUG
 			std::cout<<"Number of players : "<<manager_->getNumberOfPlayers()<<std::endl;
 			std::cout<<"Money : "<<manager_->getMoney()<<std::endl;
 			std::cout<<"Number of fans : "<<manager_->getNumberOfFans()<<std::endl;
+#endif
 			calendar_->update();
 			manager_->save();
-			//construct answer with manager_->getNumberOfPlayers() manager_->getMoney() et manager_->getNumberOfFans();
-			
+			//construct answer
+			answer.typeOfInfos = MANAGERINFOS;
+			memcpy(answerPosition, &nbPlayers, sizeof(nbPlayers));
+			answerPosition += sizeof(nbPlayers);
+			memcpy(answerPosition, &money, sizeof(money));
+			answerPosition += sizeof(money);
+			memcpy(answerPosition, &nbFans, sizeof(nbFans));
+			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 
 		case GETPLAYERSLIST :
@@ -123,15 +149,37 @@ void User::cmdHandler(SerializedObject *received) {
 #ifdef __DEBUG
 			std::cout<<"Demande de la liste des joueurs reçue sur socket "<<getSockfd()<<std::endl;
 #endif
-			//handle demand: nothing to handle
+			//handle demand
 
 			calendar_->update();
 			manager_->save();
 			playersList = manager_->getPlayersList();
-			for (int i=0;i<playersList.size();i+=2) {std::cout<<playersList[i]<<" "<<playersList[i+1]<<std::endl; }
+			//construct answer 
+			answer.typeOfInfos = PLAYERSLIST;
+			int size;
+			size = playersList.size();
+			memcpy(answerPosition, &size, sizeof(size)); //nb de noms à lire
+			answerPosition += sizeof(size);
+			for (unsigned int i=0;i<playersList.size() - 1;i+=2) { //un paquet par joueur
+				char playerFirstName[USERNAME_LENGTH], playerLastName[USERNAME_LENGTH];
+				//un managedPlayer dans la liste =
+				//indice dans la liste déductible par l'ordre en renvoi
+				//nom : char[30]
+				//prénom : char[30]
+				//on suppose le buffer assez grand
+				string firstname = playersList[i];
+				string lastname = playersList[i+1];
+				strcpy(playerFirstName, firstname.c_str());
+				strcpy(playerLastName, lastname.c_str());
+				memcpy(answerPosition, &playerFirstName, sizeof(playerFirstName));
+				answerPosition += sizeof(playerFirstName);
+				memcpy(answerPosition, &playerLastName, sizeof(playerLastName));
+				answerPosition += sizeof(playerLastName);
+				
+			}
 			calendar_->update();
 			manager_->save();
-			//construct answer 
+			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			
 			break;
 
@@ -143,7 +191,7 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"targetedPlayer reçu : "<<targetedPlayer<<std::endl;
 #endif
 			infos= manager_->getPlayerInformations(targetedPlayer);
-			for (int i=0;i<infos.size();++i) {std::cout<<infos[i]<<std::endl;}
+			for (unsigned int i=0;i<infos.size();++i) {std::cout<<infos[i]<<std::endl;}
 			calendar_->update();
 			manager_->save();
 			//construct answer
@@ -208,7 +256,7 @@ void User::cmdHandler(SerializedObject *received) {
 			break;
 		case ACCEPTMATCH :
 			//reading details
-			int confirmation; //temporary for gcc compiler (testing only). Change to bool when compiled with g++
+			bool confirmation; 
 			position = received->stringData;
 			memcpy(&targetedUser, position, sizeof(targetedUser)); 
 			position += sizeof(targetedUser);

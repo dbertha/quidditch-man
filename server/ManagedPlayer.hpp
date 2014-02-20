@@ -36,6 +36,8 @@ class ManagedPlayer : public Player {
 
     void train(int capacityNumber);
     gold getEstimatedValue();
+    
+    void serialize(char * stringData);
 
     std::vector<int> getInformations();
 

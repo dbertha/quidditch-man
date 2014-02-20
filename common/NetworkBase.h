@@ -2,7 +2,7 @@
 #ifndef NETWORKBASE_H
 #define NETWORKBASE_H
 /* TODO : vérifier si modules inutiles */
-#include <stdlib.h>
+#include <stdlib.h> 
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>

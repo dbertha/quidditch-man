@@ -29,27 +29,27 @@ int buildConnection (const int port_) {
 	else return sockfd_;
 }
 
-int receiveMsg(const int sockfd, char * buf, const int len) {
-	int length=recv(sockfd,buf,len,0);
-	if(length==0 || length==ERROR) std::cerr<<"message receive error"<<std::endl;
-	else {
-		buf[length]='\0';
-#ifdef __DEBUG
-		std::cout<<"**got "<<length<<" char. : "<<buf<<"**"<<std::endl;
-#endif
-	}
-	return length;
-}
-
-int sendMsg(const int sockfd, char * buf, const int length) {
-	if(send(sockfd,buf,length,0)==ERROR) {
-		std::cerr<<" message send error on socket "<<sockfd<<std::endl;
-		return EXIT_FAILURE;
-	}
-	else {
-#ifdef __DEBUG
-		std::cout<<"**sent on "<<sockfd<<" : "<<buf<<"**"<<std::endl;
-#endif
-		return EXIT_SUCCESS;
-	}
-}
+//~ int receiveMsg(const int sockfd, char * buf, const int len) {
+	//~ int length=recv(sockfd,buf,len,0);
+	//~ if(length==0 || length==ERROR) std::cerr<<"message receive error"<<std::endl;
+	//~ else {
+		//~ buf[length]='\0';
+//~ #ifdef __DEBUG
+		//~ std::cout<<"**got "<<length<<" char. : "<<buf<<"**"<<std::endl;
+//~ #endif
+	//~ }
+	//~ return length;
+//~ }
+//~ 
+//~ int sendMsg(const int sockfd, char * buf, const int length) {
+	//~ if(send(sockfd,buf,length,0)==ERROR) {
+		//~ std::cerr<<" message send error on socket "<<sockfd<<std::endl;
+		//~ return EXIT_FAILURE;
+	//~ }
+	//~ else {
+//~ #ifdef __DEBUG
+		//~ std::cout<<"**sent on "<<sockfd<<" : "<<buf<<"**"<<std::endl;
+//~ #endif
+		//~ return EXIT_SUCCESS;
+	//~ }
+//~ }
