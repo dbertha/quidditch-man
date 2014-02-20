@@ -89,21 +89,35 @@ int askForPlayerInfos(int sockfd, int playerID){
 }
 
 
-int proposeMatchTo(int sockfd, int userID){
+int proposeMatchTo(int sockfd, int userID, std::vector<int> playersInTeam){
     SerializedObject serialized;
     char * position = serialized.stringData;
+    int value;
     serialized.typeOfInfos = PROPOSEMATCH;
     memcpy(position, &userID, sizeof(userID));
+    position += sizeof(userID);
+    for(unsigned int i = 0; i < playersInTeam.size();++i){ //joueurs choisi pour joueur le match
+        value = playersInTeam[i];
+        memcpy(position, &value, sizeof(value));
+        position += sizeof(value);
+    }
+    
     return sendOnSocket(sockfd, serialized);
 }
 
-int answerMatchProposal(int sockfd, int askerID, bool confirmation){
+int answerMatchProposal(int sockfd, int askerID, bool confirmation, std::vector<int> playersInTeam){
     SerializedObject serialized;
     char * position = serialized.stringData;
     serialized.typeOfInfos = ACCEPTMATCH;
     memcpy(position, &askerID, sizeof(askerID));
     position += sizeof(askerID);
     memcpy(position, &confirmation, sizeof(confirmation));
+    position += sizeof(confirmation);
+    for(unsigned int i = 0; i < playersInTeam.size();++i){ //joueurs choisi pour joueur le match
+        value = playersInTeam[i];
+        memcpy(position, &value, sizeof(value));
+        position += sizeof(value);
+    }
     return sendOnSocket(sockfd, serialized);
 }
 

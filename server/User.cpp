@@ -298,6 +298,14 @@ void User::cmdHandler(SerializedObject *received) {
 			//reading details
 			position = received->stringData;
 			memcpy(&targetedUser, position, sizeof(targetedUser)); 
+			position += sizeof(targetedUser);
+			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
+			for(int i = 0; i < 7; ++i){
+				int value;
+				memcpy(&value,position, sizeof(value));
+				position += sizeof(value);
+				playersInTeam.push_back(value); //ajout à la liste
+			}
 #ifdef __DEBUG
 			std::cout<<"Demande de proposition d'un match reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"userID reçu : "<<targetedUser<<std::endl;
@@ -312,6 +320,14 @@ void User::cmdHandler(SerializedObject *received) {
 			memcpy(&targetedUser, position, sizeof(targetedUser)); 
 			position += sizeof(targetedUser);
 			memcpy(&confirmation, position, sizeof(confirmation)); 
+			position += sizeof(confirmation);
+			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
+			for(int i = 0; i < 7; ++i){
+				int value;
+				memcpy(&value,position, sizeof(value));
+				position += sizeof(value);
+				playersInTeam.push_back(value); //ajout à la liste
+			}
 #ifdef __DEBUG
 			std::cout<<"Demande d'acceptation d'un match reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"userID reçu : "<<targetedUser<<std::endl;
