@@ -7,7 +7,7 @@
 
 typedef int gold;
 
-Hospital::Hospital(int level, gold price, int timeRequired): ImprovementBuilding(level,price,timeRequired) {}
+Hospital::Hospital(int level, gold price, int timeRequired, bool isUpgrading): ImprovementBuilding(level,price,timeRequired,isUpgrading) {}
 
 void Hospital::heal(ManagedPlayer& player) {
 	player.lockPlayer();

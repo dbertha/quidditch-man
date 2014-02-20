@@ -13,7 +13,7 @@ class ImprovementBuilding : public Building {
 
  public:
 
- 	ImprovementBuilding(int level=0, gold price=0, int timeRequired=0);
+ 	ImprovementBuilding(int level=0, gold price=0, int timeRequired=0, bool isUpgrading=false);
  	
  	gold getPriceForNextLevel();
  	int getTimeRequired();

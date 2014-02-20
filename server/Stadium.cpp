@@ -10,7 +10,7 @@ typedef int gold;
 
 using namespace std;
 
-Stadium::Stadium(int level, gold price, int maxPlaces): Building(level,price), _maxPlacesAtFirstLevel(maxPlaces) {}
+Stadium::Stadium(int level, gold price, int maxPlaces, bool isUpgrading): Building(level,price,isUpgrading), _maxPlacesAtFirstLevel(maxPlaces) {}
 
 gold Stadium::getPriceForNextLevel() {
 	int priceScale = _priceForConstruction/2;
@@ -35,6 +35,7 @@ vector<int> Stadium::getInformations() {
 	tmp.push_back(this->getLevel());
 	tmp.push_back(this->getPriceForNextLevel());
 	tmp.push_back(this->getMaxPlaces());
+	tmp.push_back(this->isUpgrading());
 
 	return tmp;
 }

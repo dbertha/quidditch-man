@@ -30,6 +30,9 @@
 #define TICKETPRICE 40
 #define VICTORYBONUS 35000
 #define TIMESCALECONSTRUCTION 1
+#define CONSTRUCTIONSTARTED 1
+#define ALREADYINCONSTRUCTION 2
+#define NOTENOUGHMONEY 3
 
 typedef int gold;
 
@@ -168,40 +171,50 @@ gold Manager::getIncomeFromFanShop() {return _fanShop.getIncome();}
 
 vector<int> Manager::getRecruitmentCenterInformations() {return _recruitmentCenter.getInformations();}
 
-bool Manager::startStadiumConstruction() {
-	if (_money<_stadium.getPriceForNextLevel()) return false;
+int Manager::startStadiumConstruction() {
+	if (_money<_stadium.getPriceForNextLevel()) return NOTENOUGHMONEY;
+	if (_stadium.isUpgrading()) return ALREADYINCONSTRUCTION;
 	pay(_stadium.getPriceForNextLevel());
+	_stadium.startConstruction();
 	string file = "server/Saves/"+_login+"/constructionCalendar.txt";
-	writeInCalendar(file,"Stadium", TIMESCALECONSTRUCTION*(7-_stadium.getLevel()));
-	return true;
+	writeInCalendar(file,"Stadium", TIMESCALECONSTRUCTION*(1+_stadium.getLevel()));
+	return CONSTRUCTIONSTARTED;
 }
-bool Manager::startTrainingCenterConstruction() {
-	if (_money<_trainingCenter.getPriceForNextLevel()) return false;
+int Manager::startTrainingCenterConstruction() {
+	if (_money<_trainingCenter.getPriceForNextLevel()) return NOTENOUGHMONEY;
+	if (_trainingCenter.isUpgrading()) return ALREADYINCONSTRUCTION;
 	pay(_trainingCenter.getPriceForNextLevel());
+	_trainingCenter.startConstruction();
 	string file = "server/Saves/"+_login+"/constructionCalendar.txt";
-	writeInCalendar(file,"TrainingCenter", TIMESCALECONSTRUCTION*(7-_trainingCenter.getLevel()));
-	return true;
+	writeInCalendar(file,"TrainingCenter", TIMESCALECONSTRUCTION*(1+_trainingCenter.getLevel()));
+	return CONSTRUCTIONSTARTED;
 }
-bool Manager::startHospitalConstruction() {
-	if (_money<_hospital.getPriceForNextLevel()) return false;
+int Manager::startHospitalConstruction() {
+	if (_money<_hospital.getPriceForNextLevel()) return NOTENOUGHMONEY;
+	if (_hospital.isUpgrading()) return ALREADYINCONSTRUCTION;
 	pay(_hospital.getPriceForNextLevel());
+	_hospital.startConstruction();
 	string file = "server/Saves/"+_login+"/constructionCalendar.txt";
-	writeInCalendar(file,"Hospital", TIMESCALECONSTRUCTION*(7-_hospital.getLevel()));
-	return true;
+	writeInCalendar(file,"Hospital", TIMESCALECONSTRUCTION*(1+_hospital.getLevel()));
+	return CONSTRUCTIONSTARTED;
 }
-bool Manager::startFanShopConstruction() {
-	if (_money<_fanShop.getPriceForNextLevel()) return false;
+int Manager::startFanShopConstruction() {
+	if (_money<_fanShop.getPriceForNextLevel()) return NOTENOUGHMONEY;
+	if (_fanShop.isUpgrading()) return ALREADYINCONSTRUCTION;
 	pay(_fanShop.getPriceForNextLevel());
+	_fanShop.startConstruction();
 	string file = "server/Saves/"+_login+"/constructionCalendar.txt";
-	writeInCalendar(file,"FanShop", TIMESCALECONSTRUCTION*(7-_fanShop.getLevel()));
-	return true;
+	writeInCalendar(file,"FanShop", TIMESCALECONSTRUCTION*(1+_fanShop.getLevel()));
+	return CONSTRUCTIONSTARTED;
 }
-bool Manager::startRecruitmentCenterConstruction() {
-	if (_money<_recruitmentCenter.getPriceForNextLevel()) return false;
+int Manager::startRecruitmentCenterConstruction() {
+	if (_money<_recruitmentCenter.getPriceForNextLevel()) return NOTENOUGHMONEY;
+	if (_recruitmentCenter.isUpgrading()) return ALREADYINCONSTRUCTION;
 	pay(_recruitmentCenter.getPriceForNextLevel());
+	_recruitmentCenter.startConstruction();
 	string file = "server/Saves/"+_login+"/constructionCalendar.txt";
-	writeInCalendar(file,"RecruitmentCenter", TIMESCALECONSTRUCTION*(7-_recruitmentCenter.getLevel()));
-	return true;
+	writeInCalendar(file,"RecruitmentCenter", TIMESCALECONSTRUCTION*(1+_recruitmentCenter.getLevel()));
+	return CONSTRUCTIONSTARTED;
 }
 
 void Manager::upgradeBuilding(string buildingName) {
@@ -402,15 +415,17 @@ void Manager::setBuildings(string file) {
 	int byte = read(fd,buffer,size);
 	buffer[byte]='\0';
 
-	string tmp1,tmp2,tmp3;
-	int param1,param2,param3;
+	string tmp1,tmp2,tmp3,tmp4;
+	int param1,param2,param3,param4;
 	tmp1 = strtok(buffer,"\n");
 	param1 = atoi(tmp1.c_str());
 	tmp2 = strtok(NULL,"\n");
 	param2 = atoi(tmp2.c_str());
 	tmp3 = strtok(NULL,"\n");
 	param3 = atoi(tmp3.c_str());
-	_stadium = Stadium(param1,param2,param3);
+	tmp4 = strtok(NULL,"\n");
+	param4 = atoi(tmp4.c_str());
+	_stadium = Stadium(param1,param2,param3,param4);
 
 	tmp1 = strtok(NULL,"\n");
 	param1 = atoi(tmp1.c_str());
@@ -418,7 +433,9 @@ void Manager::setBuildings(string file) {
 	param2 = atoi(tmp2.c_str());
 	tmp3 = strtok(NULL,"\n");
 	param3 = atoi(tmp3.c_str());
-	_trainingCenter = TrainingCenter(param1,param2,param3);
+	tmp4 = strtok(NULL,"\n");
+	param4 = atoi(tmp4.c_str());
+	_trainingCenter = TrainingCenter(param1,param2,param3,param4);
 
 	tmp1 = strtok(NULL,"\n");
 	param1 = atoi(tmp1.c_str());
@@ -426,7 +443,9 @@ void Manager::setBuildings(string file) {
 	param2 = atoi(tmp2.c_str());
 	tmp3 = strtok(NULL,"\n");
 	param3 = atoi(tmp3.c_str());
-	_hospital = Hospital(param1,param2,param3);
+	tmp4 = strtok(NULL,"\n");
+	param4 = atoi(tmp4.c_str());
+	_hospital = Hospital(param1,param2,param3,param4);
 
 	tmp1 = strtok(NULL,"\n");
 	param1 = atoi(tmp1.c_str());
@@ -434,13 +453,17 @@ void Manager::setBuildings(string file) {
 	param2 = atoi(tmp2.c_str());
 	tmp3 = strtok(NULL,"\n");
 	param3 = atoi(tmp3.c_str());
-	_fanShop = FanShop(param1,param2,param3);
+	tmp4 = strtok(NULL,"\n");
+	param4 = atoi(tmp4.c_str());
+	_fanShop = FanShop(param1,param2,param3,param4);
 
 	tmp1 = strtok(NULL,"\n");
 	param1 = atoi(tmp1.c_str());
 	tmp2 = strtok(NULL,"\n");
 	param2 = atoi(tmp2.c_str());
-	_recruitmentCenter = RecruitmentCenter(param1,param2);
+	tmp3 = strtok(NULL,"\n");
+	param3 = atoi(tmp3.c_str());
+	_recruitmentCenter = RecruitmentCenter(param1,param2,param3);
 
 	close(fd);
 }

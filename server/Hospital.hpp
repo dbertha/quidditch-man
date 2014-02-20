@@ -11,7 +11,7 @@ class Hospital : public ImprovementBuilding {
 
  public:
 
- 	Hospital(int level=0, gold price=0, int _timeRequired=0);
+ 	Hospital(int level=0, gold price=0, int _timeRequired=0, bool isUpgrading=false);
 
     void heal(ManagedPlayer& player);
 

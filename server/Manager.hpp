@@ -71,11 +71,11 @@ class Manager {
 
  	vector<int> getRecruitmentCenterInformations();
 
- 	bool startStadiumConstruction();
- 	bool startTrainingCenterConstruction();
-	bool startHospitalConstruction();
-	bool startFanShopConstruction();
-	bool startRecruitmentCenterConstruction();
+ 	int startStadiumConstruction();
+ 	int startTrainingCenterConstruction();
+	int startHospitalConstruction();
+	int startFanShopConstruction();
+	int startRecruitmentCenterConstruction();
 
 	void upgradeBuilding(string buildingName);
 

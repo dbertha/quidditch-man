@@ -33,6 +33,27 @@ int sendLoginToServer(int sockfd, char username[USERNAME_LENGTH], char password[
     return sendOnSocket(sockfd, serialized);
 }
 
+int sendNewManagerToServer(int sockfd, char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]){
+    //REM : les param reçu ne sont pas des char[N] (sizeof() = N) mais des char * (sizeof() = taille pointeur)
+    //TODO : define size
+    SerializedObject serialized;
+    char * position;
+    serialized.typeOfInfos = CREATE_MANAGER;
+    position = serialized.stringData;
+    memcpy(position, username, USERNAME_LENGTH);
+    position += USERNAME_LENGTH;
+    memcpy(position, password, PASSWORD_LENGTH);
+    //position += sizeof(password);
+    return sendOnSocket(sockfd, serialized);
+}
+
+int askForManagerInfos(int sockfd){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = GETMANAGERINFOS;
+    return sendOnSocket(sockfd, serialized);
+}
+
 int askForBuildingInfos(int sockfd, int buildingID){
     SerializedObject serialized;
     char * position = serialized.stringData;
@@ -48,6 +69,22 @@ int askForBuildingUpgrade(int sockfd, int buildingID){
     memcpy(position, &buildingID, sizeof(buildingID));
     return sendOnSocket(sockfd, serialized);
 }
+
+int askForPlayersList(int sockfd){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = GETPLAYERSLIST;
+    return sendOnSocket(sockfd, serialized);
+}
+
+int askForPlayerInfos(int sockfd, int playerID){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = GETPLAYERINFOS;
+    memcpy(position, &playerID, sizeof(playerID));
+    return sendOnSocket(sockfd, serialized);
+}
+
 
 int proposeMatchTo(int sockfd, int userID){
     SerializedObject serialized;
