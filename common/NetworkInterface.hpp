@@ -9,6 +9,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <string>
+#include <vector>
+#include <iostream>
 
 
 
@@ -86,22 +89,35 @@ int askForPlayerInfos(int sockfd, int playerID){
 }
 
 
-int proposeMatchTo(int sockfd, int userID){
+int proposeMatchTo(int sockfd, int userID, std::vector<int> playersInTeam){
     SerializedObject serialized;
     char * position = serialized.stringData;
+    int value;
     serialized.typeOfInfos = PROPOSEMATCH;
     memcpy(position, &userID, sizeof(userID));
+    position += sizeof(userID);
+    for(unsigned int i = 0; i < playersInTeam.size();++i){ //joueurs choisi pour joueur le match
+        value = playersInTeam[i];
+        memcpy(position, &value, sizeof(value));
+        position += sizeof(value);
+    }
+    
     return sendOnSocket(sockfd, serialized);
 }
 
-int answerMatchProposal(int sockfd, int askerID, int confirmation){
-    //TODO : when in c++ code, use bool for confirmation
+int answerMatchProposal(int sockfd, int askerID, bool confirmation, std::vector<int> playersInTeam){
     SerializedObject serialized;
     char * position = serialized.stringData;
     serialized.typeOfInfos = ACCEPTMATCH;
     memcpy(position, &askerID, sizeof(askerID));
     position += sizeof(askerID);
     memcpy(position, &confirmation, sizeof(confirmation));
+    position += sizeof(confirmation);
+    for(unsigned int i = 0; i < playersInTeam.size();++i){ //joueurs choisi pour joueur le match
+        value = playersInTeam[i];
+        memcpy(position, &value, sizeof(value));
+        position += sizeof(value);
+    }
     return sendOnSocket(sockfd, serialized);
 }
 
@@ -203,13 +219,92 @@ int bid(int sockfd){
     return sendOnSocket(sockfd, serialized);
 }
 
+//réception des donnéés du serveur :
 
+bool getConfirmation(int sockfd){ //valable pour LOGIN_CONFIRM, UPGRADE_CONFIRM, TRAINING_STARTED
+    bool confirmation;
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    //TODO : vérifier qu'il s'agit bien d'un message de confirmation
+    memcpy(&confirmation,position, sizeof(confirmation));
+    return confirmation;
+}
 
+void receiveManagerInfos(int sockfd, int *nbPlayers, int * money, int * nbFans){
+    //écrit les données sur les objets pointés
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    if(received.typeOfInfos == MANAGERINFOS){
+        memcpy(nbPlayers,position, sizeof(int));
+        position += sizeof(int);
+        memcpy(money,position, sizeof(int));
+        position += sizeof(int);
+        memcpy(nbFans,position, sizeof(int));
+        position += sizeof(int);
+    }
+}
 
-
-
+std::vector<std::string> receivePlayersList(int sockfd){
+    //pour chaque ManagedPlayer, on reçoit un string firstname et un lastname, de façon ordonnée (indice 0 à 1 : playerID = 0, etc)
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    std::vector<std::string> playersListNames;
+    if(received.typeOfInfos == PLAYERSLIST){ //on suppose toujours vrai
+        int nbNames;
+        memcpy(&nbNames,position, sizeof(nbNames));
+        position += sizeof(nbNames);
+        std::cout << nbNames << std::endl;
+        for(int i = 0; i < nbNames; ++i){
+            char name[USERNAME_LENGTH];
+            std::string strName;
+            memcpy(&name,position, sizeof(name));
+            position += sizeof(name);
+            strName = name; //conversion
+            playersListNames.push_back(strName); //ajout à la liste
+        }
+    }
+    return playersListNames;
+}
     
+std::vector<int> receivePlayerInfo(int sockfd){
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    std::vector<int> playerInfos;
+    if(received.typeOfInfos == PLAYERINFOS){ //on suppose toujours vrai
+            //5 attributs int
+			//5 états d'entrainements d'attribut int
+			//1 int blocked
+			//1 int bonus du balais
+			//1 int capacity du balais
+        for(int i = 0; i < 13; ++i){
+            int value;
+            memcpy(&value,position, sizeof(value));
+            position += sizeof(value);
+            playerInfos.push_back(value); //ajout à la liste
+        }
+    }
+    return playerInfos;
+}
+        
 
+std::vector<int> receiveBuildingInfos(int sockfd){
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    std::vector<int> buildingInfos;
+    if(received.typeOfInfos == BUILDINGINFOS){ //on suppose toujours vrai
+            //int : level
+            //int : pricefornextlevel
+            //int : specialAttribut
+            //int : enTravaux
+        for(int i = 0; i < 4; ++i){
+            int value;
+            memcpy(&value,position, sizeof(value));
+            position += sizeof(value);
+            buildingInfos.push_back(value); //ajout à la liste
+        }
+    }
+    return buildingInfos;
+}
 
 
 

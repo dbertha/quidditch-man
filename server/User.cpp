@@ -19,24 +19,21 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#define STADIUM 1
-#define TRAININGCENTER 2
-#define HOSPITAL 3
-#define FANSHOP 4
-#define CONSTRUCTIONSTARTED 1
-#define ALREADYINCONSTRUCTION 2
-#define NOTENOUGHMONEY 3
+
+
 
 User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), state_(INIT), userId_(0), manager_(NULL), calendar_(NULL) {}
 //TODO : initialisation dans le bon ordre
 void User::cmdHandler(SerializedObject *received) {
 	SerializedObject answer;
 	char * position;
+	char * answerPosition = answer.stringData;
 	int targetedBuilding;
 	int targetedUser;
 	int targetedPlayer;
 	int resultOfUpgrade;
 	bool resultOfTraining;
+	bool confirmation;
 	vector<int> infos;
 	vector<string> playersList;
 	position = received->stringData;
@@ -59,7 +56,7 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Password reçu :  "<<password <<std::endl;
 #endif
 			//handle demand:
-			if (checkLoginAndPassword(username,password)==1) {
+			if (checkLoginAndPassword(username,password) == 1) {
 				std::cout<<"LOGIN OK"<<std::endl;
 				manager_ = new Manager(username);
 				userName_=username;
@@ -68,11 +65,18 @@ void User::cmdHandler(SerializedObject *received) {
 				calendar_->update();
 				manager_->save();
 				state_=FREE;
+				confirmation = true;
 			}
-			else std::cout<<"WRONG LOGIN/PASSWORD"<<std::endl;
+			else {
+				std::cout<<"WRONG LOGIN/PASSWORD"<<std::endl;
+				confirmation = false;
+			}
 			//construct answer
 			answer.typeOfInfos = LOGIN_CONFIRM;
 
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+			
 			break;
 
 		case CREATE_MANAGER :
@@ -88,6 +92,7 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Password reçu :  "<<password <<std::endl;
 #endif
 			//handle demand:
+			confirmation = false;
 			if (checkLoginAndPassword(username,password)==-1) { //This Manager login already exists
 				std::cout<<"LOGIN ALREADY TAKEN"<<std::endl;
 			}
@@ -99,11 +104,14 @@ void User::cmdHandler(SerializedObject *received) {
 				userId_=server_->usersList_.size();
 				manager_->save();
 				calendar_ = new Calendar(manager_);
+
 				state_=FREE;
+				confirmation = true;
 			}
 			//construct answer
 			answer.typeOfInfos = LOGIN_CONFIRM;
-			
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 
 		case GETMANAGERINFOS :
@@ -111,17 +119,31 @@ void User::cmdHandler(SerializedObject *received) {
 #ifdef __DEBUG
 			std::cout<<"Demande des infos du manager reçue sur socket "<<getSockfd()<<std::endl;
 #endif
-			//handle demand: nothing to handle
-
+			//handle demand
+			
 			calendar_->update();
 			manager_->save();
+			int nbPlayers;
+			nbPlayers = manager_->getNumberOfPlayers();
+			int money;
+			money = manager_->getMoney();
+			int nbFans;
+			nbFans = manager_->getNumberOfFans();
+#ifdef __DEBUG
 			std::cout<<"Number of players : "<<manager_->getNumberOfPlayers()<<std::endl;
 			std::cout<<"Money : "<<manager_->getMoney()<<std::endl;
 			std::cout<<"Number of fans : "<<manager_->getNumberOfFans()<<std::endl;
+#endif
 			calendar_->update();
 			manager_->save();
-			//construct answer with manager_->getNumberOfPlayers() manager_->getMoney() et manager_->getNumberOfFans();
-			
+			//construct answer
+			answer.typeOfInfos = MANAGERINFOS;
+			memcpy(answerPosition, &nbPlayers, sizeof(nbPlayers));
+			answerPosition += sizeof(nbPlayers);
+			memcpy(answerPosition, &money, sizeof(money));
+			answerPosition += sizeof(money);
+			memcpy(answerPosition, &nbFans, sizeof(nbFans));
+			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 
 		case GETPLAYERSLIST :
@@ -129,15 +151,37 @@ void User::cmdHandler(SerializedObject *received) {
 #ifdef __DEBUG
 			std::cout<<"Demande de la liste des joueurs reçue sur socket "<<getSockfd()<<std::endl;
 #endif
-			//handle demand: nothing to handle
+			//handle demand
 
 			calendar_->update();
 			manager_->save();
 			playersList = manager_->getPlayersList();
-			for (int i=0;i<playersList.size();i+=2) {std::cout<<playersList[i]<<" "<<playersList[i+1]<<std::endl; }
+			//construct answer 
+			answer.typeOfInfos = PLAYERSLIST;
+			int size;
+			size = playersList.size();
+			memcpy(answerPosition, &size, sizeof(size)); //nb de noms à lire
+			answerPosition += sizeof(size);
+			for (unsigned int i=0;i<playersList.size() - 1;i+=2) { //un paquet par joueur
+				char playerFirstName[USERNAME_LENGTH], playerLastName[USERNAME_LENGTH];
+				//un managedPlayer dans la liste =
+				//indice dans la liste déductible par l'ordre en renvoi
+				//nom : char[30]
+				//prénom : char[30]
+				//on suppose le buffer assez grand
+				string firstname = playersList[i];
+				string lastname = playersList[i+1];
+				strcpy(playerFirstName, firstname.c_str());
+				strcpy(playerLastName, lastname.c_str());
+				memcpy(answerPosition, &playerFirstName, sizeof(playerFirstName));
+				answerPosition += sizeof(playerFirstName);
+				memcpy(answerPosition, &playerLastName, sizeof(playerLastName));
+				answerPosition += sizeof(playerLastName);
+				
+			}
 			calendar_->update();
 			manager_->save();
-			//construct answer 
+			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			
 			break;
 
@@ -149,10 +193,26 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"targetedPlayer reçu : "<<targetedPlayer<<std::endl;
 #endif
 			infos= manager_->getPlayerInformations(targetedPlayer);
-			for (int i=0;i<infos.size();++i) {std::cout<<infos[i]<<std::endl;}
+			//for (unsigned int i=0;i<infos.size();++i) {std::cout<<infos[i]<<std::endl;}
 			calendar_->update();
 			manager_->save();
 			//construct answer
+			answer.typeOfInfos = PLAYERINFOS;
+			//5 attributs int
+			//5 états d'entrainements d'attribut int
+			//1 int blocked
+			//1 int bonus du balais
+			//1 int capacity du balais
+			//TODO : ajouter la vie
+			std::cout << infos.size() << std::endl;
+			for(unsigned int i = 0; i < infos.size(); ++i){
+				int value;
+				value = infos[i];
+				memcpy(answerPosition, &value, sizeof(value));
+				answerPosition += sizeof(value);
+			}
+			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+			
 			break;
 
 		case GETBUILDINGINFOS :
@@ -167,17 +227,27 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand:
 			calendar_->update();
 			manager_->save();
+			//RecrutmentCenter inutilisé
 			if (targetedBuilding==STADIUM) infos=manager_->getStadiumInformations();
 			else if (targetedBuilding==TRAININGCENTER) infos=manager_->getTrainingCenterInformations();
 			else if (targetedBuilding==HOSPITAL) infos=manager_->getHospitalInformations();
-			else if (targetedBuilding==FANSHOP) infos=manager_->getFanShopInformations();
+			else /*if (targetedBuilding==FANSHOP)*/ infos=manager_->getFanShopInformations();
 			
-			for (int i=0;i<4;++i) {std::cout<<infos[i]<<std::endl;}
+
 			calendar_->update();
 			manager_->save();
-
+	
 			//construct answer
 
+			answer.typeOfInfos = BUILDINGINFOS;
+			for (unsigned int i=0;i<4;++i) {
+				//std::cout<<infos[i]<<std::endl;
+				int attr;
+				attr = infos[i];
+				memcpy(answerPosition, &attr, sizeof(attr));
+				answerPosition += sizeof(attr);
+			}
+			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 		case UPGRADE_BUILDING :
 			//reading details
@@ -190,21 +260,63 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand:
 			calendar_->update();
 			manager_->save();
+			confirmation = false;
 			if (targetedBuilding==STADIUM) resultOfUpgrade=manager_->startStadiumConstruction();
 			else if (targetedBuilding==TRAININGCENTER) resultOfUpgrade=manager_->startTrainingCenterConstruction();
 			else if (targetedBuilding==HOSPITAL) resultOfUpgrade=manager_->startHospitalConstruction();
 			else if (targetedBuilding==FANSHOP) resultOfUpgrade=manager_->startFanShopConstruction();
 			if (resultOfUpgrade==ALREADYINCONSTRUCTION) std::cout<<"Already in construction !"<<std::endl;
-			else if (resultOfUpgrade==NOTENOUGHMONEY) std::cout<<"Not enough money !"<<std::endl;
-			else std::cout<<"Construction started !"<<std::endl;
+			else if (resultOfUpgrade==NOTENOUGHMONEY) std::cout<<"Not enough money !"<<std::endl; //testé au niveau client
+			else {
+				std::cout<<"Construction started !"<<std::endl;
+				confirmation = true;
+			}
 			calendar_->update();
 			manager_->save();
 			//construct answer
+			answer.typeOfInfos = UPGRADE_CONFIRM;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+			break;
+			
+		case TRAIN_PLAYER :
+			//reading details
+			int capacityToTrain;
+			memcpy(&targetedPlayer, position, sizeof(targetedPlayer)); 
+			position += sizeof(targetedPlayer);
+			memcpy(&capacityToTrain, position, sizeof(capacityToTrain)); 
+#ifdef __DEBUG
+			std::cout<<"Demande d'un entrainement pour un joueur reçue sur le socket "<<getSockfd()<<std::endl;
+			std::cout<<"targetedPlayer reçu : "<<targetedPlayer<<std::endl;
+			std::cout<<"capacityToTrain reçu : "<<capacityToTrain<<std::endl;
+#endif
+			//handle demand
+			calendar_->update();
+			manager_->save();
+			resultOfTraining = manager_->trainPlayer(targetedPlayer,capacityToTrain);
+			if (!resultOfTraining) std::cout<<"This player is already blocked by a training or the hospital"<<std::endl;
+			calendar_->update();
+			manager_->save();
+
+			//construct answer
+			answer.typeOfInfos = TRAINING_STARTED;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 		case PROPOSEMATCH : {
 			//reading details
 			position = received->stringData;
+
 			memcpy(&targetedUser, position, sizeof(targetedUser));
+
+			position += sizeof(targetedUser);
+			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
+			for(int i = 0; i < 7; ++i){
+				int value;
+				memcpy(&value,position, sizeof(value));
+				position += sizeof(value);
+				playersInTeam.push_back(value); //ajout à la liste
+			}
 #ifdef __DEBUG
 			std::cout<<"Demande de proposition d'un match reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"userID reçu : "<<targetedUser<<std::endl;
@@ -223,11 +335,20 @@ void User::cmdHandler(SerializedObject *received) {
 			}
 		case ACCEPTMATCH : {
 			//reading details
-			int confirmation; //temporary for gcc compiler (testing only). Change to bool when compiled with g++
+			bool confirmation; 
 			position = received->stringData;
 			memcpy(&targetedUser, position, sizeof(targetedUser));
 			position += sizeof(targetedUser);
+
 			memcpy(&confirmation, position, sizeof(confirmation));
+			position += sizeof(confirmation);
+			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
+			for(int i = 0; i < 7; ++i){
+				int value;
+				memcpy(&value,position, sizeof(value));
+				position += sizeof(value);
+				playersInTeam.push_back(value); //ajout à la liste
+			}
 #ifdef __DEBUG
 			std::cout<<"Demande d'acceptation d'un match reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"userID reçu : "<<targetedUser<<std::endl;
@@ -346,6 +467,7 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand
 			//construct answer
 			break;
+
 		case TRAIN_PLAYER :
 			//reading details
 			int capacityToTrain;
@@ -365,8 +487,6 @@ void User::cmdHandler(SerializedObject *received) {
 			calendar_->update();
 			manager_->save();
 
-			//construct answer
-			break;
 		case MAKEMOVES :
 			//reading details
 			//soit un joueur se déplace, soit un joueur fait se déplacer une balle, soit ne fait rien : nbmax de mouvements = nbtotal de mouvement = nbjoueurs = 7

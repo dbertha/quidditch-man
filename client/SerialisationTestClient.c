@@ -15,6 +15,8 @@
 #include <sys/socket.h>
 #include <sys/unistd.h>
 
+#include <iostream>
+
 #define DIM 100
 
 void displayPlayersList() {}
@@ -273,10 +275,30 @@ int main(int argc, char *argv[]){
 
     if (choice==1) {
       sendLoginToServer(sockfd,username,password);
-
+      getConfirmation(sockfd);
       askForManagerInfos(sockfd);
+      int nbPlayers, money, nbFans;
+      receiveManagerInfos(sockfd, &nbPlayers, &money, &nbFans);
+      printf("nbPlayers money nbFans : %d, %d, %d", nbPlayers, money, nbFans);
       askForPlayersList(sockfd);
+
       getManagersList(sockfd);
+
+      std::vector<std::string> list = receivePlayersList(sockfd);
+      std::cout << list.size() << std::endl;
+      for(unsigned int i = 0; i < list.size() ; ++i){
+        std::cout << list[i] << std::endl;
+      }
+      askForPlayerInfos(sockfd, 0);
+      std::vector<int> playerInfo = receivePlayerInfo(sockfd);
+      for(unsigned int i = 0; i < playerInfo.size() ; ++i){
+        std::cout << playerInfo[i] << std::endl;
+      }
+      askForBuildingInfos(sockfd, STADIUM);
+      std::vector<int> buildingInfo = receiveBuildingInfos(sockfd);
+      for(unsigned int i = 0; i < buildingInfo.size() ; ++i){
+        std::cout << buildingInfo[i] << std::endl;
+      }
 
       scanf("%s",username);
       printf("%s",username);
