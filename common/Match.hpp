@@ -85,6 +85,7 @@ private :
     std::vector <Ball> __balls;
     HexagonalField __field;
     int __winner; //0:no winner, 1:team1, 2:team2
+    std::vector<int> __indexesSortedBySpeed;
 public :
     Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team2);
     //Listes ordonnées de 7 joueurs telles que 

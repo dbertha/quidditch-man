@@ -85,6 +85,31 @@ Match::Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team
     __balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE))); 
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE), QUAFFLE);
     __field.display();
+    
+    //on enregistre les priorités de déplacements :
+    //TODO : à optimiser
+    for(int i; i < 18; ++i){
+        maxIndex = -1;
+        maxSpeedValue = 0;
+        for(int player = 0; player < __players.size(); ++player){
+            if(not isInVector(&__indexesSortedBySpeed, player)){
+                if(__players[player].getCapacity(SPEED) > maxSpeedValue){
+                    maxIndex = player;
+                    maxSpeedValue = __players[player].getCapacity(SPEED);
+                }
+            }
+        }
+        for(int ball = GOLDENSNITCH; ball < (GOLDENSNITCH + __balls.size()); ++ball){
+            if(not isInVector(&__indexesSortedBySpeed, ball)){
+                if(__balls[ball - GOLDENSNITCH].getSpeed() > maxSpeedValue){
+                    maxIndex = ball;
+                    maxSpeedValue = __balls[ball - GOLDENSNITCH].getSpeed();
+                }
+            }
+        }
+        __indexesSortedBySpeed.push_back(maxIndex);
+    }
+    
 }
 
 void Match::makeMoves(int movesTeam1[][4], int movesTeam2[][4]){
@@ -137,7 +162,13 @@ void Match::makeMoves(int movesTeam1[][4], int movesTeam2[][4]){
         }
     }
     
-    //2ème étape : gestion des déplacements dans un ordre prioritaire
+    //2ème étape : gestion des déplacements case par case dans un ordre prioritaire
+    
+    
+    
+    
     
     
 }
+
+bool isInVector(std::vector<int> toTest
