@@ -1,5 +1,0 @@
-v1 class dia => remise en page + ajout qlq methode [par manon]
-v2 renomage en logical view: les differents type de diagramme (class,sequence,...) seront tous dedans (trucs: changer "package-centric" en "diagram-centric" pour mieux les voir) [audry]
-v3 ajout ébauche connexion-client serveur => indique l'utilité d'implementer de nouvelle classe
-v4 david : réseau en séquence diagramme, manque des classes + division du gros diag de classes en sous-diag
-v5 audry : rajout du redemarhe du managementhandle pour bien montrer comme se passe le "cycle" de jeu
