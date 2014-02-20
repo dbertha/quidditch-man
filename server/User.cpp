@@ -191,10 +191,26 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"targetedPlayer reçu : "<<targetedPlayer<<std::endl;
 #endif
 			infos= manager_->getPlayerInformations(targetedPlayer);
-			for (unsigned int i=0;i<infos.size();++i) {std::cout<<infos[i]<<std::endl;}
+			//for (unsigned int i=0;i<infos.size();++i) {std::cout<<infos[i]<<std::endl;}
 			calendar_->update();
 			manager_->save();
 			//construct answer
+			answer.typeOfInfos = PLAYERINFOS;
+			//5 attributs int
+			//5 états d'entrainements d'attribut int
+			//1 int blocked
+			//1 int bonus du balais
+			//1 int capacity du balais
+			//TODO : ajouter la vie
+			std::cout << infos.size() << std::endl;
+			for(unsigned int i = 0; i < infos.size(); ++i){
+				int value;
+				value = infos[i];
+				memcpy(answerPosition, &value, sizeof(value));
+				answerPosition += sizeof(value);
+			}
+			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+			
 			break;
 
 		case GETBUILDINGINFOS :

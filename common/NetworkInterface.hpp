@@ -252,6 +252,25 @@ std::vector<std::string> receivePlayersList(int sockfd){
     return playersListNames;
 }
     
+std::vector<int> receivePlayerInfo(int sockfd){
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    std::vector<int> playerInfos;
+    if(received.typeOfInfos == PLAYERINFOS){ //on suppose toujours vrai
+            //5 attributs int
+			//5 états d'entrainements d'attribut int
+			//1 int blocked
+			//1 int bonus du balais
+			//1 int capacity du balais
+        for(int i = 0; i < 13; ++i){
+            int value;
+            memcpy(&value,position, sizeof(value));
+            position += sizeof(value);
+            playerInfos.push_back(value); //ajout à la liste
+        }
+    }
+    return playerInfos;
+}
         
 
     
