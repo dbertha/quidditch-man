@@ -163,6 +163,7 @@
     0.7 & David & 20/12/13 & Glossaire et Index \\
     1.0 & Manon & 20/12/13 & Relecture et révision \\
     1.1 & Hélène & 07/02/14 & 1ère correction \\
+    1.2 & Hélène & 20/02/14 & Communication réseau et Qt \\    
     \hline
   \end{tabular}
 
@@ -276,7 +277,7 @@
         \item \textbf{Cas exceptionnels} :
         \begin{itemize}
             \item Le joueur est heurté par un \gls{cognard}\index{balle!cognard}. La passe échoue. 
-          \end{itemize}
+        \end{itemize}
       \end{itemize}
      \subsubsection{Tirer aux buts}
       \begin{itemize}
@@ -285,6 +286,7 @@
         \item \textbf{Post-conditions} : Qu’il y ait but ou non, le joueur ne tiendra plus le souafle.
         \item \textbf{Cas général} : Le client essaie de marquer un but en indiquant au poursuiveur détenant le souafle vers quel but il doit tirer. Intercepter le souafle se fait automatiquement par le \gls{gardien}\index{joueur!gardien} ou les \gls{poursuiveur}s \index{joueur!poursuiveur} adverses s’ils se trouvent sur la trajectoire du souafle. Si le tir est réussi, l'équipe qui vient de marquer gagne 10 points.
         \item \textbf{Cas exceptionnels} :
+          \begin{itemize}
         \item Le poursuiveur qui s'apprête à tirer est heurté par un \gls{cognard}\index{balle!cognard}. Le tir au but échoue. 
           \end{itemize}
       \end{itemize}
@@ -294,7 +296,8 @@
         \item \textbf{Pré-conditions} : Le joueur qui va essayer de frapper un \gls{cognard}\index{balle!cognard} doit être un batteur\index{joueur!batteur} et doit se situer près du cognard.
         \item \textbf{Post-conditions} : Le cognard est projeté dans la direction voulue.
         \item \textbf{Cas général} : Le client indique dans quelle direction le batteur doit frapper le cognard.
-        \item \textbf{Cas exceptionnels} : 
+        \item \textbf{Cas exceptionnels} :
+          \begin{itemize}
         \item Le batteur rate son coup. Le cognard heurte le joueur.
           \end{itemize}
       \end{itemize}
@@ -741,6 +744,7 @@
         \item \textbf{Cas exceptionnels} : 
         \begin{itemize}
          \item Le client ne donne aucune instruction au joueur. Le joueur reste sur place.
+        \end{itemize}
       \end{itemize}
     \subsubsection{Réaliser action des joueurs}
       \begin{itemize}
@@ -773,9 +777,6 @@
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
 
-
-
-
 \section{Exigences non fonctionnelles}
   \subsection{Le réseau}
   Au niveau du réseau, le problème de la synchronisation n'est pas préoccupant, 
@@ -799,6 +800,33 @@
   L'environement d'exécution étant fixé (les machines des salles informatiques du NO), 
   le code se limitera à l'utilisation des librairies C++ standards. 
   Le système d'exploitation visé est GNU/Linux.
+  \subsection{Choix d'une librairie graphique}
+  Qt est un framework d'interface graphique orienté objet et développé en C++ par la PME norvégienne Trolltech.
+La première version gratuite fut mise à disposition du public en mai 1995.\cite{Blanchette2006} \\
+Il offre des composants d'interface graphique (widgets), d'accès aux données, de communication réseau, de gestion des threads. \\
+Il permet la portabilité des applications qui n'utilisent que ses composants par simple recompilation du code source.
+Les environnements supportés sont les Unix (dont Linux) qui utilisent le système graphique X Window System, Windows et Mac OS X,
+mais aussi Android, iOS et QNX (BlackBerry). \\
+Il peut s'intégrer dans des développements réalisés dans la plupart des langages de programmation modernes, d'Ada à Python. \\
+Ses librairies sont accompagnées de plusieurs outils de développement, parmi lesquels :
+\begin{itemize}
+\item Un IDE;
+\item Un concepteur d'interface graphique;
+\item Des plugins pour Eclipse et Visual Studio.
+\end{itemize}
+
+Qt est notamment connu pour être la bibliothèque sur laquelle repose l'environnement graphique KDE, l'un des environnements de bureau les plus utilisés dans le monde Linux;
+des logiciels commerciaux comme Adobe Photoshop Album, Autodesk Maya et Mathematica, et
+des logiciels gratuits omniprésents comme Skype, VLC media player et VirtualBox, l'utilisent également. \\
+La popularité de Qt (des milliers de clients et des dizaines de milliers de programmeurs) est un point important dans le choix de la bibliothèque graphique.
+Elle permet en effet d'assurer :
+\begin{itemize}
+\item Sa pérennité et son adaptation aux évolutions technologiques;
+\item Sa fiabilité et la qualité de son support;
+\item Une communauté d'utilisateurs actifs sur de nombreux forums d'entraide;
+\item Une documentation abondante et de qualité.
+\end{itemize}
+
 \section{Design et fonctionnement du système}
   % Cette partie sera décrite à l’aide des différents diagrammes UML
   % vus au cours théorique et aux exercices.
@@ -890,6 +918,9 @@
 %  Contiendra, au moins, toutes les entrées du glossaire (avec les numéros des pages correspondantes).
 \addcontentsline{toc}{chapter}{4 Index}
 \phantomsection
+\begin{thebibliography}{9}
+\bibitem{Blanchette2006} Blanchette Jasmin, Summerfield Mark - Trolltech 2006 - C++ GUI programming with Qt4 - ISBN 0-13-187249-4
+\end{thebibliography}
 \printindex
 
 \end{document}
