@@ -2,8 +2,8 @@
 #include "Server.hpp"
 #include "CommonMgr.hpp"
 #include "../common/NetworkBase.h"
+#include "../server/Manager.hpp"
 
-<<<<<<< HEAD
 #include <sys/stat.h>
 #include <iostream>
 #include <stdlib.h>     /* atoi */
@@ -17,12 +17,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), userId_(""), disconnecting_(false) {}
-
-=======
-User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), state_(INIT), userId_("") {}
+User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), state_(INIT), userId_(""), manager_(NULL) {}
 //TODO : initialisation dans le bon ordre
->>>>>>> 505aa8608c1c738b3699abb8d61788a974a6c271
 void User::cmdHandler(SerializedObject *received) {
 	SerializedObject answer;
 	char * position;
@@ -49,8 +45,11 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Password reçu :  "<<password <<std::endl;
 #endif
 			//handle demand:
-			if (checkLoginAndPassword(username,password)) std::cout<<"LOGIN OK"<<std::endl;
-			else std::cout<<"WRONG LOGIN"<<std::endl;
+			if (checkLoginAndPassword(username,password)) {
+				std::cout<<"LOGIN OK"<<std::endl;
+				manager_ = new Manager(username);
+			}
+			else std::cout<<"WRONG LOGIN/PASSWORD"<<std::endl;
 			//construct answer
 			answer.typeOfInfos = LOGIN_CONFIRM;
 			
@@ -249,10 +248,10 @@ int User::getSockfd() {return sockfd_;}
 std::string User::getUserId() {return userId_;}
 
 bool User::checkLoginAndPassword(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]) {
-	int fd = open("..common/Saves/managers.txt",O_RDONLY);
+	int fd = open("server/Saves/managers.txt",O_RDONLY);
 	if (fd==-1){
 		std::cerr<<"Error while opening file\n";
-		return -1;
+		return 0;
 	}
 
 	int size = lseek(fd,0,SEEK_END);
@@ -263,24 +262,17 @@ bool User::checkLoginAndPassword(char username[USERNAME_LENGTH], char password[P
 	int byte = read(fd,buffer,size);
 	buffer[byte]='\0';
 
+	close(fd);
+
 	char *line, *login, *pass, *context1, *context2;
 
-	if ( (line=strtok_r(buffer,"\n",&context1))!=NULL) {
+	if ( (line=strtok_r(buffer,"\n",&context1))!=NULL ) {
 		do {
-			std::cout<<line<<std::endl;
 			login = strtok_r(line,"#",&context2);
 			pass = strtok_r(NULL,"#",&context2);
-			if (strcmp(login,username)==0) {
-				if (strcmp(pass,password)==0){
-					return 1;
-				}
-				
-			}
-		} while ( (line=strtok_r(NULL,"\n",&context1))!=NULL)  ;
+			if ( (strcmp(login,username)==0)&&(strcmp(pass,password)==0) ) return 1;
+		} while ( (line=strtok_r(NULL,"\n",&context1))!=NULL ) ;
 	}
 
-	close(fd);
 	return 0;
-
-
 }

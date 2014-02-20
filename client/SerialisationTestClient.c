@@ -17,7 +17,67 @@
 
 #define DIM 100
 
+void displayPlayersList() {}
+
+void displayConnexionMenu(){
+  printf(" ------------------------ WELCOME TO QUIDDITCH MANAGER 2014 ! ------------------------");
+  printf("\n [1] Log in\n");
+  printf(" [2] Create a new game\n");
+  printf("-----> ");
+}
+
+void displayMainMenu(){
+  printf(" --------------------------------------------------------------------------------------");
+  printf("\nWhat do you want to do ?");
+  printf("\n [1] See managers connected\n");
+  printf(" [2] See/create auctions\n");
+  printf(" [3] Manage players\n");
+  printf(" [4] Manage buildings\n");
+  printf(" [0] Quit game\n");
+  printf("-----> ");
+}
+
+void displayAuctionMenus(){
+  printf(" --------------------------------------------------------------------------------------");
+  printf("\n//YOU'RE NOW IN THE AUCTION ROOM// What do you want to do ?");
+  printf("\n [1] See current auctions\n");
+  printf(" [2] Sell a player\n");
+  printf(" [0] Return to the main menu\n");
+  printf("-----> ");
+}
+
+void displaySellPlayerMenu(){
+  printf(" --------------------------------------------------------------------------------------");
+  printf("\n//YOU'RE ABOUT TO SELL A PLAYER// What do you want to do ?");
+  displayPlayersList();
+  printf("\n Which player do you want to sell [enter 0 to abort] ? ");
+}
+
+void displayManagePlayersMenu(){
+  printf(" --------------------------------------------------------------------------------------");
+  printf("\n//MANAGE TEAM// What do you want to do ?");
+  printf("\n [1] Inspect a player\n");
+  printf(" [2] Train a player\n");
+  printf(" [3] Send a player to the hospital\n");
+  printf(" [0] Return to the main menu\n");
+  printf("-----> ");
+}
+
+void displayManageBuildingsMenu(){
+  printf(" --------------------------------------------------------------------------------------");
+  printf("\n//MANAGE BUILDINGS// What do you want to do ?");
+  printf("\n [1] Enter Stadium\n");
+  printf(" [2] Enter Training Center\n");
+  printf(" [3] Enter Hospital\n");
+  printf(" [4] Enter FanShop\n");
+  printf(" [0] Return to the main menu\n");
+  printf("-----> ");
+}
+
+
+
 int main(int argc, char *argv[]){
+  int choice;
   int buildingID, userID;
   int confirm, price, moves[7][3];
   int att2;
@@ -182,7 +242,7 @@ int main(int argc, char *argv[]){
   //~ printf ("indice de la capacité à entrainer : ");
   //~ scanf ("%d",&buildingID); 
   //~ trainPlayer(sockfd, userID, buildingID);
-  
+  /*
   printf("%s\n", "Test du passage d'une liste de mouvement de 7 joueurs :");
   for(int i = 0; i < 7; ++i){
     printf ("indice du joueur à déplacer : ");
@@ -200,7 +260,18 @@ int main(int argc, char *argv[]){
   trainPlayer(sockfd, userID, buildingID);
   
   sendMoves(sockfd, moves);
-  
+  */
+  displayConnexionMenu();
+  scanf("%d",&choice);
+
+  if (choice==1) {
+    printf("\nlogin : ");
+    scanf("%s",username);
+    printf("password : ");
+    scanf("%s",password);
+
+    sendLoginToServer(sockfd,username,password);
+  }
 
   
   return EXIT_SUCCESS;
