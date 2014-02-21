@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <vector>
 
 
 #include "Player.hpp"
@@ -36,6 +37,7 @@ ManagedPlayer::ManagedPlayer(string playerSaveFile): Player(playerSaveFile) {
 		Precision (used by the constructor of Player)
 		Reflex (used by the constructor of Player)
 		Resistance (used by the constructor of Player)
+		life (used by the constructor of Player)
 		Training left to do to up speed
 		Training left to do to up strength
 		Training left to do to up precision
@@ -123,8 +125,8 @@ gold ManagedPlayer::getEstimatedValue() {
 	return index*PRICESCALE + _broomstick.getValue(); //Value of player is the index * the price scale + the value of the broomstick
 }
 
-void ManagedPlayer::displayInformations() {
-	cout<<"------------------ "<<this->getFirstName()<<" "<<this->getLastName()<<" ------------------"<<endl;
+vector<int> ManagedPlayer::getInformations() {
+	/*cout<<"------------------ "<<this->getFirstName()<<" "<<this->getLastName()<<" ------------------"<<endl;
 	cout<<"Capacities :"<<endl;
 	cout<<"Speed : "<<this->getCapacity(0)<<endl;
 	cout<<"Strength : "<<this->getCapacity(1)<<endl;
@@ -133,5 +135,20 @@ void ManagedPlayer::displayInformations() {
 	cout<<"Resistance : "<<this->getCapacity(4)<<endl;
 	cout<<"\nLife : "<<this->getLife()<<endl;
 	cout<<"\nIs the player blocked ? "<<_blocked<<endl;
-	cout<<"\nBroomstick bonus is "<<_broomstick.getBonus()<<" for capacity "<<_broomstick.getCapacityBoosted()<<endl;
+	cout<<"\nBroomstick bonus is "<<_broomstick.getBonus()<<" for capacity "<<_broomstick.getCapacityBoosted()<<endl;*/
+
+	vector<int> tmp;
+	for (int i=0;i<5;++i) tmp.push_back(this->getCapacity(i));
+	for (int i=0;i<5;++i) tmp.push_back(_trainingLeft[i]);
+	tmp.push_back(_blocked);
+	tmp.push_back(_broomstick.getCapacityBoosted());
+	tmp.push_back(_broomstick.getBonus());
+	tmp.push_back(this->getLife());
+	tmp.push_back(getEstimatedValue());
+
+	return tmp;
 }
+
+
+//~ void ManagedPlayer::serialize(char * stringData){
+//~ }

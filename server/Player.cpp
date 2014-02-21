@@ -31,6 +31,7 @@ Player::Player(string playerSaveFile) {
 		Precision
 		Reflex 
 		Resistance
+		Life
 		Training left to do to up speed (used by the constructor of ManagedPlayer)
 		Training left to do to up strength (used by the constructor of ManagedPlayer)
 		Training left to do to up precision (used by the constructor of ManagedPlayer)
@@ -46,7 +47,7 @@ Player::Player(string playerSaveFile) {
 	int fd = open(playerSaveFile.c_str(),O_RDONLY);
 	if (fd==-1) {
 		perror("Fuck1");
-		cerr<<"Error while opening file " << playerSaveFile.c_str() << endl;
+		cerr<<"Error while opening file\n";
 		return;
 	}
 	
@@ -66,9 +67,11 @@ Player::Player(string playerSaveFile) {
 		_capacities[i] = atoi(tmp.c_str());
 	}
 
-	close(fd);
+	tmp = strtok(NULL,"\n");
+	_offset+= tmp.size()+1;
+	_life = atoi(tmp.c_str());
 
-	_life = _capacities[4]; //Life = resistance
+	close(fd);
 
 	//default name is John Doe. If it's the player name, it's a new player, and he needs a real name.
 	if ((_firstName=="John")&&(_lastName=="Doe")) verifyName(); 
@@ -97,7 +100,7 @@ void Player::verifyName() {
 
 	} while (isNameTaken()); //check if name already exists
 	
-	int fd = open("Saves/namesTaken.txt",O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
+	int fd = open("server/Saves/namesTaken.txt",O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
 	if (fd==-1){
 		cerr<<"Error while opening file\n";
 	}
@@ -111,7 +114,7 @@ void Player::verifyName() {
 }
 bool Player::isNameTaken(){
 	//Check if a line in namesTaken.txt is the same name as the current one
-	int fd = open("Saves/namesTaken.txt",O_RDONLY);
+	int fd = open("server/Saves/namesTaken.txt",O_RDONLY);
 	if (fd==-1){
 		cerr<<"Error while opening file\n";
 		return 0;
@@ -185,8 +188,8 @@ int Player::getLife() const {return _life;}
 void Player::setLife(int value) {_life = value;}
 void Player::heal() {_life = _capacities[4];}
 
-string Player::getRandomFirstName(int line) {return getRandomName("Saves/firstNames.txt",line);}
-string Player::getRandomLastName(int line) { return getRandomName("Saves/lastNames.txt",line);}
+string Player::getRandomFirstName(int line) {return getRandomName("server/Saves/firstNames.txt",line);}
+string Player::getRandomLastName(int line) { return getRandomName("server/Saves/lastNames.txt",line);}
 
 void Player::setFirstName(string firstName) {_firstName = firstName;}
 void Player::setLastName(string lastName) {_lastName = lastName;}

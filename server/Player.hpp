@@ -1,12 +1,6 @@
 #ifndef Player_hpp
 #define Player_hpp
 
-#define SPEED 0
-#define STRENGTH 1
-#define PRECISION 2
-#define REFLEX 3
-#define RESISTANCE 4
-
 #include <string>
 
 #include "Broomstick.hpp"
