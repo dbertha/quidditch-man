@@ -3,7 +3,8 @@
 #include "../common/NetworkInterface.hpp"
 #include "../common/Defines.hpp"
 
-
+//TODO : en faire une classe complète, à l'instar du server
+//TODO : utiliser la méthode buildconnexion de commAPI
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -63,7 +64,7 @@ void displayBuildingInfos(vector<int> buildingInfos, int buildingID){
   else if (buildingID==HOSPITAL) cout<<"Time required to finish healing : "<<buildingInfos[2]<<endl;
   else if (buildingID==FANSHOP) cout<<"Max clients in the fan shop per match : "<<buildingInfos[2]<<endl;
   if (buildingInfos[3]==1) cout<<"This building is currently being upgraded"<<endl;
-  else cout<<"This building can be upgraded.";
+  else cout<<"This building is not upgrading yet.";
 }
 
 void displayPlayerInfos(int sockfd,vector<int> playerInfos, int playerID) {
@@ -398,6 +399,7 @@ int main(int argc, char *argv[]){
           askForBuildingInfos(sockfd,manageBuildingsChoice);
           vector<int> buildingInfos = receiveBuildingInfos(sockfd);
           displayBuildingInfos(buildingInfos,manageBuildingsChoice);
+          //TODO : tester niveau client si argent suffisant
           cout<<"\n---------------\nEnter 1 if you wish to upgrade this building [or 0 to abort] : ";
           int upgrade;
           cin>>upgrade;
