@@ -41,6 +41,7 @@
 #define WAITINGSECONDMOVE 2 
 #define INVITORSASKENDOFMATCH 3 
 #define INVITEDASKENDOFMATCH 4
+#define WAITING_POSITIONS 5
 
 class User;
 class MatchesHandler{
@@ -57,6 +58,7 @@ public :
     void respondToMatchProposal(User * invited, std::vector<ManagedPlayer> &team2);
     bool isInvited(User * user);
     int sendConfirmationTo(User * client, int answerCode);
+    void getScoresAndPositions(User * demander);
 };
 
 #endif

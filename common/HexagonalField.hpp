@@ -26,6 +26,7 @@ public :
     void display();
     void display(AxialCoordinates selected, int distance);
     bool isFree(AxialCoordinates toTest);
+    void reset();
 };
 
 #endif

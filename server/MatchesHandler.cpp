@@ -38,6 +38,7 @@ void MatchesHandler::respondToMatchProposal(User * invited, std::vector<ManagedP
         matchesVector[matchIndex]->launch(team2);
         sendConfirmationTo(invited, MATCH_STARTING);
         sendConfirmationTo(invitors[matchIndex], MATCH_STARTING);
+        statesOfMatches[matchIndex] = WAITING_POSITIONS;
     }
 }
 
@@ -48,4 +49,18 @@ int MatchesHandler::sendConfirmationTo(User * client, int answerCode){
     int confirmation = answerCode;
     memcpy(answerPosition, &confirmation, sizeof(confirmation));
     return sendOnSocket(client->getSockfd(), answer); //TODO : tester valeur retour
+}
+
+void MatchesHandler::getScoresAndPositions(User * demander){
+    int matchIndex = std::find(inviteds.begin(), inviteds.end(), demander) - inviteds.begin();
+    if(matchIndex > int(inviteds.size())-1){
+        matchIndex = std::find(invitors.begin(), invitors.end(), demander) - invitors.begin(); 
+    }
+#ifdef __DEBUG
+    std::cout << "index du match concerné : " << matchIndex << std::endl;
+#endif
+    SerializedObject answer;
+    answer.typeOfInfos = POSITIONS;
+    matchesVector[matchIndex]->serializeScoreAndPositions(answer.stringData);
+    sendOnSocket(demander->getSockfd(), answer);
 }

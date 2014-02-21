@@ -91,7 +91,7 @@ void Match::launch(std::vector<ManagedPlayer> &team2){ //suite du constructeur
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE), QUAFFLE);
 #ifdef __DEBUG
     __field.display();
-#endif __DEBUG
+#endif
     
     //on enregistre les priorités de déplacements :
     //TODO : à optimiser
@@ -422,6 +422,8 @@ bool Match::isInVector(std::vector<int> toTest, int value){
 }
 
 void Match::serializeScoreAndPositions(char * bufferPosition){
+    memcpy(bufferPosition, &__winner, sizeof(__winner));
+    bufferPosition += sizeof(__winner);
     memcpy(bufferPosition, &__scoreTeam1, sizeof(__scoreTeam1));
     bufferPosition += sizeof(__scoreTeam1);
     memcpy(bufferPosition, &__scoreTeam2, sizeof(__scoreTeam2));

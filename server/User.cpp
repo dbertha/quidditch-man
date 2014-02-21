@@ -484,6 +484,7 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Demande de la liste des positions sur le terrain reçue sur le socket "<<getSockfd()<<std::endl;
 #endif
 			//handle demand
+			__matchesHandler->getScoresAndPositions(this);
 			//construct answer
 			break;
 		case SELECTPLAYER :

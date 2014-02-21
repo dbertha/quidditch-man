@@ -317,16 +317,18 @@ std::vector<int> receiveBuildingInfos(int sockfd){
 }
 
 
-std::vector<AxialCoordinates> receiveScoresAndPositions(int sockfd, int * scoreTeam1, int * scoreTeam2){
+std::vector<AxialCoordinates> receiveScoresAndPositions(int sockfd, int * winner, int * scoreTeam1, int * scoreTeam2){
     SerializedObject received = receiveOnSocket(sockfd);
     char * position = received.stringData;
     std::vector<AxialCoordinates> orderedPositions;
     int diag;
     int line;
+    memcpy(winner, position, sizeof(int));
+    position += sizeof(int);
     memcpy(scoreTeam1, position, sizeof(int));
-    position += sizeof(diag);
+    position += sizeof(int);
     memcpy(scoreTeam2, position, sizeof(int));
-    position += sizeof(line);
+    position += sizeof(int);
     for(unsigned int i = 0; i < 18; ++i){ //positions des 18 objets
         memcpy(&diag, position, sizeof(diag));
         position += sizeof(diag);

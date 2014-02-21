@@ -3,11 +3,7 @@
 #include <algorithm> //max()
 #include <cstring>
 #include <iomanip> //setw
-
-HexagonalField::HexagonalField(){
-    //-2 : hors de la grille hexagonale
-    //-1 : place vide
-    //>= 0 : objet
+void HexagonalField::reset(){
     for (int indexRow = 0; indexRow < MATRIX_SIZE; ++indexRow){
         for(int indexCol = 0; indexCol < std::max(0,((MATRIX_SIZE/2) - indexRow)); ++indexCol){
             matrix[indexRow][indexCol] = NOT_ON_HEX_GRID;
@@ -19,6 +15,13 @@ HexagonalField::HexagonalField(){
             matrix[indexRow][indexCol] = NOT_ON_HEX_GRID;
         }
     }
+}
+
+HexagonalField::HexagonalField(){
+    //-2 : hors de la grille hexagonale
+    //-1 : place vide
+    //>= 0 : objet
+    reset();
     //ordre identique à la liste des joueurs
     unicodes.push_back(TEAM1_KEEPER_UNICODE);
     unicodes.push_back(TEAM1_SEEKER_UNICODE);
@@ -55,6 +58,7 @@ bool HexagonalField::setOccupant(AxialCoordinates coord, objectIndex_t object){
 void HexagonalField::display() {
     AxialCoordinates goal1Position(GOAL_SIDE1_DIAG, GOAL_SIDE1_LINE), goal2Position(GOAL_SIDE2_DIAG, GOAL_SIDE2_LINE);
     char space = ' ';
+    std::string emptyUnicode = "\u20DD";
     for (int indexRow = 0; indexRow < MATRIX_SIZE; ++indexRow){
         std::string decalage(abs(indexRow - (MATRIX_SIZE/2)) * 3, space);
         std::cout << decalage;
@@ -66,7 +70,7 @@ void HexagonalField::display() {
                     std::cout << std::setw(2) << goalUnicode << std::string(4, space);
                 }
                 else{
-                    std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+                    std::cout << std::setw(2) << emptyUnicode << std::string(4, space); //séparateur
                 }
             }
             else{
@@ -82,6 +86,7 @@ void HexagonalField::display(AxialCoordinates selected, int distance){
     std::string startColoring = "\033[31m"; //31 : rouge
     std::string stopColoring = "\033[0m"; // 0 : reset 
     std::string colorCenter = "\033[1;32m"; // 1 : gras, 32 : vert
+    std::string emptyUnicode = "\u20DD";
     char space = ' ';
     for (int indexRow = 0; indexRow < MATRIX_SIZE; ++indexRow){
         std::string decalage(abs(indexRow - (MATRIX_SIZE/2)) * 3, space);
@@ -103,7 +108,7 @@ void HexagonalField::display(AxialCoordinates selected, int distance){
                         std::cout << std::setw(2) << goalUnicode << std::string(4, space);
                     }
                     else{
-                        std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+                        std::cout << std::setw(2) << emptyUnicode << std::string(4, space); //séparateur
                     }
                 }
                 else{

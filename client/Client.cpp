@@ -2,6 +2,7 @@
 #include "../common/NetworkBase.h"
 #include "../common/NetworkInterface.hpp"
 #include "../common/Defines.hpp"
+#include "../common/HexagonalField.hpp"
 
 //TODO : en faire une classe complète, à l'instar du server
 //TODO : utiliser la méthode buildconnexion de commAPI
@@ -158,7 +159,24 @@ void displayManageBuildingsMenu(){
 }
 
 
-
+void startMatch(int sockfd){
+  int winner = 0;
+  int scoreTeam1 = 0;
+  int scoreTeam2 = 0;
+  HexagonalField field;
+  std::vector<AxialCoordinates> allPositions;
+  while(winner == 0){
+    getAllPositions(sockfd);
+    allPositions = receiveScoresAndPositions(sockfd, &winner, &scoreTeam1, &scoreTeam2);
+    cout << "Score team1 (inviter) = " << scoreTeam1 << endl;
+    cout << "Score team2 (invited) = " << scoreTeam2 << endl;
+    field.reset();
+    for(unsigned int i = 0; i < allPositions.size(); ++i){
+      field.setOccupant(allPositions[i], i);
+    }
+    field.display();
+  }
+}
 std::vector<int> displayAndAskPlayersForMatch(int sockfd){
   displayPlayersList(sockfd);
   std::cout << "Veuillez donner les index de vos joueur dans l'ordre suivant : KEEPER SEEKER CHASER1 CHASER2 CHASER3 BEATER1 BEATER2" << std::endl;
@@ -185,10 +203,13 @@ void testMatchInvitation(int sockfd){
     }
     answerMatchProposal(sockfd, confirmation, playersInTeam);
     if(receiveMatchConfirmation(sockfd) == MATCH_STARTING){
-      cout << "le match commence !" << endl;
+      startMatch(sockfd);
     }
   }
 }
+
+
+    
 
 int main(int argc, char *argv[]){
   int choice;
@@ -346,7 +367,7 @@ int main(int argc, char *argv[]){
       std::vector<int> playersInTeam = displayAndAskPlayersForMatch(sockfd);
       proposeMatchTo(sockfd, targetedUser,  playersInTeam);
       if(receiveMatchConfirmation(sockfd) == MATCH_STARTING){
-        cout << "le match commence !" << endl;
+        startMatch(sockfd);
       }
       
     }
