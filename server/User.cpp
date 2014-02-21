@@ -360,7 +360,7 @@ void User::cmdHandler(SerializedObject *received) {
 			}
             User *invited = NULL;
             for(unsigned int i; i < server_->usersList_.size(); ++i){
-                if(server_->usersList_[i]->getUserId() == targetedUser){
+                if(server_->usersList_[i]->getUserID() == targetedUser){
                     invited = server_->usersList_[i];
                 }
             }
@@ -479,8 +479,8 @@ void User::cmdHandler(SerializedObject *received) {
             for (unsigned int i=0;i<server_->usersList_.size();++i){
                 if(server_->usersList_[i]->state_==FREE) { //TODO : ne pas reprendre l'user qui fait la demande dans la liste
                     ++counter;
-                    IDList.push_back(server_->usersList_[i]->getUserId());
-                    std::cout << "userId " << server_->usersList_[i]->getUserId() << std::endl;
+                    IDList.push_back(server_->usersList_[i]->getUserID());
+                    std::cout << "userId " << server_->usersList_[i]->getUserID() << std::endl;
                     std::cout << "name " << server_->usersList_[i]->getUserName() << std::endl;
                     namesList.push_back(server_->usersList_[i]->getUserName());
                 }
