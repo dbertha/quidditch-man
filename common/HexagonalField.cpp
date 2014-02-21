@@ -53,13 +53,21 @@ bool HexagonalField::setOccupant(AxialCoordinates coord, objectIndex_t object){
 }
 
 void HexagonalField::display() {
+    AxialCoordinates goal1Position(GOAL_SIDE1_DIAG, GOAL_SIDE1_LINE), goal2Position(GOAL_SIDE2_DIAG, GOAL_SIDE2_LINE);
     char space = ' ';
     for (int indexRow = 0; indexRow < MATRIX_SIZE; ++indexRow){
         std::string decalage(abs(indexRow - (MATRIX_SIZE/2)) * 3, space);
         std::cout << decalage;
         for(int indexCol = std::max(0,((MATRIX_SIZE/2) - indexRow)); indexCol < (MATRIX_SIZE - std::max(0, indexRow - (MATRIX_SIZE /2))); ++indexCol){
             if(matrix[indexRow][indexCol] < 0){
-                std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+                if(((indexRow == goal1Position.getLineOnMatrix()) and (indexCol == goal1Position.getColOnMatrix()))
+                or((indexRow == goal2Position.getLineOnMatrix()) and (indexCol == goal2Position.getColOnMatrix()))){ //affichage du goal
+                    std::string goalUnicode = "\u2A02";
+                    std::cout << std::setw(2) << goalUnicode << std::string(4, space);
+                }
+                else{
+                    std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+                }
             }
             else{
                 std::cout << /*std::setw(2) <<*/ unicodes[matrix[indexRow][indexCol]] << std::string(4, space); //séparateur
@@ -70,6 +78,7 @@ void HexagonalField::display() {
 }
     
 void HexagonalField::display(AxialCoordinates selected, int distance){
+    AxialCoordinates goal1Position(GOAL_SIDE1_DIAG, GOAL_SIDE1_LINE), goal2Position(GOAL_SIDE2_DIAG, GOAL_SIDE2_LINE);
     std::string startColoring = "\033[31m"; //31 : rouge
     std::string stopColoring = "\033[0m"; // 0 : reset 
     std::string colorCenter = "\033[1;32m"; // 1 : gras, 32 : vert
@@ -88,7 +97,14 @@ void HexagonalField::display(AxialCoordinates selected, int distance){
                     std::cout << colorCenter; //coloration particulière pour le centre
                 }
                 if(matrix[indexRow][indexCol] < 0){
-                    std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+                    if(((indexRow == goal1Position.getLineOnMatrix()) and (indexCol == goal1Position.getColOnMatrix()))
+                    or((indexRow == goal2Position.getLineOnMatrix()) and (indexCol == goal2Position.getColOnMatrix()))){ //affichage du goal
+                        std::string goalUnicode = "\u2A02";
+                        std::cout << std::setw(2) << goalUnicode << std::string(4, space);
+                    }
+                    else{
+                        std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
+                    }
                 }
                 else{
                     std::cout << /*std::setw(2) <<*/ unicodes[matrix[indexRow][indexCol]] << std::string(4, space); //séparateur

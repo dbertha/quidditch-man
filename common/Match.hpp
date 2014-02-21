@@ -7,6 +7,11 @@
 #include "Ball.hpp"
 #include <vector>
 #include <iostream>
+#include <cstring> //memcpy
+
+//compilation du module match avec tests :
+//g++ -Wall -Wextra  testMatch.cpp Match.cpp PlayingPlayer.cpp HexagonalField.cpp ManagedPlayer.cpp Player.cpp Broomstick.cpp -o match.out
+
 
 #define INTERCEPT_QUAFFLE 0
 #define CATCH_GOLDENSNITCH 1
@@ -15,10 +20,7 @@
 //TODO : plusieurs buts quand grand terrain
 //TODO : position de départ du vif d'or et des bugler aléatoire
 
-#define GOAL_SIDE1_DIAG 9
-#define GOAL_SIDE1_LINE 0
-#define GOAL_SIDE2_DIAG -9
-#define GOAL_SIDE2_LINE 0
+
 
 #define STARTINGDIAG_QUAFFLE 0
 #define STARTINGLINE_QUAFFLE 0
@@ -107,6 +109,7 @@ public :
     bool isInVector(std::vector<int> toTest, int value);
     int getScoreTeam1(){return __scoreTeam1;}
     int getScoreTeam2(){return __scoreTeam2;}
+    void serializeScoreAndPositions(char * bufferPosition);
 };
 
 #endif

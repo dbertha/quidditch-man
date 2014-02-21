@@ -137,7 +137,8 @@ void Match::makeMoves(int movesTeam1[][4], int movesTeam2[][4]){
                 //calcul de la distance entre l'attrapeur et la balle
                 int distance = __players[movesTeam1[i][0]].getPosition().getDistanceTo(__balls[0].getPosition());
                 if(__players[movesTeam1[i][0]].catchGoldenSnitch(distance)){ //si attrapage réussi
-                    __winner = 1;
+                    __scoreTeam1 += 150;
+                    __winner = (__scoreTeam1 > __scoreTeam2) ? 1 : 2;
                 }
             }
         }
@@ -157,7 +158,8 @@ void Match::makeMoves(int movesTeam1[][4], int movesTeam2[][4]){
                 //calcul de la distance entre l'attrapeur et la balle
                 int distance = __players[movesTeam2[i][0]].getPosition().getDistanceTo(__players[GOLDENSNITCH].getPosition());
                 if(__players[movesTeam2[i][0]].catchGoldenSnitch(distance) and not __winner){ //si attrapage réussi
-                    __winner = 2;
+                    __scoreTeam1 += 150;
+                    __winner = (__scoreTeam1 > __scoreTeam2) ? 1 : 2;
                 }
             }
         }
@@ -217,7 +219,7 @@ void Match::makeMoves(int movesTeam1[][4], int movesTeam2[][4]){
     std::cout << "taille du vecteur allMoves[0] " << allMoves[0].size() <<  std::endl;
     //réalisation des déplacements
     bool stillMoves = true;
-    int moveIndex = 0;
+    unsigned int moveIndex = 0;
     while(stillMoves){
         std::cout << "taille du vecteur allMoves[2] " << allMoves[2].size() <<  std::endl;
         stillMoves = false;
@@ -265,9 +267,9 @@ void Match::makeMoves(int movesTeam1[][4], int movesTeam2[][4]){
                         __field.setOccupant(currentPosition, FREE_SPACE);
                         if(movesOrder[objectToMove] == QUAFFLE){ //test si traverse le but
                             if((destination.getDiagAxis() == GOAL_SIDE1_DIAG) and (destination.getLineAxis() == GOAL_SIDE1_LINE)){
-                                ++__scoreTeam2;
+                                __scoreTeam2 += 10;
                             }else if((destination.getDiagAxis() == GOAL_SIDE2_DIAG) and (destination.getLineAxis() == GOAL_SIDE2_LINE)){
-                                ++__scoreTeam1;
+                                ++__scoreTeam1 += 10;
                             }
                         }
                     }
@@ -307,3 +309,49 @@ bool Match::isInVector(std::vector<int> toTest, int value){
     }
     return result;
 }
+
+void Match::serializeScoreAndPositions(char * bufferPosition){
+    memcpy(bufferPosition, &__scoreTeam1, sizeof(__scoreTeam1));
+    bufferPosition += sizeof(__scoreTeam1);
+    memcpy(bufferPosition, &__scoreTeam2, sizeof(__scoreTeam2));
+    bufferPosition += sizeof(__scoreTeam2);
+    for(unsigned int i = 0; i < __players.size(); ++i){ //positions des joueurs
+        AxialCoordinates position = __players[i].getPosition();
+        int diag = position.getDiagAxis();
+        int line = position.getLineAxis();
+        memcpy(bufferPosition, &diag, sizeof(diag));
+        bufferPosition += sizeof(diag);
+        memcpy(bufferPosition, &line, sizeof(line));
+        bufferPosition += sizeof(line);
+    }
+    for(unsigned int i = 0; i < __balls.size(); ++i){ //positions des balles
+        AxialCoordinates position = __players[i].getPosition();
+        int diag = position.getDiagAxis();
+        int line = position.getLineAxis();
+        memcpy(bufferPosition, &diag, sizeof(diag));
+        bufferPosition += sizeof(diag);
+        memcpy(bufferPosition, &line, sizeof(line));
+        bufferPosition += sizeof(line);
+    }
+}
+
+//~ coté client :
+//~ std::vector<AxialCoordinates> receiveScoresAndPositions(int sockfd, int * scoreTeam1, int scoreTeam2){
+    //~ SerializedObject received = receiveOnSocket(sockfd);
+    //~ char * position = received.stringData;
+    //~ std::vector<AxialCoordinates> orderedPositions;
+    //~ int diag;
+    //~ int line;
+    //~ memcpy(scoreTeam1, position, sizeof(int));
+    //~ position += sizeof(diag);
+    //~ memcpy(scoreTeam2, position, sizeof(int));
+    //~ position += sizeof(line);
+    //~ for(unsigned int i = 0; i < 18; ++i){ //positions des 18 objets
+        //~ memcpy(&diag, position, sizeof(diag));
+        //~ position += sizeof(diag);
+        //~ memcpy(&line, position, sizeof(line));
+        //~ position += sizeof(line);
+        //~ orderedPositions.push_back(AxialCoordinates(diag, line));
+    //~ }
+    //~ return orderedPositions;
+//~ }

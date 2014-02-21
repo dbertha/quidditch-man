@@ -45,6 +45,11 @@
 #define BLUDGER2_UNICODE "\u2A01"
 #define QUAFFLE_UNICODE "\u2B24"
 
+#define GOAL_SIDE1_DIAG 9
+#define GOAL_SIDE1_LINE 0
+#define GOAL_SIDE2_DIAG -9
+#define GOAL_SIDE2_LINE 0
+
 
 //TODO : affichage du vif d'or seulement si l'attrapeur de l'équipe est dans les environs
 //TODO : corriger defaut affichage avec unicodes

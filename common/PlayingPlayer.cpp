@@ -59,9 +59,46 @@ void PlayingPlayer::moveTo(AxialCoordinates destination){
 }
 
 void PlayingPlayer::loseQuaffle(){
-    __hasQuaffle = 0;
+    __hasQuaffle = false;
 }
 void PlayingPlayer::carryQuaffle(){
-    __hasQuaffle = 1;
+    __hasQuaffle = true;
 }
+
+char * PlayingPlayer::serializeAttributes(char * bufferPosition){
+    int attribute;
+    for(int i = 0; i < 5; ++i){
+	attribute = getCapacity(i);
+	memcpy(bufferPosition, &attribute, sizeof(attribute));
+	bufferPosition += sizeof(attribute);
+    }
+    attribute = __hasQuaffle; //conversion to int
+    memcpy(bufferPosition, &attribute, sizeof(attribute));
+    bufferPosition += sizeof(attribute);
+    return bufferPosition;
+}
+
+//~ coté client :
+//~ 
+//~ typedef struct { //pas besoin de la classe complète
+    //~ int attributes[5];
+    //~ int hasQuaffle;
+//~ } playerAttr;
+//~ 
+//~ playerAttr receiveSelectedPlayerInfos(int sockfd){
+    //~ SerializedObject received = receiveOnSocket(sockfd);
+    //~ char * position = received.stringData;
+    //~ playerAttr thePlayer;
+    //~ int attribute;
+    //~ for(int i = 0; i < 5; ++i){
+	//~ memcpy(&attribute, position, sizeof(attribute));
+	//~ position += sizeof(attribute);
+	//~ thePlayer.attributes[i] = attribute;
+    //~ }
+    //~ memcpy(&attribute, position, sizeof(attribute)); //hasQuaffle
+    //~ position += sizeof(attribute);
+    //~ thePlayer.hasQuaffle = attribute;
+//~ }
+    
+
 

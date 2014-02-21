@@ -1,13 +1,13 @@
 #ifndef PlayingPlayer_hpp
 #define PlayingPlayer_hpp
 
-#include "HexagonalField.hpp"
-#include "Coordinates.hpp"
-//#include "Match.hpp"
+#include "../common/HexagonalField.hpp"
+#include "../common/Coordinates.hpp"
 #include "Player.hpp"
 #include "ManagedPlayer.hpp"
 #include "Ball.hpp"
-//#include "Position.hpp"
+#include <cstring> //memcpy
+
 
 
 #define ROLE_KEEPER 0
@@ -34,6 +34,10 @@ public:
     bool hasQuaffle(){return __hasQuaffle;}
     AxialCoordinates getPosition() {return __currentPosition;}
     int getRole(){return __role;}
+    char * serializeAttributes(char * bufferPosition); //renvoie l'extrémité du buffer, où l'on peut continuer à écrire
+    //5 int : attribut
+    //1 int : hasQuaffle
+    
 
 private:
     int __role;
