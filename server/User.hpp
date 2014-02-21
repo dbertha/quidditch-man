@@ -9,11 +9,19 @@
 #include <iostream>
 #include "../server/Manager.hpp"
 #include "../server/Calendar.hpp"
+
+#define INIT 0
+#define FREE 1 
+#define MATCH_INVITING 2
+#define MATCH_INVITED 3
+#define MATCH_INGAME 4
+#define DISCONNECTING 5
+
 class Server;
 class MatchesHandler;
 class User {
 public:
-	User(Server *, MatchesHandler *, int);
+	User(Server *, MatchesHandler *, int, int);
 	void cmdHandler(SerializedObject *);
 	void setDisconnection();
 	bool isDisconnecting();
@@ -22,9 +30,9 @@ public:
 	std::string getUserName();// initialement dans UserId...!
 	//int sendAnswer(User *, const char cmd, std::string); cf NetworkBase.cpp
 	void* createMatch();
-	enum Status {INIT,FREE/*,MATCH_LIST*/,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING};
+	
 //	Status getState();
-	Status state_; //TODO : getter/setter public
+	int state_; //TODO : getter/setter public
 	pthread_t thread; // thread utilisé pour la gestion d'un match ou de tout autre activité spécifique
 
 	int checkLoginAndPassword(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);

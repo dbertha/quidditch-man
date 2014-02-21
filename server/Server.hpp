@@ -41,6 +41,7 @@ private:
 	unsigned int sin_size;
 	char msg[INPUTSIZE];
 	fd_set FDSet_;
+	int _nextuserID;
 
 	int connect();
 	int mainLoop();

@@ -3,6 +3,7 @@
 
 #include "../common/HexagonalField.hpp"
 #include "../common/Defines.hpp"
+#include "../common/NetworkBase.h"
 #include "ManagedPlayer.hpp"
 #include "PlayingPlayer.hpp"
 #include "Ball.hpp"
@@ -34,6 +35,13 @@
 //~ regarde si le user a été invité
 //~ #define ASKFORENDOFMATCH 36 -> CONFIRM
 //~ set un attribut du user adverse pour le marquer comme devant répondre à une demande de match null
+
+#define WAITINGACCEPTMATCH 0
+#define WAITINGFIRSTMOVE 1
+#define WAITINGSECONDMOVE 2 
+#define INVITORSASKENDOFMATCH 3 
+#define INVITEDASKENDOFMATCH 4
+
 class User;
 class MatchesHandler{
 private :
@@ -41,12 +49,12 @@ private :
     std::vector<User *> invitors;
     std::vector<User *> inviteds;
     std::vector<int> statesOfMatches; //WAITINGACCEPTMATCH, WAITINGFIRSTMOVE, WAITINGSECONDMOVE, INVITORSASKENDOFMATCH, INVITEDASKENDOFMATCH
-    std::vector<int[7][4]> movesLists; //pour chaque match, enregistre les déplacements des deux joueurs avant de les passer à l'instance de Match
+    std::vector<int**> movesLists; //pour chaque match, enregistre les déplacements des deux joueurs avant de les passer à l'instance de Match
     //enregistrement dans user de l'équipe
 public :
     MatchesHandler(){} //construction par défaut des listes
     void proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1);
-    void respondToMatchProposal(User * invitor, User * invited, std::vector<ManagedPlayer> &team2);
+    void respondToMatchProposal(User * invited, std::vector<ManagedPlayer> &team2);
     bool isInvited(User * user);
 };
 

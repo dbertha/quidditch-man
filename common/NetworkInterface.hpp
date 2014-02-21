@@ -361,7 +361,7 @@ playerAttr receiveSelectedPlayerInfos(int sockfd){
     return thePlayer;
 }
 
-int receiveMatchConfirmation(int sockdf){
+int receiveMatchConfirmation(int sockfd){
     SerializedObject received = receiveOnSocket(sockfd);
     char * position = received.stringData;
     int confirmation;
@@ -369,7 +369,7 @@ int receiveMatchConfirmation(int sockdf){
     return confirmation;
 }
 
-void receiveManagersIDandNames(std::vector<int> * IDList, std::vector<std::string> * namesList){
+void receiveManagersIDandNames(int sockfd, std::vector<int> * IDList, std::vector<std::string> * namesList){
     SerializedObject received = receiveOnSocket(sockfd);
     char * position = received.stringData;
     int ID;

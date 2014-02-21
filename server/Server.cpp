@@ -7,7 +7,7 @@
 //TODO : pas de EXIT_SUCCESS ou EXIT_FAILURE pour d'autres méthodes que main()
 
 // Documentation : voir Readme.txt
-Server::Server(int port): __matchesHandler(), port_(port), max_(0) {}
+Server::Server(int port): __matchesHandler(), port_(port), max_(0), _nextuserID(0) {}
 // initialisations dans le constructeur
 void Server::run() {
 	std::cout<<"Server started to listen on port "<<port_<<std::endl;
@@ -91,9 +91,9 @@ void Server::loadFDSet() {
 	FD_ZERO(&FDSet_); //l'ensemble est vidé
 	FD_SET(sockfd_,&FDSet_); //le socket du serveur pour accepter de nouvelles connexions
 	FD_SET(STDIN_FILENO,&FDSet_); //le file descriptor de l'input pour accepter des commandes du clavier du serveur
-	for (unsigned int i=0;i<usersList_.size();++i)
-		if(usersList_[i]->state_!=User::MATCH_INGAME)
-			FD_SET(usersList_[i]->getSockfd(),&FDSet_);
+	for (unsigned int i=0;i<usersList_.size();++i){
+		FD_SET(usersList_[i]->getSockfd(),&FDSet_);
+	}
 }
 
 bool Server::isNewConnection() {return FD_ISSET(sockfd_,&FDSet_);}
@@ -107,7 +107,8 @@ int Server::newUser() {
 		std::cerr<<"Accept error"<<std::endl;
 		return EXIT_FAILURE;
 	}
-	User * user = new User(this,&__matchesHandler,clientSockfd_);
+	User * user = new User(this,&__matchesHandler,clientSockfd_, _nextuserID);
+	++_nextuserID;
 	usersList_.push_back(user);
 	FD_SET(clientSockfd_,&FDSet_);
 	if(clientSockfd_>max_) max_= clientSockfd_;

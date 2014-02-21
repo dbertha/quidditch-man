@@ -21,7 +21,7 @@
 
 
 
-User::User(Server * server, MatchesHandler *matchesHandler, int sockfd): server_(server), __matchesHandler(matchesHandler), sockfd_(sockfd), state_(INIT), userId_(0), manager_(NULL), calendar_(NULL) {}
+User::User(Server * server, MatchesHandler *matchesHandler, int sockfd, int userID): server_(server), __matchesHandler(matchesHandler), sockfd_(sockfd), state_(INIT), userId_(userID), manager_(NULL), calendar_(NULL) {}
 //TODO : initialisation dans le bon ordre
 
 void User::cmdHandler(SerializedObject *received) {
@@ -62,7 +62,7 @@ void User::cmdHandler(SerializedObject *received) {
 				std::cout<<"LOGIN OK"<<std::endl;
 				manager_ = new Manager(username);
 				userName_=username;
-				userId_=server_->usersList_.size();
+				//userId_=server_->usersList_.size();
 				calendar_ = new Calendar(manager_);
 				calendar_->update();
 				manager_->save();
@@ -103,7 +103,7 @@ void User::cmdHandler(SerializedObject *received) {
 				addManager(username,password);
 				manager_ = new Manager(username);
 				userName_=username;
-				userId_=server_->usersList_.size();
+				//userId_=server_->usersList_.size();
 				manager_->save();
 				calendar_ = new Calendar(manager_);
 
@@ -429,7 +429,7 @@ void User::cmdHandler(SerializedObject *received) {
             int counter;
             counter = 0;
             for (unsigned int i=0;i<server_->usersList_.size();++i){
-                if(server_->usersList_[i]->state_==FREE) {
+                if(server_->usersList_[i]->state_==FREE) { //TODO : ne pas reprendre l'user qui fait la demande dans la liste
                     ++counter;
                     IDList.push_back(server_->usersList_[i]->getUserId());
                     std::cout << "userId " << server_->usersList_[i]->getUserId() << std::endl;
@@ -487,25 +487,29 @@ void User::cmdHandler(SerializedObject *received) {
 			//reading details
 			//soit un joueur se déplace, soit un joueur fait se déplacer une balle, soit ne fait rien : nbmax de mouvements = nbtotal de mouvement = nbjoueurs = 7
 			//structure d'un mouvement : int playerID, int diagDest, int lineDest
-			int moves[7][3];
+			int moves[7][4];
 			int diagDest;
 			int lineDest;
+			int specialAction;
 			for(int i = 0; i < 7; ++i){
 				memcpy(&targetedPlayer, position, sizeof(targetedPlayer));
 				position += sizeof(targetedPlayer);
+				memcpy(&specialAction, position, sizeof(specialAction));
+				position += sizeof(specialAction);
 				memcpy(&diagDest, position, sizeof(diagDest));
 				position += sizeof(diagDest);
 				memcpy(&lineDest, position, sizeof(lineDest));
 				position += sizeof(lineDest);
 				moves[i][0] = targetedPlayer;
-				moves[i][1] = diagDest;
-				moves[i][2] = lineDest;
+				moves[i][1] = specialAction;
+				moves[i][2] = diagDest;
+				moves[i][3] = lineDest;
 			}
 #ifdef __DEBUG
 			std::cout<<"Liste de déplacements reçue sur le socket "<<getSockfd()<<std::endl;
-			std::cout<<"1er mouvement reçu : playerID diagDestination lineDestination "<<moves[0][0] << " " <<moves[0][1]<< " " << moves[0][2]<< std::endl;
-			std::cout<<"3eme mouvement reçu : playerID diagDestination lineDestination "<<moves[2][0] << " " <<moves[2][1]<< " " << moves[2][2]<< std::endl;
-			std::cout<<"7eme mouvement reçu : playerID diagDestination lineDestination "<<moves[6][0] << " " <<moves[6][1]<< " " << moves[6][2]<< std::endl;
+			std::cout<<"1er mouvement reçu : playerID diagDestination lineDestination "<<moves[0][0] << " " <<moves[0][2]<< " " << moves[0][3]<< std::endl;
+			std::cout<<"3eme mouvement reçu : playerID diagDestination lineDestination "<<moves[2][0] << " " <<moves[2][2]<< " " << moves[2][3]<< std::endl;
+			std::cout<<"7eme mouvement reçu : playerID diagDestination lineDestination "<<moves[6][0] << " " <<moves[6][2]<< " " << moves[6][3]<< std::endl;
 #endif
 			//handle demand
 			//construct answer

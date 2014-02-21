@@ -31,8 +31,8 @@
 #define SEE_AUCTIONS 1
 #define SELL_PLAYER 2
 #define INSPECT_PLAYER 1
-#define TRAIN_PLAYER 2
-#define HEAL_PLAYER 3
+#define TRAIN_PLAYER_OPTION 2
+#define HEAL_PLAYER_OPTION 3
 #define ENTER_STADIUM 1
 #define ENTER_TRAININGCENTER 2
 #define ENTER_HOSPITAL 3
@@ -302,7 +302,11 @@ int main(int argc, char *argv[]){
       getManagersList(sockfd);
       std::vector<int> IDList;
       std::vector<std::string> namesList;
-      receiveManagersIDandNames(&IDList,&namesList);
+      receiveManagersIDandNames(sockfd, &IDList,&namesList);
+      for(unsigned int i = 0; i < IDList.size(); ++i){
+        std::cout << "ID :" << IDList[i] << " name : " << namesList[i] << std::endl;
+      }
+      
     }
     
 
@@ -361,7 +365,7 @@ int main(int argc, char *argv[]){
               displayPlayerInfos(sockfd,playerInfos,playerID-1);
             }
           }
-          else if (managePlayersChoice==TRAIN_PLAYER) {
+          else if (managePlayersChoice==TRAIN_PLAYER_OPTION) {
             int capacityNumber;
             cout<<"Indicate the number of the player you wish to train : ";
             cin>>playerID;
@@ -379,7 +383,7 @@ int main(int argc, char *argv[]){
               else cout<<"------------\n Training impossible, this player is blocked"<<endl;
             }
           }
-          else if (managePlayersChoice==HEAL_PLAYER) {
+          else if (managePlayersChoice==HEAL_PLAYER_OPTION) {
             cout<<"Indicate the number of the player you wish to heal [or 0 to abort] : ";
             cin>>playerID;
             if (playerID!=ABORT) {
