@@ -106,12 +106,10 @@ int proposeMatchTo(int sockfd, int userID, std::vector<int> playersInTeam){
     return sendOnSocket(sockfd, serialized);
 }
 
-int answerMatchProposal(int sockfd, int askerID, bool confirmation, std::vector<int> playersInTeam){
+int answerMatchProposal(int sockfd, bool confirmation, std::vector<int> playersInTeam){
     SerializedObject serialized;
     char * position = serialized.stringData;
     serialized.typeOfInfos = ACCEPTMATCH;
-    memcpy(position, &askerID, sizeof(askerID));
-    position += sizeof(askerID);
     memcpy(position, &confirmation, sizeof(confirmation));
     position += sizeof(confirmation);
     int value;

@@ -56,6 +56,7 @@ public :
     void proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1);
     void respondToMatchProposal(User * invited, std::vector<ManagedPlayer> &team2);
     bool isInvited(User * user);
+    int sendConfirmationTo(User * client, int answerCode);
 };
 
 #endif

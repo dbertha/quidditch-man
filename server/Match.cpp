@@ -9,6 +9,9 @@
 //si beater (batteur)
 //si bludger collisionne joueur, handlerBludger
 Match::Match(std::vector<ManagedPlayer> &team1): __players(), __field(), __winner(0){
+#ifdef __DEBUG
+        std::cout << "Match généré à partir de la première équipe" << std::endl;
+#endif
         for(int i = 0; i < 7; ++i){
         int role = i; //les 2 premiers roles correspondent déjà
         if((role < TEAM1_BEATER1) and (role > TEAM1_SEEKER)) {role = ROLE_CHASER;}
@@ -42,7 +45,10 @@ Match::Match(std::vector<ManagedPlayer> &team1): __players(), __field(), __winne
     }
 }
 
-void Match::launch(std::vector<ManagedPlayer> &team2){ //suite du construceur
+void Match::launch(std::vector<ManagedPlayer> &team2){ //suite du constructeur
+#ifdef __DEBUG
+        std::cout << "Match démarré avec la réception de la 2 ème équipe" << std::endl;
+#endif
     for(int i = 0; i < 7; ++i){ //création et positionnement de l'équipe 2
         int role = i % TEAM2_KEEPER; //les 2 premiers roles correspondent déjà
         if((role < TEAM1_BEATER1) and (role > TEAM1_SEEKER)) {role = ROLE_CHASER;}
@@ -83,7 +89,9 @@ void Match::launch(std::vector<ManagedPlayer> &team2){ //suite du construceur
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2), BLUDGER2);
     __balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE))); 
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE), QUAFFLE);
+#ifdef __DEBUG
     __field.display();
+#endif __DEBUG
     
     //on enregistre les priorités de déplacements :
     //TODO : à optimiser

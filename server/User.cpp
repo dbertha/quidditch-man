@@ -364,23 +364,33 @@ void User::cmdHandler(SerializedObject *received) {
 			//reading details
 			bool confirmation; 
 			position = received->stringData;
-			memcpy(&targetedUser, position, sizeof(targetedUser));
-			position += sizeof(targetedUser);
-
 			memcpy(&confirmation, position, sizeof(confirmation));
 			position += sizeof(confirmation);
+			std::cout << "size of confirmation : " << sizeof(confirmation) << std::endl;
 			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
-			for(int i = 0; i < 7; ++i){
-				int value;
-				memcpy(&value,position, sizeof(value));
-				position += sizeof(value);
-				playersInTeam.push_back(value); //ajout à la liste
+			if(confirmation){
+				for(int i = 0; i < 7; ++i){
+					int value;
+					std::cout << "départ : " << position - received->stringData << std::endl;
+					memcpy(&value,position, sizeof(value));
+					position += sizeof(value);
+					playersInTeam.push_back(value); //ajout à la liste
+				}
 			}
 #ifdef __DEBUG
 			std::cout<<"Demande d'acceptation d'un match reçue sur socket "<<getSockfd()<<std::endl;
-			std::cout<<"userID reçu : "<<targetedUser<<std::endl;
 			std::cout<<"confirmation : "<<confirmation<<std::endl;
 #endif
+			std::vector<ManagedPlayer> team2;
+            for(int i = 0; i < playersInTeam.size(); ++i){
+				std::cout << " on récupère les objets correspondants " << playersInTeam[i] <<std::endl;
+                //TODO : éviter des copies ?
+				team2.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
+			}
+#ifdef __DEBUG
+			std::cout<<"On passe le relais à matchesHandler"<<std::endl;
+#endif
+			__matchesHandler->respondToMatchProposal(this, team2);
 
 			break;
         }

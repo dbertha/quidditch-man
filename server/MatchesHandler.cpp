@@ -13,12 +13,7 @@ void MatchesHandler::proposeForMatch(User * invitor, User * invited, std::vector
         invitor->state_ = MATCH_INVITING;
         invited->state_ = MATCH_INVITED;
     }else{
-        SerializedObject answer;
-        answer.typeOfInfos = MATCH_CONFIRM;
-        char * answerPosition = answer.stringData;
-        int confirmation = INVITATION_NOT_POSSIBLE;
-        memcpy(answerPosition, &confirmation, sizeof(confirmation));
-        sendOnSocket(invitor->getSockfd(), answer); //TODO : tester valeur retour
+        sendConfirmationTo(invitor, INVITATION_NOT_POSSIBLE);
         //code to invitor: INVITATION_NOT_POSSIBLE
     }
 }
@@ -28,5 +23,29 @@ bool MatchesHandler::isInvited(User * user){
 }
 
 void MatchesHandler::respondToMatchProposal(User * invited, std::vector<ManagedPlayer> &team2){
-    int matchIndex = std::find(invitors.begin(), invitors.end(), invited) - invitors.begin(); 
+    int matchIndex = std::find(inviteds.begin(), inviteds.end(), invited) - inviteds.begin(); 
+    if(team2.empty()){//refuse le match
+#ifdef __DEBUG
+        std::cout << "Match refused " << std::endl;
+#endif
+        sendConfirmationTo(invited, MATCH_DENIED);
+        sendConfirmationTo(invitors[matchIndex], MATCH_DENIED);
+        //TODO : supprimer les infos de ce match des vecteurs
+    }else{
+#ifdef __DEBUG
+        std::cout << "Match lauched " << std::endl;
+#endif
+        matchesVector[matchIndex]->launch(team2);
+        sendConfirmationTo(invited, MATCH_STARTING);
+        sendConfirmationTo(invitors[matchIndex], MATCH_STARTING);
+    }
+}
+
+int MatchesHandler::sendConfirmationTo(User * client, int answerCode){
+    SerializedObject answer;
+    answer.typeOfInfos = MATCH_CONFIRM;
+    char * answerPosition = answer.stringData;
+    int confirmation = answerCode;
+    memcpy(answerPosition, &confirmation, sizeof(confirmation));
+    return sendOnSocket(client->getSockfd(), answer); //TODO : tester valeur retour
 }

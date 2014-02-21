@@ -5,6 +5,7 @@
 
 //TODO : en faire une classe complète, à l'instar du server
 //TODO : utiliser la méthode buildconnexion de commAPI
+//TODO : actions à proposer en fonction du batiment choisi
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -26,7 +27,7 @@
 #define AUCTION_ROOM 2
 #define MANAGE_PLAYERS 3
 #define MANAGE_BUILDINGS 4
-#define PROPOSEMATCH 5
+#define PROPOSEMATCH_OPTION 5
 
 #define SEE_AUCTIONS 1
 #define SELL_PLAYER 2
@@ -156,11 +157,36 @@ void displayManageBuildingsMenu(){
   cout<<"-----> ";
 }
 
+
+
+std::vector<int> displayAndAskPlayersForMatch(int sockfd){
+  displayPlayersList(sockfd);
+  std::cout << "Veuillez donner les index de vos joueur dans l'ordre suivant : KEEPER SEEKER CHASER1 CHASER2 CHASER3 BEATER1 BEATER2" << std::endl;
+  int managedIndex;
+  std::vector<int> playersInTeam;
+  for(int i = 0; i < 7; ++i){
+    cout << "indice joueur : " ;
+    cin >> managedIndex;
+    playersInTeam.push_back(managedIndex-1); //index commence à 0, affichage commence à 1
+  }
+  return playersInTeam;
+}
+
 void testMatchInvitation(int sockfd){
   isMatchWaiting(sockfd);
   if(getConfirmation(sockfd)){
     cout << "You've got a match proposal !" << endl;
     cout << "Accept ? [1/0]" << endl;
+    bool confirmation;
+    cin >> confirmation;
+    std::vector<int> playersInTeam;
+    if(confirmation){
+      playersInTeam = displayAndAskPlayersForMatch(sockfd);
+    }
+    answerMatchProposal(sockfd, confirmation, playersInTeam);
+    if(receiveMatchConfirmation(sockfd) == MATCH_STARTING){
+      cout << "le match commence !" << endl;
+    }
   }
 }
 
@@ -317,19 +343,11 @@ int main(int argc, char *argv[]){
       cout<<"Indicate the ID of the player you want to challenge : "; //TODO : retour en arrière, vérification des inputs, tester retours des send et receive
       int targetedUser;
       cin >> targetedUser;
-      displayPlayersList(sockfd);
-      std::cout << "Veuillez donner les index de vos joueur dans l'ordre suivant : KEEPER SEEKER CHASER1 CHASER2 CHASER3 BEATER1 BEATER2" << std::endl;
-      int managedIndex;
-      std::vector<int> playersInTeam;
-      for(int i = 0; i < 7; ++i){
-        cout << "indice joueur : " ;
-        cin >> managedIndex;
-        playersInTeam.push_back(managedIndex-1); //index commence à 0, affichage commence à 1
-      }
+      std::vector<int> playersInTeam = displayAndAskPlayersForMatch(sockfd);
       proposeMatchTo(sockfd, targetedUser,  playersInTeam);
-      isMatchWaiting(sockfd);
-      getConfirmation(sockfd);
-      //receiveMatchConfirmation(sockfd);
+      if(receiveMatchConfirmation(sockfd) == MATCH_STARTING){
+        cout << "le match commence !" << endl;
+      }
       
     }
     
