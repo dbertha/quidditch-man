@@ -1,5 +1,5 @@
 #include "Server.hpp"
-#include "CommonMgr.hpp"
+//#include "CommonMgr.hpp"
 #include "User.hpp"
 #include <netinet/in.h> //htons()  ntohs()
 #include "../common/NetworkBase.h"
@@ -7,7 +7,7 @@
 //TODO : pas de EXIT_SUCCESS ou EXIT_FAILURE pour d'autres méthodes que main()
 
 // Documentation : voir Readme.txt
-Server::Server(int port): commonMgr_(new CommonMgr(this)), port_(port), max_(0) {}
+Server::Server(int port): __matchesHandler(), port_(port), max_(0) {}
 // initialisations dans le constructeur
 void Server::run() {
 	std::cout<<"Server started to listen on port "<<port_<<std::endl;
@@ -107,7 +107,7 @@ int Server::newUser() {
 		std::cerr<<"Accept error"<<std::endl;
 		return EXIT_FAILURE;
 	}
-	User * user = new User(this,commonMgr_,clientSockfd_);
+	User * user = new User(this,&__matchesHandler,clientSockfd_);
 	usersList_.push_back(user);
 	FD_SET(clientSockfd_,&FDSet_);
 	if(clientSockfd_>max_) max_= clientSockfd_;

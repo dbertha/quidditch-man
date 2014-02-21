@@ -26,6 +26,8 @@
 #define AUCTION_ROOM 2
 #define MANAGE_PLAYERS 3
 #define MANAGE_BUILDINGS 4
+#define PROPOSEMATCH 5
+
 #define SEE_AUCTIONS 1
 #define SELL_PLAYER 2
 #define INSPECT_PLAYER 1
@@ -41,6 +43,8 @@
 #define TIMESCALE 1
 
 using namespace std;
+
+//TODO : affichage et récupération de l'input dans une seule méthode
 
 void displayManagerInfos(int sockfd) {
   askForManagerInfos(sockfd);
@@ -107,7 +111,7 @@ void displayConnexionMenu(){
 void displayMainMenu(){
   cout<<" --------------------------------------------------------------------------------------"<<endl;
   cout<<"What do you want to do ?"<<endl;
-  cout<<" [1] See managers connected"<<endl;
+  cout<<" [1] See managers connected to propose match"<<endl;
   cout<<" [2] See/create auctions"<<endl;
   cout<<" [3] Manage players"<<endl;
   cout<<" [4] Manage buildings"<<endl;
@@ -296,7 +300,11 @@ int main(int argc, char *argv[]){
 
     if (choice==SEE_MANAGERS) {
       getManagersList(sockfd);
+      std::vector<int> IDList;
+      std::vector<std::string> namesList;
+      receiveManagersIDandNames(&IDList,&namesList);
     }
+    
 
     else if (choice==AUCTION_ROOM) {
       int auctionChoice;

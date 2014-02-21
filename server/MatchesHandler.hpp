@@ -34,7 +34,7 @@
 //~ regarde si le user a été invité
 //~ #define ASKFORENDOFMATCH 36 -> CONFIRM
 //~ set un attribut du user adverse pour le marquer comme devant répondre à une demande de match null
-
+class User;
 class MatchesHandler{
 private :
     std::vector<Match *> matchesVector;
@@ -47,6 +47,7 @@ public :
     MatchesHandler(){} //construction par défaut des listes
     void proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1);
     void respondToMatchProposal(User * invitor, User * invited, std::vector<ManagedPlayer> &team2);
+    bool isInvited(User * user);
 };
 
 #endif

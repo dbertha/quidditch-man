@@ -1,6 +1,5 @@
 #include "User.hpp"
 #include "Server.hpp"
-#include "CommonMgr.hpp"
 #include "../common/NetworkBase.h"
 #include "../server/Manager.hpp"
 #include "../server/Calendar.hpp"
@@ -22,8 +21,9 @@
 
 
 
-User::User(Server * server, CommonMgr * commonMgr, int sockfd): server_(server), commonMgr_(commonMgr), sockfd_(sockfd), state_(INIT), userId_(0), manager_(NULL), calendar_(NULL) {}
+User::User(Server * server, MatchesHandler *matchesHandler, int sockfd): server_(server), __matchesHandler(matchesHandler), sockfd_(sockfd), state_(INIT), userId_(0), manager_(NULL), calendar_(NULL) {}
 //TODO : initialisation dans le bon ordre
+
 void User::cmdHandler(SerializedObject *received) {
 	SerializedObject answer;
 	char * position;
@@ -36,6 +36,8 @@ void User::cmdHandler(SerializedObject *received) {
 	bool confirmation;
 	vector<int> infos;
 	vector<string> playersList;
+    std::vector<int> IDList;
+    std::vector<std::string> namesList;
 	position = received->stringData;
 #ifdef __DEBUG
 	std::cout<<"En-tête reçu : "<<received->typeOfInfos<<std::endl;
@@ -343,18 +345,21 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Demande de proposition d'un match reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"userID reçu : "<<targetedUser<<std::endl;
 #endif
-						for (unsigned int i=0;i<server_->usersList_.size();++i)
-							if(server_->usersList_[i]->state_==FREE && server_->usersList_[i]->getUserId()==targetedUser) {
-								opponent_=server_->usersList_[i];
-								opponent_->state_=MATCH_INVITED;
-								state_=MATCH_INVITING;
-								answer_+="Le manager "+server_->usersList_[i]->getUserName()+" vous invite à jouer un match amical.";
-//								return sendAnswer(server_->usersList_[i],msg[0],answer_);
-//					TODO		à envoyer au manager invité !
-							}
-						answer_="0Vous n'avez pas sélectionné un joueur disponible.";
-			break;
+            std::vector<ManagedPlayer> team1;
+            for(int i = 0; i < 7; ++i){
+                //TODO : éviter des copies ?
+				team1.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
 			}
+            User *invited = NULL;
+            for(unsigned int i; i < server_->usersList_.size(); ++i){
+                if(server_->usersList_[i]->getUserId() == targetedUser){
+                    invited = server_->usersList_[i];
+                }
+            }
+                
+            __matchesHandler->proposeForMatch(this, invited, team1); //matchesHandler handle the answer
+			break;
+        }
 		case ACCEPTMATCH : {
 			//reading details
 			bool confirmation; 
@@ -376,30 +381,9 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"userID reçu : "<<targetedUser<<std::endl;
 			std::cout<<"confirmation : "<<confirmation<<std::endl;
 #endif
-			std::string answer_;
-			if (confirmation) {
-						std::cout<<userId_<<" est d'accord pour rencontrer "<<targetedUser<<" en match amical"<<std::endl;
-						for (unsigned int i=0;i<server_->usersList_.size();++i)
-							if(server_->usersList_[i]->state_==MATCH_INVITING && server_->usersList_[i]->getUserId()==targetedUser) {
-								server_->usersList_[i]->state_=MATCH_INGAME;
-								state_=MATCH_INGAME;
-								answer_=" Ce joueur est d'accord !";
-//			TODO		message à envoyer au manager qui invite :
-//								return sendAnswer(server_->usersList_[i],msg[0],answer_);
-							}
-						state_=FREE;
-						answer_="0Le joueur qui vous invitait n'est plus disponible !";
-					}
-			else {
-						answer_="0Ce joueur n'est pas d'accord.";
-						for (unsigned int i=0;i<server_->usersList_.size();++i)
-							if(server_->usersList_[i]->getUserId()==targetedUser) {
-								server_->usersList_[i]->state_=FREE;
-								state_=FREE;
-							}
-			}
+
 			break;
-		}
+        }
 		case IS_MATCH_WAITING ://no more needed
 			//no details to read
 			//on suppose qu'un seul match sera demandé à la fois
@@ -436,32 +420,40 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand
 			//construct answer
 			break;
-		case GETMANAGERSLIST : {
+		case GETMANAGERSLIST : 
 			//no details to read
 #ifdef __DEBUG
 			std::cout<<"Demande de la liste des managers reçue sur le socket "<<getSockfd()<<std::endl;
 #endif
-					std::string answer_;
-					std::ostringstream oSStream_;
-					if(state_!=FREE) {
-						answer_="0Internal error : user already busy in a conversation with the server.";
-					}
-					else {
-						state_=MATCH_LIST;
-						answer_=' ';
-						for (unsigned int i=0;i<server_->usersList_.size();++i)
-							if(server_->usersList_[i]->state_==FREE) {
-								oSStream_<<server_->usersList_[i]->userId_;
-								answer_=answer_+oSStream_.str()+" "+server_->usersList_[i]->userName_+"\n";
-								state_=MATCH_LIST;
-							}
-						if(answer_.length()==1) answer_="0Il n'y a pas d'autres managers disponibles.";
-					}
-					std::cout<<answer_<<std::endl;
 
-					state_=FREE;
+            int counter;
+            counter = 0;
+            for (unsigned int i=0;i<server_->usersList_.size();++i){
+                if(server_->usersList_[i]->state_==FREE) {
+                    ++counter;
+                    IDList.push_back(server_->usersList_[i]->getUserId());
+                    std::cout << "userId " << server_->usersList_[i]->getUserId() << std::endl;
+                    std::cout << "name " << server_->usersList_[i]->getUserName() << std::endl;
+                    namesList.push_back(server_->usersList_[i]->getUserName());
+                }
+            }
+            //construct answer
+			answer.typeOfInfos = MANAGERSLIST;
+			memcpy(answerPosition, &counter, sizeof(counter));
+            answerPosition += sizeof(counter);
+            for(int i = 0; i < counter; ++i){
+                int ID = IDList[i];
+                char name[30];
+                std::string strName = namesList[i];
+                strcpy(name, strName.c_str());
+                memcpy(answerPosition, &ID, sizeof(ID));
+				answerPosition += sizeof(ID);
+				memcpy(answerPosition, &name, sizeof(name));
+				answerPosition += sizeof(name);
+            }
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
-			}
+			
 		case GETAUCTIONSLIST :
 			//no details to read
 #ifdef __DEBUG
@@ -534,8 +526,6 @@ void User::cmdHandler(SerializedObject *received) {
 			break;
 
 	}
-	//server_->sendToClient(this,&answer);
-	//envoi de la réponse
 }
 
 void User::setDisconnection() {

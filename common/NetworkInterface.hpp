@@ -360,6 +360,33 @@ playerAttr receiveSelectedPlayerInfos(int sockfd){
     thePlayer.hasQuaffle = attribute;
     return thePlayer;
 }
+
+int receiveMatchConfirmation(int sockdf){
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    int confirmation;
+    memcpy(&confirmation, position, sizeof(confirmation));
+    return confirmation;
+}
+
+void receiveManagersIDandNames(std::vector<int> * IDList, std::vector<std::string> * namesList){
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    int ID;
+    char name[USERNAME_LENGTH];
+    int nbOfAvailableManagers;
+    memcpy(&nbOfAvailableManagers, position, sizeof(nbOfAvailableManagers));
+    position += sizeof(nbOfAvailableManagers);
+    for(int i = 0; i < nbOfAvailableManagers; ++i){
+        memcpy(&ID, position, sizeof(ID));
+        position += sizeof(ID);
+        IDList->push_back(ID);
+        memcpy(&name, position, sizeof(name));
+        position += sizeof(name);
+        std::string strName = name;
+        namesList->push_back(strName);
+    }
+}
     
 
 

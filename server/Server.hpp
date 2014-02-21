@@ -4,6 +4,7 @@
 #include "../common/Defines.hpp"
 #include "../common/NetworkBase.h"
 #include "../common/commAPI.hpp"
+#include "MatchesHandler.hpp"
 #include <iostream>
 #include <set>
 #include <vector>
@@ -20,7 +21,7 @@
 #include <arpa/inet.h>
 
 class User;
-class CommonMgr;
+class MatchesHandler;
 class Server {
 public:
 	Server(int);
@@ -31,7 +32,7 @@ public:
 	//int getNewUserId();
 
 private:
-	CommonMgr* commonMgr_;
+	MatchesHandler __matchesHandler;
 	int port_;
 	int max_; //nombre de connections
 	int sockfd_; //socket d'écoute du serveur
