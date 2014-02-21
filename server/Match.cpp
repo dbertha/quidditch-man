@@ -335,23 +335,4 @@ void Match::serializeScoreAndPositions(char * bufferPosition){
     }
 }
 
-//~ coté client :
-//~ std::vector<AxialCoordinates> receiveScoresAndPositions(int sockfd, int * scoreTeam1, int scoreTeam2){
-    //~ SerializedObject received = receiveOnSocket(sockfd);
-    //~ char * position = received.stringData;
-    //~ std::vector<AxialCoordinates> orderedPositions;
-    //~ int diag;
-    //~ int line;
-    //~ memcpy(scoreTeam1, position, sizeof(int));
-    //~ position += sizeof(diag);
-    //~ memcpy(scoreTeam2, position, sizeof(int));
-    //~ position += sizeof(line);
-    //~ for(unsigned int i = 0; i < 18; ++i){ //positions des 18 objets
-        //~ memcpy(&diag, position, sizeof(diag));
-        //~ position += sizeof(diag);
-        //~ memcpy(&line, position, sizeof(line));
-        //~ position += sizeof(line);
-        //~ orderedPositions.push_back(AxialCoordinates(diag, line));
-    //~ }
-    //~ return orderedPositions;
-//~ }
+

@@ -4,6 +4,7 @@
 /* Interface réseau en C++ qui fera appel au module C */
 #include "NetworkBase.h" //SerializedObject
 #include "Defines.hpp" 
+#include "HexagonalField.hpp"
 
 //pour le test en c :
 #include <stdio.h>
@@ -318,9 +319,47 @@ std::vector<int> receiveBuildingInfos(int sockfd){
 }
 
 
+std::vector<AxialCoordinates> receiveScoresAndPositions(int sockfd, int * scoreTeam1, int * scoreTeam2){
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    std::vector<AxialCoordinates> orderedPositions;
+    int diag;
+    int line;
+    memcpy(scoreTeam1, position, sizeof(int));
+    position += sizeof(diag);
+    memcpy(scoreTeam2, position, sizeof(int));
+    position += sizeof(line);
+    for(unsigned int i = 0; i < 18; ++i){ //positions des 18 objets
+        memcpy(&diag, position, sizeof(diag));
+        position += sizeof(diag);
+        memcpy(&line, position, sizeof(line));
+        position += sizeof(line);
+        orderedPositions.push_back(AxialCoordinates(diag, line));
+    }
+    return orderedPositions;
+}
 
 
-//Serveur lit le SerializedObject et le transmet à commandHandler de User
+typedef struct { //pas besoin de la classe complète
+    int attributes[5];
+    int hasQuaffle;
+} playerAttr;
+
+playerAttr receiveSelectedPlayerInfos(int sockfd){
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    playerAttr thePlayer;
+    int attribute;
+    for(int i = 0; i < 5; ++i){
+	memcpy(&attribute, position, sizeof(attribute));
+	position += sizeof(attribute);
+	thePlayer.attributes[i] = attribute;
+    }
+    memcpy(&attribute, position, sizeof(attribute)); //hasQuaffle
+    position += sizeof(attribute);
+    thePlayer.hasQuaffle = attribute;
+    return thePlayer;
+}
     
 
 
