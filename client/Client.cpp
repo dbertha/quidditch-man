@@ -156,7 +156,13 @@ void displayManageBuildingsMenu(){
   cout<<"-----> ";
 }
 
-
+void testMatchInvitation(int sockfd){
+  isMatchWaiting(sockfd);
+  if(getConfirmation(sockfd)){
+    cout << "You've got a match proposal !" << endl;
+    cout << "Accept ? [1/0]" << endl;
+  }
+}
 
 int main(int argc, char *argv[]){
   int choice;
@@ -294,11 +300,13 @@ int main(int argc, char *argv[]){
   } while (!result);
 
   do {
+    testMatchInvitation(sockfd);
     displayManagerInfos(sockfd);
     displayMainMenu();
     cin>>choice;
 
     if (choice==SEE_MANAGERS) {
+      testMatchInvitation(sockfd);
       getManagersList(sockfd);
       std::vector<int> IDList;
       std::vector<std::string> namesList;
@@ -306,6 +314,22 @@ int main(int argc, char *argv[]){
       for(unsigned int i = 0; i < IDList.size(); ++i){
         std::cout << "ID :" << IDList[i] << " name : " << namesList[i] << std::endl;
       }
+      cout<<"Indicate the ID of the player you want to challenge : "; //TODO : retour en arrière, vérification des inputs, tester retours des send et receive
+      int targetedUser;
+      cin >> targetedUser;
+      displayPlayersList(sockfd);
+      std::cout << "Veuillez donner les index de vos joueur dans l'ordre suivant : KEEPER SEEKER CHASER1 CHASER2 CHASER3 BEATER1 BEATER2" << std::endl;
+      int managedIndex;
+      std::vector<int> playersInTeam;
+      for(int i = 0; i < 7; ++i){
+        cout << "indice joueur : " ;
+        cin >> managedIndex;
+        playersInTeam.push_back(managedIndex-1); //index commence à 0, affichage commence à 1
+      }
+      proposeMatchTo(sockfd, targetedUser,  playersInTeam);
+      isMatchWaiting(sockfd);
+      getConfirmation(sockfd);
+      //receiveMatchConfirmation(sockfd);
       
     }
     
@@ -348,6 +372,7 @@ int main(int argc, char *argv[]){
   }
 
     else if (choice==MANAGE_PLAYERS) {
+      testMatchInvitation(sockfd);
       int managePlayersChoice;
       do {
         displayManagerInfos(sockfd);
@@ -402,6 +427,7 @@ int main(int argc, char *argv[]){
       } while (managePlayersChoice!=ABORT);
     }
     else if (choice==MANAGE_BUILDINGS) {
+      testMatchInvitation(sockfd);
       int manageBuildingsChoice;
       do {
         displayManagerInfos(sockfd);

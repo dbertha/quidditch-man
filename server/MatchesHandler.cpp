@@ -24,7 +24,6 @@ void MatchesHandler::proposeForMatch(User * invitor, User * invited, std::vector
 }
 
 bool MatchesHandler::isInvited(User * user){
-    
     return user->state_ == MATCH_INVITED;
 }
 

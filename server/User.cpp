@@ -356,7 +356,7 @@ void User::cmdHandler(SerializedObject *received) {
                     invited = server_->usersList_[i];
                 }
             }
-                
+               
             __matchesHandler->proposeForMatch(this, invited, team1); //matchesHandler handle the answer
 			break;
         }
@@ -384,15 +384,21 @@ void User::cmdHandler(SerializedObject *received) {
 
 			break;
         }
-		case IS_MATCH_WAITING ://no more needed
+		case IS_MATCH_WAITING : {
 			//no details to read
 			//on suppose qu'un seul match sera demandé à la fois
 #ifdef __DEBUG
 			std::cout<<"Demande si match demandé reçue sur socket "<<getSockfd()<<std::endl;
 #endif
 			//handle demand
+			bool confirmation = __matchesHandler->isInvited(this); //TODO : récupérer ID et name de l'invitant
+			
 			//construct answer
+			answer.typeOfInfos = MATCH_WAITING;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
+		}
 		case CREATEAUCTION :
 			//reading details
 			int startingPrice;
