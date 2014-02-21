@@ -2,8 +2,14 @@
 #include "../common/NetworkBase.h"
 #include "../common/NetworkInterface.hpp"
 #include "../common/Defines.hpp"
+#include "../common/HexagonalField.hpp"
 
 #include <pthread.h>
+
+//TODO : en faire une classe complète, à l'instar du server
+//TODO : utiliser la méthode buildconnexion de commAPI
+//TODO : actions à proposer en fonction du batiment choisi
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -28,11 +34,13 @@
 #define AUCTION_ROOM 2
 #define MANAGE_PLAYERS 3
 #define MANAGE_BUILDINGS 4
+#define PROPOSEMATCH_OPTION 5
+
 #define SEE_AUCTIONS 1
 #define SELL_PLAYER 2
 #define INSPECT_PLAYER 1
-#define TRAIN_PLAYER 2
-#define HEAL_PLAYER 3
+#define TRAIN_PLAYER_OPTION 2
+#define HEAL_PLAYER_OPTION 3
 #define ENTER_STADIUM 1
 #define ENTER_TRAININGCENTER 2
 #define ENTER_HOSPITAL 3
@@ -44,8 +52,12 @@
 
 using namespace std;
 
+
 bool isBidder;
 bool hasChosen;
+
+//TODO : affichage et récupération de l'input dans une seule méthode
+
 
 void displayManagerInfos(int sockfd) {
   askForManagerInfos(sockfd);
@@ -69,7 +81,7 @@ void displayBuildingInfos(vector<int> buildingInfos, int buildingID){
   else if (buildingID==HOSPITAL) cout<<"Time required to finish healing : "<<buildingInfos[2]<<endl;
   else if (buildingID==FANSHOP) cout<<"Max clients in the fan shop per match : "<<buildingInfos[2]<<endl;
   if (buildingInfos[3]==1) cout<<"This building is currently being upgraded"<<endl;
-  else cout<<"This building can be upgraded.";
+  else cout<<"This building is not upgrading yet.";
 }
 
 void displayPlayerInfos(int sockfd,vector<int> playerInfos, int playerID) {
@@ -165,7 +177,7 @@ void displayConnexionMenu(){
 void displayMainMenu(){
   cout<<" --------------------------------------------------------------------------------------"<<endl;
   cout<<"What do you want to do ?"<<endl;
-  cout<<" [1] See managers connected"<<endl;
+  cout<<" [1] See managers connected to propose match"<<endl;
   cout<<" [2] See/create auctions"<<endl;
   cout<<" [3] Manage players"<<endl;
   cout<<" [4] Manage buildings"<<endl;
@@ -305,6 +317,57 @@ void mainAuction(int sockfd, int auctionID, int timeLeft) {
 
 
 
+void startMatch(int sockfd){
+  int winner = 0;
+  int scoreTeam1 = 0;
+  int scoreTeam2 = 0;
+  HexagonalField field;
+  std::vector<AxialCoordinates> allPositions;
+  while(winner == 0){
+    getAllPositions(sockfd);
+    allPositions = receiveScoresAndPositions(sockfd, &winner, &scoreTeam1, &scoreTeam2);
+    cout << "Score team1 (inviter) = " << scoreTeam1 << endl;
+    cout << "Score team2 (invited) = " << scoreTeam2 << endl;
+    field.reset();
+    for(unsigned int i = 0; i < allPositions.size(); ++i){
+      field.setOccupant(allPositions[i], i);
+    }
+    field.display();
+  }
+}
+std::vector<int> displayAndAskPlayersForMatch(int sockfd){
+  displayPlayersList(sockfd);
+  std::cout << "Veuillez donner les index de vos joueur dans l'ordre suivant : KEEPER SEEKER CHASER1 CHASER2 CHASER3 BEATER1 BEATER2" << std::endl;
+  int managedIndex;
+  std::vector<int> playersInTeam;
+  for(int i = 0; i < 7; ++i){
+    cout << "indice joueur : " ;
+    cin >> managedIndex;
+    playersInTeam.push_back(managedIndex-1); //index commence à 0, affichage commence à 1
+  }
+  return playersInTeam;
+}
+
+void testMatchInvitation(int sockfd){
+  isMatchWaiting(sockfd);
+  if(getConfirmation(sockfd)){
+    cout << "You've got a match proposal !" << endl;
+    cout << "Accept ? [1/0]" << endl;
+    bool confirmation;
+    cin >> confirmation;
+    std::vector<int> playersInTeam;
+    if(confirmation){
+      playersInTeam = displayAndAskPlayersForMatch(sockfd);
+    }
+    answerMatchProposal(sockfd, confirmation, playersInTeam);
+    if(receiveMatchConfirmation(sockfd) == MATCH_STARTING){
+      startMatch(sockfd);
+    }
+  }
+}
+
+
+    
 
 int main(int argc, char *argv[]){
   int choice;
@@ -442,13 +505,31 @@ int main(int argc, char *argv[]){
   } while (!result);
 
   do {
+    testMatchInvitation(sockfd);
     displayManagerInfos(sockfd);
     displayMainMenu();
     cin>>choice;
 
     if (choice==SEE_MANAGERS) {
+      testMatchInvitation(sockfd);
       getManagersList(sockfd);
+      std::vector<int> IDList;
+      std::vector<std::string> namesList;
+      receiveManagersIDandNames(sockfd, &IDList,&namesList);
+      for(unsigned int i = 0; i < IDList.size(); ++i){
+        std::cout << "ID :" << IDList[i] << " name : " << namesList[i] << std::endl;
+      }
+      cout<<"Indicate the ID of the player you want to challenge : "; //TODO : retour en arrière, vérification des inputs, tester retours des send et receive
+      int targetedUser;
+      cin >> targetedUser;
+      std::vector<int> playersInTeam = displayAndAskPlayersForMatch(sockfd);
+      proposeMatchTo(sockfd, targetedUser,  playersInTeam);
+      if(receiveMatchConfirmation(sockfd) == MATCH_STARTING){
+        startMatch(sockfd);
+      }
+      
     }
+    
 
     else if (choice==AUCTION_ROOM) {
       int auctionChoice;
@@ -505,6 +586,7 @@ int main(int argc, char *argv[]){
   }
 
     else if (choice==MANAGE_PLAYERS) {
+      testMatchInvitation(sockfd);
       int managePlayersChoice;
       do {
         displayManagerInfos(sockfd);
@@ -522,7 +604,7 @@ int main(int argc, char *argv[]){
               displayPlayerInfos(sockfd,playerInfos,playerID-1);
             }
           }
-          else if (managePlayersChoice==TRAIN_PLAYER) {
+          else if (managePlayersChoice==TRAIN_PLAYER_OPTION) {
             int capacityNumber;
             cout<<"Indicate the number of the player you wish to train  \n -----> ";
             cin>>playerID;
@@ -540,8 +622,9 @@ int main(int argc, char *argv[]){
               else cout<<"------------\n Training impossible, this player is blocked"<<endl;
             }
           }
-          else if (managePlayersChoice==HEAL_PLAYER) {
-            cout<<"Indicate the number of the player you wish to heal [or 0 to abort] \n -----> ";
+
+          else if (managePlayersChoice==HEAL_PLAYER_OPTION) {
+            cout<<"Indicate the number of the player you wish to heal [or 0 to abort] : ";
             cin>>playerID;
             if (playerID!=ABORT) {
               healPlayer(sockfd,playerID-1);
@@ -559,6 +642,7 @@ int main(int argc, char *argv[]){
       } while (managePlayersChoice!=ABORT);
     }
     else if (choice==MANAGE_BUILDINGS) {
+      testMatchInvitation(sockfd);
       int manageBuildingsChoice;
       do {
         displayManagerInfos(sockfd);
@@ -568,7 +652,10 @@ int main(int argc, char *argv[]){
           askForBuildingInfos(sockfd,manageBuildingsChoice);
           vector<int> buildingInfos = receiveBuildingInfos(sockfd);
           displayBuildingInfos(buildingInfos,manageBuildingsChoice);
+
           cout<<"\n---------------\nEnter 1 if you wish to upgrade this building [or 0 to abort] \n -----> ";
+
+          //TODO : tester niveau client si argent suffisant
           int upgrade;
           cin>>upgrade;
           if (upgrade) {
