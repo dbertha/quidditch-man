@@ -4,6 +4,7 @@
 /* Interface réseau en C++ qui fera appel au module C */
 #include "NetworkBase.h" //SerializedObject
 #include "Defines.hpp" 
+#include "HexagonalField.hpp"
 
 //pour le test en c :
 #include <stdio.h>
@@ -105,12 +106,10 @@ int proposeMatchTo(int sockfd, int userID, std::vector<int> playersInTeam){
     return sendOnSocket(sockfd, serialized);
 }
 
-int answerMatchProposal(int sockfd, int askerID, bool confirmation, std::vector<int> playersInTeam){
+int answerMatchProposal(int sockfd, bool confirmation, std::vector<int> playersInTeam){
     SerializedObject serialized;
     char * position = serialized.stringData;
     serialized.typeOfInfos = ACCEPTMATCH;
-    memcpy(position, &askerID, sizeof(askerID));
-    position += sizeof(askerID);
     memcpy(position, &confirmation, sizeof(confirmation));
     position += sizeof(confirmation);
     int value;
@@ -353,6 +352,7 @@ std::vector<std::string> receiveAuctionsList(int sockfd){
     return auctionsList;
 }
 
+
 int receiveAuctionResult(int sockfd) {
     int result;
     SerializedObject received = receiveOnSocket(sockfd);
@@ -360,10 +360,78 @@ int receiveAuctionResult(int sockfd) {
     //TODO : vérifier qu'il s'agit bien d'un message de confirmation
     memcpy(&result,position, sizeof(result));
     return result;
-
 }
 
-//Serveur lit le SerializedObject et le transmet à commandHandler de User
+std::vector<AxialCoordinates> receiveScoresAndPositions(int sockfd, int * winner, int * scoreTeam1, int * scoreTeam2){
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    std::vector<AxialCoordinates> orderedPositions;
+    int diag;
+    int line;
+    memcpy(winner, position, sizeof(int));
+    position += sizeof(int);
+    memcpy(scoreTeam1, position, sizeof(int));
+    position += sizeof(int);
+    memcpy(scoreTeam2, position, sizeof(int));
+    position += sizeof(int);
+    for(unsigned int i = 0; i < 18; ++i){ //positions des 18 objets
+        memcpy(&diag, position, sizeof(diag));
+        position += sizeof(diag);
+        memcpy(&line, position, sizeof(line));
+        position += sizeof(line);
+        orderedPositions.push_back(AxialCoordinates(diag, line));
+    }
+    return orderedPositions;
+}
+
+
+typedef struct { //pas besoin de la classe complète
+    int attributes[5];
+    int hasQuaffle;
+} playerAttr;
+
+playerAttr receiveSelectedPlayerInfos(int sockfd){
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    playerAttr thePlayer;
+    int attribute;
+    for(int i = 0; i < 5; ++i){
+	memcpy(&attribute, position, sizeof(attribute));
+	position += sizeof(attribute);
+	thePlayer.attributes[i] = attribute;
+    }
+    memcpy(&attribute, position, sizeof(attribute)); //hasQuaffle
+    position += sizeof(attribute);
+    thePlayer.hasQuaffle = attribute;
+    return thePlayer;
+}
+
+int receiveMatchConfirmation(int sockfd){
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    int confirmation;
+    memcpy(&confirmation, position, sizeof(confirmation));
+    return confirmation;
+}
+
+void receiveManagersIDandNames(int sockfd, std::vector<int> * IDList, std::vector<std::string> * namesList){
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    int ID;
+    char name[USERNAME_LENGTH];
+    int nbOfAvailableManagers;
+    memcpy(&nbOfAvailableManagers, position, sizeof(nbOfAvailableManagers));
+    position += sizeof(nbOfAvailableManagers);
+    for(int i = 0; i < nbOfAvailableManagers; ++i){
+        memcpy(&ID, position, sizeof(ID));
+        position += sizeof(ID);
+        IDList->push_back(ID);
+        memcpy(&name, position, sizeof(name));
+        position += sizeof(name);
+        std::string strName = name;
+        namesList->push_back(strName);
+    }
+}
     
 
 
