@@ -302,14 +302,14 @@ int main(int argc, char *argv[]){
 
       scanf("%s",username);
       printf("%s",username);
-      answerMatchProposal(sockfd, 1, 1);
+      //answerMatchProposal(sockfd, 1, 1);
     }
 
 
 
     else if (choice==2) {
       sendNewManagerToServer(sockfd,username,password);
-      proposeMatchTo(sockfd, 0);
+      //proposeMatchTo(sockfd, 0);
     //result = serverAnswer
     }
 

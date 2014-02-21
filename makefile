@@ -8,7 +8,7 @@ NOLINKING = -c
 DEBUGINFOS = -g
 #COMMONCPP= 
 
-all :  Serveur.out ClientTest.out
+all :  Serveur.out ClientTest.out Client.out
 
 
 #NetworkBaseTest.out : NetworkBase.o NetworkBaseTest.cpp
@@ -26,5 +26,5 @@ NetworkBase.o : ${COMMONDIR}NetworkBase.c ${COMMONDIR}NetworkBase.h
 Serveur.out : NetworkBase.o ${COMMONDIR}Defines.hpp ${SERVERDIR}Server.hpp ${SERVERDIR}User.hpp ${SERVERDIR}ServerMain.cpp ${SERVERDIR}Server.cpp ${SERVERDIR}User.cpp ${SERVERDIR}CommonMgr.cpp ${SERVERDIR}CommonMgr.hpp ${COMMONDIR}commAPI.cpp  ${COMMONDIR}commAPI.hpp ${SERVERDIR}Manager.hpp ${SERVERDIR}Manager.cpp ${SERVERDIR}Player.cpp ${SERVERDIR}ManagedPlayer.cpp ${SERVERDIR}Broomstick.cpp ${SERVERDIR}Saver.cpp ${SERVERDIR}TrainingCenter.cpp ${SERVERDIR}Hospital.cpp ${SERVERDIR}RecruitmentCenter.cpp ${SERVERDIR}FanShop.cpp ${SERVERDIR}Stadium.cpp ${SERVERDIR}ImprovementBuilding.cpp ${SERVERDIR}Building.cpp ${SERVERDIR}Calendar.cpp ${SERVERDIR}Player.hpp ${SERVERDIR}ManagedPlayer.hpp ${SERVERDIR}Broomstick.hpp ${SERVERDIR}Saver.hpp ${SERVERDIR}TrainingCenter.hpp ${SERVERDIR}Hospital.hpp ${SERVERDIR}RecruitmentCenter.hpp ${SERVERDIR}FanShop.hpp ${SERVERDIR}Stadium.hpp ${SERVERDIR}ImprovementBuilding.hpp ${SERVERDIR}Building.hpp ${SERVERDIR}Calendar.hpp
 	${G++} ${DEBUGINFOS} NetworkBase.o ${SERVERDIR}ServerMain.cpp ${SERVERDIR}Server.cpp ${SERVERDIR}User.cpp ${SERVERDIR}CommonMgr.cpp ${COMMONDIR}commAPI.cpp ${SERVERDIR}Manager.cpp ${SERVERDIR}Player.cpp ${SERVERDIR}ManagedPlayer.cpp ${SERVERDIR}Broomstick.cpp ${SERVERDIR}Saver.cpp ${SERVERDIR}TrainingCenter.cpp ${SERVERDIR}Hospital.cpp ${SERVERDIR}RecruitmentCenter.cpp ${SERVERDIR}FanShop.cpp ${SERVERDIR}Stadium.cpp ${SERVERDIR}ImprovementBuilding.cpp ${SERVERDIR}Building.cpp ${SERVERDIR}Calendar.cpp -o Server.out
 
-#Client.out : ${CLIENTDIR}client.c
-#	${GCC} ${DEBUGINFOS} ${CLIENTDIR}client.c -o Client.out
+Client.out : NetworkBase.o ${CLIENTDIR}Client.cpp ${COMMONDIR}${COMMONHEADERS}
+	${G++} ${DEBUGINFOS} NetworkBase.o ${CLIENTDIR}Client.cpp -o Client.out

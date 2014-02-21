@@ -31,6 +31,7 @@ Player::Player(string playerSaveFile) {
 		Precision
 		Reflex 
 		Resistance
+		Life
 		Training left to do to up speed (used by the constructor of ManagedPlayer)
 		Training left to do to up strength (used by the constructor of ManagedPlayer)
 		Training left to do to up precision (used by the constructor of ManagedPlayer)
@@ -66,9 +67,11 @@ Player::Player(string playerSaveFile) {
 		_capacities[i] = atoi(tmp.c_str());
 	}
 
-	close(fd);
+	tmp = strtok(NULL,"\n");
+	_offset+= tmp.size()+1;
+	_life = atoi(tmp.c_str());
 
-	_life = _capacities[4]; //Life = resistance
+	close(fd);
 
 	//default name is John Doe. If it's the player name, it's a new player, and he needs a real name.
 	if ((_firstName=="John")&&(_lastName=="Doe")) verifyName(); 

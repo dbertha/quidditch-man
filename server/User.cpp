@@ -293,8 +293,8 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand
 			calendar_->update();
 			manager_->save();
-			resultOfTraining = manager_->trainPlayer(targetedPlayer,capacityToTrain);
-			if (!resultOfTraining) std::cout<<"This player is already blocked by a training or the hospital"<<std::endl;
+			confirmation = manager_->trainPlayer(targetedPlayer,capacityToTrain);
+			if (!confirmation) std::cout<<"This player is already blocked by a training or the hospital"<<std::endl;
 			calendar_->update();
 			manager_->save();
 
@@ -302,7 +302,29 @@ void User::cmdHandler(SerializedObject *received) {
 			answer.typeOfInfos = TRAINING_STARTED;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
             sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+			break;	
+
+		case HEAL_PLAYER :
+			//reading details
+			memcpy(&targetedPlayer, position, sizeof(targetedPlayer)); 
+#ifdef __DEBUG
+			std::cout<<"Demande de soin pour un joueur reçue sur le socket "<<getSockfd()<<std::endl;
+			std::cout<<"targetedPlayer reçu : "<<targetedPlayer<<std::endl;
+#endif
+			//handle demand
+			calendar_->update();
+			manager_->save();
+			confirmation = manager_->healPlayer(targetedPlayer);
+			if (!confirmation) std::cout<<"This player is already blocked by a training or the hospital or is in full health"<<std::endl;
+			calendar_->update();
+			manager_->save();
+
+			//construct answer
+			answer.typeOfInfos = HEAL_STARTED;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
+
 		case PROPOSEMATCH : {
 			//reading details
 			position = received->stringData;
@@ -468,24 +490,6 @@ void User::cmdHandler(SerializedObject *received) {
 			//construct answer
 			break;
 
-		case TRAIN_PLAYER :
-			//reading details
-			int capacityToTrain;
-			memcpy(&targetedPlayer, position, sizeof(targetedPlayer));
-			position += sizeof(targetedPlayer);
-			memcpy(&capacityToTrain, position, sizeof(capacityToTrain));
-#ifdef __DEBUG
-			std::cout<<"Demande d'un entrainement pour un joueur reçue sur le socket "<<getSockfd()<<std::endl;
-			std::cout<<"targetedPlayer reçu : "<<targetedPlayer<<std::endl;
-			std::cout<<"capacityToTrain reçu : "<<capacityToTrain<<std::endl;
-#endif
-			//handle demand
-			calendar_->update();
-			manager_->save();
-			resultOfTraining = manager_->trainPlayer(targetedPlayer,capacityToTrain);
-			if (!resultOfTraining) std::cout<<"This player is already blocked by a training or the hospital"<<std::endl;
-			calendar_->update();
-			manager_->save();
 
 		case MAKEMOVES :
 			//reading details

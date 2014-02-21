@@ -69,7 +69,10 @@ void Saver::savePlayer(string managerLogin, ManagedPlayer player) {
 		write(fd,toWrite.c_str(),toWrite.size());
 		write(fd,"\n",1);
 	}
-
+	toWrite = intToString(player.getLife());
+	write(fd,toWrite.c_str(),toWrite.size());
+	write(fd,"\n",1);
+	
 	for (int i=0;i<5;++i) {
 		toWrite = intToString(player.getTrainingLeft(i));
 		write(fd,toWrite.c_str(),toWrite.size());

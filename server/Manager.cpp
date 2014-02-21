@@ -159,6 +159,7 @@ bool Manager::isPlayerBlocked(string name) {
 vector<int> Manager::getHospitalInformations() {return _hospital.getInformations();}
 bool Manager::healPlayer(int playerID) {
 	if (isPlayerBlocked(playerID)) return false;
+	if (_players[playerID].getLife()==_players[playerID].getCapacity(4)) return false;
 	if (playerID>=_numberOfPlayers) throw "Index out of range";
 	_hospital.heal(_players[playerID]);
 	string name = _players[playerID].getFirstName() + " " + _players[playerID].getLastName();

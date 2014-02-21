@@ -37,6 +37,7 @@ ManagedPlayer::ManagedPlayer(string playerSaveFile): Player(playerSaveFile) {
 		Precision (used by the constructor of Player)
 		Reflex (used by the constructor of Player)
 		Resistance (used by the constructor of Player)
+		life (used by the constructor of Player)
 		Training left to do to up speed
 		Training left to do to up strength
 		Training left to do to up precision
@@ -142,6 +143,8 @@ vector<int> ManagedPlayer::getInformations() {
 	tmp.push_back(_blocked);
 	tmp.push_back(_broomstick.getCapacityBoosted());
 	tmp.push_back(_broomstick.getBonus());
+	tmp.push_back(this->getLife());
+	tmp.push_back(getEstimatedValue());
 
 	return tmp;
 }

@@ -113,6 +113,7 @@ int answerMatchProposal(int sockfd, int askerID, bool confirmation, std::vector<
     position += sizeof(askerID);
     memcpy(position, &confirmation, sizeof(confirmation));
     position += sizeof(confirmation);
+    int value;
     for(unsigned int i = 0; i < playersInTeam.size();++i){ //joueurs choisi pour joueur le match
         value = playersInTeam[i];
         memcpy(position, &value, sizeof(value));
@@ -181,6 +182,14 @@ int trainPlayer(int sockfd, int playerID, int capacity){
     memcpy(position, &playerID, sizeof(playerID));
     position += sizeof(playerID);
     memcpy(position, &capacity, sizeof(capacity));
+    return sendOnSocket(sockfd, serialized);
+}
+
+int healPlayer(int sockfd, int playerID){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = HEAL_PLAYER;
+    memcpy(position, &playerID, sizeof(playerID));
     return sendOnSocket(sockfd, serialized);
 }
 
@@ -276,7 +285,9 @@ std::vector<int> receivePlayerInfo(int sockfd){
 			//1 int blocked
 			//1 int bonus du balais
 			//1 int capacity du balais
-        for(int i = 0; i < 13; ++i){
+            //1 int life
+            //1 int estimated value of player
+        for(int i = 0; i < 15; ++i){
             int value;
             memcpy(&value,position, sizeof(value));
             position += sizeof(value);
