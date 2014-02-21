@@ -1,7 +1,9 @@
 #ifndef BALL_HPP
 #define BALL_HPP
 
-//~ Rappel, dans HexagonalField.hpp :
+#include "../common/Defines.hpp"
+
+//~ Rappel, dans Defines.hpp :
 //~ #define GOLDENSNITCH 14
 //~ #define BLUDGER1 15
 //~ #define BLUDGER2 16

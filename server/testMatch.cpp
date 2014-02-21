@@ -1,5 +1,5 @@
-#include "Coordinates.hpp"
-#include "HexagonalField.hpp"
+#include "../common/Coordinates.hpp"
+#include "../common/HexagonalField.hpp"
 #include "ManagedPlayer.hpp"
 #include "PlayingPlayer.hpp"
 #include "Match.hpp"

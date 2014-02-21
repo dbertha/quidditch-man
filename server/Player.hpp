@@ -4,6 +4,7 @@
 #include <string>
 
 #include "Broomstick.hpp"
+#include "../common/Defines.hpp"
 
 using namespace std;
 
