@@ -802,7 +802,7 @@
   Le système d'exploitation visé est GNU/Linux.
   \subsection{Choix d'une librairie graphique}
   Qt est un framework d'interface graphique orienté objet et développé en C++ par la PME norvégienne Trolltech.
-La première version gratuite fut mise à disposition du public en mai 1995.\cite{Blanchette2006} \\
+La première version gratuite fut mise à disposition du public en mai 1995\cite{Blanchette2006}. \\
 Il offre des composants d'interface graphique (widgets), d'accès aux données, de communication réseau, de gestion des threads. \\
 Il permet la portabilité des applications qui n'utilisent que ses composants par simple recompilation du code source.
 Les environnements supportés sont les Unix (dont Linux) qui utilisent le système graphique X Window System, Windows et Mac OS X,
@@ -908,11 +908,97 @@ Elle permet en effet d'assurer :
     \center
     \includegraphics[scale=0.4]{uml/class/connexionserveurclient.png}
     \caption{Diagramme des classes impliquées dans le réseau}
-    \end{figure}	
+    \end{figure}
+
   Le côté gestion est bien dissocié du côté match, et le \emph{clientHandler} assure la communication avec le client.
   C'est le \emph{clientHandler} du manager\index{manager} qui reçoit le match dans son stade
   qui va créer l'instance en charge du match.
-  
+\subsection{Le réseau}
+  L'interface réseau a pour fonction de faire communiquer de façon bidirectionnelle :
+\begin{itemize}
+  \item des clients chargés de communiquer chacun avec un manager : affichage d'informations et enregistrement de commandes;
+  \item un serveur chargé de partager de l'information entre les clients en la centralisant et en la conservant sur disque.
+\end{itemize}
+La logique applicative peut être répartie entre ces deux entités, comme elle peut être concentrée sur le serveur (le client se comporte alors comme un browser sans scripts) ou sur le client (le serveur peut se limiter aux fonctions de gestionnaire de fichiers ou de bases de données et de données temporaires en mémoire centralisée).\\
+Entre les deux, l'interface réseau, comme tout middleware, ne doit pas connaître les formats internes des messages échangés entre clients et serveur. Le respect de ce principe doit permettre d'assurer à la fois l'indépendance entre le fonctionnel et le technique, et une séparation du code réalisé pour couvrir ces deux aspects du projet.\\
+En général, le modèle client-serveur \cite{Bulfone} est serveur-centrique :
+\begin{itemize}
+  \item les clients ne communiquent qu'avec le serveur, pas entre eux; le partage d'informations entre les clients
+  se fait donc via le serveur, selon un modèle de tableau d'affichage (tableau noir), partagé par les/certains clients;
+  \item la communication et les dialogues qui s'en suivent se font à l'initiative des clients.
+\end{itemize}
+Ce deuxième principe ne permet cependant pas de répondre à tous les besoins exprimés pour ce projet :
+les clients doivent pouvoir être invités dans des dialogues; ils doivent donc être en mesure,
+lorsqu'ils ne sont pas occupés par une activité, de recevoir des messages non sollicités;
+nous avons donc dû revoir notre design initial en conséquence, tel qu'il apparaîtra ci-après.\\
+
+\subsection{Synopsis du serveur}
+\begin{itemize}
+  \item Au démarrage, le serveur crée une instance de la classe CommonMgr, destinée à gérer initialisation et clôture des activités fonctionnelles sur le serveur;
+  \item Le serveur se place en attente (fonction select()) d'une activité sur son clavier
+  (pour commander l'arrêt du serveur par exemple ou obtenir la liste des utilisateurs connectés...), sur
+  son socket destiné à recevoir les nouvelles connexions et sur les sockets des clients déjà connectés (voir figure \ref{diag-serveur});
+  \item Lors d'une nouvelle connexion, le serveur crée une instance de la classe User; il y a donc un objet User par client;
+  \item Tout nouveau message reçu par le serveur est confié à la méthode cmdHandler de l'objet User, qui assure le dispatching
+  vers le module fonctionnel concerné, en se basant et mettant à jour la variable d'état state;
+  \item Cela assure un contrôle global des activités du client (et de l'arrêt de celles-ci) et,
+  dans le futur (interface graphique), devrait lui permettre éventuellement d'entreprendre plusieurs activités en parallèle.
+\end{itemize}
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/Serveur.jpeg}
+    \caption{Diagramme d'activité réseau du serveur} \label{diag-serveur}
+    \end{figure}
+Aucune des méthodes du serveur n'étant bloquante pendant plus d'une fraction de seconde (peu d'I/O) et compte tenu des délais très courts pour la mise en oeuvre, nous avons opté à ce stade pour une solution mono-thread;
+travailler avec un seul thread supprime la nécessité de devoir gérer l'accès concurrent aux données (en mémoire ou sur disque) et la communication entre threads (arrêt du serveur par exemple) :
+une solution multi-threads rendrait la gestion de ressources communes par les fonctions applicatives plus complexe (sérialisation de sections critiques), tout en étant beaucoup plus gourmande en ressources CPU et présentant des risques de deadlocks (tests plus délicats à réaliser!). Seul le déroulement d'une vente aux enchères devra être accompagné par un thread de cadencement (un par vente).\\
+
+En pratique, la séparation du code est réalisée ainsi :
+\begin{itemize}
+  \item Serveur-communication : ServerMain.cpp, Server.cpp, commAPI.cpp;
+  \item Serveur-fonctionnel : CommonMgr.cpp, User.cpp, ...
+\end{itemize}
+Si les messages sont de longueur fixe prévisible, un buffer de taille fixe (INPUTSIZE) peut être utilisé de part et d'autre.
+Sinon (par exemple pour une liste), deux solutions sont possibles :
+\begin{itemize}
+  \item Un message par ligne de la liste;
+  \item Utiliser de part et d'autre des zones de mémoire allouées dynamiquement et envoyer tout en un seul message, après un premier message indiquant au client la taille du buffer.
+\end{itemize}
+Pour l'instant, le code de communication est écrit pour Linux et n'est pas portable tel quel vers Windows (mais une version multi-compatible est réalisable...).\\
+Améliorations prévues dans le futur : gestion du terminal du serveur, détection des sockets morts (clients qui n'ont pas fait disconnect suite à un crash par ex.), ...
+
+\subsection{Synopsis du client}
+Comme le serveur, le client utilise la fonction select() afin de pouvoir capter indiféremment des messages d'origine différente,
+ en l'occurence en provenance du clavier et du socket de communication, ceci pour pouvoir recevoir des messages non sollicités.
+      \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/Client.jpeg}
+    \caption{Diagramme d'activité réseau du client} \label{diag-client}
+    \end{figure}
+ Mais cette faculté ne peut exister que lorsque le client
+ n'est pas occupé dans une activité particulière, c'est-à-dire lorsqu'il se voit proposer le menu (state=FREE).\\
+ Le client est donc, tout comme son image User chez le serveur, contrôlé par une variable d'état et les deux variables d'état
+ évoluent de part et d'autre de concert.\\
+      \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/PROPOSEMATCH.jpeg}
+    \caption{Exemple de diagramme d'interaction client-serveur} \label{diag-client-serveur}
+    \end{figure}
+ Lorsque le manager choisit une activité, le client entre dans un dialogue avec à la fois le serveur et le manager,
+ sans qu'il puisse être interrompu par un message non sollicité; d'ailleurs, le serveur ne va pas lui en envoyer,
+ puisqu'il connaît l'état dans lequel se trouve le client :
+ ne peuvent par exemple être invités à un match que les managers dont state=FREE.\\
+ Le serveur travaillant en mode répétitif (pas de parallélisme), la variable d'état suffit donc à contrôler l'accès
+ aux sections critiques que sont les différentes activités (voir par exemple la figure \ref{diag-client-serveur}).\\
+ De même, lorsque le client reçoit un message non sollicité, il entre dans un dialogue avec à la fois le serveur et le manager,
+ sans qu'il puisse être interrompu par un autre message non sollicité ou par une autre demande du manager au clavier.\\
+ On constate donc (voir figure \ref{diag-client}) la présence de deux structures de séquencement fort similaires, en forme de rateau :
+ \begin{itemize}
+   \item un input;
+   \item le choix d'une séquence d'instruction (une méthode) en fonction de cet input;
+   \item un output.
+ \end{itemize}
+ Cette structure sera celle que nous généraliserons lors de la mise en \oe uvre de l'interface graphique !
 
 %\chapter{Index des termes utilisés}
 %  Contiendra, au moins, toutes les entrées du glossaire (avec les numéros des pages correspondantes).
@@ -920,6 +1006,7 @@ Elle permet en effet d'assurer :
 \phantomsection
 \begin{thebibliography}{9}
 \bibitem{Blanchette2006} Blanchette Jasmin, Summerfield Mark - Trolltech 2006 - C++ GUI programming with Qt4 - ISBN 0-13-187249-4
+\bibitem{Bulfone} Bulfone Christian - 2012 - Le modèle client-serveur - www.gipsa-lab.fr/~christian.bulfone/IC2A-DCISS
 \end{thebibliography}
 \printindex
 
