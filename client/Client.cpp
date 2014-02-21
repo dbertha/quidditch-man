@@ -282,6 +282,10 @@ int main(int argc, char *argv[]){
     if (choice==LOG_IN) sendLoginToServer(sockfd,username,password);
     else if (choice==NEW_MANAGER) sendNewManagerToServer(sockfd,username,password);
     result = getConfirmation(sockfd);
+    if (!result) {
+      if (choice==LOG_IN) cout<<" ------------- WRONG LOGIN/PASSWORD"<<endl;
+      else if (choice==NEW_MANAGER) cout<<" ------------- LOGIN ALREADY TAKEN"<<endl;
+    }
   } while (!result);
 
   do {

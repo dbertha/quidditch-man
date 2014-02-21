@@ -93,7 +93,7 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 			//handle demand:
 			confirmation = false;
-			if (checkLoginAndPassword(username,password)==-1) { //This Manager login already exists
+			if ((checkLoginAndPassword(username,password)==-1)||(checkLoginAndPassword(username,password)==1)) { //This Manager login already exists
 				std::cout<<"LOGIN ALREADY TAKEN"<<std::endl;
 			}
 			else {
@@ -598,7 +598,7 @@ void User::addManager(char username[USERNAME_LENGTH], char password[PASSWORD_LEN
 	write(fd,"#",1);
 	write(fd,pass.c_str(),pass.size());
 	write(fd,"#",1);
-
+	write(fd,"\n",1);
 	close(fd);
 }
 
