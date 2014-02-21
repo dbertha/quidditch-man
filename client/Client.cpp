@@ -333,6 +333,9 @@ void startMatch(int sockfd){
       field.setOccupant(allPositions[i], i);
     }
     field.display();
+    
+    cout << "Les échanges de messages suivants pour le match n'ont pas encore été implémentés." << endl;
+    winner =1;
   }
 }
 std::vector<int> displayAndAskPlayersForMatch(int sockfd){
