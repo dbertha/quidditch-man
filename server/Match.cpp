@@ -40,7 +40,7 @@ Match::Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team
                 position = AxialCoordinates(STARTINGDIAG_TEAM1_BEATER2, STARTINGLINE_TEAM1_BEATER2);
                 break;
         }
-        __players.push_back(PlayingPlayer(team1[i], role, position));
+        __players.push_back(PlayingPlayer((team1[i]), role, position));
         __field.setOccupant(position, i);
     }
     
@@ -72,7 +72,7 @@ Match::Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team
                 position = AxialCoordinates(STARTINGDIAG_TEAM2_BEATER2, STARTINGLINE_TEAM2_BEATER2);
                 break;
         }
-        __players.push_back(PlayingPlayer(team2[i], role, position));
+        __players.push_back(PlayingPlayer((team2[i]), role, position));
         __field.setOccupant(position, i+TEAM2_KEEPER);
     }
     //les 4 balles :

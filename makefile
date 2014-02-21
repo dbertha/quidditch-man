@@ -10,8 +10,8 @@ DEBUGINFOS = -g
 
 all :  Serveur.out ClientTest.out Client.out Match.out
 
-Match.out : ${SERVERDIR}testMatch.cpp ${SERVERDIR}Match.cpp ${SERVERDIR}Match.hpp ${SERVERDIR}PlayingPlayer.cpp ${SERVERDIR}PlayingPlayer.hpp ${COMMONDIR}HexagonalField.cpp ${COMMONDIR}HexagonalField.hpp ${COMMONDIR}Coordinates.hpp ${SERVERDIR}ManagedPlayer.cpp ${SERVERDIR}ManagedPlayer.hpp ${SERVERDIR}Player.cpp ${SERVERDIR}Player.hpp ${SERVERDIR}Broomstick.cpp ${SERVERDIR}Broomstick.hpp
-	${G++} ${DEBUGINFOS}  ${SERVERDIR}testMatch.cpp ${SERVERDIR}Match.cpp ${SERVERDIR}PlayingPlayer.cpp ${COMMONDIR}HexagonalField.cpp ${SERVERDIR}ManagedPlayer.cpp ${SERVERDIR}Player.cpp ${SERVERDIR}Broomstick.cpp -o Match.out
+Match.out : ${SERVERDIR}testMatch.cpp ${SERVERDIR}MatchesHandler.cpp ${SERVERDIR}MatchesHandler.hpp ${SERVERDIR}Match.cpp ${SERVERDIR}Match.hpp ${SERVERDIR}PlayingPlayer.cpp ${SERVERDIR}PlayingPlayer.hpp ${COMMONDIR}HexagonalField.cpp ${COMMONDIR}HexagonalField.hpp ${COMMONDIR}Coordinates.hpp ${SERVERDIR}ManagedPlayer.cpp ${SERVERDIR}ManagedPlayer.hpp ${SERVERDIR}Player.cpp ${SERVERDIR}Player.hpp ${SERVERDIR}Broomstick.cpp ${SERVERDIR}Broomstick.hpp
+	${G++} ${DEBUGINFOS}  ${SERVERDIR}testMatch.cpp ${SERVERDIR}MatchesHandler.cpp ${SERVERDIR}Match.cpp ${SERVERDIR}PlayingPlayer.cpp ${COMMONDIR}HexagonalField.cpp ${SERVERDIR}ManagedPlayer.cpp ${SERVERDIR}Player.cpp ${SERVERDIR}Broomstick.cpp -o Match.out
 
 
 #NetworkBaseTest.out : NetworkBase.o NetworkBaseTest.cpp

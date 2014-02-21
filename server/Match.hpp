@@ -32,6 +32,8 @@ private :
     int __scoreTeam1;
     int __scoreTeam2;
 public :
+    Match(std::vector<ManagedPlayer> &team1); //match en attente de recevoir l'équipe adverse
+    void launch(std::vector<ManagedPlayer> &team2);
     Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team2);
     //Listes ordonnées de 7 joueurs telles que 
     //~ KEEPER en position 0

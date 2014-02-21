@@ -3,6 +3,7 @@
 #include "ManagedPlayer.hpp"
 #include "PlayingPlayer.hpp"
 #include "Match.hpp"
+#include "MatchesHandler.hpp"
 #include <iostream>
 #include <vector>
 
@@ -99,5 +100,7 @@ int main(){
     
     Match theMatch(team1, team2);
     theMatch.makeMoves(movesTeam1, movesTeam2);
+    
+    MatchesHandler handler;
     
 }

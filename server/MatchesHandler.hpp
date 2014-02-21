@@ -39,10 +39,14 @@ class MatchesHandler{
 private :
     std::vector<Match *> matchesVector;
     std::vector<User *> invitors;
-    std::vector<User *> invited;
+    std::vector<User *> inviteds;
     std::vector<int> statesOfMatches; //WAITINGACCEPTMATCH, WAITINGFIRSTMOVE, WAITINGSECONDMOVE, INVITORSASKENDOFMATCH, INVITEDASKENDOFMATCH
-    std::vector< std::vector<int[][4]> > movesLists; //pour chaque match, enregistre les déplacements des deux joueurs
+    std::vector<int[7][4]> movesLists; //pour chaque match, enregistre les déplacements des deux joueurs avant de les passer à l'instance de Match
+    //enregistrement dans user de l'équipe
 public :
+    MatchesHandler(){} //construction par défaut des listes
+    void proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1);
+    void respondToMatchProposal(User * invitor, User * invited, std::vector<ManagedPlayer> &team2);
 };
 
 #endif
