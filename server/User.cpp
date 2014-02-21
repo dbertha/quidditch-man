@@ -39,6 +39,7 @@ void User::cmdHandler(SerializedObject *received) {
 	int targetedAuction;
 	int isFinished;
 	int auctionPrice;
+	ManagedPlayer tmpPlayer;
 	vector<int> infos;
 	vector<string> playersList;
 	vector<string> auctionsList;
@@ -429,9 +430,12 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand:
 			calendar_->update();
 			manager_->save();
-			server_->createAuction(this,manager_->getPlayer(targetedPlayer),startingPrice);
-			//construct answer:
-			confirmation=true;
+			tmpPlayer = manager_->getPlayer(targetedPlayer);
+			if (tmpPlayer.isBlocked()) confirmation=false;
+			else {
+				server_->createAuction(this,tmpPlayer,startingPrice);
+				confirmation=true;
+			}
 			answer.typeOfInfos = AUCTIONCREATION_CONFIRM;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
             sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
@@ -493,7 +497,7 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand:
 			calendar_->update();
 			manager_->save();
-			for (int i=0;i<server_->auctionsList_.size();++i) {
+			for (unsigned int i=0;i<server_->auctionsList_.size();++i) {
 				if (server_->getAuctionTimeLeft(i)>0) {
 					auctionsList.push_back(intToString(server_->getAuctionID(i)));
 					auctionsList.push_back(server_->getPlayerSoldName(i));
@@ -504,9 +508,10 @@ void User::cmdHandler(SerializedObject *received) {
 			//construct answer 
 			answer.typeOfInfos = AUCTIONSLIST;
 			size = auctionsList.size();
+			std::cout<<size<<std::endl;
 			memcpy(answerPosition, &size, sizeof(size)); //nb de noms à lire
 			answerPosition += sizeof(size);
-			for (unsigned int i=0;i<auctionsList.size() - 1;i+=4) { //un paquet par joueur
+			for (int i=0;i<int(auctionsList.size()) - 1;i+=4) { //un paquet par joueur
 				char auctionID[2*USERNAME_LENGTH], playerName[2*USERNAME_LENGTH], timeLeft[2*USERNAME_LENGTH],price[2*USERNAME_LENGTH];
 				string param1 = auctionsList[i];
 				string param2 = auctionsList[i+1];

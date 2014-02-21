@@ -47,7 +47,7 @@ int Auction::getAuctionID() {return auctionID_;}
 int Auction::isAuctionFinished() {
 	if (bidders_.size()==1) return 1;
 	else if (bidders_.size()>1) return 0;
-	else if (bidders_.size()==0) return -1;
+	else return -1;
 }
 
 void Auction::bid(User* bidder) {

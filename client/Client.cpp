@@ -460,19 +460,21 @@ int main(int argc, char *argv[]){
           getAuctionsList(sockfd);
           vector<string> auctionsList = receiveAuctionsList(sockfd);
           displayAuctionsList(auctionsList);
-          int auctionToInspect;
-          cin>>auctionToInspect;
-          if (auctionToInspect!=0) {
-            askForAuctionInfos(sockfd,auctionToInspect-1);
-            vector<int> playerAuctionInfos = receivePlayerInfo(sockfd);
-            string timeLeft = displayAuctionInfos(auctionsList,playerAuctionInfos,auctionToInspect-1);
-            cout<<"Do you want to join this auction ? [1 to enter, 0 to quit] \n -----> ";
-            int enterAuction;
-            cin>>enterAuction;
-            if (enterAuction==1) {
-              joinAuction(sockfd,auctionToInspect-1);
-              int joinResult = getConfirmation(sockfd);
-              mainAuction(sockfd,auctionToInspect-1,atoi(timeLeft.c_str()));
+          if (auctionsList.size()!=0) {
+            int auctionToInspect;
+            cin>>auctionToInspect;
+            if (auctionToInspect!=0) {
+              askForAuctionInfos(sockfd,auctionToInspect-1);
+              vector<int> playerAuctionInfos = receivePlayerInfo(sockfd);
+              string timeLeft = displayAuctionInfos(auctionsList,playerAuctionInfos,auctionToInspect-1);
+              cout<<"Do you want to join this auction ? [1 to enter, 0 to quit] \n -----> ";
+              int enterAuction;
+              cin>>enterAuction;
+              if (enterAuction==1) {
+                joinAuction(sockfd,auctionToInspect-1);
+                int joinResult = getConfirmation(sockfd);
+                mainAuction(sockfd,auctionToInspect-1,atoi(timeLeft.c_str()));
+              }
             }
           }
         }
@@ -492,6 +494,8 @@ int main(int argc, char *argv[]){
               if (startingPrice>0) {
                 sellPlayer(sockfd,sellPlayerChoice-1,startingPrice);
                 bool sellingResult = getConfirmation(sockfd); //always true
+                if (!sellingResult) cout<<" ----- The player is blocked and cannot be selled right now"<<endl;
+                else cout<<" ----- Auction started !"<<endl;
                 sellPlayerChoice=ABORT;
               }
             }
