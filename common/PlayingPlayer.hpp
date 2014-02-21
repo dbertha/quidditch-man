@@ -31,6 +31,7 @@ public:
     void moveTo(AxialCoordinates destination); //setter
     void loseQuaffle();
     void carryQuaffle();
+    bool hasQuaffle(){return __hasQuaffle;}
     AxialCoordinates getPosition() {return __currentPosition;}
     int getRole(){return __role;}
 

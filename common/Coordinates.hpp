@@ -3,8 +3,10 @@
 
 #include <cstdlib> // abs()
 #include <cmath> //floor()
-#include <algorithm> //min() 
-#include <list>
+#include <algorithm> //min() max()
+#include <vector>
+#include <cstdlib>
+#include <ctime>
 
 #define MATRIX_SIZE 23 // nombre impair pour obtenir un centre unique en [MATRIX_SIZE/2][MATRIX_SIZE/2], qui correspondra à [0][0] en coordonnées axiales
 
@@ -84,24 +86,11 @@ public :
         int y2 = -(x2 + z2);
         return (abs(x1 - x2) + abs(y1 - y2) + abs(z1 - z2)) / 2;
     }
+    inline AxialCoordinates getRandomDestination(int distance);
     
-    inline std::list<Move> getMovesTo(AxialCoordinates destination);
+    inline std::vector<Move> getMovesTo(AxialCoordinates destination);
     
-    
-    
-    
-    //TODO : tester sortie hors du terrain
-    
-    
-    //AxialCoordinates[6] getNeighbors;
-    //~ neighbors = [
-   //~ [+1,  0], [+1, -1], [ 0, -1],
-   //~ [-1,  0], [-1, +1], [ 0, +1]
-//~ ]
-//~ d = neighbors[direction]
-//~ return AxialCoordinates(q + d[0], r + d[1])
 
-    //TODO : conversion par assignation
 };
 
 class CubicCoordinates {
@@ -139,11 +128,11 @@ public:
     int getLineDiff(){return __moveOnLine;}
 };
 
-std::list<Move> AxialCoordinates::getMovesTo(AxialCoordinates destination){
+std::vector<Move> AxialCoordinates::getMovesTo(AxialCoordinates destination){
     //TODO : éviter de faire une copie lors du return
     int diagDiff = destination.getDiagAxis() - getDiagAxis();
     int lineDiff = destination.getLineAxis() - getLineAxis();
-    std::list<Move> orderedMoves;
+    std::vector<Move> orderedMoves;
     while((diagDiff != 0) or (lineDiff != 0)){
         //le long diagonale opposée
         if((diagDiff > 0) and (lineDiff < 0)){
@@ -170,5 +159,17 @@ std::list<Move> AxialCoordinates::getMovesTo(AxialCoordinates destination){
     }
     return orderedMoves;
 }
+
+AxialCoordinates AxialCoordinates::getRandomDestination(int distance){
+    srand(int(time(0)));
+    int minRow = getLineOnMatrix() - distance;
+    int maxRow = getLineOnMatrix() + distance;
+    int indexRow = (rand() % (maxRow+1-minRow))+minRow;
+    int minCol = getColOnMatrix() - distance + std::max(0, getLineOnMatrix() - indexRow);
+    int maxCol = getColOnMatrix() + distance - std::max(0, indexRow - getLineOnMatrix());
+    int indexCol = (rand() % (maxCol+1-minCol))+minCol;
+    return AxialCoordinates(indexCol - (MATRIX_SIZE / 2), indexRow - (MATRIX_SIZE / 2));
+}
+    
 
 #endif

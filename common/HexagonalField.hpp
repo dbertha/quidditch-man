@@ -46,7 +46,9 @@
 #define QUAFFLE_UNICODE "\u2B24"
 
 
-
+//TODO : affichage du vif d'or seulement si l'attrapeur de l'équipe est dans les environs
+//TODO : corriger defaut affichage avec unicodes
+//TODO : afficher les buts
 
 typedef int objectIndex_t;
 

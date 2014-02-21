@@ -6,6 +6,7 @@
 #include "PlayingPlayer.hpp"
 #include "Ball.hpp"
 #include <vector>
+#include <iostream>
 
 #define INTERCEPT_QUAFFLE 0
 #define CATCH_GOLDENSNITCH 1
@@ -75,17 +76,21 @@
 #define STARTINGDIAG_TEAM2_BEATER2 -1
 #define STARTINGLINE_TEAM2_BEATER2 5
 
-#define GOLDENSNITCH_SPEED 8
-#define BLUDGER_AUTOSPEED 8
+//TODO : logger ce qu'il se passe pour le renvoyer au client
+//TODO : réunit tous les define propres au match
 
 class Match {
     //ne connait pas le réseau, la partie réseau est gérée par matchHandler
 private :
     std::vector <PlayingPlayer> __players;
     std::vector <Ball> __balls;
+public : //test purpose only
     HexagonalField __field;
+private :
     int __winner; //0:no winner, 1:team1, 2:team2
     std::vector<int> __indexesSortedBySpeed;
+    int __scoreTeam1;
+    int __scoreTeam2;
 public :
     Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team2);
     //Listes ordonnées de 7 joueurs telles que 
@@ -99,6 +104,9 @@ public :
     void makeMoves(int movesTeam1[][4], int movesTeam2[][4]);
     int getWinner();
     PlayingPlayer * getPlayer(int indexObject);
+    bool isInVector(std::vector<int> toTest, int value);
+    int getScoreTeam1(){return __scoreTeam1;}
+    int getScoreTeam2(){return __scoreTeam2;}
 };
 
 #endif

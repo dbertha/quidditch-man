@@ -62,7 +62,7 @@ void HexagonalField::display() {
                 std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
             }
             else{
-                std::cout << std::setw(2) << unicodes[matrix[indexRow][indexCol]] << std::string(4, space); //séparateur
+                std::cout << /*std::setw(2) <<*/ unicodes[matrix[indexRow][indexCol]] << std::string(4, space); //séparateur
             }
         }
         std::cout << std::endl;
@@ -91,7 +91,7 @@ void HexagonalField::display(AxialCoordinates selected, int distance){
                     std::cout << std::setw(2) << matrix[indexRow][indexCol] << std::string(4, space); //séparateur
                 }
                 else{
-                    std::cout << std::setw(2) << unicodes[matrix[indexRow][indexCol]] << std::string(4, space); //séparateur
+                    std::cout << /*std::setw(2) <<*/ unicodes[matrix[indexRow][indexCol]] << std::string(4, space); //séparateur
                 }
                 if((indexRow == selected.getLineOnMatrix()) and (indexCol == selected.getColOnMatrix())){
                     std::cout << stopColoring;

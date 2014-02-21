@@ -49,13 +49,13 @@ int main(){
     std::cout << firstMove.getLineDiff() << std::endl; // -1
     std::cout << secondMove.getDiagDiff() << std::endl; // doit donner 1
     std::cout << secondMove.getLineDiff() << std::endl; //doit donner 0
-    
-    std::cout << "Test de la récupération des déplacements : " << std::endl;
-    std::list<Move> moves = axialCoord.getMovesTo(AxialCoordinates(-2,4));
-    std::cout << moves.size() << std::endl;
-    for(std::list<Move>::iterator list_iter = moves.begin(); list_iter != moves.end(); list_iter++){
-        std::cout << (*list_iter).getDiagDiff() << " " << (*list_iter).getLineDiff() << std::endl;
-    }
+    //~ 
+    //~ std::cout << "Test de la récupération des déplacements : " << std::endl;
+    //~ std::list<Move> moves = axialCoord.getMovesTo(AxialCoordinates(-2,4));
+    //~ std::cout << moves.size() << std::endl;
+    //~ for(std::list<Move>::iterator list_iter = moves.begin(); list_iter != moves.end(); list_iter++){
+        //~ std::cout << (*list_iter).getDiagDiff() << " " << (*list_iter).getLineDiff() << std::endl;
+    //~ }
     ManagedPlayer chaser("defaultChaser.txt");
     PlayingPlayer myPlayer(chaser, ROLE_CHASER, axialCoord);
     std::cout << myPlayer.getMaxDistance() << " " << chaser.getCapacity(SPEED) << std::endl;
@@ -77,6 +77,27 @@ int main(){
     team2.push_back(ManagedPlayer("Saves/defaultBeater.txt")); //TEAM2_BEATER1
     team2.push_back(ManagedPlayer("Saves/defaultBeater.txt")); //TEAM2_BEATER2
     
+    int movesTeam1[7][4], movesTeam2[7][4];
+    movesTeam1[0][0] = TEAM1_KEEPER;
+    movesTeam1[0][1] = 0;
+    movesTeam1[0][2] = -7;
+    movesTeam1[0][3] = 0;
+    movesTeam2[0][0] = TEAM2_KEEPER;
+    movesTeam2[0][1] = 0;
+    movesTeam2[0][2] = 7;
+    movesTeam2[0][3] = 0;
+    for(int i = 1; i < 7; ++i){
+        movesTeam1[i][0] = i;
+        movesTeam1[i][1] = 0;
+        movesTeam1[i][2] = 10000;
+        movesTeam1[i][3] = 10000;
+        movesTeam2[i][0] = i+7;
+        movesTeam2[i][1] = 0;
+        movesTeam2[i][2] = 10000;
+        movesTeam2[i][3] = 10000;
+    }
+    
     Match theMatch(team1, team2);
+    theMatch.makeMoves(movesTeam1, movesTeam2);
     
 }

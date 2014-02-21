@@ -8,6 +8,8 @@
 //~ #define QUAFFLE 17
 
 //TODO : role inutile ?
+#define GOLDENSNITCH_SPEED 8
+#define BLUDGER_AUTOSPEED 8
 
 class Ball{
 public :
