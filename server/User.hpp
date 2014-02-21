@@ -7,8 +7,11 @@
 #include <sstream>
 #include <iostream>
 #include "../server/Manager.hpp"
+#include "../server/ManagedPlayer.hpp"
 #include "../server/Calendar.hpp"
+
 class Server;
+class Auction;
 class CommonMgr;
 class User {
 public:
@@ -17,7 +20,7 @@ public:
 	void setDisconnection();
 	bool isDisconnecting();
 	int getSockfd();
-	int getUserId();
+	int getUserID();
 	std::string getUserName();// initialement dans UserId...!
 	//int sendAnswer(User *, const char cmd, std::string); cf NetworkBase.cpp
 	void* createMatch();
@@ -30,6 +33,10 @@ public:
 	void addManager(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
 	Manager* getManager();
 
+	void auctionWin(Manager* manager, ManagedPlayer player);
+
+	std::string intToString(int value);
+
 private:
 	Server* server_;
 	CommonMgr* commonMgr_;
@@ -41,6 +48,7 @@ private:
 	std::string dataRequest_;
 	Manager* manager_;
 	Calendar* calendar_;
+	Auction* auction_;
 };
 
 #endif

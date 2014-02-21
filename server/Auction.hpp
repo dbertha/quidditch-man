@@ -1,4 +1,6 @@
-
+#include <stdio.h>
+#include <time.h>
+#include <string>
 
 #include "User.hpp"
 #include "Manager.hpp"
@@ -8,25 +10,32 @@
 class Auction {
 
 	User* auctionCreator_;
-	User* lastBidder_;
-	vector<User*> userInAuctions_;
+	vector<User*> usersInAuction_;
 	vector<User*> bidders_;
-	ManagedPlayer* player_;
+	ManagedPlayer player_;
+	struct tm instant_;
 	int startingPrice_;
 	int currentPrice_;
+	int currentTurn_;
+	int auctionID_;
 
  public:
 
- 	Auction(User* creator, ManagedPlayer* player, int startingPrice);
+ 	Auction(User* creator, ManagedPlayer player, int startingPrice, int ID);
 
  	User* getAuctionCreator();
+ 	Manager* getManager();
  	User* getLastBidder();
- 	ManagedPlayer* getPlayer();
+ 	void resetBidders();
+ 	ManagedPlayer getPlayer();
+ 	vector<int> getPlayerInfos();
+ 	int getTimeBeforeFirstTurn();
  	int getStartingPrice();
  	int getCurrentPrice();
- 	void bid(User* bidder, bool realBid);
+ 	int getCurrentTurn();
+ 	int getAuctionID();
+ 	int isAuctionFinished();
+ 	string getPlayerName();
+ 	void bid(User* bidder);
 
- 	void startAuction(); //tour 0
-
- 	void startAuctionTurn(); //tour 1+
-}
+};
