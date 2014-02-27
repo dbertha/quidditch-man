@@ -448,4 +448,7 @@ void Match::serializeScoreAndPositions(char * bufferPosition){
     }
 }
 
-
+void Match::serializePlayerAttr(int playerID, char * bufferPosition){
+    //on suppose l'ID valide
+    __players[playerID].serializeAttributes(bufferPosition);
+}

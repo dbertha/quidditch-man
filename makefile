@@ -3,7 +3,7 @@ SERVERDIR= server/
 CLIENTDIR= client/
 COMMONHEADERS= NetworkInterface.hpp  
 GCC = gcc -Wall -Wextra -std=c99
-G++ = g++ -pthread 
+G++ = g++ -Wall -Wextra -pthread 
 NOLINKING = -c
 DEBUGINFOS = -g
 #COMMONCPP= 

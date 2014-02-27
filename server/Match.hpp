@@ -50,6 +50,7 @@ public :
     int getScoreTeam1(){return __scoreTeam1;}
     int getScoreTeam2(){return __scoreTeam2;}
     void serializeScoreAndPositions(char * bufferPosition);
+    void serializePlayerAttr(int playerID, char * bufferPosition);
 };
 
 #endif

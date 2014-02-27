@@ -59,6 +59,7 @@ public :
     bool isInvited(User * user);
     int sendConfirmationTo(User * client, int answerCode);
     void getScoresAndPositions(User * demander);
+    void getPlayerInfos(User * demander, int playerID);
 };
 
 #endif

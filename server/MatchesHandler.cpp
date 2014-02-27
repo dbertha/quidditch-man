@@ -57,10 +57,24 @@ void MatchesHandler::getScoresAndPositions(User * demander){
         matchIndex = std::find(invitors.begin(), invitors.end(), demander) - invitors.begin(); 
     }
 #ifdef __DEBUG
-    std::cout << "index du match concerné : " << matchIndex << std::endl;
+    std::cout << "Demande des scores et des positions, index du match concerné : " << matchIndex << std::endl;
 #endif
     SerializedObject answer;
     answer.typeOfInfos = POSITIONS;
     matchesVector[matchIndex]->serializeScoreAndPositions(answer.stringData);
+    sendOnSocket(demander->getSockfd(), answer);
+}
+
+void MatchesHandler::getPlayerInfos(User * demander, int playerID){
+    int matchIndex = std::find(inviteds.begin(), inviteds.end(), demander) - inviteds.begin();
+    if(matchIndex > int(inviteds.size())-1){
+        matchIndex = std::find(invitors.begin(), invitors.end(), demander) - invitors.begin(); 
+    }
+#ifdef __DEBUG
+    std::cout << "Demande des informations d'un joueur, index du match concerné : " << matchIndex << std::endl;
+#endif
+    SerializedObject answer;
+    answer.typeOfInfos = PLAYERINFOS;
+    matchesVector[matchIndex]->serializePlayerAttr(playerID, answer.stringData);
     sendOnSocket(demander->getSockfd(), answer);
 }

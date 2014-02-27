@@ -200,18 +200,20 @@ int healPlayer(int sockfd, int playerID){
     return sendOnSocket(sockfd, serialized);
 }
 
-int sendMoves(int sockfd, int moves[][3]){
+int sendMoves(int sockfd, int moves[][4]){
     SerializedObject serialized;
     char * position = serialized.stringData;
     serialized.typeOfInfos = MAKEMOVES;
     int targetedPlayer;
+    int specialAction;
     int diagDest;
     int lineDest;
     for(int i = 0; i < 7; ++i){
         
         targetedPlayer = moves[i][0];
-        diagDest = moves[i][1];
-        lineDest = moves[i][2];
+        specialAction = moves[i][1];
+        diagDest = moves[i][2];
+        lineDest = moves[i][3];
         printf("%s : %d %d %d\n", "playerID diagDest lineDest", targetedPlayer, diagDest, lineDest);
         memcpy(position, &targetedPlayer,sizeof(targetedPlayer)); 
         position += sizeof(targetedPlayer);
@@ -384,27 +386,27 @@ std::vector<AxialCoordinates> receiveScoresAndPositions(int sockfd, int * winner
     return orderedPositions;
 }
 
-std::vector<AxialCoordinates> receiveScoresAndPositions(int sockfd, int * winner, int * scoreTeam1, int * scoreTeam2){
-    SerializedObject received = receiveOnSocket(sockfd);
-    char * position = received.stringData;
-    std::vector<AxialCoordinates> orderedPositions;
-    int diag;
-    int line;
-    memcpy(winner, position, sizeof(int));
-    position += sizeof(int);
-    memcpy(scoreTeam1, position, sizeof(int));
-    position += sizeof(int);
-    memcpy(scoreTeam2, position, sizeof(int));
-    position += sizeof(int);
-    for(unsigned int i = 0; i < 18; ++i){ //positions des 18 objets
-        memcpy(&diag, position, sizeof(diag));
-        position += sizeof(diag);
-        memcpy(&line, position, sizeof(line));
-        position += sizeof(line);
-        orderedPositions.push_back(AxialCoordinates(diag, line));
-    }
-    return orderedPositions;
-}
+//~ std::vector<AxialCoordinates> receiveScoresAndPositions(int sockfd, int * winner, int * scoreTeam1, int * scoreTeam2){
+    //~ SerializedObject received = receiveOnSocket(sockfd);
+    //~ char * position = received.stringData;
+    //~ std::vector<AxialCoordinates> orderedPositions;
+    //~ int diag;
+    //~ int line;
+    //~ memcpy(winner, position, sizeof(int));
+    //~ position += sizeof(int);
+    //~ memcpy(scoreTeam1, position, sizeof(int));
+    //~ position += sizeof(int);
+    //~ memcpy(scoreTeam2, position, sizeof(int));
+    //~ position += sizeof(int);
+    //~ for(unsigned int i = 0; i < 18; ++i){ //positions des 18 objets
+        //~ memcpy(&diag, position, sizeof(diag));
+        //~ position += sizeof(diag);
+        //~ memcpy(&line, position, sizeof(line));
+        //~ position += sizeof(line);
+        //~ orderedPositions.push_back(AxialCoordinates(diag, line));
+    //~ }
+    //~ return orderedPositions;
+//~ }
 
 
 typedef struct { //pas besoin de la classe complète

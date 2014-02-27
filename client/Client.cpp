@@ -317,10 +317,53 @@ void mainAuction(int sockfd, int auctionID, int timeLeft) {
 
 
 
+void askAndSendMoves(int sockfd, int numTeam){
+  int moves[7][4];
+  int currentMove = 0;
+  int selectedPlayerID = 1;
+  playerAttr attributs;
+  std::string keeper, seeker, chaser1, chaser2, chaser3, beater1, beater2;
+  if(numTeam == 1){ //TODO : optimiser
+    keeper = TEAM1_KEEPER_UNICODE;
+    seeker = TEAM1_SEEKER_UNICODE;
+    chaser1 = TEAM1_CHASER1_UNICODE;
+    chaser2 = TEAM1_CHASER2_UNICODE;
+    chaser3 = TEAM1_CHASER3_UNICODE;
+    beater1 = TEAM1_BEATER1_UNICODE;
+    beater2 = TEAM1_BEATER2_UNICODE;
+  }
+  else{
+    keeper = TEAM2_KEEPER_UNICODE;
+    seeker = TEAM2_SEEKER_UNICODE;
+    chaser1 = TEAM2_CHASER1_UNICODE;
+    chaser2 = TEAM2_CHASER2_UNICODE;
+    chaser3 = TEAM2_CHASER3_UNICODE;
+    beater1 = TEAM2_BEATER1_UNICODE;
+    beater2 = TEAM2_BEATER2_UNICODE;
+  }
+  while((selectedPlayerID != -1) and (currentMove < 7)){
+    std::cout << "Légende :" << endl;
 
+    std::cout << "KEEPER : " << keeper << std::endl;
+    std::cout << "SEEKER  : " << seeker << std::endl;
+    std::cout << "CHASER1  : " << chaser1 << std::endl;
+    std::cout << "CHASER2  : " << chaser2 << std::endl;
+    std::cout << "CHASER3  : " << chaser3 << std::endl;
+    std::cout << "BEATER1  : " << beater1 << std::endl;
+    std::cout << "BEATER2 : " << beater2 << std::endl;
+    std::cout << "Veuillez sélectionner un joueur(valeur numérique), -1 pour terminer le tour :" << endl;
+    //TODO : vérification de l'input : indice correspond bien à un joueur de l'équipe et pas déjà de mouvement attribué
+    std::cin >> selectedPlayerID;
+    if(numTeam == 2){
+      selectedPlayerID += 7; //ajustement de l'index
+    }
+    selectPlayer(sockfd, selectedPlayerID);
+    attributs = receiveSelectedPlayerInfos(sockfd);
+    ++currentMove;
+  }
+}
 
-
-void startMatch(int sockfd){
+void startMatch(int sockfd, int numTeam){
   int winner = 0;
   int scoreTeam1 = 0;
   int scoreTeam2 = 0;
@@ -336,7 +379,7 @@ void startMatch(int sockfd){
       field.setOccupant(allPositions[i], i);
     }
     field.display();
-
+    askAndSendMoves(sockfd, numTeam);
     
     cout << "Les échanges de messages suivants pour le match n'ont pas encore été implémentés." << endl;
     winner =1;
@@ -368,7 +411,7 @@ void testMatchInvitation(int sockfd){
     }
     answerMatchProposal(sockfd, confirmation, playersInTeam);
     if(receiveMatchConfirmation(sockfd) == MATCH_STARTING){
-      startMatch(sockfd);
+      startMatch(sockfd, 2); //invité a l'équipe 2
     }
   }
 }
@@ -532,7 +575,7 @@ int main(int argc, char *argv[]){
       std::vector<int> playersInTeam = displayAndAskPlayersForMatch(sockfd);
       proposeMatchTo(sockfd, targetedUser,  playersInTeam);
       if(receiveMatchConfirmation(sockfd) == MATCH_STARTING){
-        startMatch(sockfd);
+        startMatch(sockfd, 1); //inviteur a l'équipe 1
       }
       
     }

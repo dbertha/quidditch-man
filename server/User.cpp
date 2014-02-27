@@ -601,6 +601,7 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"targetedPlayer reçu : "<<targetedPlayer<<std::endl;
 #endif
 			//handle demand
+			__matchesHandler->getPlayerInfos(this, targetedPlayer);
 			//construct answer
 			break;
 
