@@ -19,8 +19,11 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <string>
 
 class User;
+class Auction;
+class ManagedPlayer;
 class MatchesHandler;
 class Server {
 public:
@@ -29,6 +32,14 @@ public:
 	int sendToClient(User *, SerializedObject *); //TODO : transformer la modélisation pour conserver en private ou protected
 	std::vector<User*> usersList_;
 	std::vector<User*> GetUsersList();
+	std::vector<Auction*> auctionsList_;
+	std::vector<Auction*> getAuctionsList();
+	int getAuctionID(int index);
+	std::vector<int> getPlayerSoldInfos(int index);
+	std::string getPlayerSoldName(int index);
+	int getAuctionTimeLeft(int index);
+	int getAuctionStartingPrice(int index);
+	void createAuction(User* user, ManagedPlayer player, int startingPrice);
 	//int getNewUserId();
 
 private:

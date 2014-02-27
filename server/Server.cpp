@@ -3,6 +3,7 @@
 #include "User.hpp"
 #include <netinet/in.h> //htons()  ntohs()
 #include "../common/NetworkBase.h"
+#include "../server/Auction.hpp"
 
 //TODO : pas de EXIT_SUCCESS ou EXIT_FAILURE pour d'autres méthodes que main()
 
@@ -19,6 +20,16 @@ void Server::run() {
 }
 
 std::vector<User*> Server::GetUsersList() {return usersList_;}
+std::vector<Auction*> Server::getAuctionsList() {return auctionsList_;}
+int Server::getAuctionID(int index) {return auctionsList_[index]->getAuctionID();}
+std::vector<int> Server::getPlayerSoldInfos(int index) {return auctionsList_[index]->getPlayerInfos();}
+std::string Server::getPlayerSoldName(int index) {return auctionsList_[index]->getPlayerName();}
+int Server::getAuctionTimeLeft(int index) {return auctionsList_[index]->getTimeBeforeFirstTurn();}
+int Server::getAuctionStartingPrice(int index) {return auctionsList_[index]->getStartingPrice();}
+
+void Server::createAuction(User* user, ManagedPlayer player, int startingPrice) {
+	auctionsList_.push_back(new Auction(user,player,startingPrice,auctionsList_.size()));
+}
 
 int Server::connect() {
 	//initialisation du socket et mise sur écoute :
@@ -69,7 +80,7 @@ int Server::mainLoop() {
 				if (FD_ISSET(usersList_[i]->getSockfd(),&FDSet_)) {
 					int length = receive(usersList_[i],&received); //TODO : tester valeur
 					if(usersList_[i]->isDisconnecting()) {
-						std::cout<<"User "<<usersList_[i]->getUserId()<<" disappeared from socket "
+						std::cout<<"User "<<usersList_[i]->getUserID()<<" disappeared from socket "
 										<<usersList_[i]->getSockfd()<<std::endl;
 						removeUser(i);
 					}
@@ -132,7 +143,7 @@ int Server::receive(User * aUser, SerializedObject * received) {
 int Server::sendToClient(User * aUser, SerializedObject * toSend) {
 	toSend->typeOfInfos = htons(toSend->typeOfInfos);
 	if(send(aUser->getSockfd(),toSend,sizeof(SerializedObject),0)==ERROR) {
-		std::cerr<<aUser->getUserId()<<" message send error on socket "
+		std::cerr<<aUser->getUserID()<<" message send error on socket "
 				<<aUser->getSockfd()<<std::endl;
 		return EXIT_FAILURE;
 	}

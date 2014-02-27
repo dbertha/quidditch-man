@@ -12,7 +12,7 @@
 #include <sys/socket.h>*/
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <pthread.h>
 #include "Defines.hpp"
 #include "NetworkBase.h"
 

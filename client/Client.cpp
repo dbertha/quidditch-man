@@ -4,9 +4,13 @@
 #include "../common/Defines.hpp"
 #include "../common/HexagonalField.hpp"
 
+
+#include <pthread.h>
+
 //TODO : en faire une classe complète, à l'instar du server
 //TODO : utiliser la méthode buildconnexion de commAPI
 //TODO : actions à proposer en fonction du batiment choisi
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -19,6 +23,9 @@
 #include <sys/unistd.h>
 #include <vector>
 #include <iostream>
+#include <ctime>
+#include <time.h>
+
 
 #define DIM 100
 
@@ -46,7 +53,13 @@
 
 using namespace std;
 
+
+
+bool isBidder;
+bool hasChosen;
+
 //TODO : affichage et récupération de l'input dans une seule méthode
+
 
 void displayManagerInfos(int sockfd) {
   askForManagerInfos(sockfd);
@@ -103,6 +116,59 @@ void displayPlayerInfos(int sockfd,vector<int> playerInfos, int playerID) {
   cout<<" The value of this player is estimated at "<<playerInfos[14]<<" gold"<<endl;
 }
 
+string displayAuctionInfos(vector<string> auctionsList,vector<int> playerInfos, int auctionID) {
+  string name;
+  string price;
+  string timeLeft;
+  for (int i=0;i<auctionsList.size();i+=4) {
+    if (atoi(auctionsList[i].c_str())==auctionID) {
+      name = auctionsList[i+1];
+      price = auctionsList[i+3];
+      timeLeft = auctionsList[i+2];
+    }
+  }
+  cout<<"-------- "<<name<<" --------"<<endl;
+  cout<<" [1] Speed : "<<playerInfos[0]<<endl;
+  cout<<" [2] Strength : "<<playerInfos[1]<<endl;
+  cout<<" [3] Precision : "<<playerInfos[2]<<endl;
+  cout<<" [4] Reflex : "<<playerInfos[3]<<endl;
+  cout<<" [5] Resistance : "<<playerInfos[4]<<endl;
+  cout<<"---------------------------------\n Number of trainings left to up speed : "<<playerInfos[5]<<endl;
+  cout<<" Number of trainings left to up strength : "<<playerInfos[6]<<endl;
+  cout<<" Number of trainings left to up precision : "<<playerInfos[7]<<endl;
+  cout<<" Number of trainings left to up reflex : "<<playerInfos[8]<<endl;
+  cout<<" Number of trainings left to up resistance : "<<playerInfos[9]<<endl;
+  if (playerInfos[10]==1) cout<<"\n This player is currently blocked."<<endl;
+  else cout<<"\n This player isn't blocked."<<endl;
+  if (playerInfos[12]>0) {
+    cout<<" The broomstick of this player grants a bonus of "<<playerInfos[12]<<" for ";
+    if (playerInfos[11]==0) cout<<"speed"<<endl;
+    else if (playerInfos[11]==1) cout<<"strength"<<endl;
+    else if (playerInfos[11]==2) cout<<"precision"<<endl;
+    else if (playerInfos[11]==3) cout<<"reflex"<<endl;
+    else if (playerInfos[11]==4) cout<<"resistance"<<endl;
+  }
+  else cout<<" The broomstick of this player doesn't grant him any bonus."<<endl;
+
+  cout<<" The life of this player is "<<playerInfos[13]<<" (max="<<playerInfos[4]<<")"<<endl;
+  cout<<" The value of this player is estimated at "<<playerInfos[14]<<" gold"<<endl;
+  cout<<"\n STARTING PRICE FOR THE AUCTION : "<<price<<endl;
+
+  return timeLeft;
+}
+
+
+void displayAuctionsList(vector<string> auctionsList) {
+  if (auctionsList.size()==0) cout<<" --------- No auction available"<<endl;
+  else {
+    for (int i=0;i<auctionsList.size();i+=4) {
+      cout<<" ["<<atoi(auctionsList[i].c_str())+1<<"] "<<auctionsList[i+1]<<" | Starting price : "<<auctionsList[i+3];
+      cout<<" | Time left to participate : "<<auctionsList[2]<<endl;
+    }
+    cout<<"Indicate which auction you wish to inspect [or 0 to abort] : ";
+  }
+}
+
 void displayConnexionMenu(){
   cout<<" ------------------------ WELCOME TO QUIDDITCH MANAGER 2014 ! ------------------------"<<endl;
   cout<<" [1] Log in"<<endl;;
@@ -130,10 +196,10 @@ void displayAuctionMenus(){
   cout<<"-----> ";
 }
 
-void displaySellPlayerMenu(){
+void displaySellPlayerMenu(int sockfd){
   cout<<" --------------------------------------------------------------------------------------"<<endl;
   cout<<"//YOU'RE ABOUT TO SELL A PLAYER// What do you want to do ?"<<endl;
-  //displayPlayersList();
+  displayPlayersList(sockfd);
   cout<<" Which player do you want to sell [enter 0 to abort] ? "<<endl;
 }
 
@@ -158,6 +224,101 @@ void displayManageBuildingsMenu(){
   cout<<"-----> ";
 }
 
+void *auctionTurn(void* data) {
+
+  int* sockfd = (int *)data;
+
+  cout<<"Auction turn has started !"<<endl;
+  cout<<" [1] Bid "<<endl;
+  cout<<" [2] Quit auction"<<endl;
+
+
+  int choice;
+  cout<<" -----> ";
+  cin>>choice;
+
+  if (choice==1) {
+    bid(*sockfd);
+    int result = getConfirmation(*sockfd);
+    isBidder=true;
+    hasChosen=true;
+  }
+  else {
+    isBidder=false;
+    hasChosen=true;
+  }
+
+}
+
+
+void mainAuction(int sockfd, int auctionID, int timeLeft) {
+
+  hasChosen=false;
+  isBidder=false;
+  int turn = 0;
+
+  pthread_t thread;
+  int res = pthread_create(&thread, NULL, auctionTurn, (void*) &sockfd);
+  sleep(timeLeft);
+  pthread_cancel(thread);
+  checkAuction(sockfd);
+  int result = receiveAuctionResult(sockfd);
+  int price = receiveAuctionResult(sockfd);
+  if (result<0) {
+    cout<<" -Congrats! You have won this auction"<<endl;
+    if (result==-1) cout<<" --- "<<price<<" gold will be transferred in exchange of the player"<<endl;
+    else if (result==-2) {
+      cout<<" --- You don't have enough money to pay the "<<price<<" required";
+      cout<<", so 3 percent of your money will be given to the owner of the player"<<endl;
+    }
+  }
+  else if (result==0) {
+    cout<<" -Goodbye! You have left this auction"<<endl;
+  }
+  else {
+    cout<<" -Next turn will start soon... The current price is "<<price<<endl;
+    sleep(10);
+    turn+=1;
+
+    while ((result>0)&&(hasChosen)&&(isBidder)) {
+        hasChosen=false;
+        res = pthread_create(&thread, NULL, auctionTurn, (void*)(&sockfd));
+        sleep(30);
+        pthread_cancel(thread);
+        cout<<" --- END OF TURN"<<endl;
+        checkAuction(sockfd);
+        result = receiveAuctionResult(sockfd);
+        price = receiveAuctionResult(sockfd);
+        if ((!hasChosen)||(!isBidder)) {
+          cout<<" -Goodbye! You have left this auction"<<endl;
+        }
+        else if (result<0) {
+          cout<<" -Congrats! You have won this auction"<<endl;
+          if (result==-1) cout<<" --- "<<price<<" gold will be transfered in exchange of the player"<<endl;
+          else if (result==-2) {
+            cout<<" --- You don't have enough money to pay the "<<price<<" required";
+            cout<<", so 3 percent of your money will be given to the owner of the player"<<endl;
+          }
+        }
+        else {
+          cout<<" -Next turn will start soon... The current price is "<<price<<endl;
+          sleep(10);
+        }
+        turn+=1;
+      } 
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 
 void startMatch(int sockfd){
   int winner = 0;
@@ -175,6 +336,10 @@ void startMatch(int sockfd){
       field.setOccupant(allPositions[i], i);
     }
     field.display();
+
+    
+    cout << "Les échanges de messages suivants pour le match n'ont pas encore été implémentés." << endl;
+    winner =1;
   }
 }
 std::vector<int> displayAndAskPlayersForMatch(int sockfd){
@@ -381,27 +546,44 @@ int main(int argc, char *argv[]){
         cin>>auctionChoice;
         if (auctionChoice==SEE_AUCTIONS) {
           getAuctionsList(sockfd);
-          cout<<"Indicate in which auction you wish to participate [or 0 to abort] : ";
-          int auctionToJoin;
-          cin>>auctionToJoin;
-          if (auctionToJoin!=0) {
-            joinAuction(sockfd,auctionToJoin-1);
-            auctionChoice=ABORT;
+          vector<string> auctionsList = receiveAuctionsList(sockfd);
+          displayAuctionsList(auctionsList);
+          if (auctionsList.size()!=0) {
+            int auctionToInspect;
+            cin>>auctionToInspect;
+            if (auctionToInspect!=0) {
+              askForAuctionInfos(sockfd,auctionToInspect-1);
+              vector<int> playerAuctionInfos = receivePlayerInfo(sockfd);
+              string timeLeft = displayAuctionInfos(auctionsList,playerAuctionInfos,auctionToInspect-1);
+              cout<<"Do you want to join this auction ? [1 to enter, 0 to quit] \n -----> ";
+              int enterAuction;
+              cin>>enterAuction;
+              if (enterAuction==1) {
+                joinAuction(sockfd,auctionToInspect-1);
+                int joinResult = getConfirmation(sockfd);
+                mainAuction(sockfd,auctionToInspect-1,atoi(timeLeft.c_str()));
+              }
+            }
           }
         }
         else if (auctionChoice==SELL_PLAYER) {
           int sellPlayerChoice;
           do {
             displayManagerInfos(sockfd);
-            displaySellPlayerMenu();
+            displaySellPlayerMenu(sockfd);
             cin>>sellPlayerChoice;
             if (sellPlayerChoice!=ABORT) {
-              //vector<int> playerInfos = receivePlayerInfo(sockfd,sellPlayerChoice);
-              cout<<"Indicate the starting price of the auction [or 0 to abort] : ";
+              askForPlayerInfos(sockfd,sellPlayerChoice-1);
+              vector<int> playerInfos = receivePlayerInfo(sockfd);
+              displayPlayerInfos(sockfd,playerInfos,sellPlayerChoice-1);
+              cout<<"Indicate the starting price of the auction [or 0 to abort] \n -----> ";
               int startingPrice;
               cin>>startingPrice;
               if (startingPrice>0) {
-                sellPlayer(sockfd,sellPlayerChoice,startingPrice);
+                sellPlayer(sockfd,sellPlayerChoice-1,startingPrice);
+                bool sellingResult = getConfirmation(sockfd); //always true
+                if (!sellingResult) cout<<" ----- The player is blocked and cannot be selled right now"<<endl;
+                else cout<<" ----- Auction started !"<<endl;
                 sellPlayerChoice=ABORT;
               }
             }
@@ -421,7 +603,7 @@ int main(int argc, char *argv[]){
           displayPlayersList(sockfd);
           int playerID;
           if (managePlayersChoice==INSPECT_PLAYER) {
-            cout<<"Indicate the number of the player you wish to inspect [or 0 to abort] : ";
+            cout<<"Indicate the number of the player you wish to inspect [or 0 to abort] \n -----> ";
             cin>>playerID;
             if (playerID>0) {
               askForPlayerInfos(sockfd,playerID-1);
@@ -431,9 +613,9 @@ int main(int argc, char *argv[]){
           }
           else if (managePlayersChoice==TRAIN_PLAYER_OPTION) {
             int capacityNumber;
-            cout<<"Indicate the number of the player you wish to train : ";
+            cout<<"Indicate the number of the player you wish to train  \n -----> ";
             cin>>playerID;
-            cout<<"Indicate the number of the capacity you wish to train [or 0 to abort] : ";
+            cout<<"Indicate the number of the capacity you wish to train [or 0 to abort]  \n -----> ";
             cin>>capacityNumber;
             if ((playerID>0)&&(capacityNumber>0)) {
               trainPlayer(sockfd,playerID-1,capacityNumber-1);
@@ -447,6 +629,7 @@ int main(int argc, char *argv[]){
               else cout<<"------------\n Training impossible, this player is blocked"<<endl;
             }
           }
+
           else if (managePlayersChoice==HEAL_PLAYER_OPTION) {
             cout<<"Indicate the number of the player you wish to heal [or 0 to abort] : ";
             cin>>playerID;
@@ -476,8 +659,11 @@ int main(int argc, char *argv[]){
           askForBuildingInfos(sockfd,manageBuildingsChoice);
           vector<int> buildingInfos = receiveBuildingInfos(sockfd);
           displayBuildingInfos(buildingInfos,manageBuildingsChoice);
+
+
+          cout<<"\n---------------\nEnter 1 if you wish to upgrade this building [or 0 to abort] \n -----> ";
+
           //TODO : tester niveau client si argent suffisant
-          cout<<"\n---------------\nEnter 1 if you wish to upgrade this building [or 0 to abort] : ";
           int upgrade;
           cin>>upgrade;
           if (upgrade) {

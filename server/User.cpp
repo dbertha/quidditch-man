@@ -3,6 +3,7 @@
 #include "../common/NetworkBase.h"
 #include "../server/Manager.hpp"
 #include "../server/Calendar.hpp"
+#include "../server/Auction.hpp"
 
 #include <sys/stat.h>
 #include <iostream>
@@ -21,7 +22,10 @@
 
 
 
-User::User(Server * server, MatchesHandler *matchesHandler, int sockfd, int userID): server_(server), __matchesHandler(matchesHandler), sockfd_(sockfd), state_(INIT), userId_(userID), manager_(NULL), calendar_(NULL) {}
+
+
+User::User(Server * server, MatchesHandler *matchesHandler, int sockfd, int userID): server_(server), __matchesHandler(matchesHandler), sockfd_(sockfd), state_(INIT), userId_(userID), manager_(NULL), calendar_(NULL), auction_(NULL) {}
+
 //TODO : initialisation dans le bon ordre
 
 void User::cmdHandler(SerializedObject *received) {
@@ -32,10 +36,15 @@ void User::cmdHandler(SerializedObject *received) {
 	int targetedUser;
 	int targetedPlayer;
 	int resultOfUpgrade;
-	bool resultOfTraining;
 	bool confirmation;
+	int size;
+	int targetedAuction;
+	int isFinished;
+	int auctionPrice;
+	ManagedPlayer tmpPlayer;
 	vector<int> infos;
 	vector<string> playersList;
+	vector<string> auctionsList;
     std::vector<int> IDList;
     std::vector<std::string> namesList;
 	position = received->stringData;
@@ -160,7 +169,6 @@ void User::cmdHandler(SerializedObject *received) {
 			playersList = manager_->getPlayersList();
 			//construct answer 
 			answer.typeOfInfos = PLAYERSLIST;
-			int size;
 			size = playersList.size();
 			memcpy(answerPosition, &size, sizeof(size)); //nb de noms à lire
 			answerPosition += sizeof(size);
@@ -345,6 +353,7 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Demande de proposition d'un match reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"userID reçu : "<<targetedUser<<std::endl;
 #endif
+
             std::vector<ManagedPlayer> team1;
             for(int i = 0; i < 7; ++i){
                 //TODO : éviter des copies ?
@@ -352,7 +361,8 @@ void User::cmdHandler(SerializedObject *received) {
 			}
             User *invited = NULL;
             for(unsigned int i; i < server_->usersList_.size(); ++i){
-                if(server_->usersList_[i]->getUserId() == targetedUser){
+
+                if(server_->usersList_[i]->getUserID() == targetedUser){
                     invited = server_->usersList_[i];
                 }
             }
@@ -381,6 +391,7 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Demande d'acceptation d'un match reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"confirmation : "<<confirmation<<std::endl;
 #endif
+
 			std::vector<ManagedPlayer> team2;
             for(int i = 0; i < playersInTeam.size(); ++i){
 				std::cout << " on récupère les objets correspondants " << playersInTeam[i] <<std::endl;
@@ -421,22 +432,45 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"playerID reçu : "<<targetedPlayer<<std::endl;
 			std::cout<<"prix de départ reçu : "<<startingPrice<<std::endl;
 #endif
-			//handle demand
-			//construct answer
+			//handle demand:
+			calendar_->update();
+			manager_->save();
+			tmpPlayer = manager_->getPlayer(targetedPlayer);
+			if (tmpPlayer.isBlocked()) confirmation=false;
+			else {
+				server_->createAuction(this,tmpPlayer,startingPrice);
+				confirmation=true;
+			}
+			answer.typeOfInfos = AUCTIONCREATION_CONFIRM;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 		case JOINAUCTION :
 			//reading details
-			int targetedAuction;
 			position = received->stringData;
 			memcpy(&targetedAuction, position, sizeof(targetedAuction));
 #ifdef __DEBUG
 			std::cout<<"Demande de participation à une enchère reçue sur le socket "<<getSockfd()<<std::endl;
 			std::cout<<"targetedAuction reçu : "<<targetedAuction<<std::endl;
 #endif
-			//handle demand
-			//construct answer
+			//handle demand:
+			calendar_->update();
+			manager_->save();
+			for (int i=0;i<server_->auctionsList_.size();++i) {
+				if (targetedAuction==server_->getAuctionID(i)) auction_ = server_->auctionsList_[i];
+			}
+			if (auction_==NULL) confirmation = false;
+			else confirmation = true;
+			//construct answer:
+
+			answer.typeOfInfos = AUCTIONJOIN_CONFIRM;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
-		case GETMANAGERSLIST : 
+
+
+		case GETMANAGERSLIST : {
+
 			//no details to read
 #ifdef __DEBUG
 			std::cout<<"Demande de la liste des managers reçue sur le socket "<<getSockfd()<<std::endl;
@@ -447,8 +481,8 @@ void User::cmdHandler(SerializedObject *received) {
             for (unsigned int i=0;i<server_->usersList_.size();++i){
                 if(server_->usersList_[i]->state_==FREE) { //TODO : ne pas reprendre l'user qui fait la demande dans la liste
                     ++counter;
-                    IDList.push_back(server_->usersList_[i]->getUserId());
-                    std::cout << "userId " << server_->usersList_[i]->getUserId() << std::endl;
+                    IDList.push_back(server_->usersList_[i]->getUserID());
+                    std::cout << "userId " << server_->usersList_[i]->getUserID() << std::endl;
                     std::cout << "name " << server_->usersList_[i]->getUserName() << std::endl;
                     namesList.push_back(server_->usersList_[i]->getUserName());
                 }
@@ -469,15 +503,86 @@ void User::cmdHandler(SerializedObject *received) {
             }
             sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
-			
+		}
 		case GETAUCTIONSLIST :
 			//no details to read
 #ifdef __DEBUG
 			std::cout<<"Demande de la liste des enchères reçue sur le socket "<<getSockfd()<<std::endl;
 #endif
-			//handle demand
-			//construct answer
+			//handle demand:
+			calendar_->update();
+			manager_->save();
+			for (unsigned int i=0;i<server_->auctionsList_.size();++i) {
+				if (server_->getAuctionTimeLeft(i)>0) {
+					auctionsList.push_back(intToString(server_->getAuctionID(i)));
+					auctionsList.push_back(server_->getPlayerSoldName(i));
+					auctionsList.push_back(intToString(server_->getAuctionTimeLeft(i)));
+					auctionsList.push_back(intToString(server_->getAuctionStartingPrice(i)));
+				}
+			}
+			//construct answer 
+			answer.typeOfInfos = AUCTIONSLIST;
+			size = auctionsList.size();
+			std::cout<<size<<std::endl;
+			memcpy(answerPosition, &size, sizeof(size)); //nb de noms à lire
+			answerPosition += sizeof(size);
+			for (int i=0;i<int(auctionsList.size()) - 1;i+=4) { //un paquet par joueur
+				char auctionID[2*USERNAME_LENGTH], playerName[2*USERNAME_LENGTH], timeLeft[2*USERNAME_LENGTH],price[2*USERNAME_LENGTH];
+				string param1 = auctionsList[i];
+				string param2 = auctionsList[i+1];
+				string param3 = auctionsList[i+2];
+				string param4 = auctionsList[i+3];
+				strcpy(auctionID, param1.c_str());
+				strcpy(playerName, param2.c_str());
+				strcpy(timeLeft, param3.c_str());
+				strcpy(price, param4.c_str());
+				memcpy(answerPosition, &auctionID, sizeof(auctionID));
+				answerPosition += sizeof(auctionID);
+				memcpy(answerPosition, &playerName, sizeof(playerName));
+				answerPosition += sizeof(playerName);
+				memcpy(answerPosition, &timeLeft, sizeof(timeLeft));
+				answerPosition += sizeof(timeLeft);
+				memcpy(answerPosition, &price, sizeof(price));
+				answerPosition += sizeof(price);
+				
+			}
+
+			sendOnSocket(sockfd_, answer);
 			break;
+
+		case GETAUCTIONINFO :
+
+			position = received->stringData;
+			memcpy(&targetedAuction, position, sizeof(targetedAuction));
+#ifdef __DEBUG
+			std::cout<<"Demande de la liste des enchères reçue sur le socket "<<getSockfd()<<std::endl;
+#endif
+			//handle demand:
+			calendar_->update();
+			manager_->save();
+			for (int i=0;i<server_->auctionsList_.size();++i) {
+				if (server_->getAuctionID(i)==targetedAuction) {
+					infos= server_->getPlayerSoldInfos(i);
+				}
+			}
+			answer.typeOfInfos = PLAYERINFOS;
+			//5 attributs int
+			//5 états d'entrainements d'attribut int
+			//1 int blocked
+			//1 int bonus du balais
+			//1 int capacity du balais
+			//TODO : ajouter la vie //done
+			std::cout << infos.size() << std::endl;
+			for(unsigned int i = 0; i < infos.size(); ++i){
+				int value;
+				value = infos[i];
+				memcpy(answerPosition, &value, sizeof(value));
+				answerPosition += sizeof(value);
+			}
+			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+				
+			break;
+
 		case GETPOSITIONS :
 			//no details to read
 #ifdef __DEBUG
@@ -531,15 +636,55 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand
 			//construct answer
 			break;
-		case GETCURRENTPRICE :
-			//no details to read : possible improvement : participation to several auctions at a same time
-			//handle demand
-			//construct answer
-			break;
+
 		case BID :
-			//no details to read : possible improvement : participation to several auctions at a same time
-			//construct answer
+			//no details to read : possible improvement : participation to several auctions at a same time. No.
+#ifdef __DEBUG
+			std::cout<<"Enchère reçue sur le socket "<<getSockfd()<<std::endl;
+#endif
+
+			calendar_->update();
+			manager_->save();
+			auction_->bid(this);
+			//construct answer:
+			confirmation=true;
+			answer.typeOfInfos = BID_CONFIRM;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); 
 			break;
+
+		case END_AUCTION_TURN :
+			//no details to read : possible improvement : participation to several auctions at a same time. No.
+#ifdef __DEBUG
+			std::cout<<"Tour d'enchère fini sur le socket "<<getSockfd()<<std::endl;
+#endif
+			calendar_->update();
+			manager_->save();
+			isFinished = auction_->isAuctionFinished();
+			auctionPrice = auction_->getCurrentPrice();
+			int result;
+			if (isFinished==1) {
+				if (auction_->getLastBidder()==this) {
+					result = -1;
+					if (manager_->getMoney()<auctionPrice) result = -2;
+					auctionWin(auction_->getManager(),auction_->getPlayer());
+				}
+			}
+			else {
+				auction_->resetBidders();
+				result=1;
+			}
+			calendar_->update();
+			manager_->save();
+			//construct answer:
+			answer.typeOfInfos = AUCTION_RESULT;
+			memcpy(answerPosition, &result, sizeof(result));
+            sendOnSocket(sockfd_, answer); 
+			answer.typeOfInfos = AUCTION_RESULT;
+			memcpy(answerPosition, &auctionPrice, sizeof(auctionPrice));
+            sendOnSocket(sockfd_, answer); 
+			break;	
+
 		default :
 #ifdef __DEBUG
 			std::cout<<"En-tête inconnu : "<<received->typeOfInfos<<std::endl;
@@ -557,7 +702,7 @@ void User::setDisconnection() {
 bool User::isDisconnecting() {return (state_==DISCONNECTING);}
 int User::getSockfd() {return sockfd_;}
 
-int User::getUserId() {return userId_;}
+int User::getUserID() {return userId_;}
 
 std::string User::getUserName() {return userName_;}
 
@@ -614,3 +759,31 @@ void User::addManager(char username[USERNAME_LENGTH], char password[PASSWORD_LEN
 }
 
 Manager* User::getManager() {return manager_;}
+
+void User::auctionWin(Manager* manager, ManagedPlayer player) {
+	int amount = auction_->getCurrentPrice();
+	if (manager_->getMoney()<amount) {
+		manager->addMoney(manager_->getMoney()/33);
+		manager_->pay(manager_->getMoney()/33);
+	}
+	else {
+		manager_->pay(amount);
+		manager->addMoney(amount);
+		manager_->addPlayer(player);
+		manager->removePlayer(player);
+	}
+	manager_->save();
+	manager->save();
+}
+
+string User::intToString(int value) {
+	char buffer[20];
+	sprintf(buffer,"%d",value);
+	string tmp = "";
+	int i = 0;
+	while (buffer[i] != '\0') {
+		tmp+=buffer[i];
+		++i;
+	}
+	return tmp;
+}

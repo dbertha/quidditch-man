@@ -9,7 +9,7 @@
 //pour le test en c :
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <pthread.h>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -147,6 +147,14 @@ int joinAuction(int sockfd, int auctionID){
     return sendOnSocket(sockfd, serialized);
 }
 
+int askForAuctionInfos(int sockfd, int auctionID){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = GETAUCTIONINFO;
+    memcpy(position, &auctionID, sizeof(auctionID));
+    return sendOnSocket(sockfd, serialized);
+}
+
 
 int getManagersList(int sockfd){
     SerializedObject serialized;
@@ -227,9 +235,15 @@ int bid(int sockfd){
     return sendOnSocket(sockfd, serialized);
 }
 
+int checkAuction(int sockfd){
+    SerializedObject serialized;
+    serialized.typeOfInfos = END_AUCTION_TURN;
+    return sendOnSocket(sockfd, serialized);
+}
+
 //réception des donnéés du serveur :
 
-bool getConfirmation(int sockfd){ //valable pour LOGIN_CONFIRM, UPGRADE_CONFIRM, TRAINING_STARTED
+bool getConfirmation(int sockfd){ //valable pour LOGIN_CONFIRM, UPGRADE_CONFIRM, TRAINING_STARTED, HEAL_STARTED, AUCTIONCREATION_CONFIRM
     bool confirmation;
     SerializedObject received = receiveOnSocket(sockfd);
     char * position = received.stringData;
@@ -316,6 +330,59 @@ std::vector<int> receiveBuildingInfos(int sockfd){
     return buildingInfos;
 }
 
+std::vector<std::string> receiveAuctionsList(int sockfd){
+    //pour chaque ManagedPlayer, on reçoit un string firstname et un lastname, de façon ordonnée (indice 0 à 1 : playerID = 0, etc)
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    std::vector<std::string> auctionsList;
+    if(received.typeOfInfos == AUCTIONSLIST){ //on suppose toujours vrai
+        int nbInfos;
+        memcpy(&nbInfos,position, sizeof(nbInfos));
+        position += sizeof(nbInfos);
+        std::cout << nbInfos << std::endl;
+        for(int i = 0; i < nbInfos; ++i){
+            char info[2*USERNAME_LENGTH];
+            std::string strInfos;
+            memcpy(&info,position, sizeof(info));
+            position += sizeof(info);
+            strInfos = info; //conversion
+            auctionsList.push_back(strInfos); //ajout à la liste
+        }
+    }
+    return auctionsList;
+}
+
+
+int receiveAuctionResult(int sockfd) {
+    int result;
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    //TODO : vérifier qu'il s'agit bien d'un message de confirmation
+    memcpy(&result,position, sizeof(result));
+    return result;
+}
+
+std::vector<AxialCoordinates> receiveScoresAndPositions(int sockfd, int * winner, int * scoreTeam1, int * scoreTeam2){
+    SerializedObject received = receiveOnSocket(sockfd);
+    char * position = received.stringData;
+    std::vector<AxialCoordinates> orderedPositions;
+    int diag;
+    int line;
+    memcpy(winner, position, sizeof(int));
+    position += sizeof(int);
+    memcpy(scoreTeam1, position, sizeof(int));
+    position += sizeof(int);
+    memcpy(scoreTeam2, position, sizeof(int));
+    position += sizeof(int);
+    for(unsigned int i = 0; i < 18; ++i){ //positions des 18 objets
+        memcpy(&diag, position, sizeof(diag));
+        position += sizeof(diag);
+        memcpy(&line, position, sizeof(line));
+        position += sizeof(line);
+        orderedPositions.push_back(AxialCoordinates(diag, line));
+    }
+    return orderedPositions;
+}
 
 std::vector<AxialCoordinates> receiveScoresAndPositions(int sockfd, int * winner, int * scoreTeam1, int * scoreTeam2){
     SerializedObject received = receiveOnSocket(sockfd);
@@ -344,6 +411,7 @@ typedef struct { //pas besoin de la classe complète
     int attributes[5];
     int hasQuaffle;
 } playerAttr;
+
 
 playerAttr receiveSelectedPlayerInfos(int sockfd){
     SerializedObject received = receiveOnSocket(sockfd);
