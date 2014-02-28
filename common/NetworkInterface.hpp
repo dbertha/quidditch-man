@@ -411,6 +411,7 @@ std::vector<AxialCoordinates> receiveScoresAndPositions(int sockfd, int * winner
 
 typedef struct { //pas besoin de la classe complète
     int attributes[5];
+    AxialCoordinates position;
     int hasQuaffle;
 } playerAttr;
 
@@ -419,12 +420,17 @@ playerAttr receiveSelectedPlayerInfos(int sockfd){
     SerializedObject received = receiveOnSocket(sockfd);
     char * position = received.stringData;
     playerAttr thePlayer;
-    int attribute;
+    int attribute, diag, line;
     for(int i = 0; i < 5; ++i){
-	memcpy(&attribute, position, sizeof(attribute));
-	position += sizeof(attribute);
-	thePlayer.attributes[i] = attribute;
+        memcpy(&attribute, position, sizeof(attribute));
+        position += sizeof(attribute);
+        thePlayer.attributes[i] = attribute;
     }
+    memcpy(&diag, position, sizeof(diag)); //coord 1 : diagonale
+    position += sizeof(diag);
+    memcpy(&line, position, sizeof(line)); //coord 2 : ligne
+    position += sizeof(line);
+    thePlayer.position = AxialCoordinates(diag, line);
     memcpy(&attribute, position, sizeof(attribute)); //hasQuaffle
     position += sizeof(attribute);
     thePlayer.hasQuaffle = attribute;

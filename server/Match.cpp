@@ -91,12 +91,13 @@ void Match::launch(std::vector<ManagedPlayer> &team2){ //suite du constructeur
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE), QUAFFLE);
 #ifdef __DEBUG
     __field.display();
+    std::cout << "On passe aux priorités." << std::endl;
 #endif
     
     //on enregistre les priorités de déplacements :
     //TODO : à optimiser
     int maxIndex, maxSpeedValue;
-    for(int i; i < 18; ++i){
+    for(unsigned int i = 0; i < 18; ++i){
         maxIndex = -1;
         maxSpeedValue = 0;
         for(unsigned int player = 0; player < __players.size(); ++player){
@@ -107,6 +108,7 @@ void Match::launch(std::vector<ManagedPlayer> &team2){ //suite du constructeur
                 }
             }
         }
+        std::cout << "On regarde les balles. i : " << i << std::endl;
         for(unsigned int ball = GOLDENSNITCH; ball < (GOLDENSNITCH + __balls.size()); ++ball){
             if(not isInVector(__indexesSortedBySpeed, ball)){
                 if(__balls[ball - GOLDENSNITCH].getSpeed() > maxSpeedValue){
@@ -115,8 +117,10 @@ void Match::launch(std::vector<ManagedPlayer> &team2){ //suite du constructeur
                 }
             }
         }
+        std::cout << "nouvel index choisi." << maxIndex << std::endl;
         __indexesSortedBySpeed.push_back(maxIndex);
     }
+    std::cout << "Match constructed" << std::endl;
     
 }
 
@@ -438,7 +442,7 @@ void Match::serializeScoreAndPositions(char * bufferPosition){
         bufferPosition += sizeof(line);
     }
     for(unsigned int i = 0; i < __balls.size(); ++i){ //positions des balles
-        AxialCoordinates position = __players[i].getPosition();
+        AxialCoordinates position = __balls[i].getPosition();
         int diag = position.getDiagAxis();
         int line = position.getLineAxis();
         memcpy(bufferPosition, &diag, sizeof(diag));

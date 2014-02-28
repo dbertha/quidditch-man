@@ -68,10 +68,16 @@ void PlayingPlayer::carryQuaffle(){
 char * PlayingPlayer::serializeAttributes(char * bufferPosition){
     int attribute;
     for(int i = 0; i < 5; ++i){
-	attribute = getCapacity(i);
-	memcpy(bufferPosition, &attribute, sizeof(attribute));
-	bufferPosition += sizeof(attribute);
+        attribute = getCapacity(i);
+        memcpy(bufferPosition, &attribute, sizeof(attribute));
+        bufferPosition += sizeof(attribute);
     }
+    attribute = __currentPosition.getDiagAxis(); //Coordonnée 1 : diagonale
+    memcpy(bufferPosition, &attribute, sizeof(attribute));
+    bufferPosition += sizeof(attribute);
+    attribute = __currentPosition.getLineAxis(); //Coordonnée 2 : ligne
+    memcpy(bufferPosition, &attribute, sizeof(attribute));
+    bufferPosition += sizeof(attribute);
     attribute = __hasQuaffle; //conversion to int
     memcpy(bufferPosition, &attribute, sizeof(attribute));
     bufferPosition += sizeof(attribute);

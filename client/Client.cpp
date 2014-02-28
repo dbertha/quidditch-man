@@ -317,7 +317,7 @@ void mainAuction(int sockfd, int auctionID, int timeLeft) {
 
 
 
-void askAndSendMoves(int sockfd, int numTeam){
+void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field){
   int moves[7][4];
   int currentMove = 0;
   int selectedPlayerID = 1;
@@ -354,11 +354,25 @@ void askAndSendMoves(int sockfd, int numTeam){
     std::cout << "Veuillez sélectionner un joueur(valeur numérique), -1 pour terminer le tour :" << endl;
     //TODO : vérification de l'input : indice correspond bien à un joueur de l'équipe et pas déjà de mouvement attribué
     std::cin >> selectedPlayerID;
+    selectedPlayerID -= 1; //index commence à 0
     if(numTeam == 2){
-      selectedPlayerID += 7; //ajustement de l'index
+      selectedPlayerID += 7; //ajustement de l'index en fonction de l'équipe
     }
     selectPlayer(sockfd, selectedPlayerID);
     attributs = receiveSelectedPlayerInfos(sockfd);
+    field.display(attributs.position, attributs.attributes[SPEED]);
+    std::cout << "Attributs du joueur sélectionné  : " << keeper << std::endl;
+    std::cout << "Vitesse  : " << attributs.attributes[SPEED] << std::endl;
+    std::cout << "Force  : " << attributs.attributes[STRENGTH] << std::endl;
+    std::cout << "Précision  : " << attributs.attributes[PRECISION] << std::endl;
+    std::cout << "Réflexe  : " << attributs.attributes[REFLEX] << std::endl;
+    std::cout << "Résistance  : " << attributs.attributes[RESISTANCE] << std::endl;
+    if(attributs.hasQuaffle){
+      std::cout << "Ce joueur porte le souaffle " << std::endl;
+    }
+    else{
+      std::cout << "Ce joueur ne porte pas le souaffle " << std::endl;
+    }
     ++currentMove;
   }
 }
@@ -379,7 +393,7 @@ void startMatch(int sockfd, int numTeam){
       field.setOccupant(allPositions[i], i);
     }
     field.display();
-    askAndSendMoves(sockfd, numTeam);
+    askAndSendMoves(sockfd, numTeam, field);
     
     cout << "Les échanges de messages suivants pour le match n'ont pas encore été implémentés." << endl;
     winner =1;

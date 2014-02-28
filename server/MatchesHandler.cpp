@@ -38,6 +38,9 @@ void MatchesHandler::respondToMatchProposal(User * invited, std::vector<ManagedP
         matchesVector[matchIndex]->launch(team2);
         sendConfirmationTo(invited, MATCH_STARTING);
         sendConfirmationTo(invitors[matchIndex], MATCH_STARTING);
+#ifdef __DEBUG
+        std::cout << "Confirmations sent " << std::endl;
+#endif
         statesOfMatches[matchIndex] = WAITING_POSITIONS;
     }
 }
