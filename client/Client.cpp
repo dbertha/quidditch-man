@@ -317,12 +317,14 @@ void mainAuction(int sockfd, int auctionID, int timeLeft) {
 
 
 
-void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field){
+void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field, std::vector<AxialCoordinates> &positions){
   int moves[7][4];
+  int playerRole = 0;
   int currentMove = 0;
   int selectedPlayerID = 1;
+  int choiceInput, deltaDiag, deltaLine;
   playerAttr attributs;
-  std::string keeper, seeker, chaser1, chaser2, chaser3, beater1, beater2;
+  std::string keeper, seeker, chaser1, chaser2, chaser3, beater1, beater2, quaffle, bludger, goldensnitch;
   if(numTeam == 1){ //TODO : optimiser
     keeper = TEAM1_KEEPER_UNICODE;
     seeker = TEAM1_SEEKER_UNICODE;
@@ -341,9 +343,20 @@ void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field){
     beater1 = TEAM2_BEATER1_UNICODE;
     beater2 = TEAM2_BEATER2_UNICODE;
   }
-  while((selectedPlayerID != -1) and (currentMove < 7)){
+  quaffle = QUAFFLE_UNICODE;
+  bludger = BLUDGER1_UNICODE;
+  goldensnitch = GOLDENSNITCH_UNICODE;
+  
+  //initialisation de la matrice des mouvements : liste de mouvements vides
+  for(int i = 0; i < 7; ++i){
+    moves[i][0] = i;
+    moves[i][1] = NO_SPECIAL_ACTION;
+    moves[i][2] = 10000; //sentinelle : mouvement vide
+    moves[i][3] = 10000;
+  }
+  
+  while((playerRole != -1) and (currentMove < 7)){
     std::cout << "Légende :" << endl;
-
     std::cout << "KEEPER : " << keeper << std::endl;
     std::cout << "SEEKER  : " << seeker << std::endl;
     std::cout << "CHASER1  : " << chaser1 << std::endl;
@@ -351,30 +364,85 @@ void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field){
     std::cout << "CHASER3  : " << chaser3 << std::endl;
     std::cout << "BEATER1  : " << beater1 << std::endl;
     std::cout << "BEATER2 : " << beater2 << std::endl;
+    std::cout << "QUAFFLE : " << quaffle << std::endl;
+    std::cout << "BLUDGER : " << bludger << std::endl;
+    std::cout << "GOLDENSNITCH : " << goldensnitch << std::endl;
     std::cout << "Veuillez sélectionner un joueur(valeur numérique), -1 pour terminer le tour :" << endl;
     //TODO : vérification de l'input : indice correspond bien à un joueur de l'équipe et pas déjà de mouvement attribué
-    std::cin >> selectedPlayerID;
-    selectedPlayerID -= 1; //index commence à 0
-    if(numTeam == 2){
-      selectedPlayerID += 7; //ajustement de l'index en fonction de l'équipe
+    std::cin >> playerRole;
+    if(playerRole != -1){
+      playerRole -= 1; //index commence à 0
+      selectedPlayerID = playerRole;
+      if(numTeam == 2){
+        selectedPlayerID += 7; //ajustement de l'index en fonction de l'équipe
+      }
+      selectPlayer(sockfd, selectedPlayerID);
+      attributs = receiveSelectedPlayerInfos(sockfd);
+      field.display(attributs.position, attributs.attributes[SPEED]);
+      std::cout << "Attributs du joueur sélectionné  : " << std::endl;
+      std::cout << "Vitesse  : " << attributs.attributes[SPEED] << std::endl;
+      std::cout << "Force  : " << attributs.attributes[STRENGTH] << std::endl;
+      std::cout << "Précision  : " << attributs.attributes[PRECISION] << std::endl;
+      std::cout << "Réflexe  : " << attributs.attributes[REFLEX] << std::endl;
+      std::cout << "Résistance  : " << attributs.attributes[RESISTANCE] << std::endl;
+      if(attributs.hasQuaffle){
+        std::cout << "Ce joueur porte le souaffle " << std::endl;
+      }
+      else{
+        std::cout << "Ce joueur ne porte pas le souaffle " << std::endl;
+      }
+      //RAPPEL : 
+      //moves[][0] : indice de l'objet concerné
+      //moves[][1] : action spéciale :
+      //#define INTERCEPT_QUAFFLE 0
+      //#define CATCH_GOLDENSNITCH 1
+      //moves[][2] : diagonale destination
+      //moves[][3] : ligne destination
+      std::cout << "Vos possibilités pour ce joueur :" << std::endl;
+      std::cout << "[0]Déplacer le joueur" << std::endl;
+      if(attributs.hasQuaffle){
+        std::cout << "[1]Envoyer le souaffle dans une direction" << std::endl;
+      }
+      else if((playerRole <= TEAM1_BEATER2) and (playerRole >= TEAM1_BEATER1)){
+        int nearestBludger = BLUDGER1;
+        if (attributs.position.getDistanceTo(positions[BLUDGER2]) < attributs.position.getDistanceTo(positions[BLUDGER1])){
+          nearestBludger = BLUDGER2;
+        }
+        if(attributs.position.getDistanceTo(positions[nearestBludger]) < 2 ){ //seulement si adjacent
+          std::cout << "[1]Frapper le cognard dans une direction" << std::endl;
+        }
+      }
+      //menus proposés seulement si précision suffisante par rapport à la distance avec la balle
+      else if((playerRole <= TEAM1_CHASER3) and (playerRole>= TEAM1_CHASER1)
+      and (attributs.position.getDistanceTo(positions[QUAFFLE]) < attributs.attributes[PRECISION])){
+        std::cout << "[2]Tenter de récupérer le souaffle" << std::endl;
+      }
+      else if((playerRole == TEAM1_SEEKER)
+      and (attributs.position.getDistanceTo(positions[GOLDENSNITCH]) < attributs.attributes[PRECISION]) ){
+        std::cout << "[2]Tenter d'attraper le vif d'or" << std::endl;
+      }
+      
+      std::cin >> choiceInput;
+      if(choiceInput == 0){
+        std::cout << "Déplacement le long de la diagonale \\ (négatif pour monter, positif pour descendre) : " << std::endl;
+        std::cin >> deltaDiag;
+        std::cout << "Déplacement le long de la colonne | (négatif pour monter, positif pour descendre) : " << std::endl;
+        std::cin >> deltaLine;
+        if(attributs.position.getDistanceTo(AxialCoordinates(attributs.position.getDiagAxis() + deltaDiag, attributs.position.getLineAxis() + deltaLine)) <= attributs.attributes[SPEED]){
+          //si case accessible
+          moves[currentMove][0] = selectedPlayerID;
+          moves[currentMove][1] = NO_SPECIAL_ACTION; //pas d'action spéciale
+          moves[currentMove][2] = attributs.position.getDiagAxis() + deltaDiag;
+          moves[currentMove][3] = attributs.position.getLineAxis() + deltaLine;
+        }else{
+          std::cout << "Case trop éloignée, votre joueur n'a pas une vitesse suffisante !" << std::endl;
+        }
+      }
+
+      ++currentMove;
     }
-    selectPlayer(sockfd, selectedPlayerID);
-    attributs = receiveSelectedPlayerInfos(sockfd);
-    field.display(attributs.position, attributs.attributes[SPEED]);
-    std::cout << "Attributs du joueur sélectionné  : " << keeper << std::endl;
-    std::cout << "Vitesse  : " << attributs.attributes[SPEED] << std::endl;
-    std::cout << "Force  : " << attributs.attributes[STRENGTH] << std::endl;
-    std::cout << "Précision  : " << attributs.attributes[PRECISION] << std::endl;
-    std::cout << "Réflexe  : " << attributs.attributes[REFLEX] << std::endl;
-    std::cout << "Résistance  : " << attributs.attributes[RESISTANCE] << std::endl;
-    if(attributs.hasQuaffle){
-      std::cout << "Ce joueur porte le souaffle " << std::endl;
-    }
-    else{
-      std::cout << "Ce joueur ne porte pas le souaffle " << std::endl;
-    }
-    ++currentMove;
   }
+  sendMoves(sockfd, moves);
 }
 
 void startMatch(int sockfd, int numTeam){
@@ -393,7 +461,7 @@ void startMatch(int sockfd, int numTeam){
       field.setOccupant(allPositions[i], i);
     }
     field.display();
-    askAndSendMoves(sockfd, numTeam, field);
+    askAndSendMoves(sockfd, numTeam, field, allPositions);
     
     cout << "Les échanges de messages suivants pour le match n'ont pas encore été implémentés." << endl;
     winner =1;

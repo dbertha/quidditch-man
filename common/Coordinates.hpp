@@ -78,6 +78,7 @@ public :
     
     int getDistanceTo(AxialCoordinates destination){
         //calcul des coordonnées cubiques => méthodes de CubicCoord ?
+        if(not destination.isOnField()) { return 10000;}
         int x1 = getLineAxis();
         int z1 = getDiagAxis();
         int x2 = destination.getLineAxis();

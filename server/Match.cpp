@@ -234,8 +234,10 @@ void Match::makeMoves(int movesTeam1[][4], int movesTeam2[][4]){
     //moves[][2] : diagonale destination
     //moves[][3] : ligne destination
     //1ère étape : gestion des interceptions de balle
+    
+    //TODO : si chaser lance le souaffle, lui donner une position de départ
     for(int i = 0; i < 7; ++i){
-        if(movesTeam1[i][1] > 0){ //tentative de capture d'une balle
+        if(movesTeam1[i][1] >= 0){ //tentative de capture d'une balle
             if((__players[movesTeam1[i][0]].getRole() == ROLE_CHASER) and (movesTeam1[i][1] == INTERCEPT_QUAFFLE)){ //normalement c'est test est fait aussi niveau client
                 //tentative de récupérer le quaffle
                 //calcul de la distance entre l'attrapeur et la balle
@@ -257,7 +259,7 @@ void Match::makeMoves(int movesTeam1[][4], int movesTeam2[][4]){
                 }
             }
         }
-        if(movesTeam2[i][1] > 0 and not __winner){ //tentative de capture d'une balle
+        if(movesTeam2[i][1] >= 0 and not __winner){ //tentative de capture d'une balle
             if((__players[movesTeam2[i][0]].getRole() == ROLE_CHASER) and (movesTeam2[i][1] == INTERCEPT_QUAFFLE)){ //normalement ce test est fait aussi niveau client
                 //tentative de récupérer le quaffle
                 //calcul de la distance entre l'attrapeur et la balle
@@ -292,7 +294,7 @@ void Match::makeMoves(int movesTeam1[][4], int movesTeam2[][4]){
     
     for(int i = 0; i < 7; ++i){
         //on prend un joueur/balle déplacé par la 1ère équipe
-        if((movesTeam1[i][1] == 0) and (movesTeam1[i][2] < 10000)){ //si pas d'action spéciale et déplacement non vide
+        if((movesTeam1[i][1] == NO_SPECIAL_ACTION) and (movesTeam1[i][2] < 10000)){ //si pas d'action spéciale et déplacement non vide
             std::cout << "Objet de la 1ère équipe" << std::endl;
             if(movesTeam1[i][0] < GOLDENSNITCH){ //si pas une balle
                 std::vector<Move> orderedMoves = __players[movesTeam1[i][0]].getPosition().getMovesTo(AxialCoordinates(movesTeam1[i][2], movesTeam1[i][3]));
@@ -305,7 +307,7 @@ void Match::makeMoves(int movesTeam1[][4], int movesTeam2[][4]){
             movesOrder.push_back(movesTeam1[i][0]);
         }
         //on prend un joueur/balle à déplacer dans la seconde équipe
-        if((movesTeam2[i][1] == 0) and (movesTeam2[i][2] < 10000)){ //si pas d'action spéciale et déplacement non vide
+        if((movesTeam2[i][1] == NO_SPECIAL_ACTION) and (movesTeam2[i][2] < 10000)){ //si pas d'action spéciale et déplacement non vide
             if(movesTeam2[i][0] < GOLDENSNITCH){ //si pas une balle
                 std::vector<Move> orderedMoves = __players[movesTeam2[i][0]].getPosition().getMovesTo(AxialCoordinates(movesTeam2[i][2], movesTeam2[i][3]));
                 allMoves.push_back(orderedMoves);

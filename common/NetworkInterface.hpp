@@ -217,6 +217,8 @@ int sendMoves(int sockfd, int moves[][4]){
         printf("%s : %d %d %d\n", "playerID diagDest lineDest", targetedPlayer, diagDest, lineDest);
         memcpy(position, &targetedPlayer,sizeof(targetedPlayer)); 
         position += sizeof(targetedPlayer);
+        memcpy(position, &specialAction,sizeof(specialAction)); 
+        position += sizeof(specialAction);
         memcpy(position, &diagDest, sizeof(diagDest));
         position += sizeof(diagDest); 
         memcpy(position, &lineDest, sizeof(lineDest));
