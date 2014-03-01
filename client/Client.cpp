@@ -325,6 +325,7 @@ void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field, std::vector
   int choiceInput, deltaDiag, deltaLine;
   playerAttr attributs;
   std::string keeper, seeker, chaser1, chaser2, chaser3, beater1, beater2, quaffle, bludger, goldensnitch;
+  int nearestBludger = BLUDGER1;
   if(numTeam == 1){ //TODO : optimiser
     keeper = TEAM1_KEEPER_UNICODE;
     seeker = TEAM1_SEEKER_UNICODE;
@@ -404,7 +405,7 @@ void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field, std::vector
         std::cout << "[1]Envoyer le souaffle dans une direction" << std::endl;
       }
       else if((playerRole <= TEAM1_BEATER2) and (playerRole >= TEAM1_BEATER1)){
-        int nearestBludger = BLUDGER1;
+        
         if (attributs.position.getDistanceTo(positions[BLUDGER2]) < attributs.position.getDistanceTo(positions[BLUDGER1])){
           nearestBludger = BLUDGER2;
         }
@@ -413,7 +414,7 @@ void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field, std::vector
         }
       }
       //menus proposés seulement si précision suffisante par rapport à la distance avec la balle
-      else if((playerRole <= TEAM1_CHASER3) and (playerRole>= TEAM1_CHASER1)
+      else if(((playerRole <= TEAM1_CHASER3) and (playerRole>= TEAM1_CHASER1)) or (playerRole == TEAM1_KEEPER)
       and (attributs.position.getDistanceTo(positions[QUAFFLE]) < attributs.attributes[PRECISION])){
         std::cout << "[2]Tenter de récupérer le souaffle" << std::endl;
       }
@@ -438,7 +439,30 @@ void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field, std::vector
           std::cout << "Case trop éloignée, votre joueur n'a pas une vitesse suffisante !" << std::endl;
         }
       }
-
+      else if(choiceInput == 2){ //interception d'une balle
+        if(playerRole == TEAM1_SEEKER){
+          moves[currentMove][0] = selectedPlayerID;
+          moves[currentMove][1] = CATCH_GOLDENSNITCH;
+        }
+        else if(((playerRole <= TEAM1_CHASER3) and (playerRole>= TEAM1_CHASER1)) or (playerRole == TEAM1_KEEPER)){
+          moves[currentMove][0] = selectedPlayerID;
+          moves[currentMove][1] = INTERCEPT_QUAFFLE;
+        }
+      }
+      else if(choiceInput == 1){ //frappage/lancement d'une balle : déplacement du joueur remplacé par déplacement de la balle
+        if((playerRole == TEAM1_BEATER1) or (playerRole == TEAM1_BEATER2)){
+          moves[currentMove][0] = nearestBludger;
+          moves[currentMove][1] = NO_SPECIAL_ACTION;
+          //TODO : demander déplacement
+        }
+        else if(attributs.hasQuaffle){
+          moves[currentMove][0] = QUAFFLE;
+          moves[currentMove][1] = NO_SPECIAL_ACTION;
+          //TODO : demander déplacement
+        }
+      } 
+          
+      //si input correct, on passe au joueur suivant
       ++currentMove;
     }
   }
