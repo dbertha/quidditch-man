@@ -24,7 +24,13 @@
 
 
 
-User::User(Server * server, MatchesHandler *matchesHandler, int sockfd, int userID): server_(server), __matchesHandler(matchesHandler), sockfd_(sockfd), state_(INIT), userId_(userID), manager_(NULL), calendar_(NULL), auction_(NULL) {}
+User::User(Server * server, MatchesHandler *matchesHandler, int sockfd, int userID): state_(INIT), server_(server), __matchesHandler(matchesHandler), sockfd_(sockfd), userId_(userID), manager_(NULL), calendar_(NULL), auction_(NULL) {
+    __moves = new int*[7]; //7 lignes
+    for(int i =0; i < 7; ++i){
+        __moves[i] = new int[4]; //4 colonnes
+    }
+    //TODO : delete correspondant dans le destructeur
+}
 
 //TODO : initialisation dans le bon ordre
 
@@ -367,7 +373,7 @@ void User::cmdHandler(SerializedObject *received) {
                 }
             }
                
-            __matchesHandler->proposeForMatch(this, invited, team1); //matchesHandler handle the answer
+            __matchesHandler->proposeForMatch(this, invited, team1, __moves); //matchesHandler handle the answer
 			break;
         }
 		case ACCEPTMATCH : {
@@ -393,7 +399,7 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 
 			std::vector<ManagedPlayer> team2;
-            for(int i = 0; i < playersInTeam.size(); ++i){
+            for(unsigned int i = 0; i < playersInTeam.size(); ++i){
 				std::cout << " on récupère les objets correspondants " << playersInTeam[i] <<std::endl;
                 //TODO : éviter des copies ?
 				team2.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
@@ -401,7 +407,7 @@ void User::cmdHandler(SerializedObject *received) {
 #ifdef __DEBUG
 			std::cout<<"On passe le relais à matchesHandler"<<std::endl;
 #endif
-			__matchesHandler->respondToMatchProposal(this, team2);
+			__matchesHandler->respondToMatchProposal(this, team2, __moves);
 
 			break;
         }
@@ -420,6 +426,38 @@ void User::cmdHandler(SerializedObject *received) {
             sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 		}
+		case MAKEMOVES : {
+			//reading details
+			//soit un joueur se déplace, soit un joueur fait se déplacer une balle, soit ne fait rien : nbmax de mouvements = nbtotal de mouvement = nbjoueurs = 7
+			//structure d'un mouvement : int playerID, int diagDest, int lineDest
+			
+			int diagDest;
+			int lineDest;
+			int specialAction;
+			for(int i = 0; i < 7; ++i){
+				memcpy(&targetedPlayer, position, sizeof(targetedPlayer));
+				position += sizeof(targetedPlayer);
+				memcpy(&specialAction, position, sizeof(specialAction));
+				position += sizeof(specialAction);
+				memcpy(&diagDest, position, sizeof(diagDest));
+				position += sizeof(diagDest);
+				memcpy(&lineDest, position, sizeof(lineDest));
+				position += sizeof(lineDest);
+				__moves[i][0] = targetedPlayer;
+				__moves[i][1] = specialAction;
+				__moves[i][2] = diagDest;
+				__moves[i][3] = lineDest;
+			}
+#ifdef __DEBUG
+			std::cout<<"Liste de déplacements reçue sur le socket "<<getSockfd()<<std::endl;
+			std::cout<<"1er mouvement reçu : playerID diagDestination lineDestination "<<__moves[0][0] << " " <<__moves[0][2]<< " " << __moves[0][3]<< std::endl;
+			std::cout<<"3eme mouvement reçu : playerID diagDestination lineDestination "<<__moves[2][0] << " " <<__moves[2][2]<< " " << __moves[2][3]<< std::endl;
+			std::cout<<"7eme mouvement reçu : playerID diagDestination lineDestination "<<__moves[6][0] << " " <<__moves[6][2]<< " " << __moves[6][3]<< std::endl;
+#endif
+			//handling demand and answering by the MatchesHandler
+            __matchesHandler->recordMoves(this);
+			break;
+        }
 		case CREATEAUCTION :
 			//reading details
 			int startingPrice;
@@ -456,7 +494,7 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand:
 			calendar_->update();
 			manager_->save();
-			for (int i=0;i<server_->auctionsList_.size();++i) {
+			for (unsigned int i=0;i<server_->auctionsList_.size();++i) {
 				if (targetedAuction==server_->getAuctionID(i)) auction_ = server_->auctionsList_[i];
 			}
 			if (auction_==NULL) confirmation = false;
@@ -560,7 +598,7 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand:
 			calendar_->update();
 			manager_->save();
-			for (int i=0;i<server_->auctionsList_.size();++i) {
+			for (unsigned int i=0;i<server_->auctionsList_.size();++i) {
 				if (server_->getAuctionID(i)==targetedAuction) {
 					infos= server_->getPlayerSoldInfos(i);
 				}
@@ -604,40 +642,6 @@ void User::cmdHandler(SerializedObject *received) {
 			__matchesHandler->getPlayerInfos(this, targetedPlayer);
 			//construct answer
 			break;
-
-
-		case MAKEMOVES :
-			//reading details
-			//soit un joueur se déplace, soit un joueur fait se déplacer une balle, soit ne fait rien : nbmax de mouvements = nbtotal de mouvement = nbjoueurs = 7
-			//structure d'un mouvement : int playerID, int diagDest, int lineDest
-			int moves[7][4];
-			int diagDest;
-			int lineDest;
-			int specialAction;
-			for(int i = 0; i < 7; ++i){
-				memcpy(&targetedPlayer, position, sizeof(targetedPlayer));
-				position += sizeof(targetedPlayer);
-				memcpy(&specialAction, position, sizeof(specialAction));
-				position += sizeof(specialAction);
-				memcpy(&diagDest, position, sizeof(diagDest));
-				position += sizeof(diagDest);
-				memcpy(&lineDest, position, sizeof(lineDest));
-				position += sizeof(lineDest);
-				moves[i][0] = targetedPlayer;
-				moves[i][1] = specialAction;
-				moves[i][2] = diagDest;
-				moves[i][3] = lineDest;
-			}
-#ifdef __DEBUG
-			std::cout<<"Liste de déplacements reçue sur le socket "<<getSockfd()<<std::endl;
-			std::cout<<"1er mouvement reçu : playerID diagDestination lineDestination "<<moves[0][0] << " " <<moves[0][2]<< " " << moves[0][3]<< std::endl;
-			std::cout<<"3eme mouvement reçu : playerID diagDestination lineDestination "<<moves[2][0] << " " <<moves[2][2]<< " " << moves[2][3]<< std::endl;
-			std::cout<<"7eme mouvement reçu : playerID diagDestination lineDestination "<<moves[6][0] << " " <<moves[6][2]<< " " << moves[6][3]<< std::endl;
-#endif
-			//handle demand
-			//construct answer
-			break;
-
 		case BID :
 			//no details to read : possible improvement : participation to several auctions at a same time. No.
 #ifdef __DEBUG

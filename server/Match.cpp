@@ -8,7 +8,7 @@
 //si chaser (poursuiveur : quaffle)
 //si beater (batteur)
 //si bludger collisionne joueur, handlerBludger
-Match::Match(std::vector<ManagedPlayer> &team1): __players(), __field(), __winner(0){
+Match::Match(std::vector<ManagedPlayer> &team1, int ** movesTeam1): __players(), __field(), __winner(0), __movesTeam1(movesTeam1), __movesTeam2(NULL){
 #ifdef __DEBUG
         std::cout << "Match généré à partir de la première équipe" << std::endl;
 #endif
@@ -45,10 +45,11 @@ Match::Match(std::vector<ManagedPlayer> &team1): __players(), __field(), __winne
     }
 }
 
-void Match::launch(std::vector<ManagedPlayer> &team2){ //suite du constructeur
+void Match::launch(std::vector<ManagedPlayer> &team2, int ** movesTeam2){ //suite du constructeur
 #ifdef __DEBUG
         std::cout << "Match démarré avec la réception de la 2 ème équipe" << std::endl;
 #endif
+    __movesTeam2 = movesTeam2;
     for(int i = 0; i < 7; ++i){ //création et positionnement de l'équipe 2
         int role = i % TEAM2_KEEPER; //les 2 premiers roles correspondent déjà
         if((role < TEAM1_BEATER1) and (role > TEAM1_SEEKER)) {role = ROLE_CHASER;}
@@ -124,8 +125,8 @@ void Match::launch(std::vector<ManagedPlayer> &team2){ //suite du constructeur
     
 }
 
-Match::Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team2) :
-    __players(), __field(), __winner(0){
+Match::Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team2, int ** movesTeam1, int ** movesTeam2) :
+    __players(), __field(), __winner(0), __movesTeam1(movesTeam1), __movesTeam2(movesTeam2){
     
     for(int i = 0; i < 7; ++i){
         int role = i % TEAM2_KEEPER; //les 2 premiers roles correspondent déjà
@@ -228,7 +229,7 @@ Match::Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team
     
 }
 
-void Match::makeMoves(int movesTeam1[][4], int movesTeam2[][4]){
+void Match::makeMoves(){
     //moves[][0] : indice de l'objet concerné
     //moves[][1] : action spéciale
     //moves[][2] : diagonale destination
@@ -237,44 +238,44 @@ void Match::makeMoves(int movesTeam1[][4], int movesTeam2[][4]){
     
     //TODO : si chaser lance le souaffle, lui donner une position de départ
     for(int i = 0; i < 7; ++i){
-        if(movesTeam1[i][1] >= 0){ //tentative de capture d'une balle
-            if((__players[movesTeam1[i][0]].getRole() == ROLE_CHASER) and (movesTeam1[i][1] == INTERCEPT_QUAFFLE)){ //normalement c'est test est fait aussi niveau client
+        if(__movesTeam1[i][1] >= 0){ //tentative de capture d'une balle
+            if((__players[__movesTeam1[i][0]].getRole() == ROLE_CHASER) and (__movesTeam1[i][1] == INTERCEPT_QUAFFLE)){ //normalement c'est test est fait aussi niveau client
                 //tentative de récupérer le quaffle
                 //calcul de la distance entre l'attrapeur et la balle
                 //TODO : meilleure gestion de l'indice des balles
-                int distance = __players[movesTeam1[i][0]].getPosition().getDistanceTo(__balls[3].getPosition());
-                if(__players[movesTeam1[i][0]].interceptQuaffle(distance)){ //si attrapage réussi
-                    __players[movesTeam1[i][0]].carryQuaffle(); //le joueur prend la balle avec lui
+                int distance = __players[__movesTeam1[i][0]].getPosition().getDistanceTo(__balls[3].getPosition());
+                if(__players[__movesTeam1[i][0]].interceptQuaffle(distance)){ //si attrapage réussi
+                    __players[__movesTeam1[i][0]].carryQuaffle(); //le joueur prend la balle avec lui
                     __field.setOccupant(__balls[3].getPosition(), -1); //balle sort du terrain
-                    __balls[3].moveTo(__players[movesTeam1[i][0]].getPosition()); //superposition joueur et balle
+                    __balls[3].moveTo(__players[__movesTeam1[i][0]].getPosition()); //superposition joueur et balle
                 }
             }
-            else if((__players[movesTeam1[i][0]].getRole() == ROLE_SEEKER) and (movesTeam1[i][1] == CATCH_GOLDENSNITCH)){ //normalement ce test est fait aussi niveau client
+            else if((__players[__movesTeam1[i][0]].getRole() == ROLE_SEEKER) and (__movesTeam1[i][1] == CATCH_GOLDENSNITCH)){ //normalement ce test est fait aussi niveau client
                 //tentative d'attraper le vif d'or
                 //calcul de la distance entre l'attrapeur et la balle
-                int distance = __players[movesTeam1[i][0]].getPosition().getDistanceTo(__balls[0].getPosition());
-                if(__players[movesTeam1[i][0]].catchGoldenSnitch(distance)){ //si attrapage réussi
+                int distance = __players[__movesTeam1[i][0]].getPosition().getDistanceTo(__balls[0].getPosition());
+                if(__players[__movesTeam1[i][0]].catchGoldenSnitch(distance)){ //si attrapage réussi
                     __scoreTeam1 += 150;
                     __winner = (__scoreTeam1 > __scoreTeam2) ? 1 : 2;
                 }
             }
         }
-        if(movesTeam2[i][1] >= 0 and not __winner){ //tentative de capture d'une balle
-            if((__players[movesTeam2[i][0]].getRole() == ROLE_CHASER) and (movesTeam2[i][1] == INTERCEPT_QUAFFLE)){ //normalement ce test est fait aussi niveau client
+        if(__movesTeam2[i][1] >= 0 and not __winner){ //tentative de capture d'une balle
+            if((__players[__movesTeam2[i][0]].getRole() == ROLE_CHASER) and (__movesTeam2[i][1] == INTERCEPT_QUAFFLE)){ //normalement ce test est fait aussi niveau client
                 //tentative de récupérer le quaffle
                 //calcul de la distance entre l'attrapeur et la balle
-                int distance = __players[movesTeam2[i][0]].getPosition().getDistanceTo(__players[QUAFFLE].getPosition());
-                if(__players[movesTeam2[i][0]].interceptQuaffle(distance)){ //si attrapage réussi
-                    __players[movesTeam2[i][0]].carryQuaffle(); //le joueur prend la balle avec lui
+                int distance = __players[__movesTeam2[i][0]].getPosition().getDistanceTo(__players[QUAFFLE].getPosition());
+                if(__players[__movesTeam2[i][0]].interceptQuaffle(distance)){ //si attrapage réussi
+                    __players[__movesTeam2[i][0]].carryQuaffle(); //le joueur prend la balle avec lui
                     __field.setOccupant(__players[QUAFFLE].getPosition(), -1); //balle sort du terrain
-                    __players[QUAFFLE].moveTo(__players[movesTeam2[i][0]].getPosition()); //superposition joueur et balle
+                    __players[QUAFFLE].moveTo(__players[__movesTeam2[i][0]].getPosition()); //superposition joueur et balle
                 }
             }
-            else if((__players[movesTeam2[i][0]].getRole() == ROLE_SEEKER) and (movesTeam2[i][1] == CATCH_GOLDENSNITCH)){ //normalement ce test est fait aussi niveau client
+            else if((__players[__movesTeam2[i][0]].getRole() == ROLE_SEEKER) and (__movesTeam2[i][1] == CATCH_GOLDENSNITCH)){ //normalement ce test est fait aussi niveau client
                 //tentative d'attraper le vif d'or
                 //calcul de la distance entre l'attrapeur et la balle
-                int distance = __players[movesTeam2[i][0]].getPosition().getDistanceTo(__players[GOLDENSNITCH].getPosition());
-                if(__players[movesTeam2[i][0]].catchGoldenSnitch(distance) and not __winner){ //si attrapage réussi
+                int distance = __players[__movesTeam2[i][0]].getPosition().getDistanceTo(__players[GOLDENSNITCH].getPosition());
+                if(__players[__movesTeam2[i][0]].catchGoldenSnitch(distance) and not __winner){ //si attrapage réussi
                     __scoreTeam1 += 150;
                     __winner = (__scoreTeam1 > __scoreTeam2) ? 1 : 2;
                 }
@@ -287,36 +288,36 @@ void Match::makeMoves(int movesTeam1[][4], int movesTeam2[][4]){
     //2ème étape : gestion des déplacements case par case dans un ordre prioritaire
     
     std::vector< std::vector<Move> > allMoves;
-    //TODO : analyser les objets dans movesTeam1 et movesTeam2 pour récupérer les destination par rapport à l'ordre prioritaire.
+    //TODO : analyser les objets dans __movesTeam1 et __movesTeam2 pour récupérer les destination par rapport à l'ordre prioritaire.
     //TODO : concaténer l'ensemble des déplacements voulu et les trier par rapport à l'ordre prioritaire par rapport à la vitesse
     //provisoire : réalisation des mouvements en fonction de l'ordre reçu des clients
     std::vector<int> movesOrder;
     
     for(int i = 0; i < 7; ++i){
         //on prend un joueur/balle déplacé par la 1ère équipe
-        if((movesTeam1[i][1] == NO_SPECIAL_ACTION) and (movesTeam1[i][2] < 10000)){ //si pas d'action spéciale et déplacement non vide
+        if((__movesTeam1[i][1] == NO_SPECIAL_ACTION) and (__movesTeam1[i][2] < 10000)){ //si pas d'action spéciale et déplacement non vide
             std::cout << "Objet de la 1ère équipe" << std::endl;
-            if(movesTeam1[i][0] < GOLDENSNITCH){ //si pas une balle
-                std::vector<Move> orderedMoves = __players[movesTeam1[i][0]].getPosition().getMovesTo(AxialCoordinates(movesTeam1[i][2], movesTeam1[i][3]));
+            if(__movesTeam1[i][0] < GOLDENSNITCH){ //si pas une balle
+                std::vector<Move> orderedMoves = __players[__movesTeam1[i][0]].getPosition().getMovesTo(AxialCoordinates(__movesTeam1[i][2], __movesTeam1[i][3]));
                 allMoves.push_back(orderedMoves);
                 
             }else{
-                std::vector<Move> orderedMoves = __balls[movesTeam1[i][0]].getPosition().getMovesTo(AxialCoordinates(movesTeam1[i][2], movesTeam1[i][3]));
+                std::vector<Move> orderedMoves = __balls[__movesTeam1[i][0]].getPosition().getMovesTo(AxialCoordinates(__movesTeam1[i][2], __movesTeam1[i][3]));
                 allMoves.push_back(orderedMoves);
             }
-            movesOrder.push_back(movesTeam1[i][0]);
+            movesOrder.push_back(__movesTeam1[i][0]);
         }
         //on prend un joueur/balle à déplacer dans la seconde équipe
-        if((movesTeam2[i][1] == NO_SPECIAL_ACTION) and (movesTeam2[i][2] < 10000)){ //si pas d'action spéciale et déplacement non vide
-            if(movesTeam2[i][0] < GOLDENSNITCH){ //si pas une balle
-                std::vector<Move> orderedMoves = __players[movesTeam2[i][0]].getPosition().getMovesTo(AxialCoordinates(movesTeam2[i][2], movesTeam2[i][3]));
+        if((__movesTeam2[i][1] == NO_SPECIAL_ACTION) and (__movesTeam2[i][2] < 10000)){ //si pas d'action spéciale et déplacement non vide
+            if(__movesTeam2[i][0] < GOLDENSNITCH){ //si pas une balle
+                std::vector<Move> orderedMoves = __players[__movesTeam2[i][0]].getPosition().getMovesTo(AxialCoordinates(__movesTeam2[i][2], __movesTeam2[i][3]));
                 allMoves.push_back(orderedMoves);
                 
             }else{
-                std::vector<Move> orderedMoves = __balls[movesTeam2[i][0]].getPosition().getMovesTo(AxialCoordinates(movesTeam2[i][2], movesTeam2[i][3]));
+                std::vector<Move> orderedMoves = __balls[__movesTeam2[i][0]].getPosition().getMovesTo(AxialCoordinates(__movesTeam2[i][2], __movesTeam2[i][3]));
                 allMoves.push_back(orderedMoves);
             }
-            movesOrder.push_back(movesTeam2[i][0]);
+            movesOrder.push_back(__movesTeam2[i][0]);
         }
     }
     // déplacement autonome

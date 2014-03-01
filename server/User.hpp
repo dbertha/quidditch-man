@@ -60,6 +60,7 @@ private:
 	Manager* manager_;
 	Calendar* calendar_;
 	Auction* auction_;
+    int **__moves;
 };
 
 #endif

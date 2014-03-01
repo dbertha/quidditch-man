@@ -424,9 +424,9 @@ void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field, std::vector
       
       std::cin >> choiceInput;
       if(choiceInput == 0){
-        std::cout << "Déplacement le long de la diagonale \\ (négatif pour monter, positif pour descendre) : " << std::endl;
+        std::cout << "Déplacement le long de la ligne -- (négatif vers la gauche, positif vers la droite) : " << std::endl;
         std::cin >> deltaDiag;
-        std::cout << "Déplacement le long de la colonne | (négatif pour monter, positif pour descendre) : " << std::endl;
+        std::cout << "Déplacement le long de la diagonale \\ (négatif pour monter, positif pour descendre) : " << std::endl;
         std::cin >> deltaLine;
         if(attributs.position.getDistanceTo(AxialCoordinates(attributs.position.getDiagAxis() + deltaDiag, attributs.position.getLineAxis() + deltaLine)) <= attributs.attributes[SPEED]){
           //si case accessible
@@ -462,6 +462,7 @@ void startMatch(int sockfd, int numTeam){
     }
     field.display();
     askAndSendMoves(sockfd, numTeam, field, allPositions);
+    getConfirmation(sockfd);
     
     cout << "Les échanges de messages suivants pour le match n'ont pas encore été implémentés." << endl;
     winner =1;

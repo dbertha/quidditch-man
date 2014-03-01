@@ -71,9 +71,9 @@ public :
     }
     
     bool isOnField(){
-        return (abs(getDiagAxis() + getLineAxis()) < (MATRIX_SIZE/2)) //sur la partie de la matrice utilisée
-        and (abs(getDiagAxis()) < (MATRIX_SIZE/2)) //out of range
-        and (abs(getLineAxis()) < (MATRIX_SIZE/2));
+        return (abs(getDiagAxis() + getLineAxis()) <= (MATRIX_SIZE/2)) //sur la partie de la matrice utilisée
+        and (abs(getDiagAxis()) <= (MATRIX_SIZE/2)) //out of range
+        and (abs(getLineAxis()) <= (MATRIX_SIZE/2));
     }
     
     int getDistanceTo(AxialCoordinates destination){

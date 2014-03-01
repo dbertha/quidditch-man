@@ -31,10 +31,12 @@ private :
     std::vector<int> __indexesSortedBySpeed;
     int __scoreTeam1;
     int __scoreTeam2;
+    int **__movesTeam1;
+    int **__movesTeam2;
 public :
-    Match(std::vector<ManagedPlayer> &team1); //match en attente de recevoir l'équipe adverse
-    void launch(std::vector<ManagedPlayer> &team2);
-    Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team2);
+    Match(std::vector<ManagedPlayer> &team1, int ** movesTeam1); //match en attente de recevoir l'équipe adverse
+    void launch(std::vector<ManagedPlayer> &team2, int ** movesTeam2);
+    Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team2, int ** movesTeam1, int **movesTeam2);
     //Listes ordonnées de 7 joueurs telles que 
     //~ KEEPER en position 0
     //~ SEEKER 1
@@ -43,7 +45,7 @@ public :
     //~ CHASER3 4
     //~ BEATER1 5
     //~ BEATER2 6
-    void makeMoves(int movesTeam1[][4], int movesTeam2[][4]);
+    void makeMoves();
     int getWinner();
     PlayingPlayer * getPlayer(int indexObject);
     bool isInVector(std::vector<int> toTest, int value);

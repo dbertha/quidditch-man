@@ -41,7 +41,7 @@
 #define WAITINGSECONDMOVE 2 
 #define INVITORSASKENDOFMATCH 3 
 #define INVITEDASKENDOFMATCH 4
-#define WAITING_POSITIONS 5
+#define WAITING_MOVES 5
 
 class User;
 class MatchesHandler{
@@ -50,16 +50,17 @@ private :
     std::vector<User *> invitors;
     std::vector<User *> inviteds;
     std::vector<int> statesOfMatches; //WAITINGACCEPTMATCH, WAITINGFIRSTMOVE, WAITINGSECONDMOVE, INVITORSASKENDOFMATCH, INVITEDASKENDOFMATCH
-    std::vector<int**> movesLists; //pour chaque match, enregistre les déplacements des deux joueurs avant de les passer à l'instance de Match
+    //std::vector<int**> movesLists; //pour chaque match, enregistre les déplacements des deux joueurs avant de les passer à l'instance de Match
     //enregistrement dans user de l'équipe
 public :
     MatchesHandler(){} //construction par défaut des listes
-    void proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1);
-    void respondToMatchProposal(User * invited, std::vector<ManagedPlayer> &team2);
+    void proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1, int **movesTeam1);
+    void respondToMatchProposal(User * invited, std::vector<ManagedPlayer> &team2, int **movesTeam2);
     bool isInvited(User * user);
     int sendConfirmationTo(User * client, int answerCode);
     void getScoresAndPositions(User * demander);
     void getPlayerInfos(User * demander, int playerID);
+    void recordMoves(User * demander);
 };
 
 #endif
