@@ -318,11 +318,12 @@ void mainAuction(int sockfd, int auctionID, int timeLeft) {
 
 
 void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field, std::vector<AxialCoordinates> &positions){
+	//TODO : inutile de récupérer la position du joueur lors de la sélection, déjà contenue dans le vecteur positions
   int moves[7][4];
   int playerRole = 0;
   int currentMove = 0;
   int selectedPlayerID = 1;
-  int choiceInput, deltaDiag, deltaLine;
+  int choiceInput, deltaDiag, deltaLine, distanceAccepted;
   playerAttr attributs;
   std::string keeper, seeker, chaser1, chaser2, chaser3, beater1, beater2, quaffle, bludger, goldensnitch;
   int nearestBludger = BLUDGER1;
@@ -349,6 +350,7 @@ void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field, std::vector
   goldensnitch = GOLDENSNITCH_UNICODE;
   
   //initialisation de la matrice des mouvements : liste de mouvements vides
+  //TODO : à n'initialiser qu'une fois, à la création de l'instance client,à l'instar de User
   for(int i = 0; i < 7; ++i){
     moves[i][0] = i;
     moves[i][1] = NO_SPECIAL_ACTION;
@@ -407,19 +409,19 @@ void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field, std::vector
       else if((playerRole <= TEAM1_BEATER2) and (playerRole >= TEAM1_BEATER1)){
         
         if (attributs.position.getDistanceTo(positions[BLUDGER2]) < attributs.position.getDistanceTo(positions[BLUDGER1])){
-          nearestBludger = BLUDGER2;
-        }
+          nearestBludger = BLUDGER2;        }
         if(attributs.position.getDistanceTo(positions[nearestBludger]) < 2 ){ //seulement si adjacent
           std::cout << "[1]Frapper le cognard dans une direction" << std::endl;
         }
       }
       //menus proposés seulement si précision suffisante par rapport à la distance avec la balle
-      else if(((playerRole <= TEAM1_CHASER3) and (playerRole>= TEAM1_CHASER1)) or (playerRole == TEAM1_KEEPER)
-      and (attributs.position.getDistanceTo(positions[QUAFFLE]) < attributs.attributes[PRECISION])){
+      //TODO : que faire si souaffle à distance accessible mais déjà possédé par un chaser ?
+      else if((((playerRole <= TEAM1_CHASER3) and (playerRole>= TEAM1_CHASER1)) or (playerRole == TEAM1_KEEPER))
+      and (attributs.position.getDistanceTo(positions[QUAFFLE]) <= attributs.attributes[PRECISION])){
         std::cout << "[2]Tenter de récupérer le souaffle" << std::endl;
       }
       else if((playerRole == TEAM1_SEEKER)
-      and (attributs.position.getDistanceTo(positions[GOLDENSNITCH]) < attributs.attributes[PRECISION]) ){
+      and (attributs.position.getDistanceTo(positions[GOLDENSNITCH]) <= attributs.attributes[PRECISION]) ){
         std::cout << "[2]Tenter d'attraper le vif d'or" << std::endl;
       }
       
@@ -439,7 +441,8 @@ void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field, std::vector
           std::cout << "Case trop éloignée, votre joueur n'a pas une vitesse suffisante !" << std::endl;
         }
       }
-      else if(choiceInput == 2){ //interception d'une balle
+      //interception d'une balle
+      else if(choiceInput == 2){ 
         if(playerRole == TEAM1_SEEKER){
           moves[currentMove][0] = selectedPlayerID;
           moves[currentMove][1] = CATCH_GOLDENSNITCH;
@@ -449,16 +452,43 @@ void askAndSendMoves(int sockfd, int numTeam, HexagonalField &field, std::vector
           moves[currentMove][1] = INTERCEPT_QUAFFLE;
         }
       }
-      else if(choiceInput == 1){ //frappage/lancement d'une balle : déplacement du joueur remplacé par déplacement de la balle
+      //frappage/lancement d'une balle : déplacement du joueur remplacé par déplacement de la balle
+      else if(choiceInput == 1){ 
         if((playerRole == TEAM1_BEATER1) or (playerRole == TEAM1_BEATER2)){
-          moves[currentMove][0] = nearestBludger;
-          moves[currentMove][1] = NO_SPECIAL_ACTION;
-          //TODO : demander déplacement
+          distanceAccepted = attributs.attributes[STRENGTH];
+          field.display(positions[nearestBludger], distanceAccepted); 
+          //pour le moment, la taille du déplacement du cognard quand frappé ne dépend que de l'attribut force
+          std::cout << "Déplacement du cognard le long de la ligne -- (négatif vers la gauche, positif vers la droite) : " << std::endl;
+          std::cin >> deltaDiag;
+          std::cout << "Déplacement du cognard le long de la diagonale \\ (négatif pour monter, positif pour descendre) : " << std::endl;
+          std::cin >> deltaLine;
+          if(positions[nearestBludger].getDistanceTo(AxialCoordinates(positions[nearestBludger].getDiagAxis() + deltaDiag, positions[nearestBludger].getLineAxis() + deltaLine)) <= distanceAccepted){
+          //si case accessible
+            moves[currentMove][0] = nearestBludger;
+            moves[currentMove][1] = NO_SPECIAL_ACTION;
+            moves[currentMove][2] = positions[nearestBludger].getDiagAxis() + deltaDiag;
+            moves[currentMove][3] = positions[nearestBludger].getLineAxis() + deltaLine;
+          }else{
+            std::cout << "Hors du terrain ou votre joueur n'est pas assez fort pour l'envoyer si loin !" << std::endl;
+          }
         }
         else if(attributs.hasQuaffle){
-          moves[currentMove][0] = QUAFFLE;
-          moves[currentMove][1] = NO_SPECIAL_ACTION;
-          //TODO : demander déplacement
+          distanceAccepted = attributs.attributes[STRENGTH];
+          field.display(positions[QUAFFLE], distanceAccepted); 
+          //TODO : pour marquer un but il faut que la trajectoire du souaffle soit une ligne
+          std::cout << "Déplacement du souaffle le long de la ligne -- (négatif vers la gauche, positif vers la droite) : " << std::endl;
+          std::cin >> deltaDiag;
+          std::cout << "Déplacement du souaffle le long de la diagonale \\ (négatif pour monter, positif pour descendre) : " << std::endl;
+          std::cin >> deltaLine;
+          if(positions[selectedPlayerID].getDistanceTo(AxialCoordinates(positions[selectedPlayerID].getDiagAxis() + deltaDiag, positions[selectedPlayerID].getLineAxis() + deltaLine)) <= distanceAccepted){
+            //si case accessible
+            moves[currentMove][0] = QUAFFLE;
+            moves[currentMove][1] = NO_SPECIAL_ACTION;
+            moves[currentMove][2] = attributs.position.getDiagAxis() + deltaDiag;
+            moves[currentMove][3] = attributs.position.getLineAxis() + deltaLine;
+          }else{
+            std::cout << "Hors du terrain ou votre joueur n'est pas assez fort pour l'envoyer si loin !" << std::endl;
+          }
         }
       } 
           
@@ -475,22 +505,29 @@ void startMatch(int sockfd, int numTeam){
   int scoreTeam2 = 0;
   HexagonalField field;
   std::vector<AxialCoordinates> allPositions;
-  while(winner == 0){
-    getAllPositions(sockfd);
-    allPositions = receiveScoresAndPositions(sockfd, &winner, &scoreTeam1, &scoreTeam2);
+  getAllPositions(sockfd);
+  allPositions = receiveScoresAndPositions(sockfd, &winner, &scoreTeam1, &scoreTeam2);
+  while(winner == 0){    
     cout << "Score team1 (inviter) = " << scoreTeam1 << endl;
     cout << "Score team2 (invited) = " << scoreTeam2 << endl;
     field.reset();
     for(unsigned int i = 0; i < allPositions.size(); ++i){
-      field.setOccupant(allPositions[i], i);
+      if(field.getOccupant(allPositions[i]) == FREE_SPACE){
+        field.setOccupant(allPositions[i], i);
+      }
     }
     field.display();
+    //TODO : tester si balle superposée à un joueur, et indiquer le joueur le cas échéant
     askAndSendMoves(sockfd, numTeam, field, allPositions);
     getConfirmation(sockfd);
     
-    cout << "Les échanges de messages suivants pour le match n'ont pas encore été implémentés." << endl;
-    winner =1;
+    //cout << "Les échanges de messages suivants pour le match n'ont pas encore été implémentés." << endl;
+    //winner =1;
+    getAllPositions(sockfd);
+    allPositions = receiveScoresAndPositions(sockfd, &winner, &scoreTeam1, &scoreTeam2);
   }
+  //TODO : gérer demande de match nul
+  cout << "Winner is team " << winner << endl;
 }
 std::vector<int> displayAndAskPlayersForMatch(int sockfd){
   displayPlayersList(sockfd);

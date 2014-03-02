@@ -10,10 +10,6 @@
 #include <iostream>
 #include <cstring> //memcpy
 
-//compilation du module match avec tests :
-//g++ -Wall -Wextra  testMatch.cpp Match.cpp PlayingPlayer.cpp HexagonalField.cpp ManagedPlayer.cpp Player.cpp Broomstick.cpp -o match.out
-
-
 
 
 //TODO : logger ce qu'il se passe pour le renvoyer au client
