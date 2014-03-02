@@ -66,7 +66,7 @@ void LoginDialog::loginClicked()
                 }
                 else {//on tente le login
                     lineEdit->clear();
-
+                    accept();
                 }
             }
         else //vérifions si les 2 mots de passe sont identiques

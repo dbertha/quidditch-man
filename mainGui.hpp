@@ -16,11 +16,19 @@ private slots:
         void quit();
         int login();
 private:
+        void firstMenu();
         void createMenu();
         QAction *loginAction;
         QAction *exitAction;
         QAction *aboutAction;
+        QAction *listMgrAction;
+        QAction *listAuctionsAction;
+        QAction *newAuctionAction;
+        QAction *listPlayersAction;
         QMenu *fileMenu;
+        QMenu *matchMenu;
+        QMenu *auctionMenu;
+        QMenu *playersMenu;
         QMenu *helpMenu;
         LoginDialog *dialog;
         int sockfd_;
