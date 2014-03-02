@@ -110,9 +110,9 @@
 #define FREE_SPACE_UNICODE "\u2B1C"
 #define GOAL_UNICODE "\u2A02"
 
-#define GOAL_SIDE1_DIAG 9
+#define GOAL_SIDE1_DIAG -9
 #define GOAL_SIDE1_LINE 0
-#define GOAL_SIDE2_DIAG -9
+#define GOAL_SIDE2_DIAG 9
 #define GOAL_SIDE2_LINE 0
 
 #define ROLE_KEEPER 0
