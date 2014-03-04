@@ -44,10 +44,10 @@ int main(int argc, char *argv[])
     }
     sockfd_ = socket(PF_INET,SOCK_STREAM, 0);
     if (sockfd_ == ERROR) return EXIT_FAILURE;
-//    if (connect(sockfd_, (struct sockaddr *)&serverAddr,sizeof(struct sockaddr)) == ERROR) {
-//            std::cout<<"Le serveur est absent."<<std::endl;
-//            return EXIT_FAILURE;
-//   }
+    if (connect(sockfd_, (struct sockaddr *)&serverAddr,sizeof(struct sockaddr)) == ERROR) {
+            std::cout<<"Le serveur est absent."<<std::endl;
+            return EXIT_FAILURE;
+   }
     QApplication application(argc, argv);
     MainGui * window=new MainGui(sockfd_);
     window->show();
