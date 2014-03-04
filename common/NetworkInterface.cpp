@@ -93,7 +93,7 @@ int getManagersList(int sockfd){
     return sendOnSocket(sockfd, serialized);
 }
 
-//réception des donnéés du serveur :
+//réception des données du serveur :
 
 bool getConfirmation(int sockfd){
 //valable pour LOGIN_CONFIRM, UPGRADE_CONFIRM, TRAINING_STARTED, HEAL_STARTED, AUCTIONCREATION_CONFIRM

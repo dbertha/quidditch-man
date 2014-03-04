@@ -3,8 +3,17 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <QMainWindow>
+#include <QAction>
+#include <QMenuBar>
+#include <QMenu>
+#include <QMessageBox>
+#include <QStringList>
+
 #include "loginDialog.hpp"
+#include "selectionDialog.hpp"
+
 class MainGui : public QMainWindow{
     Q_OBJECT
 public:
@@ -14,23 +23,32 @@ public:
 private slots:
         void about();
         void quit();
-        int login();
+        void login();
+        void logout();
+        void listMgrs();
 private:
+        int badConnection();
         void firstMenu();
         void createMenu();
         QAction *loginAction;
+        QAction *logoutAction;
         QAction *exitAction;
         QAction *aboutAction;
-        QAction *listMgrAction;
+        QAction *listMgrsAction;
         QAction *listAuctionsAction;
         QAction *newAuctionAction;
         QAction *listPlayersAction;
+        QAction *enterStadiumAction;
+        QAction *enterTrainingCenterAction;
+        QAction *enterHospitalAction;
+        QAction *enterFanShopAction;
         QMenu *fileMenu;
         QMenu *matchMenu;
         QMenu *auctionMenu;
         QMenu *playersMenu;
+        QMenu *buildingsMenu;
         QMenu *helpMenu;
-        LoginDialog *dialog;
+        LoginDialog *loginDialog;
         int sockfd_;
         QMainWindow parent_;
 };
