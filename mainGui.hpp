@@ -10,7 +10,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QStringList>
-
+#include "ticker.hpp"
 #include "loginDialog.hpp"
 #include "clientMatchHandler.hpp"
 
@@ -49,6 +49,7 @@ private:
         QMenu *playersMenu;
         QMenu *buildingsMenu;
         QMenu *helpMenu;
+        Ticker *ticker;
         LoginDialog *loginDialog;
         int sockfd_;
         QMainWindow parent_;

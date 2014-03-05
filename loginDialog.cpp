@@ -88,18 +88,18 @@ void LoginDialog::loginClicked()
                                  init();
                              }
                     }
-                }
+            }
             else //vérifions si les 2 mots de passe sont identiques
                 if (password1==text) {//on tente l'enregistrement
                     strncpy(username,userName.toAscii().data(),USERNAME_LENGTH);
                     strncpy(password,password1.toAscii().data(),PASSWORD_LENGTH);
                     if(sendNewManagerToServer(sockfd_,username,password)!=0)
-                         accept();
-                    else {
-                        errorMessageDialog->showMessage(
-                                tr("Registration did not succeed."));
-                        init();
-                    }
+                        if (getConfirmation(sockfd_)) accept();
+                        else {
+                            errorMessageDialog->showMessage(
+                                tr("User name already registred."));
+                            init();
+                        }
                 }
                 else {
                     std::cout<<"pswd "<<text.toStdString()<<std::endl;

@@ -6,6 +6,8 @@ MainGui::MainGui(int sockfd,QMainWindow *parent) : sockfd_(sockfd), parent_(pare
     firstMenu();
     setWindowTitle(tr("Quidditch Manager 2014"));
     loginDialog = new LoginDialog(sockfd_,this);
+    ticker = new Ticker(sockfd_,this);
+    ticker->show();
     login();
 }
 
@@ -24,11 +26,13 @@ int MainGui::badConnection() {
 }
 
 void MainGui::listMgrs() {
+    ticker->hide();
     int res = choosePartner(sockfd_,this);
     if (res==BAD_CONNECTION) badConnection();
     else {
-
+// .............
     }
+    ticker->show();
 }
 void MainGui::login() {
     loginDialog->init();
@@ -73,8 +77,8 @@ void MainGui::firstMenu() {
 
 void MainGui::createMenu() {
         fileMenu->removeAction(loginAction);
-        fileMenu->addAction(logoutAction);
-        connect(logoutAction,SIGNAL(triggered()),this,SLOT(logout()));
+//        fileMenu->addAction(logoutAction);
+//        connect(logoutAction,SIGNAL(triggered()),this,SLOT(logout()));
         matchMenu=menuBar()->addMenu(tr("Match"));
         matchMenu->addAction(listMgrsAction);
         connect(listMgrsAction,SIGNAL(triggered()),this,SLOT(listMgrs()));
