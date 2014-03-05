@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <time.h>
-#include "User.hpp"
-#include "Manager.hpp"
-#include "ManagedPlayer.hpp"
-#include <vector>
-#include <string>
 #include "Auction.hpp"
 
 #define TIMEOFTURNZERO 70 //en secondes.

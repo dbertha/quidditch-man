@@ -1,11 +1,15 @@
-#include <stdio.h>
-#include <time.h>
-#include <string>
+#ifndef AUCTION_HPP
+#define AUCTION_HPP
 
 #include "User.hpp"
 #include "Manager.hpp"
 #include "ManagedPlayer.hpp"
+#include <stdio.h>
+#include <time.h>
+#include <string>
 #include <vector>
+
+class User;
 
 class Auction {
 
@@ -39,3 +43,5 @@ class Auction {
  	void bid(User* bidder);
 
 };
+
+#endif

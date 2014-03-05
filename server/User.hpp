@@ -1,19 +1,32 @@
 #ifndef USER_H
 #define USER_H
-#include "../common/NetworkBase.h"
-#include "MatchesHandler.hpp"
+
+#include "NetworkBase.hpp"
+
+#include "Manager.hpp"
+#include "ManagedPlayer.hpp"
+#include "Calendar.hpp"
+
+
+
+#include <sys/stat.h>
 #include <iostream>
+#include <stdlib.h>     /* atoi */
+#include <ctime>
+#include <cstdlib>
+#include <vector>
+
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <pthread.h>
 #include <string>
 #include <sstream>
-#include <iostream>
-#include "../server/Manager.hpp"
-#include "../server/ManagedPlayer.hpp"
-#include "../server/Calendar.hpp"
 
 
 class Server;
 class Auction;
+class MatchesHandler;
 
 #define INIT 0
 #define FREE 1 
@@ -22,7 +35,7 @@ class Auction;
 #define MATCH_INGAME 4
 #define DISCONNECTING 5
 
-class MatchesHandler;
+
 class User {
 public:
 	User(Server *, MatchesHandler *, int, int);

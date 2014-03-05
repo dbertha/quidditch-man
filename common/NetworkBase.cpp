@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "Defines.hpp"
-#include "NetworkBase.h"
+#include "NetworkBase.hpp"
 
 /* recv(socket, *message, sizeToWrite, 0) return sizeWriten if ok
 //send(socket, *message, sizeToRead, 0) return sizeRead if ok */

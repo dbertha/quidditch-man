@@ -1,9 +1,9 @@
 #include "Server.hpp"
 //#include "CommonMgr.hpp"
-#include "User.hpp"
-#include <netinet/in.h> //htons()  ntohs()
-#include "../common/NetworkBase.h"
-#include "../server/Auction.hpp"
+//~ #include "User.hpp"
+//~ #include <netinet/in.h> //htons()  ntohs()
+//~ #include "../common/NetworkBase.h"
+//~ #include "../server/Auction.hpp"
 
 //TODO : pas de EXIT_SUCCESS ou EXIT_FAILURE pour d'autres méthodes que main()
 

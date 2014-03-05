@@ -1,5 +1,5 @@
 
-#include "../common/NetworkBase.h"
+#include "../common/NetworkBase.hpp"
 #include "../common/NetworkInterface.hpp"
 #include "../common/Defines.hpp"
 #include "../common/HexagonalField.hpp"

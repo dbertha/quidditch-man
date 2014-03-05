@@ -1,23 +1,12 @@
 #include "User.hpp"
+
+#include "MatchesHandler.hpp" 
+#include "Auction.hpp"
 #include "Server.hpp"
-#include "../common/NetworkBase.h"
-#include "../server/Manager.hpp"
-#include "../server/Calendar.hpp"
-#include "../server/Auction.hpp"
 
-#include <sys/stat.h>
-#include <iostream>
-#include <stdlib.h>     /* atoi */
-#include <ctime>
-#include <cstdlib>
-#include <stdio.h>
-#include <string.h>
-#include <vector>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
+
+
 
 
 

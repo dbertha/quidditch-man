@@ -3,7 +3,7 @@
 
 #include "../common/HexagonalField.hpp"
 #include "../common/Defines.hpp"
-#include "../common/NetworkBase.h"
+#include "../common/NetworkBase.hpp"
 #include "ManagedPlayer.hpp"
 #include "PlayingPlayer.hpp"
 #include "Ball.hpp"

@@ -2,7 +2,7 @@
 #define NETWORKINTERFACE_HPP
 
 /* Interface réseau en C++ qui fera appel au module C */
-#include "NetworkBase.h" //SerializedObject
+#include "NetworkBase.hpp" //SerializedObject
 #include "Defines.hpp" 
 #include "HexagonalField.hpp"
 
@@ -14,7 +14,7 @@
 #include <vector>
 #include <iostream>
 
-
+ 
 
 //Q : méthodes membres statiques d'une classe ?
 //TODO : renommage + adapté, "ask serveur" != "ask client"

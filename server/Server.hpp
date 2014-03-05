@@ -2,9 +2,11 @@
 #define SERVER_H
 
 #include "../common/Defines.hpp"
-#include "../common/NetworkBase.h"
+#include "../common/NetworkBase.hpp"
 #include "../common/commAPI.hpp"
 #include "MatchesHandler.hpp"
+#include "User.hpp"
+#include "Auction.hpp"
 #include <iostream>
 #include <set>
 #include <vector>
