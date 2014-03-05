@@ -11,6 +11,7 @@
 #include <QErrorMessage>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QString>
 
 #include <iostream>
 #include <stdio.h>
@@ -33,6 +34,7 @@ class LoginDialog : public QDialog
 public:
     LoginDialog(int, QWidget *parent = 0);
     void init();
+    QString getName();
 
 signals:
     void login(const QString &,const QString &);

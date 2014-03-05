@@ -12,7 +12,7 @@
 #include <QStringList>
 
 #include "loginDialog.hpp"
-#include "selectionDialog.hpp"
+#include "clientMatchHandler.hpp"
 
 class MainGui : public QMainWindow{
     Q_OBJECT
@@ -28,6 +28,7 @@ private slots:
         void listMgrs();
 private:
         int badConnection();
+        void createActions();
         void firstMenu();
         void createMenu();
         QAction *loginAction;

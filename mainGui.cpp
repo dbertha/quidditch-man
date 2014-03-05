@@ -2,6 +2,7 @@
 
 MainGui::MainGui(int sockfd,QMainWindow *parent) : sockfd_(sockfd), parent_(parent) {
     setFixedSize(1200,600);
+    createActions();
     firstMenu();
     setWindowTitle(tr("Quidditch Manager 2014"));
     loginDialog = new LoginDialog(sockfd_,this);
@@ -23,25 +24,9 @@ int MainGui::badConnection() {
 }
 
 void MainGui::listMgrs() {
-    std::vector<int> * IDList;
-    std::vector<std::string> * namesList;
-    if (getManagersList(sockfd_)==0) {
-        badConnection();
-        return;
-    }
-    receiveManagersIDandNames(sockfd_,IDList,namesList);
-    QStringList items;
-    char username[USERNAME_LENGTH];
-    std::vector<std::string>::iterator it;
-    for(it = namesList->begin(); it != namesList->end(); it++) {
-        strncpy(username,(*it).c_str(),USERNAME_LENGTH);
-        items.append(username);
-    }
-    SelectionDialog *selectionDialog = new SelectionDialog(items,this);
-    selectionDialog->setWindowTitle(tr("Select a partner"));
-    if (selectionDialog->exec()==loginDialog->Accepted) {
-        int pos = selectionDialog->getPosition();
-        std::cout<<pos+1<<"eme manager selectionne"<<std::endl;
+    int res = choosePartner(sockfd_,this);
+    if (res==BAD_CONNECTION) badConnection();
+    else {
 
     }
 }
@@ -55,13 +40,25 @@ void MainGui::login() {
 void MainGui::logout() {
     menuBar()->clear();
     firstMenu();
+    loginDialog->init(); //reset userName
 }
+void MainGui::createActions() {
+    loginAction=new QAction(tr("Login"),this);
+    exitAction=new QAction(tr("Exit"),this);
+    aboutAction=new QAction(tr("About"),this);
+    logoutAction=new QAction(tr("Logout"),this);
+    listMgrsAction=new QAction(tr("List available managers"),this);
+    listAuctionsAction=new QAction(tr("List auctions"),this);
+    newAuctionAction=new QAction(tr("New"),this);
+    listPlayersAction=new QAction(tr("List my players"),this);
+    enterStadiumAction=new QAction(tr("Enter Stadium"),this);
+    enterTrainingCenterAction=new QAction(tr("Enter Training Center"),this);
+    enterHospitalAction=new QAction(tr("Enter Hospital"),this);
+    enterFanShopAction=new QAction(tr("Enter FanShop"),this);
+}
+
 void MainGui::firstMenu() {
     // menu minimal - le mgr ne s'est pas encore identifie
-        loginAction=new QAction(tr("Login"),this);
-        exitAction=new QAction(tr("Exit"),this);
-        aboutAction=new QAction(tr("About"),this);
-
         connect(aboutAction,SIGNAL(triggered()),this,SLOT(about()));
         connect(exitAction,SIGNAL(triggered()),this,SLOT(close()));
         connect(loginAction,SIGNAL(triggered()),this,SLOT(login()));
@@ -72,16 +69,6 @@ void MainGui::firstMenu() {
         helpMenu=menuBar()->addMenu(tr("Help"));
     //    helpMenu->addAction(helpAction);
         helpMenu->addAction(aboutAction);
-    // actions pour les autres menus
-        logoutAction=new QAction(tr("Logout"),this);
-        listMgrsAction=new QAction(tr("List available managers"),this);
-        listAuctionsAction=new QAction(tr("List auctions"),this);
-        newAuctionAction=new QAction(tr("New"),this);
-        listPlayersAction=new QAction(tr("List my players"),this);
-        enterStadiumAction=new QAction(tr("Enter Stadium"),this);
-        enterTrainingCenterAction=new QAction(tr("Enter Training Center"),this);
-        enterHospitalAction=new QAction(tr("Enter Hospital"),this);
-        enterFanShopAction=new QAction(tr("Enter FanShop"),this);
 }
 
 void MainGui::createMenu() {

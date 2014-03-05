@@ -47,13 +47,15 @@ LoginDialog::LoginDialog(int sockfd, QWidget *parent): sockfd_(sockfd), QDialog(
 
 void LoginDialog::init() {
     userName=" ";
-     password1=" ";
-     label->setText(tr("User Name"));
-     lineEdit->clear();
-     lineEdit->setEchoMode(lineEdit->Normal);
-     loginButton->setEnabled(false);
-     setResult(Rejected);
+    password1=" ";
+    label->setText(tr("User Name"));
+    lineEdit->clear();
+    lineEdit->setEchoMode(lineEdit->Normal);
+    loginButton->setEnabled(false);
+    setResult(Rejected);
 }
+
+QString LoginDialog::getName() {return userName;}
 
 void LoginDialog::loginClicked()
 {
