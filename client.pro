@@ -4,4 +4,5 @@ TEMPLATE = app
 TARGET = client.out
 DEPENDPATH += . client
 
-SOURCES += client/Client.cpp
+HEADERS += client/Client.hpp
+SOURCES += client/Client.cpp client/ClientMain.cpp

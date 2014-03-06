@@ -31,7 +31,7 @@ void User::cmdHandler(SerializedObject *received) {
 	int targetedUser;
 	int targetedPlayer;
 	int resultOfUpgrade;
-	bool confirmation;
+	int confirmation;
 	int size;
 	int targetedAuction;
 	int isFinished;
@@ -70,12 +70,13 @@ void User::cmdHandler(SerializedObject *received) {
 				calendar_ = new Calendar(manager_);
 				calendar_->update();
 				manager_->save();
+				
 				state_=FREE;
-				confirmation = true;
+				confirmation = NORMAL_LOGIN;
 			}
 			else {
 				std::cout<<"WRONG LOGIN/PASSWORD"<<std::endl;
-				confirmation = false;
+				confirmation = LOGIN_FAILED;
 			}
 			//construct answer
 			answer.typeOfInfos = LOGIN_CONFIRM;
@@ -98,7 +99,7 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Password reçu :  "<<password <<std::endl;
 #endif
 			//handle demand:
-			confirmation = false;
+			confirmation = LOGIN_FAILED;
 			if ((checkLoginAndPassword(username,password)==-1)||(checkLoginAndPassword(username,password)==1)) { //This Manager login already exists
 				std::cout<<"LOGIN ALREADY TAKEN"<<std::endl;
 			}
@@ -112,7 +113,7 @@ void User::cmdHandler(SerializedObject *received) {
 				calendar_ = new Calendar(manager_);
 
 				state_=FREE;
-				confirmation = true;
+				confirmation = NORMAL_LOGIN;
 			}
 			//construct answer
 			answer.typeOfInfos = LOGIN_CONFIRM;

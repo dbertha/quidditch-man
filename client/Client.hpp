@@ -1,0 +1,136 @@
+#ifndef CLIENT_H
+#define CLIENT_H
+
+#include "../common/Defines.hpp"
+#include "../common/NetworkBase.hpp"
+#include "../common/Coordinates.hpp"
+#include "../common/HexagonalField.hpp"
+//#include "../common/NetworkInterface.hpp"
+#include <iostream>
+#include <set>
+#include <vector>
+#include <string> 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <netdb.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
+
+
+#define DIM 100
+
+#define LOG_IN 1
+#define NEW_MANAGER 2
+#define SEE_MANAGERS 1
+#define AUCTION_ROOM 2
+#define MANAGE_PLAYERS 3
+#define MANAGE_BUILDINGS 4
+#define PROPOSEMATCH_OPTION 5
+
+#define SEE_AUCTIONS 1
+#define SELL_PLAYER 2
+#define INSPECT_PLAYER 1
+#define TRAIN_PLAYER_OPTION 2
+#define HEAL_PLAYER_OPTION 3
+#define ENTER_STADIUM 1
+#define ENTER_TRAININGCENTER 2
+#define ENTER_HOSPITAL 3
+#define ENTER_FANSHOP 4
+
+#define ABORT 0
+
+#define TIMESCALE 1
+
+typedef struct { //pas besoin de la classe complète
+    int attributes[5];
+    AxialCoordinates position;
+    int hasQuaffle;
+} playerAttr;
+
+class Client {
+public:
+    Client(int);
+    void run();
+
+private:
+    int sockfd_; //socket d'écoute du serveur
+//SerializedObject received;
+    //char msg[INPUTSIZE];
+    int input_;
+    char opponent_[10];
+    fd_set FDSet_;
+    enum Status {INIT,ADMIN,FREE,MATCH_LIST,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING};
+    Status state_;
+
+    int mainLoop();
+    void loadFDSet();
+    bool keyboard();
+    void askInput();
+    void login();
+    //display :
+    void displayMainMenu();
+    void displayConnexionMenu();
+    void displayManagerInfos();
+    void displayPlayersList();
+    void displayBuildingInfos(std::vector<int> buildingInfos, int buildingID);
+    void displayPlayerInfos(std::vector<int> playerInfos, int playerID);
+    std::string displayAuctionInfos(std::vector<std::string> auctionsList,std::vector<int> playerInfos, int auctionID);
+    void displayAuctionMenus();
+    void displaySellPlayerMenu();
+    void displayManagePlayersMenu();
+    void displayManageBuildingsMenu();
+    //handlers :
+    void kbMgr();
+    void commMgr();
+    void matchTentative();
+    void contactServer();
+    void receiveMessage();
+    //network :
+    int sendLoginToServer(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
+    int sendNewManagerToServer(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
+    int getConfirmation();
+    
+    int askForManagerInfos();
+    void receiveManagerInfos(int *nbPlayers, int * money, int * nbFans);
+    int askForBuildingInfos(int buildingID);
+    std::vector<int> receiveBuildingInfos();
+    int askForBuildingUpgrade(int buildingID);
+    int askForPlayersList();
+    std::vector<std::string> receivePlayersList();
+    int askForPlayerInfos(int playerID);
+    std::vector<int> receivePlayerInfo();
+    int trainPlayer(int playerID, int capacity);
+    int healPlayer(int playerID);
+    
+    int getManagersList();
+    void receiveManagersIDandNames(std::vector<int> * IDList, std::vector<std::string> * namesList);
+    int proposeMatchTo(int userID, std::vector<int> playersInTeam);
+    int answerMatchProposal(bool confirmation, std::vector<int> playersInTeam);
+    int receiveMatchConfirmation();
+    int getAllPositions();
+    std::vector<AxialCoordinates> receiveScoresAndPositions(int * winner, int * scoreTeam1, int * scoreTeam2);
+    int selectPlayer(int playerID);
+    playerAttr receiveSelectedPlayerInfos();
+    int sendMoves(int moves[][4]); //TODO : moves confirmation ?
+    
+    int sellPlayer(int playerID, int startingPrice);
+    int getAuctionsList();
+    std::vector<std::string> receiveAuctionsList();
+    int joinAuction(int auctionID);
+    int askForAuctionInfos(int auctionID);
+    int getCurrentPrice();
+    int bid();
+    int checkAuction();
+    int receiveAuctionResult();
+};
+
+
+
+#endif

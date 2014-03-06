@@ -10,6 +10,10 @@
 #define USERNAME_LENGTH 30
 #define PASSWORD_LENGTH 30
 
+#define LOGIN_FAILED 0 
+#define NORMAL_LOGIN 1
+#define ADMIN_LOGIN 2
+
 #define LOGIN 1
 #define LOGIN_CONFIRM 2
 #define GETBUILDINGINFOS 3
