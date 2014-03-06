@@ -55,13 +55,14 @@ typedef struct { //pas besoin de la classe complète
 
 class Client {
 public:
-    Client(int);
+    Client(int, bool GUI = false);
     void run();
     //for the thread :
     int getConfirmation();
     int bid();
 
 private:
+    bool GUI_;
     int sockfd_; //socket d'écoute du serveur
 //SerializedObject received;
     //char msg[INPUTSIZE];
