@@ -9,6 +9,7 @@
 #include <QTimerEvent>
 #include <QShowEvent>
 #include <QHideEvent>
+#include "common/NetworkInterface.hpp"
 
 class Ticker : public QWidget
 {
@@ -25,9 +26,7 @@ protected:
 
 private:
     QString myText;
-    int sockfd_;
-    int offset;
-    int myTimerId;
+    int sockfd_, offset, myTimerId, money, nbFans, nbPlayers;
 };
 
 #endif

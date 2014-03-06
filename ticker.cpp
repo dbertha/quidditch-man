@@ -2,11 +2,10 @@
 // This is not a toy : it is used to accept unexpected messages while the manager is idle
 // The display tell us when the timer used to accept() is working...
 Ticker::Ticker(const int sockfd, QWidget *parent)
-    : sockfd_(sockfd), QWidget(parent) {
+    : sockfd_(sockfd), QWidget(parent), money(0), nbFans(0) {
     offset = 0; // starting position of the text displayed
     myTimerId = 0; // no timer started yet
     move(100,50); // position in parent window
-    myText=tr("Please make your choice !! ");
     setWindowTitle(tr("Attention"));
 }
 
@@ -26,6 +25,9 @@ void Ticker::paintEvent(QPaintEvent * /* event */) {
 
 void Ticker::showEvent(QShowEvent * /* event */) {
     //starts the timer when the widget is visible
+    askForManagerInfos(sockfd_);
+    receiveManagerInfos(sockfd_,&nbPlayers,&money,&nbFans);
+    myText=QString(" --- MONEY : %1 ||| NUMBER OF FANS : %2").arg(money).arg(nbFans);
     myTimerId = startTimer(30);
 }
 

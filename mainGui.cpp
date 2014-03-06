@@ -7,7 +7,6 @@ MainGui::MainGui(int sockfd,QMainWindow *parent) : sockfd_(sockfd), parent_(pare
     setWindowTitle(tr("Quidditch Manager 2014"));
     loginDialog = new LoginDialog(sockfd_,this);
     ticker = new Ticker(sockfd_,this);
-    ticker->show();
     login();
 }
 
@@ -39,11 +38,14 @@ void MainGui::login() {
     if (loginDialog->exec()==loginDialog->Accepted) {//le mgr est connecte; on cree le menu
         std::cout<<"Manager identifie"<<std::endl;
         createMenu();
+        ticker->show();
     }
+    else ticker->hide();
 }
 void MainGui::logout() {
     menuBar()->clear();
     firstMenu();
+    ticker->hide();
     loginDialog->init(); //reset userName
 }
 void MainGui::createActions() {
