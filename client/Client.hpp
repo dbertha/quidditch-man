@@ -57,6 +57,9 @@ class Client {
 public:
     Client(int);
     void run();
+    //for the thread :
+    int getConfirmation();
+    int bid();
 
 private:
     int sockfd_; //socket d'écoute du serveur
@@ -65,7 +68,7 @@ private:
     int input_;
     char opponent_[10];
     fd_set FDSet_;
-    enum Status {INIT,ADMIN,FREE,MANAGERS_MENU, AUCTION_MENU, PLAYERS_MENU, BUILDINGS_MENU, MATCH_LIST,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING};
+    enum Status {INIT,ADMIN,FREE,MANAGERS_MENU, AUCTION_MENU, PLAYERS_MENU, BUILDINGS_MENU, PLAYERSLIST_MENU, TRAINING_MENU, HEALING_MENU, MATCH_LIST,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING};
     Status state_;
 
     int mainLoop();
@@ -92,6 +95,10 @@ private:
     void handleLogin();
     void handleMainMenu();
     void handleOpponentChoice();
+    void handleAuctions();
+    void handlePlayersMenu();
+    void mainAuction(int auctionID, int timeLeft);
+    //void *auctionTurn(void* data);
     void startMatch(int numTeam);
     void askAndSendMoves(int numTeam, HexagonalField &field, std::vector<AxialCoordinates> &positions);
     void commMgr();
@@ -101,7 +108,7 @@ private:
     //network :
     int sendLoginToServer(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
     int sendNewManagerToServer(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
-    int getConfirmation();
+    
     
     int askForManagerInfos();
     void receiveManagerInfos(int *nbPlayers, int * money, int * nbFans);
@@ -132,7 +139,7 @@ private:
     int joinAuction(int auctionID);
     int askForAuctionInfos(int auctionID);
     int getCurrentPrice();
-    int bid();
+    
     int checkAuction();
     int receiveAuctionResult();
 };

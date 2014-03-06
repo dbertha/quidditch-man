@@ -4,6 +4,10 @@
 
 using namespace std; //TODO : rajouter tous les spécificateurs de namespace
 
+//TODO : solution sans thread ou bien passage du pointeur this au thread
+bool hasChosen;
+bool isBidder;
+
 Client::Client(int sockfd): sockfd_(sockfd), state_(INIT) {}
 // initialisations dans le constructeur
 void Client::run() {
@@ -153,7 +157,7 @@ void Client::displayAvailableManagers(){
     for(unsigned int i = 0; i < IDList.size(); ++i){
         std::cout << "ID :" << IDList[i] << " name : " << namesList[i] << std::endl;
     }
-    cout<<"Indicate the ID of the player you want to challenge [-1 to go back]: " << endl;
+    cout<<"Indicate the ID of the player you want to challenge [-1 to go back]: " << flush;
 }
 
 
@@ -231,25 +235,7 @@ void displayAuctionsList(vector<string> auctionsList) {
 
 ////////handling interactions :\\\\\\\
 
-void Client::askInput() {
-    switch(state_) {
-        case INIT : {
-            displayConnexionMenu();
-            break;
-        }
-        case FREE : {
-            displayMainMenu();
-            break;
-        }
-        case MANAGERS_MENU :{
-            displayAvailableManagers();
-            break;
-        }
-        default : {
-            std::cout<<"Aucune option pour l'instant."<<std::endl;
-        }
-    }
-}
+
 
 void Client::loadFDSet() {
 //charge le set des FD que doit surveiller en lecture accept()
@@ -563,33 +549,7 @@ void Client::askAndSendMoves(int numTeam, HexagonalField &field, std::vector<Axi
   sendMoves(moves);
 }
 
-void Client::kbMgr() {
-    std::cin>>input_;
-    switch(state_) {
-        case INIT : {
-            //contexte verrouillé, pas d'écoute du socket tant que login pas terminé
-            handleLogin();
-            break;
-        }
-        case FREE : {
-            
-        //affichage du sous-menu avec adaptation du contexte
-            handleMainMenu();
-            
-            break;
-        }
-        case MANAGERS_MENU : {
-            handleOpponentChoice();
-            break;
-        }
-        case ADMIN : {
-            //menu d'administration, contexte bloqué, pas de push du serveur possible dans cette configuration
-        }
-        default : {//ne devrait jamais passer par ici
-            std::cout<<"Je ne puis rien faire pour vous."<<std::endl;
-        }
-    }
-}
+
 
 void Client::commMgr() {
 //gère les messages non sollicités (exemple : invitation à un match amical)
@@ -1039,4 +999,294 @@ int Client::receiveAuctionResult() {
     //TODO : vérifier qu'il s'agit bien d'un message de confirmation
     memcpy(&result,position, sizeof(result));
     return result;
+}
+
+void *auctionTurn(void* data) {
+
+  //int* sockfd = (int *)data;
+  Client *client = (Client *) data;
+    //TODO : si solution conservée, mutexes
+  cout<<"Auction turn has started !"<<endl;
+  cout<<" [1] Bid "<<endl;
+  cout<<" [2] Quit auction"<<endl;
+
+
+  int choice;
+  cout<<" -----> ";
+  cin>>choice;
+
+  if (choice==1) {
+    client->bid();
+    int result = client->getConfirmation();
+    cout << "Bid done, waiting for the end of the turn. " << endl;
+    isBidder=true;
+    hasChosen=true;
+  }
+  else {
+    isBidder=false;
+    hasChosen=true;
+  }
+
+}
+
+void Client::mainAuction(int auctionID, int timeLeft) {
+    //TODO : deux appels à receiveAuctionResult : bizarre
+  hasChosen=false;
+  isBidder=false;
+  int turn = 0;
+
+  pthread_t thread;
+  int res = pthread_create(&thread, NULL, auctionTurn, (void*) this);
+  sleep(timeLeft);
+  pthread_cancel(thread);
+  checkAuction();
+  int result = receiveAuctionResult();
+  int price = receiveAuctionResult();
+  cout << "result : " << result << " price " << price << endl;
+  if (result<0) {
+    cout<<" -Congrats! You have won this auction"<<endl;
+    if (result==-1) cout<<" --- "<<price<<" gold will be transferred in exchange of the player"<<endl;
+    else if (result==-2) {
+      cout<<" --- You don't have enough money to pay the "<<price<<" required";
+      cout<<", so 3 percent of your money will be given to the owner of the player"<<endl;
+    }
+  }
+  else if (result==0) {
+    cout<<" -Goodbye! You have left this auction"<<endl;
+  }
+  else {
+    cout<<" -Next turn will start soon... The current price is "<<price<<endl;
+    sleep(10);
+    turn+=1;
+
+    while ((result>0)&&(hasChosen)&&(isBidder)) {
+        hasChosen=false;
+        res = pthread_create(&thread, NULL, auctionTurn, (void*) this);
+        sleep(30);
+        pthread_cancel(thread);
+        cout<<" --- END OF TURN"<<endl;
+        checkAuction();
+        result = receiveAuctionResult();
+        price = receiveAuctionResult();
+        if ((!hasChosen)||(!isBidder)) {
+          cout<<" -Goodbye! You have left this auction"<<endl;
+        }
+        else if (result<0) {
+          cout<<" -Congrats! You have won this auction"<<endl;
+          if (result==-1) cout<<" --- "<<price<<" gold will be transfered in exchange of the player"<<endl;
+          else if (result==-2) {
+            cout<<" --- You don't have enough money to pay the "<<price<<" required";
+            cout<<", so 3 percent of your money will be given to the owner of the player"<<endl;
+          }
+        }
+        else {
+          cout<<" -Next turn will start soon... The current price is "<<price<<endl;
+          sleep(10);
+        }
+        turn+=1;
+      } 
+    }
+}
+
+
+
+void Client::handleAuctions(){
+    if (input_==SEE_AUCTIONS) {
+        getAuctionsList();
+        vector<string> auctionsList = receiveAuctionsList();
+        displayAuctionsList(auctionsList);
+        if (auctionsList.size()!=0) {
+            int auctionToInspect;
+            cin>>auctionToInspect;
+            if (auctionToInspect!=0) {
+                askForAuctionInfos(auctionToInspect-1);
+                vector<int> playerAuctionInfos = receivePlayerInfo();
+                string timeLeft = displayAuctionInfos(auctionsList,playerAuctionInfos,auctionToInspect-1);
+                cout<<"Do you want to join this auction ? [1 to enter, 0 to quit] \n -----> ";
+                int enterAuction;
+                cin>>enterAuction;
+                if (enterAuction==1) {
+                    joinAuction(auctionToInspect-1);
+                    int joinResult = getConfirmation();
+                    mainAuction(auctionToInspect-1,atoi(timeLeft.c_str()));
+                }
+            }
+        }
+    }
+    else if (input_==SELL_PLAYER) {
+        int sellPlayerChoice;
+        do {
+            displayManagerInfos();
+            displaySellPlayerMenu();
+            cin>>sellPlayerChoice;
+            if (sellPlayerChoice!=ABORT) {
+                askForPlayerInfos(sellPlayerChoice-1);
+                vector<int> playerInfos = receivePlayerInfo();
+                displayPlayerInfos(playerInfos,sellPlayerChoice-1);
+                cout<<"Indicate the starting price of the auction [or 0 to abort] \n -----> ";
+                int startingPrice;
+                cin>>startingPrice;
+                if (startingPrice>0) {
+                    sellPlayer(sellPlayerChoice-1,startingPrice);
+                    bool sellingResult = getConfirmation(); //always true
+                    if (!sellingResult) cout<<" ----- The player is blocked and cannot be selled right now"<<endl;
+                    else cout<<" ----- Auction started !"<<endl;
+                    sellPlayerChoice=ABORT;
+                }
+            }
+        } while (sellPlayerChoice!=ABORT);
+    }
+}
+
+void Client::handlePlayersMenu(){
+    switch(input_){
+        case ABORT : {
+            state_ = FREE;
+            return;
+        }
+        case INSPECT_PLAYER : {
+            state_ = PLAYERSLIST_MENU;
+            break;
+        }
+        case TRAIN_PLAYER_OPTION : {
+            state_ = TRAINING_MENU;
+            break;
+        }
+        case HEAL_PLAYER_OPTION : {
+            state_ = HEALING_MENU;
+            break;
+        }
+    }
+}
+
+void Client::kbMgr() {
+    std::cin>>input_;
+    //TODO : s'assurer de la gestion des retours en arrière
+    switch(state_) {
+        case INIT : {
+            //contexte verrouillé, pas d'écoute du socket tant que login pas terminé
+            handleLogin();
+            break;
+        }
+        case FREE : {
+            
+        //affichage du sous-menu avec adaptation du contexte
+            handleMainMenu();
+            
+            break;
+        }
+        case MANAGERS_MENU : {
+            //verrouillage du contexte
+            handleOpponentChoice();
+            break;
+        }
+        
+        case AUCTION_MENU : {
+            //verrouillage du contexte
+            handleAuctions();
+            break;
+        }
+        case PLAYERS_MENU : {
+            handlePlayersMenu();
+            break;
+        }
+        
+        case PLAYERSLIST_MENU : {
+            if (input_>0) {
+                askForPlayerInfos(input_-1);
+                vector<int> playerInfos = receivePlayerInfo();
+                displayPlayerInfos(playerInfos,input_-1);
+            }
+            state_ = FREE;
+            break;
+        }
+        case TRAINING_MENU : {
+            //contexte verrouillé par facilité
+            int capacityNumber;
+            cout<<"Indicate the number of the capacity you wish to train [or 0 to abort]  \n -----> ";
+            cin>>capacityNumber;
+            if ((input_>0)&&(capacityNumber>0)) {
+              trainPlayer(input_-1,capacityNumber-1);
+              bool trainingResult = getConfirmation();
+              if (trainingResult) {
+                askForBuildingInfos(TRAININGCENTER);
+                vector<int> trainingCenterInfos = receiveBuildingInfos();
+                cout<<"-------------\n Training has started !"<<endl;
+                cout<<" Training will be over in "<<trainingCenterInfos[2]<<" minutes"<<endl;
+              }
+              else cout<<"------------\n Training impossible, this player is blocked"<<endl;
+            }
+            state_ = FREE;
+            break;
+        }
+        case HEALING_MENU : {
+            if (input_!=ABORT) {
+                healPlayer(input_-1);
+                int healResult = getConfirmation();
+                if (healResult){
+                    askForBuildingInfos(HOSPITAL);
+                    vector<int> hospitalInfos = receiveBuildingInfos();
+                    cout<<"-------------\n This player has been sent to the hospital !"<<endl;
+                    cout<<" Player will leave the hospital in "<<hospitalInfos[2]<<" minutes"<<endl;
+                }
+                else cout<<"-------------\n This player cannot be send to the hospital, he's blocked or in full health"<<endl;
+            }
+            state_ = FREE;
+            break;
+        }
+        case ADMIN : {
+            //menu d'administration, contexte bloqué, pas de push du serveur possible dans cette configuration
+            break;
+        }
+        default : {//ne devrait jamais passer par ici
+            std::cout<<"Nothing to do here."<<std::endl;
+        }
+    }
+}
+
+void Client::askInput() {
+    switch(state_) {
+        case INIT : {
+            displayConnexionMenu();
+            break;
+        }
+        case FREE : {
+            displayManagerInfos();
+            displayMainMenu();
+            break;
+        }
+        case MANAGERS_MENU :{
+            displayAvailableManagers();
+            break;
+        }
+        case AUCTION_MENU : {
+            displayManagerInfos();
+            displayAuctionMenus();
+            break;
+        }
+        case PLAYERS_MENU : {
+            displayManagerInfos();
+            displayManagePlayersMenu();
+            break;
+        }
+        case PLAYERSLIST_MENU : {
+            displayPlayersList();
+            cout<<"Indicate the number of the player you wish to inspect [or 0 to abort] \n -----> " << flush;
+            break;
+        }
+        case TRAINING_MENU : {
+            displayPlayersList();
+            cout<<"Indicate the number of the player you wish to train  \n -----> " << flush;
+            break;
+        }
+        case HEALING_MENU : {
+            displayPlayersList();
+            cout<<"Indicate the number of the player you wish to heal [or 0 to abort] : " << flush;
+            break;
+        }
+        default : {
+            std::cout<<"No options available."<<std::endl;
+            break;
+        }
+    }
 }

@@ -645,7 +645,7 @@ void User::cmdHandler(SerializedObject *received) {
 			confirmation=true;
 			answer.typeOfInfos = BID_CONFIRM;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
-            sendOnSocket(sockfd_, answer); 
+			sendOnSocket(sockfd_, answer);
 			break;
 
 		case END_AUCTION_TURN :
