@@ -8,11 +8,14 @@ using namespace std; //TODO : rajouter tous les spécificateurs de namespace
 bool hasChosen;
 bool isBidder;
 
-Client::Client(int sockfd): sockfd_(sockfd), state_(INIT) {}
-// initialisations dans le constructeur
+Client::Client(int sockfd, bool GUI): GUI_(GUI), sockfd_(sockfd), state_(INIT) {}
+
 void Client::run() {
-    mainLoop();
-    close(sockfd_);
+    if(GUI_){
+    }else{
+        mainLoop();
+        close(sockfd_);
+    }
 }
 
 int Client::mainLoop() {
