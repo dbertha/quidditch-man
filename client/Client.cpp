@@ -176,16 +176,7 @@ void displayConnexionMenu(){
   cout<<"-----> ";
 }
 
-void displayMainMenu(){
-  cout<<" --------------------------------------------------------------------------------------"<<endl;
-  cout<<"What do you want to do ?"<<endl;
-  cout<<" [1] See managers connected to propose match"<<endl;
-  cout<<" [2] See/create auctions"<<endl;
-  cout<<" [3] Manage players"<<endl;
-  cout<<" [4] Manage buildings"<<endl;
-  cout<<" [0] Quit game"<<endl;
-  cout<<"-----> ";
-}
+
 
 void displayAuctionMenus(){
   cout<<" --------------------------------------------------------------------------------------"<<endl;
