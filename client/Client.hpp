@@ -32,7 +32,6 @@
 #define AUCTION_ROOM 2
 #define MANAGE_PLAYERS 3
 #define MANAGE_BUILDINGS 4
-#define PROPOSEMATCH_OPTION 5
 
 #define SEE_AUCTIONS 1
 #define SELL_PLAYER 2
@@ -66,7 +65,7 @@ private:
     int input_;
     char opponent_[10];
     fd_set FDSet_;
-    enum Status {INIT,ADMIN,FREE,MATCH_LIST,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING};
+    enum Status {INIT,ADMIN,FREE,MANAGERS_MENU, AUCTION_MENU, PLAYERS_MENU, BUILDINGS_MENU, MATCH_LIST,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING};
     Status state_;
 
     int mainLoop();
@@ -86,8 +85,15 @@ private:
     void displaySellPlayerMenu();
     void displayManagePlayersMenu();
     void displayManageBuildingsMenu();
+    void displayAvailableManagers();
+    std::vector<int> displayAndAskPlayersForMatch();
     //handlers :
     void kbMgr();
+    void handleLogin();
+    void handleMainMenu();
+    void handleOpponentChoice();
+    void startMatch(int numTeam);
+    void askAndSendMoves(int numTeam, HexagonalField &field, std::vector<AxialCoordinates> &positions);
     void commMgr();
     void matchTentative();
     void contactServer();

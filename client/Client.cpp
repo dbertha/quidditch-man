@@ -19,8 +19,8 @@ int Client::mainLoop() {
             std::cerr<<"Socket bind error"<<std::endl;
             return EXIT_FAILURE;
         }
-        if(keyboard()) kbMgr();
-        else commMgr();
+        if(keyboard()) kbMgr(); // si entrée clavier
+        else commMgr(); //sinon, message du serveur
     }
     return EXIT_SUCCESS;
 }
@@ -145,6 +145,33 @@ void Client::displaySellPlayerMenu(){
     cout<<" Which player do you want to sell [enter 0 to abort] ? "<<endl;
 }
 
+void Client::displayAvailableManagers(){
+    getManagersList();
+    std::vector<int> IDList;
+    std::vector<std::string> namesList;
+    receiveManagersIDandNames(&IDList,&namesList);
+    for(unsigned int i = 0; i < IDList.size(); ++i){
+        std::cout << "ID :" << IDList[i] << " name : " << namesList[i] << std::endl;
+    }
+    cout<<"Indicate the ID of the player you want to challenge [-1 to go back]: " << endl;
+}
+
+
+
+std::vector<int> Client::displayAndAskPlayersForMatch(){
+  displayPlayersList();
+  std::cout << "Veuillez donner les index de vos joueur dans l'ordre suivant : KEEPER SEEKER CHASER1 CHASER2 CHASER3 BEATER1 BEATER2" << std::endl;
+  int managedIndex;
+  std::vector<int> playersInTeam;
+  for(int i = 0; i < 7; ++i){
+    cout << "indice joueur : " ;
+    cin >> managedIndex;
+    playersInTeam.push_back(managedIndex-1); //index commence à 0, affichage commence à 1
+  }
+  return playersInTeam;
+}
+
+
 
 std::string Client::displayAuctionInfos(vector<string> auctionsList,vector<int> playerInfos, int auctionID) {
     std::string name;
@@ -214,6 +241,10 @@ void Client::askInput() {
             displayMainMenu();
             break;
         }
+        case MANAGERS_MENU :{
+            displayAvailableManagers();
+            break;
+        }
         default : {
             std::cout<<"Aucune option pour l'instant."<<std::endl;
         }
@@ -248,40 +279,311 @@ void Client::login() {
 //~ 
 //~ }
 
+void Client::handleLogin(){
+    char username[USERNAME_LENGTH];
+    char password[PASSWORD_LENGTH];
+    std::cout<<"Enter login : ";
+    std::cin>>username;
+    std::cout<<"Enter password : ";
+    std::cin>>password;
+    if (input_==LOG_IN) sendLoginToServer(username,password);
+    else if (input_==NEW_MANAGER) sendNewManagerToServer(username,password);
+    int result = getConfirmation();
+    if (result == LOGIN_FAILED) {
+        if (input_==LOG_IN) cout<<" ------------- WRONG LOGIN/PASSWORD"<<endl;
+        else if (input_==NEW_MANAGER) cout<<" ------------- LOGIN ALREADY TAKEN"<<endl;
+    }
+    else{
+        if(result == NORMAL_LOGIN){
+            state_ = FREE;
+        }
+        else{
+            //ADMIN_LOGIN
+            state_ = ADMIN;
+        }
+    }
+}
+
+void Client::handleMainMenu(){
+    
+
+    switch(input_){
+//Rappel :
+//#define SEE_MANAGERS 1
+//#define AUCTION_ROOM 2
+//#define MANAGE_PLAYERS 3
+//#define MANAGE_BUILDINGS 4
+        case SEE_MANAGERS : {
+            state_ = MANAGERS_MENU;
+            break;
+        }
+        case AUCTION_ROOM : {
+            state_ = AUCTION_MENU;
+            break;
+        }
+        case MANAGE_PLAYERS : {
+            state_ = PLAYERS_MENU;
+            break;
+        }
+        case MANAGE_BUILDINGS : {
+            state_ = BUILDINGS_MENU;
+            break;
+        }
+        
+
+    }
+}
+
+void Client::handleOpponentChoice(){
+    if(input_ == -1){
+        state_ = FREE;
+        return;
+    }
+    //TODO : tester input
+    //verrou du contexte après le choix d'un adversaire
+    std::vector<int> playersInTeam = displayAndAskPlayersForMatch();
+    proposeMatchTo(input_,  playersInTeam);
+    if(receiveMatchConfirmation() == MATCH_STARTING){
+        startMatch(1); //inviteur a l'équipe 1
+    }
+}
+
+void Client::startMatch(int numTeam){
+  int winner = 0;
+  int scoreTeam1 = 0;
+  int scoreTeam2 = 0;
+  HexagonalField field;
+  std::vector<AxialCoordinates> allPositions;
+  getAllPositions();
+  allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
+  while(winner == 0){    
+    cout << "Score team1 (inviter) = " << scoreTeam1 << endl;
+    cout << "Score team2 (invited) = " << scoreTeam2 << endl;
+    field.reset();
+    for(unsigned int i = 0; i < allPositions.size(); ++i){
+      if(field.getOccupant(allPositions[i]) == FREE_SPACE){
+        field.setOccupant(allPositions[i], i);
+      }
+    }
+    field.display();
+    //TODO : tester si balle superposée à un joueur, et indiquer le joueur le cas échéant
+    askAndSendMoves(numTeam, field, allPositions);
+    getConfirmation();
+    
+    //cout << "Les échanges de messages suivants pour le match n'ont pas encore été implémentés." << endl;
+    //winner =1;
+    getAllPositions();
+    allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
+  }
+  //TODO : gérer demande de match nul
+  cout << "Winner is team " << winner << endl;
+}
+
+void Client::askAndSendMoves(int numTeam, HexagonalField &field, std::vector<AxialCoordinates> &positions){
+	//TODO : inutile de récupérer la position du joueur lors de la sélection, déjà contenue dans le vecteur positions
+        //TODO : spliter le code
+  int moves[7][4];
+  int playerRole = 0;
+  int currentMove = 0;
+  int selectedPlayerID = 1;
+  int choiceInput, deltaDiag, deltaLine, distanceAccepted;
+  playerAttr attributs;
+  std::string keeper, seeker, chaser1, chaser2, chaser3, beater1, beater2, quaffle, bludger, goldensnitch;
+  int nearestBludger = BLUDGER1;
+  if(numTeam == 1){ //TODO : optimiser
+    keeper = TEAM1_KEEPER_UNICODE;
+    seeker = TEAM1_SEEKER_UNICODE;
+    chaser1 = TEAM1_CHASER1_UNICODE;
+    chaser2 = TEAM1_CHASER2_UNICODE;
+    chaser3 = TEAM1_CHASER3_UNICODE;
+    beater1 = TEAM1_BEATER1_UNICODE;
+    beater2 = TEAM1_BEATER2_UNICODE;
+  }
+  else{
+    keeper = TEAM2_KEEPER_UNICODE;
+    seeker = TEAM2_SEEKER_UNICODE;
+    chaser1 = TEAM2_CHASER1_UNICODE;
+    chaser2 = TEAM2_CHASER2_UNICODE;
+    chaser3 = TEAM2_CHASER3_UNICODE;
+    beater1 = TEAM2_BEATER1_UNICODE;
+    beater2 = TEAM2_BEATER2_UNICODE;
+  }
+  quaffle = QUAFFLE_UNICODE;
+  bludger = BLUDGER1_UNICODE;
+  goldensnitch = GOLDENSNITCH_UNICODE;
+  
+  //initialisation de la matrice des mouvements : liste de mouvements vides
+  //TODO : à n'initialiser qu'une fois, à la création de l'instance client,à l'instar de User
+  for(int i = 0; i < 7; ++i){
+    moves[i][0] = i;
+    moves[i][1] = NO_SPECIAL_ACTION;
+    moves[i][2] = 10000; //sentinelle : mouvement vide
+    moves[i][3] = 10000;
+  }
+  
+  while((playerRole != -1) and (currentMove < 7)){
+    std::cout << "Légende :" << endl;
+    std::cout << "KEEPER : " << keeper << std::endl;
+    std::cout << "SEEKER  : " << seeker << std::endl;
+    std::cout << "CHASER1  : " << chaser1 << std::endl;
+    std::cout << "CHASER2  : " << chaser2 << std::endl;
+    std::cout << "CHASER3  : " << chaser3 << std::endl;
+    std::cout << "BEATER1  : " << beater1 << std::endl;
+    std::cout << "BEATER2 : " << beater2 << std::endl;
+    std::cout << "QUAFFLE : " << quaffle << std::endl;
+    std::cout << "BLUDGER : " << bludger << std::endl;
+    std::cout << "GOLDENSNITCH : " << goldensnitch << std::endl;
+    std::cout << "Veuillez sélectionner un joueur(valeur numérique), -1 pour terminer le tour :" << endl;
+    //TODO : vérification de l'input : indice correspond bien à un joueur de l'équipe et pas déjà de mouvement attribué
+    std::cin >> playerRole;
+    if(playerRole != -1){
+      playerRole -= 1; //index commence à 0
+      selectedPlayerID = playerRole;
+      if(numTeam == 2){
+        selectedPlayerID += 7; //ajustement de l'index en fonction de l'équipe
+      }
+      selectPlayer(selectedPlayerID);
+      attributs = receiveSelectedPlayerInfos();
+      field.display(attributs.position, attributs.attributes[SPEED]);
+      std::cout << "Attributs du joueur sélectionné  : " << std::endl;
+      std::cout << "Vitesse  : " << attributs.attributes[SPEED] << std::endl;
+      std::cout << "Force  : " << attributs.attributes[STRENGTH] << std::endl;
+      std::cout << "Précision  : " << attributs.attributes[PRECISION] << std::endl;
+      std::cout << "Réflexe  : " << attributs.attributes[REFLEX] << std::endl;
+      std::cout << "Résistance  : " << attributs.attributes[RESISTANCE] << std::endl;
+      if(attributs.hasQuaffle){
+        std::cout << "Ce joueur porte le souaffle " << std::endl;
+      }
+      else{
+        std::cout << "Ce joueur ne porte pas le souaffle " << std::endl;
+      }
+      //RAPPEL : 
+      //moves[][0] : indice de l'objet concerné
+      //moves[][1] : action spéciale :
+      //#define INTERCEPT_QUAFFLE 0
+      //#define CATCH_GOLDENSNITCH 1
+      //moves[][2] : diagonale destination
+      //moves[][3] : ligne destination
+      std::cout << "Vos possibilités pour ce joueur :" << std::endl;
+      std::cout << "[0]Déplacer le joueur" << std::endl;
+      if(attributs.hasQuaffle){
+        std::cout << "[1]Envoyer le souaffle dans une direction" << std::endl;
+      }
+      else if((playerRole <= TEAM1_BEATER2) and (playerRole >= TEAM1_BEATER1)){
+        
+        if (attributs.position.getDistanceTo(positions[BLUDGER2]) < attributs.position.getDistanceTo(positions[BLUDGER1])){
+          nearestBludger = BLUDGER2;        }
+        if(attributs.position.getDistanceTo(positions[nearestBludger]) < 2 ){ //seulement si adjacent
+          std::cout << "[1]Frapper le cognard dans une direction" << std::endl;
+        }
+      }
+      //menus proposés seulement si précision suffisante par rapport à la distance avec la balle
+      //TODO : que faire si souaffle à distance accessible mais déjà possédé par un chaser ?
+      else if((((playerRole <= TEAM1_CHASER3) and (playerRole>= TEAM1_CHASER1)) or (playerRole == TEAM1_KEEPER))
+      and (attributs.position.getDistanceTo(positions[QUAFFLE]) <= attributs.attributes[PRECISION])){
+        std::cout << "[2]Tenter de récupérer le souaffle" << std::endl;
+      }
+      else if((playerRole == TEAM1_SEEKER)
+      and (attributs.position.getDistanceTo(positions[GOLDENSNITCH]) <= attributs.attributes[PRECISION]) ){
+        std::cout << "[2]Tenter d'attraper le vif d'or" << std::endl;
+      }
+      
+      std::cin >> choiceInput;
+      if(choiceInput == 0){
+        std::cout << "Déplacement le long de la ligne -- (négatif vers la gauche, positif vers la droite) : " << std::endl;
+        std::cin >> deltaDiag;
+        std::cout << "Déplacement le long de la diagonale \\ (négatif pour monter, positif pour descendre) : " << std::endl;
+        std::cin >> deltaLine;
+        if(attributs.position.getDistanceTo(AxialCoordinates(attributs.position.getDiagAxis() + deltaDiag, attributs.position.getLineAxis() + deltaLine)) <= attributs.attributes[SPEED]){
+          //si case accessible
+          moves[currentMove][0] = selectedPlayerID;
+          moves[currentMove][1] = NO_SPECIAL_ACTION; //pas d'action spéciale
+          moves[currentMove][2] = attributs.position.getDiagAxis() + deltaDiag;
+          moves[currentMove][3] = attributs.position.getLineAxis() + deltaLine;
+        }else{
+          std::cout << "Case trop éloignée, votre joueur n'a pas une vitesse suffisante !" << std::endl;
+        }
+      }
+      //interception d'une balle
+      else if(choiceInput == 2){ 
+        if(playerRole == TEAM1_SEEKER){
+          moves[currentMove][0] = selectedPlayerID;
+          moves[currentMove][1] = CATCH_GOLDENSNITCH;
+        }
+        else if(((playerRole <= TEAM1_CHASER3) and (playerRole>= TEAM1_CHASER1)) or (playerRole == TEAM1_KEEPER)){
+          moves[currentMove][0] = selectedPlayerID;
+          moves[currentMove][1] = INTERCEPT_QUAFFLE;
+        }
+      }
+      //frappage/lancement d'une balle : déplacement du joueur remplacé par déplacement de la balle
+      else if(choiceInput == 1){ 
+        if((playerRole == TEAM1_BEATER1) or (playerRole == TEAM1_BEATER2)){
+          distanceAccepted = attributs.attributes[STRENGTH];
+          field.display(positions[nearestBludger], distanceAccepted); 
+          //pour le moment, la taille du déplacement du cognard quand frappé ne dépend que de l'attribut force
+          std::cout << "Déplacement du cognard le long de la ligne -- (négatif vers la gauche, positif vers la droite) : " << std::endl;
+          std::cin >> deltaDiag;
+          std::cout << "Déplacement du cognard le long de la diagonale \\ (négatif pour monter, positif pour descendre) : " << std::endl;
+          std::cin >> deltaLine;
+          if(positions[nearestBludger].getDistanceTo(AxialCoordinates(positions[nearestBludger].getDiagAxis() + deltaDiag, positions[nearestBludger].getLineAxis() + deltaLine)) <= distanceAccepted){
+          //si case accessible
+            moves[currentMove][0] = nearestBludger;
+            moves[currentMove][1] = NO_SPECIAL_ACTION;
+            moves[currentMove][2] = positions[nearestBludger].getDiagAxis() + deltaDiag;
+            moves[currentMove][3] = positions[nearestBludger].getLineAxis() + deltaLine;
+          }else{
+            std::cout << "Hors du terrain ou votre joueur n'est pas assez fort pour l'envoyer si loin !" << std::endl;
+          }
+        }
+        else if(attributs.hasQuaffle){
+          distanceAccepted = attributs.attributes[STRENGTH];
+          field.display(positions[QUAFFLE], distanceAccepted); 
+          //TODO : pour marquer un but il faut que la trajectoire du souaffle soit une ligne
+          std::cout << "Déplacement du souaffle le long de la ligne -- (négatif vers la gauche, positif vers la droite) : " << std::endl;
+          std::cin >> deltaDiag;
+          std::cout << "Déplacement du souaffle le long de la diagonale \\ (négatif pour monter, positif pour descendre) : " << std::endl;
+          std::cin >> deltaLine;
+          if(positions[selectedPlayerID].getDistanceTo(AxialCoordinates(positions[selectedPlayerID].getDiagAxis() + deltaDiag, positions[selectedPlayerID].getLineAxis() + deltaLine)) <= distanceAccepted){
+            //si case accessible
+            moves[currentMove][0] = QUAFFLE;
+            moves[currentMove][1] = NO_SPECIAL_ACTION;
+            moves[currentMove][2] = attributs.position.getDiagAxis() + deltaDiag;
+            moves[currentMove][3] = attributs.position.getLineAxis() + deltaLine;
+          }else{
+            std::cout << "Hors du terrain ou votre joueur n'est pas assez fort pour l'envoyer si loin !" << std::endl;
+          }
+        }
+      } 
+          
+      //si input correct, on passe au joueur suivant
+      ++currentMove;
+    }
+  }
+  //TODO : tester si demande de match nul
+  sendMoves(moves);
+}
+
 void Client::kbMgr() {
     std::cin>>input_;
     switch(state_) {
         case INIT : {
             //contexte verrouillé, pas d'écoute du socket tant que login pas terminé
-            char username[USERNAME_LENGTH];
-            char password[PASSWORD_LENGTH];
-            std::cout<<"Enter login : ";
-            std::cin>>username;
-            std::cout<<"Enter password : ";
-            std::cin>>password;
-            if (input_==LOG_IN) sendLoginToServer(username,password);
-            else if (input_==NEW_MANAGER) sendNewManagerToServer(username,password);
-            int result = getConfirmation();
-            if (result == LOGIN_FAILED) {
-                if (input_==LOG_IN) cout<<" ------------- WRONG LOGIN/PASSWORD"<<endl;
-                else if (input_==NEW_MANAGER) cout<<" ------------- LOGIN ALREADY TAKEN"<<endl;
-            }
-            else{
-                if(result == NORMAL_LOGIN){
-                    state_ = FREE;
-                }
-                else{
-                    //ADMIN_LOGIN
-                    state_ = ADMIN;
-                }
-            }
+            handleLogin();
             break;
         }
         case FREE : {
             
         //affichage du sous-menu avec adaptation du contexte
+            handleMainMenu();
             
             break;
+        }
+        case MANAGERS_MENU : {
+            handleOpponentChoice();
+            break;
+        }
+        case ADMIN : {
+            //menu d'administration, contexte bloqué, pas de push du serveur possible dans cette configuration
         }
         default : {//ne devrait jamais passer par ici
             std::cout<<"Je ne puis rien faire pour vous."<<std::endl;
