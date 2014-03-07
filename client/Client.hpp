@@ -135,6 +135,8 @@ private:
     playerAttr receiveSelectedPlayerInfos();
     int sendMoves(int moves[][4]); //TODO : moves confirmation ?
     int sendForfeit();
+    int sendDrawRequest();
+    int sendAnswerToDrawProposition(int code);
     
     int sellPlayer(int playerID, int startingPrice);
     int getAuctionsList();

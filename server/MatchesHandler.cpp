@@ -60,6 +60,49 @@ void MatchesHandler::forfeit(User * demander){
     statesOfMatches[matchIndex] = OVER;
 }
 
+void MatchesHandler::transmitDrawRequest(User * demander){
+    int result;
+    User * receiver;
+    int matchIndex = std::find(inviteds.begin(), inviteds.end(), demander) - inviteds.begin();
+    if(matchIndex > int(inviteds.size())-1){ 
+        //il s'agit de l'hôte, soit de l'équipe 1
+        matchIndex = std::find(invitors.begin(), invitors.end(), demander) - invitors.begin(); 
+        receiver = inviteds[matchIndex];
+        if(statesOfMatches[matchIndex] == WAITINGFIRSTMOVE){ // mouvements de l'équipe 2 déjà reçu
+            statesOfMatches[matchIndex] = OVER;
+            sendConfirmationTo(inviteds[matchIndex], MOVES_CONFIRM); //on envoie la confirmation à l'équipe en attente
+            sendEndOfMatch(inviteds[matchIndex], ASKFORDRAW);
+        }else{ //équipe 2 n'a pas encore envoyé ses mouvements
+            sendEndOfMatch(inviteds[matchIndex], ASKFORDRAW);
+        }
+    }else{ //il s'agit de l'invité, soit de l'équipe 2
+        receiver = invitors[matchIndex];
+        if(statesOfMatches[matchIndex] == WAITINGSECONDMOVE){ // mouvements de l'équipe 1 déjà reçu
+            sendConfirmationTo(invitors[matchIndex], MOVES_CONFIRM);//on envoie la confirmation à l'équipe en attente
+            sendEndOfMatch(invitors[matchIndex], ASKFORDRAW);
+        }else{ //équipe 1 n'a pas encore envoyé ses mouvements
+            sendEndOfMatch(invitors[matchIndex], ASKFORDRAW);
+        }
+    }
+}
+
+void MatchesHandler::confirmDraw(User * responder, int confirmation){
+    //confirmation : DRAWACCEPTED or DRAWDENIED
+    User * receiver;
+    int matchIndex = std::find(inviteds.begin(), inviteds.end(), responder) - inviteds.begin();
+    if(matchIndex > int(inviteds.size())-1){ 
+        //il s'agit de l'hôte, soit de l'équipe 1
+        matchIndex = std::find(invitors.begin(), invitors.end(), responder) - invitors.begin(); 
+        receiver = inviteds[matchIndex];
+    }else{
+        receiver = invitors[matchIndex];
+    }
+    sendEndOfMatch(receiver, confirmation);
+    if(confirmation == DRAWACCEPTED){
+        statesOfMatches[matchIndex] = OVER;
+    }
+}
+
 int MatchesHandler::sendEndOfMatch(User * receiver, int code){
     SerializedObject toSend;
 	char * position = toSend.stringData;
@@ -68,6 +111,10 @@ int MatchesHandler::sendEndOfMatch(User * receiver, int code){
     }
     else if(code == ASKFORDRAW){
         toSend.typeOfInfos = OPPONENTASKFORDRAW;
+    }
+    else{
+        toSend.typeOfInfos = DRAW_CONFIRM;
+        memcpy(position, &code, sizeof(code)); //confirmation : DRAWACCEPTED or DRAWDENIED
     }
     return sendOnSocket(receiver->getSockfd(), toSend);
 }

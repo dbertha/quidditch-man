@@ -453,6 +453,16 @@ void User::cmdHandler(SerializedObject *received) {
 			__matchesHandler->forfeit(this);
 			break;
 		}
+		case ASKFORDRAW : {
+			__matchesHandler->transmitDrawRequest(this);
+			break;
+		}
+		case ANSWERTODRAWPROPOSITION : {
+			position = received->stringData;
+			memcpy(&confirmation, position, sizeof(confirmation)); 
+			__matchesHandler->confirmDraw(this,confirmation);
+			break;
+		}
 		case CREATEAUCTION : {
 			//reading details
 			int startingPrice;

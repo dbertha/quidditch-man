@@ -68,6 +68,8 @@ public :
     int sendInvitation(User * invitor, User * invited);
     void forfeit(User * demander);
     int sendEndOfMatch(User * receiver, int code);
+    void transmitDrawRequest(User * demander);
+    void confirmDraw(User * responder, int confirmation);
 };
 
 #endif

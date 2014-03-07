@@ -375,7 +375,7 @@ void Client::startMatch(int numTeam){
         }
     }
     //TODO : gérer demande de match nul
-    cout << "Winner is team " << winner << endl;
+    cout << "Winner is team " << winner << " (-1 is a draw)"<< endl;
 }
 
 int Client::testifContinue(int numTeam){
@@ -399,6 +399,16 @@ int Client::testifContinue(int numTeam){
                 sendForfeit(); //pas besoin d'une confirmation
                 return numTeam == 1 ? 2 : 1; //team adverse gagne
             }
+            case 3 : {
+                sendDrawRequest();
+                int result = getConfirmation();
+                if(result == DRAWACCEPTED){
+                    cout << "Draw accepted by the opponent ! " << endl;
+                    return -1;
+                }else{
+                    return winner;
+                }
+            }
         }
     }
     else{ //sinon, message du serveur
@@ -408,15 +418,43 @@ int Client::testifContinue(int numTeam){
                 cout << "Opponent forfeit !" << endl;
                 return numTeam;
             }
+            case OPPONENTASKFORDRAW : {
+                int code;
+                cout << "Opponent ask for a draw ! (in a tournament, the one who suggest is considered as the loser)" << endl;
+                cout << "Do you accept ? [1 for yes/0 for no] " << endl;
+                cin >> input_;
+                if(input_){
+                    code = DRAWACCEPTED;
+                }else{
+                    code = DRAWDENIED;
+                }
+                sendAnswerToDrawProposition(code);
+                return input_ ? -1 : 0;
+            }
         }
     }
     
+}
+
+int Client::sendAnswerToDrawProposition(int code){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = ANSWERTODRAWPROPOSITION;
+    memcpy(position, &code, sizeof(code));
+    return sendOnSocket(sockfd_, serialized);
 }
 
 int Client::sendForfeit(){
     SerializedObject serialized;
     char * position = serialized.stringData;
     serialized.typeOfInfos = FORFEIT;
+    return sendOnSocket(sockfd_, serialized);
+}
+
+int Client::sendDrawRequest(){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = ASKFORDRAW;
     return sendOnSocket(sockfd_, serialized);
 }
 
