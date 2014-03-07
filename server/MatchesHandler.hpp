@@ -14,6 +14,8 @@
 #include <cstring> //memcpy
 #include <string>
 
+//TODO : confier à l'user le soin d'envoyer les messages de sorte à gérer une éventuelle déco du client
+
 //quand lance un match, marque l'utilisateur comme occupé
 //quand reçoit une demande d'invitation, vérifie si l'invité n'est pas occupé
 
@@ -43,6 +45,7 @@
 #define INVITORSASKENDOFMATCH 3 
 #define INVITEDASKENDOFMATCH 4
 #define WAITING_MOVES 5
+#define OVER 6
 
 class User;
 class MatchesHandler{
@@ -63,6 +66,8 @@ public :
     void getPlayerInfos(User * demander, int playerID);
     void recordMoves(User * demander);
     int sendInvitation(User * invitor, User * invited);
+    void forfeit(User * demander);
+    int sendEndOfMatch(User * receiver, int code);
 };
 
 #endif

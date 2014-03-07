@@ -1,5 +1,7 @@
 #include "MatchesHandler.hpp"
 
+//TODO : gérer un match terminé
+
 void MatchesHandler::proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1, int **movesTeam1){
     //TODO : tester si invited non null
     if((invitor->state_ == FREE) and (invited->state_ == FREE)){
@@ -32,6 +34,42 @@ int MatchesHandler::sendInvitation(User * invitor, User * invited){
     position += sizeof(IDInvitor);
     memcpy(position, &name, sizeof(name));
     return sendOnSocket(invited->getSockfd(), toSend);
+}
+
+void MatchesHandler::forfeit(User * demander){
+    
+    int matchIndex = std::find(inviteds.begin(), inviteds.end(), demander) - inviteds.begin();
+    if(matchIndex > int(inviteds.size())-1){ 
+        //il s'agit de l'hôte, soit de l'équipe 1
+        matchIndex = std::find(invitors.begin(), invitors.end(), demander) - invitors.begin(); 
+        if(statesOfMatches[matchIndex] == WAITINGFIRSTMOVE){ // mouvements de l'équipe 2 déjà reçu
+            statesOfMatches[matchIndex] = OVER;
+            sendConfirmationTo(inviteds[matchIndex], MOVES_CONFIRM); //on envoie la confirmation à l'équipe en attente
+            sendEndOfMatch(inviteds[matchIndex], FORFEIT);
+        }else{ //équipe 2 n'a pas encore envoyé ses mouvements
+            sendEndOfMatch(inviteds[matchIndex], FORFEIT);
+        }
+    }else{ //il s'agit de l'invité, soit de l'équipe 2
+        if(statesOfMatches[matchIndex] == WAITINGSECONDMOVE){ // mouvements de l'équipe 1 déjà reçu
+            sendConfirmationTo(invitors[matchIndex], MOVES_CONFIRM);//on envoie la confirmation à l'équipe en attente
+            sendEndOfMatch(invitors[matchIndex], FORFEIT);
+        }else{ //équipe 1 n'a pas encore envoyé ses mouvements
+            sendEndOfMatch(invitors[matchIndex], FORFEIT);
+        }
+    }
+    statesOfMatches[matchIndex] = OVER;
+}
+
+int MatchesHandler::sendEndOfMatch(User * receiver, int code){
+    SerializedObject toSend;
+	char * position = toSend.stringData;
+    if(code == FORFEIT){
+        toSend.typeOfInfos = OPPONENTFORFEIT;
+    }
+    else if(code == ASKFORDRAW){
+        toSend.typeOfInfos = OPPONENTASKFORDRAW;
+    }
+    return sendOnSocket(receiver->getSockfd(), toSend);
 }
 	
 

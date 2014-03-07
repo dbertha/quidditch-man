@@ -14,6 +14,7 @@
 #define NORMAL_LOGIN 1
 #define ADMIN_LOGIN 2
 
+//TODO : regrouper les types de jeu sur un intervalle continu
 #define LOGIN 1
 #define LOGIN_CONFIRM 2
 #define GETBUILDINGINFOS 3
@@ -58,6 +59,10 @@
 #define AUCTION_RESULT 42
 #define GETAUCTIONINFO 43
 #define MATCH_INVITATION 44
+#define FORFEIT 45
+#define OPPONENTFORFEIT 46
+#define ASKFORDRAW 47
+#define OPPONENTASKFORDRAW 48
 
 #define STADIUM 1
 #define TRAININGCENTER 2

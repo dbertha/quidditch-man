@@ -48,7 +48,7 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 	switch(received->typeOfInfos){
 		//décodage du buffer en fonction de son entête
-		//TODO : solution + élégante
+		//TODO : solution + élégante, découpage en fonction du type de jeu concerné
 		case LOGIN :
 			//reading details
 			char username[USERNAME_LENGTH], password[PASSWORD_LENGTH];
@@ -448,7 +448,12 @@ void User::cmdHandler(SerializedObject *received) {
             __matchesHandler->recordMoves(this);
 			break;
         }
-		case CREATEAUCTION :
+        
+        case FORFEIT : {
+			__matchesHandler->forfeit(this);
+			break;
+		}
+		case CREATEAUCTION : {
 			//reading details
 			int startingPrice;
 			position = received->stringData;
@@ -473,6 +478,7 @@ void User::cmdHandler(SerializedObject *received) {
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
             sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
+		}
 		case JOINAUCTION :
 			//reading details
 			position = received->stringData;

@@ -91,6 +91,7 @@ private:
     void displayManageBuildingsMenu();
     void displayAvailableManagers();
     std::vector<int> displayAndAskPlayersForMatch();
+    int testifContinue(int numTeam); //combo display + select + handler pour la poursuite d'un match
     //handlers :
     void kbMgr();
     void handleLogin();
@@ -133,6 +134,7 @@ private:
     int selectPlayer(int playerID);
     playerAttr receiveSelectedPlayerInfos();
     int sendMoves(int moves[][4]); //TODO : moves confirmation ?
+    int sendForfeit();
     
     int sellPlayer(int playerID, int startingPrice);
     int getAuctionsList();

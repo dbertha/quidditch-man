@@ -338,38 +338,86 @@ void Client::handleOpponentChoice(){
     proposeMatchTo(input_,  playersInTeam);
     if(receiveMatchConfirmation() == MATCH_STARTING){
         startMatch(1); //inviteur a l'équipe 1
+        state_ = FREE; //on suppose que la fonction ne retourne qu'à la fin du match
     }
 }
 
 void Client::startMatch(int numTeam){
-  int winner = 0;
-  int scoreTeam1 = 0;
-  int scoreTeam2 = 0;
-  HexagonalField field;
-  std::vector<AxialCoordinates> allPositions;
-  getAllPositions();
-  allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
-  while(winner == 0){    
-    cout << "Score team1 (inviter) = " << scoreTeam1 << endl;
-    cout << "Score team2 (invited) = " << scoreTeam2 << endl;
-    field.reset();
-    for(unsigned int i = 0; i < allPositions.size(); ++i){
-      if(field.getOccupant(allPositions[i]) == FREE_SPACE){
-        field.setOccupant(allPositions[i], i);
-      }
-    }
-    field.display();
-    //TODO : tester si balle superposée à un joueur, et indiquer le joueur le cas échéant
-    askAndSendMoves(numTeam, field, allPositions);
-    getConfirmation();
-    
-    //cout << "Les échanges de messages suivants pour le match n'ont pas encore été implémentés." << endl;
-    //winner =1;
+    int winner = 0;
+    int scoreTeam1 = 0;
+    int scoreTeam2 = 0;
+    HexagonalField field;
+    std::vector<AxialCoordinates> allPositions;
     getAllPositions();
     allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
-  }
-  //TODO : gérer demande de match nul
-  cout << "Winner is team " << winner << endl;
+    while(winner == 0){
+        winner = testifContinue(numTeam); //demande match nul ou forfait + écoute socket pour match nul ou socket
+        if(winner == 0){ 
+            cout << "Your are team n° " << numTeam << endl;
+            cout << "Score team1 (inviter) = " << scoreTeam1 << endl;
+            cout << "Score team2 (invited) = " << scoreTeam2 << endl;
+            field.reset();
+            //TODO : méthode de field :
+            for(unsigned int i = 0; i < allPositions.size(); ++i){
+              if(field.getOccupant(allPositions[i]) == FREE_SPACE){
+                field.setOccupant(allPositions[i], i);
+              }
+            }
+            field.display();
+            //TODO : tester si balle superposée à un joueur, et indiquer le joueur le cas échéant
+            askAndSendMoves(numTeam, field, allPositions);
+            getConfirmation();
+            
+            //cout << "Les échanges de messages suivants pour le match n'ont pas encore été implémentés." << endl;
+            //winner =1;
+            getAllPositions();
+            allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
+        }
+    }
+    //TODO : gérer demande de match nul
+    cout << "Winner is team " << winner << endl;
+}
+
+int Client::testifContinue(int numTeam){
+    int winner = 0;
+    cout << "You are in a match, what do you want to do :  " << numTeam << endl;
+    cout << "[1] Continue the tour " << endl;
+    cout << "[2] Forfeit "  << endl;
+    cout << "[3] Suggest a draw (in a tournament, the one who suggest is considered as the loser) " << endl;
+    loadFDSet();
+    if (select(sockfd_+1,&FDSet_,NULL,NULL,NULL)==ERROR) {
+            std::cerr<<"Socket bind error"<<std::endl;
+            return EXIT_FAILURE;
+    }
+    if(keyboard()){ // si entrée clavier
+        cin>>input_; //on récupère l'entrée
+        switch(input_){
+            case 1 : {
+                return winner;
+            }
+            case 2 : {
+                sendForfeit(); //pas besoin d'une confirmation
+                return numTeam == 1 ? 2 : 1; //team adverse gagne
+            }
+        }
+    }
+    else{ //sinon, message du serveur
+        SerializedObject received = receiveOnSocket(sockfd_);
+        switch(received.typeOfInfos){
+            case OPPONENTFORFEIT : {
+                cout << "Opponent forfeit !" << endl;
+                return numTeam;
+            }
+        }
+    }
+    
+}
+
+int Client::sendForfeit(){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = FORFEIT;
+    return sendOnSocket(sockfd_, serialized);
 }
 
 void Client::askAndSendMoves(int numTeam, HexagonalField &field, std::vector<AxialCoordinates> &positions){
@@ -552,7 +600,7 @@ void Client::askAndSendMoves(int numTeam, HexagonalField &field, std::vector<Axi
       ++currentMove;
     }
   }
-  //TODO : tester si demande de match nul
+  //TODO : tester si reception d'une demande de match nul ou forfait
   sendMoves(moves);
 }
 
@@ -581,6 +629,7 @@ void Client::commMgr() {
             answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
             if(receiveMatchConfirmation() == MATCH_STARTING){
                 startMatch( 2); //invité a l'équipe 2
+                state_ = FREE;
             }
         }
 	}
