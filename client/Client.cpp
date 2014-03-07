@@ -52,7 +52,7 @@ void Client::displayMainMenu(){
     cout<<" [3] Manage players"<<endl;
     cout<<" [4] Manage buildings"<<endl;
     cout<<" [0] Quit game"<<endl;
-    cout<<"-----> ";
+    cout<<"-----> " << flush;
 }
 
 //Log in\\
@@ -318,6 +318,10 @@ void Client::handleMainMenu(){
             state_ = BUILDINGS_MENU;
             break;
         }
+        case 0 : {
+			state_ = DISCONNECTING;
+			break;
+		}
         
 
     }
@@ -1165,6 +1169,7 @@ void Client::handlePlayersMenu(){
 void Client::kbMgr() {
     std::cin>>input_;
     //TODO : s'assurer de la gestion des retours en arrière
+    //TODO : tester input
     switch(state_) {
         case INIT : {
             //contexte verrouillé, pas d'écoute du socket tant que login pas terminé
@@ -1205,20 +1210,22 @@ void Client::kbMgr() {
         }
         case TRAINING_MENU : {
             //contexte verrouillé par facilité
-            int capacityNumber;
-            cout<<"Indicate the number of the capacity you wish to train [or 0 to abort]  \n -----> ";
-            cin>>capacityNumber;
-            if ((input_>0)&&(capacityNumber>0)) {
-              trainPlayer(input_-1,capacityNumber-1);
-              bool trainingResult = getConfirmation();
-              if (trainingResult) {
-                askForBuildingInfos(TRAININGCENTER);
-                vector<int> trainingCenterInfos = receiveBuildingInfos();
-                cout<<"-------------\n Training has started !"<<endl;
-                cout<<" Training will be over in "<<trainingCenterInfos[2]<<" minutes"<<endl;
-              }
-              else cout<<"------------\n Training impossible, this player is blocked"<<endl;
-            }
+            if(input_ != ABORT){
+				int capacityNumber;
+				cout<<"Indicate the number of the capacity you wish to train [or 0 to abort]  \n -----> ";
+				cin>>capacityNumber;
+				if ((input_>0)&&(capacityNumber>0)) {
+				  trainPlayer(input_-1,capacityNumber-1);
+				  bool trainingResult = getConfirmation();
+				  if (trainingResult) {
+					askForBuildingInfos(TRAININGCENTER);
+					vector<int> trainingCenterInfos = receiveBuildingInfos();
+					cout<<"-------------\n Training has started !"<<endl;
+					cout<<" Training will be over in "<<trainingCenterInfos[2]<<" minutes"<<endl;
+				  }
+				  else cout<<"------------\n Training impossible, this player is blocked"<<endl;
+				}
+			}
             state_ = FREE;
             break;
         }
@@ -1237,6 +1244,30 @@ void Client::kbMgr() {
             state_ = FREE;
             break;
         }
+        
+        case BUILDINGS_MENU : {
+			//contexte verrouillé par facilité
+			if(input_ != 0){
+				askForBuildingInfos(input_);
+				vector<int> buildingInfos = receiveBuildingInfos();
+				displayBuildingInfos(buildingInfos,input_);
+				cout<<"\n---------------\nEnter 1 if you wish to upgrade this building [or 0 to abort] \n -----> ";
+				//TODO : tester niveau client si argent suffisant
+				int upgrade;
+				cin>>upgrade;
+				if (upgrade) {
+					askForBuildingUpgrade(input_);
+					int upgradeResult = getConfirmation();
+					if (upgradeResult) {
+						cout<<"-------------\n This building has started upgrading !"<<endl;
+						cout<<" Upgrade will be complete in "<<(1+buildingInfos[0])*TIMESCALE<<" minutes !"<<endl;
+					}
+					else cout<<"-------------\n You can't upgrade this building (not enough money or this building is already upgrading) !"<<endl;
+				}
+			}
+			state_ = FREE;
+			break;
+		}
         case ADMIN : {
             //menu d'administration, contexte bloqué, pas de push du serveur possible dans cette configuration
             break;
@@ -1287,6 +1318,13 @@ void Client::askInput() {
             cout<<"Indicate the number of the player you wish to heal [or 0 to abort] : " << flush;
             break;
         }
+        
+        case BUILDINGS_MENU : {
+			displayManagerInfos();
+			displayManageBuildingsMenu();
+			break;
+		}
+		
         default : {
             std::cout<<"No options available."<<std::endl;
             break;
