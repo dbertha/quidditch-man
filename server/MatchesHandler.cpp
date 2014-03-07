@@ -12,11 +12,28 @@ void MatchesHandler::proposeForMatch(User * invitor, User * invited, std::vector
         //movesLists.push_back(emptyMoves);
         invitor->state_ = MATCH_INVITING;
         invited->state_ = MATCH_INVITED;
+        sendInvitation(invitor, invited);
     }else{
         sendConfirmationTo(invitor, INVITATION_NOT_POSSIBLE);
         //code to invitor: INVITATION_NOT_POSSIBLE
     }
 }
+
+int MatchesHandler::sendInvitation(User * invitor, User * invited){
+	SerializedObject toSend;
+	toSend.typeOfInfos = MATCH_INVITATION; //paquet header
+	char * position = toSend.stringData;
+	
+	int IDInvitor = invitor->getUserID();
+	std::string nameInvitor = invitor->getUserName();
+	char name[USERNAME_LENGTH];
+	strcpy(name, nameInvitor.c_str());
+    memcpy(position, &IDInvitor, sizeof(IDInvitor));
+    position += sizeof(IDInvitor);
+    memcpy(position, &name, sizeof(name));
+    return sendOnSocket(invited->getSockfd(), toSend);
+}
+	
 
 bool MatchesHandler::isInvited(User * user){
     return user->state_ == MATCH_INVITED;

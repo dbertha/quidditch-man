@@ -61,7 +61,7 @@ void Client::displayConnexionMenu(){
     cout<<" ------------------------ WELCOME TO QUIDDITCH MANAGER 2014 ! ------------------------"<<endl;
     cout<<" [1] Log in"<<endl;;
     cout<<" [2] Create a new manager"<<endl;
-    cout<<"-----> ";
+    cout<<"-----> " << flush;
 }
 
 //Management\\
@@ -560,7 +560,30 @@ void Client::askAndSendMoves(int numTeam, HexagonalField &field, std::vector<Axi
 
 void Client::commMgr() {
 //gère les messages non sollicités (exemple : invitation à un match amical)
-
+	SerializedObject received = receiveOnSocket(sockfd_);
+	switch(received.typeOfInfos){
+		case MATCH_INVITATION : {
+            int IDInvitor;
+            char name[USERNAME_LENGTH];
+            char * position = received.stringData;
+            cout << "You've got a match proposal !" << endl;
+            memcpy(&IDInvitor, position, sizeof(IDInvitor));
+            position += sizeof(IDInvitor);
+            memcpy(&name, position, sizeof(name));
+            cout << "Opponent ID : " << IDInvitor << " name : " << name << endl;
+            cout << "Accept ? [1/0]" << endl;
+            bool confirmation;
+            cin >> confirmation;
+            std::vector<int> playersInTeam;
+            if(confirmation){
+                playersInTeam = displayAndAskPlayersForMatch();
+            }
+            answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
+            if(receiveMatchConfirmation() == MATCH_STARTING){
+                startMatch( 2); //invité a l'équipe 2
+            }
+        }
+	}
 }
 
 void Client::matchTentative() {

@@ -12,6 +12,7 @@
 #include <vector>
 #include <iostream>
 #include <cstring> //memcpy
+#include <string>
 
 //quand lance un match, marque l'utilisateur comme occupé
 //quand reçoit une demande d'invitation, vérifie si l'invité n'est pas occupé
@@ -61,6 +62,7 @@ public :
     void getScoresAndPositions(User * demander);
     void getPlayerInfos(User * demander, int playerID);
     void recordMoves(User * demander);
+    int sendInvitation(User * invitor, User * invited);
 };
 
 #endif

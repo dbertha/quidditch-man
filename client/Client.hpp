@@ -99,7 +99,7 @@ private:
     void handleAuctions();
     void handlePlayersMenu();
     void mainAuction(int auctionID, int timeLeft);
-    //void *auctionTurn(void* data);
+    //void *auctionTurn(void* data); : extern
     void startMatch(int numTeam);
     void askAndSendMoves(int numTeam, HexagonalField &field, std::vector<AxialCoordinates> &positions);
     void commMgr();
