@@ -51,6 +51,7 @@ void Client::displayMainMenu(){
     cout<<" [2] See/create auctions"<<endl;
     cout<<" [3] Manage players"<<endl;
     cout<<" [4] Manage buildings"<<endl;
+    cout<<" [5] See open tournaments"<<endl;
     cout<<" [0] Quit game"<<endl;
     cout<<"-----> " << flush;
 }
@@ -171,6 +172,14 @@ void Client::displayAvailableManagers(){
         std::cout << "ID :" << IDList[i] << " name : " << namesList[i] << std::endl;
     }
     cout<<"Indicate the ID of the player you want to challenge [-1 to go back]: " << flush;
+}
+
+void Client::displayTournamentMenu(){
+    askForTournamentList();
+    getTournamentList();
+    //TODO : afficher la liste des tournois
+    cout<<"Indicate the ID of the tournament you want to join " << \
+    "(you can't join several tournaments at the same time) [-1 to go back]: " << flush;
 }
 
 
@@ -315,6 +324,7 @@ void Client::handleMainMenu(){
 //#define AUCTION_ROOM 2
 //#define MANAGE_PLAYERS 3
 //#define MANAGE_BUILDINGS 4
+//#define SEE_TOURNAMENTS 5
         case SEE_MANAGERS : {
             state_ = MANAGERS_MENU;
             break;
@@ -331,19 +341,33 @@ void Client::handleMainMenu(){
             state_ = BUILDINGS_MENU;
             break;
         }
+        case SEE_TOURNAMENTS : {
+            state_ = TOURNAMENTS_MENU;
+            break;
+        }
         default : {
 			state_ = DISCONNECTING;
-			break;
+            break;
 		}
         
 
     }
 }
 
+int Client::askForTournamentList(){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = GETTOURNAMENTSLIST;
+    return sendOnSocket(sockfd_, serialized);
+}
+
+int Client::getTournamentList(){return 1;} //TODO
+
 void Client::handleAdminMenu(){
     switch(input_){
-        case SEE_TOURNAMENTS : {
-            //TODO
+        case SEE_TOURNAMENTS_ADMIN : {
+            askForTournamentList();
+            getTournamentList();
             break;
         }
         case CREATE_TOURNAMENT_OPTION : {
@@ -806,7 +830,7 @@ int Client::getConfirmation(){ //valable pour LOGIN_CONFIRM, UPGRADE_CONFIRM, TR
 
 int Client::askForManagerInfos(){
     SerializedObject serialized;
-    char * position = serialized.stringData;
+    //char * position = serialized.stringData;
     serialized.typeOfInfos = GETMANAGERINFOS;
     return sendOnSocket(sockfd_, serialized);
 }
@@ -862,7 +886,7 @@ int Client::askForBuildingUpgrade(int buildingID){
 
 int Client::askForPlayersList(){
     SerializedObject serialized;
-    char * position = serialized.stringData;
+    //char * position = serialized.stringData;
     serialized.typeOfInfos = GETPLAYERSLIST;
     return sendOnSocket(sockfd_, serialized);
 }
@@ -1177,6 +1201,14 @@ int Client::receiveAuctionResult() {
     return result;
 }
 
+int Client::askToJoinTournament(int tournamentID){
+    SerializedObject serialized;
+    serialized.typeOfInfos = JOINTOURNAMENT;
+    char * position = serialized.stringData;
+    memcpy(position, &tournamentID, sizeof(tournamentID));
+    return sendOnSocket(sockfd_, serialized);
+}
+
 void *auctionTurn(void* data) {
 
   //int* sockfd = (int *)data;
@@ -1445,6 +1477,25 @@ void Client::kbMgr() {
 			state_ = FREE;
 			break;
 		}
+        case TOURNAMENTS_MENU : {
+            int confirmation;
+            
+            if(input_ == -1){
+                state_ = FREE;
+                return;
+            }
+            //TODO : tester input ?
+            askToJoinTournament(input_);
+            confirmation = getConfirmation();
+            if(confirmation == TOURNAMENT_NOT_JOINED){
+                cout << "Impossible to join this tournament !" << endl;
+            }else{
+                cout << "You are recorded as a participant of this tournament. " << \
+                "Be ready for when it will start !" << endl;
+            }
+            state_ = FREE;
+            break;
+        }
         default : {//ne devrait jamais passer par ici
             std::cout<<"Nothing to do here."<<std::endl;
         }
@@ -1501,6 +1552,10 @@ void Client::askInput() {
 			displayManageBuildingsMenu();
 			break;
 		}
+        case TOURNAMENTS_MENU : {
+            displayTournamentMenu();
+            break;
+        }
 		
         default : {
             std::cout<<"No options available."<<std::endl;

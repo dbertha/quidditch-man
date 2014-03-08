@@ -714,6 +714,36 @@ void User::cmdHandler(SerializedObject *received) {
             sendOnSocket(sockfd_, answer); 
 			break;
 		}
+		case GETTOURNAMENTSLIST : {
+			//no details to read
+#ifdef __DEBUG
+			std::cout<<"Demande de la liste des tournois reçue sur le socket "<<getSockfd()<<std::endl;
+#endif
+			//handling request
+			//TODO
+			//answering
+			//TODO
+			answer.typeOfInfos = TOURNAMENTSLIST;
+			break;
+		}
+		case JOINTOURNAMENT : {
+			//reading details
+			int tournamentID;
+			position = received->stringData;
+			memcpy(&tournamentID, position, sizeof(tournamentID));
+#ifdef __DEBUG
+			std::cout<<"Demande de participation à un tournoi reçue sur le socket "<<getSockfd()<<std::endl;
+			std::cout<<"tournamentID :  "<<tournamentID<< std::endl;
+#endif
+			//handling request
+			//TODO
+			//answering
+			//answer in confirmation
+			answer.typeOfInfos = JOINTOURNAMENT_CONFIRM;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); 
+			break;
+		}
 		default :
 #ifdef __DEBUG
 			std::cout<<"En-tête inconnu : "<<received->typeOfInfos<<std::endl;

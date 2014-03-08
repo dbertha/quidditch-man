@@ -25,26 +25,29 @@
 
 
 #define DIM 100
-
+//connexion menu :
 #define LOG_IN 1
 #define NEW_MANAGER 2
+//main menu :
 #define SEE_MANAGERS 1
 #define AUCTION_ROOM 2
 #define MANAGE_PLAYERS 3
 #define MANAGE_BUILDINGS 4
-
+#define SEE_TOURNAMENTS 5
+//auctions menu
 #define SEE_AUCTIONS 1
 #define SELL_PLAYER 2
+//players menu :
 #define INSPECT_PLAYER 1
 #define TRAIN_PLAYER_OPTION 2
 #define HEAL_PLAYER_OPTION 3
-
+//buildings menu :
 #define ENTER_STADIUM 1
 #define ENTER_TRAININGCENTER 2
 #define ENTER_HOSPITAL 3
 #define ENTER_FANSHOP 4
-
-#define SEE_TOURNAMENTS 1
+//admin menu :
+#define SEE_TOURNAMENTS_ADMIN 1
 #define CREATE_TOURNAMENT_OPTION 2
 
 #define ABORT 0
@@ -73,7 +76,9 @@ private:
     int input_;
     char opponent_[10];
     fd_set FDSet_;
-    enum Status {INIT,ADMIN,FREE,MANAGERS_MENU, AUCTION_MENU, PLAYERS_MENU, BUILDINGS_MENU, PLAYERSLIST_MENU, TRAINING_MENU, HEALING_MENU, MATCH_LIST,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING};
+    enum Status {INIT,ADMIN,FREE,MANAGERS_MENU, AUCTION_MENU, PLAYERS_MENU, BUILDINGS_MENU, \
+    TOURNAMENTS_MENU, PLAYERSLIST_MENU, TRAINING_MENU, HEALING_MENU, \
+    MATCH_LIST,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING};
     Status state_;
 
     int mainLoop();
@@ -95,6 +100,7 @@ private:
     void displayManagePlayersMenu();
     void displayManageBuildingsMenu();
     void displayAvailableManagers();
+    void displayTournamentMenu();
     std::vector<int> displayAndAskPlayersForMatch();
     int testifContinue(int numTeam); //combo display + select + handler pour la poursuite d'un match
     //handlers :
@@ -139,7 +145,7 @@ private:
     std::vector<AxialCoordinates> receiveScoresAndPositions(int * winner, int * scoreTeam1, int * scoreTeam2);
     int selectPlayer(int playerID);
     playerAttr receiveSelectedPlayerInfos();
-    int sendMoves(int moves[][4]); //TODO : moves confirmation ?
+    int sendMoves(int moves[][4]); 
     int sendForfeit();
     int sendDrawRequest();
     int sendAnswerToDrawProposition(int code);
@@ -155,6 +161,9 @@ private:
     int receiveAuctionResult();
     
     int sendTournamentCreation(int nbOfPlayers, int startingPrice);
+    int askForTournamentList();
+    int getTournamentList();
+    int askToJoinTournament(int tournamentID);
 };
 
 
