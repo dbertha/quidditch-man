@@ -66,4 +66,7 @@ server.out: server/Auction.hpp \
 			common/NetworkBase.cpp
 	make -f Makefile.server
 	
+clean:
+	make clean -f Makefile.server
+	make clean -f Makefile.client
 
