@@ -76,7 +76,7 @@ private:
     void loadFDSet();
     bool keyboard();
     void askInput();
-    void login();
+    //~ void login();
     //display :
     void displayMainMenu();
     void displayConnexionMenu();

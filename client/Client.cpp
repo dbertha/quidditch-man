@@ -251,10 +251,10 @@ void Client::loadFDSet() {
 
 bool Client::keyboard() {return FD_ISSET(STDIN_FILENO,&FDSet_);}
 
-void Client::login() {
-    contactServer();
-    state_=FREE;
-}
+//~ void Client::login() {
+    //~ contactServer();
+    //~ state_=FREE;
+//~ }
 
 
 
@@ -289,6 +289,9 @@ void Client::handleLogin(){
         else{
             //ADMIN_LOGIN
             state_ = ADMIN;
+#ifdef __DEBUG
+            cout << "You are in admin mode." << endl;
+#endif
         }
     }
 }
@@ -1252,6 +1255,9 @@ void Client::handleAuctions(){
                 }
             }
         } while (sellPlayerChoice!=ABORT);
+    }
+    else{
+        state_ = FREE;
     }
 }
 

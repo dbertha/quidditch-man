@@ -6,13 +6,6 @@
 
 
 
-
-
-
-
-
-
-
 User::User(Server * server, MatchesHandler *matchesHandler, int sockfd, int userID): state_(INIT), server_(server), __matchesHandler(matchesHandler), sockfd_(sockfd), userId_(userID), manager_(NULL), calendar_(NULL), auction_(NULL) {
     __moves = new int*[7]; //7 lignes
     for(int i =0; i < 7; ++i){
@@ -20,8 +13,6 @@ User::User(Server * server, MatchesHandler *matchesHandler, int sockfd, int user
     }
     //TODO : delete correspondant dans le destructeur
 }
-
-//TODO : initialisation dans le bon ordre
 
 void User::cmdHandler(SerializedObject *received) {
 	SerializedObject answer;
@@ -67,12 +58,17 @@ void User::cmdHandler(SerializedObject *received) {
 				manager_ = new Manager(username);
 				userName_=username;
 				//userId_=server_->usersList_.size();
-				calendar_ = new Calendar(manager_);
-				calendar_->update();
-				manager_->save();
-				
-				state_=FREE;
-				confirmation = NORMAL_LOGIN;
+				if(!strcmp(username, "admin")){ //return 0 if equal
+					state_= ADMIN;
+					confirmation = ADMIN_LOGIN;
+				}else{
+					calendar_ = new Calendar(manager_);
+					calendar_->update();
+					manager_->save();
+					
+					state_=FREE;
+					confirmation = NORMAL_LOGIN;
+				}
 			}
 			else {
 				std::cout<<"WRONG LOGIN/PASSWORD"<<std::endl;

@@ -34,6 +34,7 @@ class MatchesHandler;
 #define MATCH_INVITED 3
 #define MATCH_INGAME 4
 #define DISCONNECTING 5
+#define ADMIN 6
 
 
 class User {
@@ -62,7 +63,6 @@ public:
 
 private:
 	Server* server_;
-	//CommonMgr* commonMgr_;  inutilisé
     MatchesHandler *__matchesHandler;
 	//User* opponent_;
 	int sockfd_; //socket de communication du client

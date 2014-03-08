@@ -1,6 +1,6 @@
 #include "MatchesHandler.hpp"
 
-//TODO : gérer un match terminé
+//TODO : gérer un match terminé : actuellement un client qui rejoue un match sera tjs attaché au match précédent
 
 void MatchesHandler::proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1, int **movesTeam1){
     //TODO : tester si invited non null
