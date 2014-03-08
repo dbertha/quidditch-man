@@ -32,6 +32,7 @@
 #define AUCTION_ROOM 2
 #define MANAGE_PLAYERS 3
 #define MANAGE_BUILDINGS 4
+#define ACTION_POINTS 5
 
 #define SEE_AUCTIONS 1
 #define SELL_PLAYER 2
@@ -42,6 +43,9 @@
 #define ENTER_TRAININGCENTER 2
 #define ENTER_HOSPITAL 3
 #define ENTER_FANSHOP 4
+#define ENTER_PROMOTIONCENTER 5
+#define BUY_AP 1
+#define WAIT_FOR_AP 2
 
 #define ABORT 0
 
@@ -69,7 +73,7 @@ private:
     int input_;
     char opponent_[10];
     fd_set FDSet_;
-    enum Status {INIT,ADMIN,FREE,MANAGERS_MENU, AUCTION_MENU, PLAYERS_MENU, BUILDINGS_MENU, PLAYERSLIST_MENU, TRAINING_MENU, HEALING_MENU, MATCH_LIST,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING};
+    enum Status {INIT,ADMIN,FREE,MANAGERS_MENU, AUCTION_MENU, PLAYERS_MENU, BUILDINGS_MENU, PLAYERSLIST_MENU, TRAINING_MENU, HEALING_MENU, MATCH_LIST,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING, AP_MENU, BUY_AP_MENU, WAIT_AP_MENU};
     Status state_;
 
     int mainLoop();
@@ -89,6 +93,7 @@ private:
     void displaySellPlayerMenu();
     void displayManagePlayersMenu();
     void displayManageBuildingsMenu();
+    void displayActionPointsMenu();
     void displayAvailableManagers();
     std::vector<int> displayAndAskPlayersForMatch();
     int testifContinue(int numTeam); //combo display + select + handler pour la poursuite d'un match
@@ -113,7 +118,7 @@ private:
     
     
     int askForManagerInfos();
-    void receiveManagerInfos(int *nbPlayers, int * money, int * nbFans);
+    void receiveManagerInfos(int *nbPlayers, int * money, int * nbFans, int * actionPoints);
     int askForBuildingInfos(int buildingID);
     std::vector<int> receiveBuildingInfos();
     int askForBuildingUpgrade(int buildingID);
@@ -147,6 +152,13 @@ private:
     
     int checkAuction();
     int receiveAuctionResult();
+
+    int buyActionPoints(int amount);
+    int getPriceForAP();
+
+    int startPromotionCampaign();
+    int endPromotionCampaign();
+    int getPromotionResult();
 };
 
 

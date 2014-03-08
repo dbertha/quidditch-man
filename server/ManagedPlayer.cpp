@@ -27,64 +27,6 @@ ManagedPlayer::ManagedPlayer() : _blocked(0) { //default constructor. This Manag
 	_broomstick = Broomstick(0,0);
 }
 
-ManagedPlayer::ManagedPlayer(string playerSaveFile): Player(playerSaveFile) {
-	/*
-	The format of a player save file is :
-		First Name (used by the constructor of Player)
-		Last Name (used by the constructor of Player)
-		Speed (used by the constructor of Player)
-		Strength (used by the constructor of Player)
-		Precision (used by the constructor of Player)
-		Reflex (used by the constructor of Player)
-		Resistance (used by the constructor of Player)
-		life (used by the constructor of Player)
-		Training left to do to up speed
-		Training left to do to up strength
-		Training left to do to up precision
-		Training left to do to up reflex
-		Training left to do to up resistance
-		1 if player is blocked (by the training center or the hospital) or 0 if not
-		Number of the capacity boosted by the broomstick
-		Bonus granted by the broomstick
-
-	The first part of the file will be read by the constructor of Player. Player has a protected attribute _offset
-	_offset indicates to ManagedPlayer where he has to start reading the file.
-	*/
-	int fd = open(playerSaveFile.c_str(),O_RDONLY);
-	if (fd==-1) {
-		cerr<<"Error while opening file\n";
-		return;
-	}
-	lseek(fd,this->_offset,SEEK_SET);
-	char buffer[100];
-	int bytes;
-	bytes = read(fd,buffer,sizeof(buffer));
-	buffer[bytes]='\0';
-
-	string tmp;
-	tmp = strtok(buffer,"\n");
-	_trainingLeft[0] = atoi(tmp.c_str());
-
-	for (int i=1;i<5;++i){
-		tmp = strtok(NULL,"\n");
-		_trainingLeft[i] = atoi(tmp.c_str());
-	}
-
-	tmp = strtok(NULL,"\n");
-	_blocked = atoi(tmp.c_str());
-
-	tmp = strtok(NULL,"\n");
-	int broomstickCapacity = atoi(tmp.c_str());
-
-	tmp = strtok(NULL,"\n");
-	int broomstickBonus = atoi(tmp.c_str());
-
-	_broomstick = Broomstick(broomstickCapacity,broomstickBonus);
-
-	close(fd);
-
-}
-
 ManagedPlayer& ManagedPlayer::operator= (const ManagedPlayer& player) {
 	for (int i=0;i<5;++i) {
 		this->setCapacity(i,player.getCapacity(i));
@@ -92,6 +34,7 @@ ManagedPlayer& ManagedPlayer::operator= (const ManagedPlayer& player) {
 	}
 	this->setFirstName(player.getFirstName());
 	this->setLastName(player.getLastName());
+	cout<<this->getFirstName()<<" "<<this->getLastName()<<endl;
 	_blocked = player.isBlocked();
 	this->setLife(player.getLife());
 	return *this;

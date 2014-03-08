@@ -3,15 +3,21 @@
 #include "MatchesHandler.hpp" 
 #include "Auction.hpp"
 #include "Server.hpp"
+#include "DataBase.hpp"
 
+#include <string> 
+#include <sys/stat.h>
+#include <iostream>
+#include <stdlib.h>     /* atoi */
+#include <ctime>
+#include <cstdlib> 
+#include <stdio.h>
+#include <string.h>
 
-
-
-
-
-
-
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 User::User(Server * server, MatchesHandler *matchesHandler, int sockfd, int userID): state_(INIT), server_(server), __matchesHandler(matchesHandler), sockfd_(sockfd), userId_(userID), manager_(NULL), calendar_(NULL), auction_(NULL) {
     __moves = new int*[7]; //7 lignes
@@ -36,6 +42,9 @@ void User::cmdHandler(SerializedObject *received) {
 	int targetedAuction;
 	int isFinished;
 	int auctionPrice;
+	int elapsedTime;
+	int APGained;
+	int amount, price;
 	ManagedPlayer tmpPlayer;
 	vector<int> infos;
 	vector<string> playersList;
@@ -69,7 +78,7 @@ void User::cmdHandler(SerializedObject *received) {
 				//userId_=server_->usersList_.size();
 				calendar_ = new Calendar(manager_);
 				calendar_->update();
-				manager_->save();
+				DataBase::save(*manager_);
 				
 				state_=FREE;
 				confirmation = NORMAL_LOGIN;
@@ -109,7 +118,7 @@ void User::cmdHandler(SerializedObject *received) {
 				manager_ = new Manager(username);
 				userName_=username;
 				//userId_=server_->usersList_.size();
-				manager_->save();
+				DataBase::save(*manager_);
 				calendar_ = new Calendar(manager_);
 
 				state_=FREE;
@@ -129,20 +138,22 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand
 			
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			int nbPlayers;
 			nbPlayers = manager_->getNumberOfPlayers();
 			int money;
 			money = manager_->getMoney();
 			int nbFans;
 			nbFans = manager_->getNumberOfFans();
+			int actionPoints;
+			actionPoints = manager_->getActionPoints();
 #ifdef __DEBUG
 			std::cout<<"Number of players : "<<manager_->getNumberOfPlayers()<<std::endl;
 			std::cout<<"Money : "<<manager_->getMoney()<<std::endl;
 			std::cout<<"Number of fans : "<<manager_->getNumberOfFans()<<std::endl;
 #endif
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			//construct answer
 			answer.typeOfInfos = MANAGERINFOS;
 			memcpy(answerPosition, &nbPlayers, sizeof(nbPlayers));
@@ -150,6 +161,8 @@ void User::cmdHandler(SerializedObject *received) {
 			memcpy(answerPosition, &money, sizeof(money));
 			answerPosition += sizeof(money);
 			memcpy(answerPosition, &nbFans, sizeof(nbFans));
+			answerPosition += sizeof(actionPoints);
+			memcpy(answerPosition, &actionPoints, sizeof(actionPoints));
 			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 
@@ -161,7 +174,7 @@ void User::cmdHandler(SerializedObject *received) {
 			//handle demand
 
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			playersList = manager_->getPlayersList();
 			//construct answer 
 			answer.typeOfInfos = PLAYERSLIST;
@@ -186,7 +199,7 @@ void User::cmdHandler(SerializedObject *received) {
 				
 			}
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			
 			break;
@@ -201,7 +214,7 @@ void User::cmdHandler(SerializedObject *received) {
 			infos= manager_->getPlayerInformations(targetedPlayer);
 			//for (unsigned int i=0;i<infos.size();++i) {std::cout<<infos[i]<<std::endl;}
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			//construct answer
 			answer.typeOfInfos = PLAYERINFOS;
 			//5 attributs int
@@ -232,16 +245,17 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 			//handle demand:
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			//RecrutmentCenter inutilisé
 			if (targetedBuilding==STADIUM) infos=manager_->getStadiumInformations();
 			else if (targetedBuilding==TRAININGCENTER) infos=manager_->getTrainingCenterInformations();
 			else if (targetedBuilding==HOSPITAL) infos=manager_->getHospitalInformations();
-			else /*if (targetedBuilding==FANSHOP)*/ infos=manager_->getFanShopInformations();
+			else if (targetedBuilding==FANSHOP) infos=manager_->getFanShopInformations();
+			else /*if (targetedBuilding==PROMOTIONCENTER)*/ infos=manager_->getPromotionCenterInformations();
 			
 
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 	
 			//construct answer
 
@@ -265,20 +279,22 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 			//handle demand:
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			confirmation = false;
 			if (targetedBuilding==STADIUM) resultOfUpgrade=manager_->startStadiumConstruction();
 			else if (targetedBuilding==TRAININGCENTER) resultOfUpgrade=manager_->startTrainingCenterConstruction();
 			else if (targetedBuilding==HOSPITAL) resultOfUpgrade=manager_->startHospitalConstruction();
 			else if (targetedBuilding==FANSHOP) resultOfUpgrade=manager_->startFanShopConstruction();
+			else if (targetedBuilding==PROMOTIONCENTER) resultOfUpgrade=manager_->startPromotionCenterConstruction();
 			if (resultOfUpgrade==ALREADYINCONSTRUCTION) std::cout<<"Already in construction !"<<std::endl;
 			else if (resultOfUpgrade==NOTENOUGHMONEY) std::cout<<"Not enough money !"<<std::endl; //testé au niveau client
+			else if (resultOfUpgrade==NOTENOUGHAP) std::cout<<"Not enough action points !"<<std::endl;
 			else {
 				std::cout<<"Construction started !"<<std::endl;
 				confirmation = true;
 			}
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			//construct answer
 			answer.typeOfInfos = UPGRADE_CONFIRM;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
@@ -298,11 +314,11 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 			//handle demand
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			confirmation = manager_->trainPlayer(targetedPlayer,capacityToTrain);
 			if (!confirmation) std::cout<<"This player is already blocked by a training or the hospital"<<std::endl;
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 
 			//construct answer
 			answer.typeOfInfos = TRAINING_STARTED;
@@ -319,15 +335,74 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 			//handle demand
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			confirmation = manager_->healPlayer(targetedPlayer);
 			if (!confirmation) std::cout<<"This player is already blocked by a training or the hospital or is in full health"<<std::endl;
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 
 			//construct answer
 			answer.typeOfInfos = HEAL_STARTED;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+			break;
+
+		case BUY_ACTION_POINTS :
+			//reading details
+			memcpy(&amount, position, sizeof(amount)); 
+#ifdef __DEBUG
+			std::cout<<"Demande d'achat de points d'action reçue sur le socket "<<getSockfd()<<std::endl;
+#endif
+			//handle demand
+			calendar_->update();
+			DataBase::save(*manager_);
+			price = manager_->payForActionPoints(amount);
+			calendar_->update();
+			DataBase::save(*manager_);
+
+			//construct answer
+			answer.typeOfInfos = PRICE_FOR_AP;
+			memcpy(answerPosition, &price, sizeof(price));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+			break;
+
+		case START_PROMOTION :
+			//reading details
+#ifdef __DEBUG
+			std::cout<<"Demande de début de campagne de promotion sur sockfd "<<getSockfd()<<std::endl;
+#endif
+			//handle demand
+			calendar_->update();
+			DataBase::save(*manager_);
+			time_t secondes;
+			time(&secondes);
+			timeOfStart_ =*localtime(&secondes);
+			
+			/*confirmation = true;
+			
+			//construct answer
+			answer.typeOfInfos = HEAL_STARTED;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour*/
+			break;
+
+		case END_PROMOTION :
+			//reading details
+#ifdef __DEBUG
+			std::cout<<"Fin de la campagne de promotion pour le socket "<<getSockfd()<<std::endl;
+#endif
+			//handle demand
+			calendar_->update();
+			DataBase::save(*manager_);
+			elapsedTime = calendar_->getElapsedTime(timeOfStart_);
+			APGained = manager_->waitForActionPoints(elapsedTime);
+
+			DataBase::save(*manager_);
+
+			std::cout<<" ACTION POINTS GAINED : "<<APGained<<endl;
+			//construct answer
+			answer.typeOfInfos = RESULT_PROMOTION;
+			memcpy(answerPosition, &APGained, sizeof(APGained));
             sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 
@@ -477,7 +552,7 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 			//handle demand:
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			tmpPlayer = manager_->getPlayer(targetedPlayer);
 			if (tmpPlayer.isBlocked()) confirmation=false;
 			else {
@@ -499,7 +574,7 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 			//handle demand:
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			for (unsigned int i=0;i<server_->auctionsList_.size();++i) {
 				if (targetedAuction==server_->getAuctionID(i)) auction_ = server_->auctionsList_[i];
 			}
@@ -555,7 +630,7 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 			//handle demand:
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			for (unsigned int i=0;i<server_->auctionsList_.size();++i) {
 				if (server_->getAuctionTimeLeft(i)>0) {
 					auctionsList.push_back(intToString(server_->getAuctionID(i)));
@@ -603,7 +678,7 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 			//handle demand:
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			for (unsigned int i=0;i<server_->auctionsList_.size();++i) {
 				if (server_->getAuctionID(i)==targetedAuction) {
 					infos= server_->getPlayerSoldInfos(i);
@@ -655,7 +730,7 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			auction_->bid(this);
 			//construct answer:
 			confirmation=true;
@@ -670,7 +745,7 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"Tour d'enchère fini sur le socket "<<getSockfd()<<std::endl;
 #endif
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			isFinished = auction_->isAuctionFinished();
 			auctionPrice = auction_->getCurrentPrice();
 			int result;
@@ -686,7 +761,7 @@ void User::cmdHandler(SerializedObject *received) {
 				result=1;
 			}
 			calendar_->update();
-			manager_->save();
+			DataBase::save(*manager_);
 			//construct answer:
 			answer.typeOfInfos = AUCTION_RESULT;
 			memcpy(answerPosition, &result, sizeof(result));
@@ -783,8 +858,8 @@ void User::auctionWin(Manager* manager, ManagedPlayer player) {
 		manager_->addPlayer(player);
 		manager->removePlayer(player);
 	}
-	manager_->save();
-	manager->save();
+	DataBase::save(*manager_);
+	DataBase::save(*manager);
 }
 
 string User::intToString(int value) {

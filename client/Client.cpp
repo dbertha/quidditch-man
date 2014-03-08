@@ -37,11 +37,11 @@ int Client::mainLoop() {
 //Main\\
 
 void Client::displayManagerInfos() {
-    int nbPlayers, money, nbFans;
+    int nbPlayers, money, nbFans, actionPoints;
     askForManagerInfos();
-    receiveManagerInfos(&nbPlayers,&money,&nbFans);
+    receiveManagerInfos(&nbPlayers,&money,&nbFans,&actionPoints);
     cout<<" --------------------------------------------------------------------------------------"<<endl;
-    cout<<" -------------------- MONEY : "<<money<<" ||| "<<" NUMBER OF FANS : "<<nbFans<<" --------------------"<<endl;
+    cout<<" ------ MONEY : "<<money<<" ||| "<<" NUMBER OF FANS : "<<nbFans<<" ||| "<<" ACTION POINTS : "<<actionPoints<<" ------ "<<endl;
 }
 
 void Client::displayMainMenu(){
@@ -51,6 +51,7 @@ void Client::displayMainMenu(){
     cout<<" [2] See/create auctions"<<endl;
     cout<<" [3] Manage players"<<endl;
     cout<<" [4] Manage buildings"<<endl;
+    cout<<" [5] Get action points"<<endl;
     cout<<" [0] Quit game"<<endl;
     cout<<"-----> " << flush;
 }
@@ -73,7 +74,7 @@ void Client::displayManagePlayersMenu(){
     cout<<" [2] Train a player"<<endl;
     cout<<" [3] Send a player to the hospital"<<endl;
     cout<<" [0] Return to the main menu"<<endl;
-    cout<<"-----> ";
+    cout<<"-----> " << flush;
 }
 
 void Client::displayManageBuildingsMenu(){
@@ -83,8 +84,18 @@ void Client::displayManageBuildingsMenu(){
     cout<<" [2] Enter Training Center"<<endl;
     cout<<" [3] Enter Hospital"<<endl;
     cout<<" [4] Enter FanShop"<<endl;
+    cout<<" [5] Enter PromotionCenter"<<endl;
     cout<<" [0] Return to the main menu"<<endl;
-    cout<<"-----> ";
+    cout<<"-----> " << flush;
+}
+
+void Client::displayActionPointsMenu(){
+    cout<<" --------------------------------------------------------------------------------------"<<endl;
+    cout<<"//GET ACTION POINTS// What do you want to do ?"<<endl;
+    cout<<" [1] Buy action points"<<endl;
+    cout<<" [2] Start a promotion campaign"<<endl;
+    cout<<" [0] Return to the main menu"<<endl;
+    cout<<"-----> " << flush;  
 }
 
 void Client::displayPlayersList() {
@@ -100,6 +111,7 @@ void Client::displayBuildingInfos(std::vector<int> buildingInfos, int buildingID
     else if (buildingID==TRAININGCENTER) cout<<"Time required to finish training : "<<buildingInfos[2]<<endl;
     else if (buildingID==HOSPITAL) cout<<"Time required to finish healing : "<<buildingInfos[2]<<endl;
     else if (buildingID==FANSHOP) cout<<"Max clients in the fan shop per match : "<<buildingInfos[2]<<endl;
+    else if (buildingID==PROMOTIONCENTER) cout<<"Action points gained by waiting "<<TIMESCALEACTIONPOINTS<<" minutes : "<<buildingInfos[2]<<endl;
     if (buildingInfos[3]==1) cout<<"This building is currently being upgraded"<<endl;
     else cout<<"This building is not upgrading yet.";
 }
@@ -142,14 +154,15 @@ void Client::displayAuctionMenus(){
     cout<<" [1] See current auctions"<<endl;
     cout<<" [2] Sell a player"<<endl;
     cout<<" [0] Return to the main menu"<<endl;
-    cout<<"-----> ";
+    cout<<"-----> " << flush;
 }
 
 void Client::displaySellPlayerMenu(){
     cout<<" --------------------------------------------------------------------------------------"<<endl;
     cout<<"//YOU'RE ABOUT TO SELL A PLAYER// What do you want to do ?"<<endl;
     displayPlayersList();
-    cout<<" Which player do you want to sell [enter 0 to abort] ? "<<endl;
+    cout<<" ---- Selling a player costs "<<AP_AUCTION<<" action points ----"<<endl;
+    cout<<" Which player do you want to sell [enter 0 to abort] ? \n-----> "<<endl;
 }
 
 void Client::displayAvailableManagers(){
@@ -316,6 +329,10 @@ void Client::handleMainMenu(){
         }
         case MANAGE_BUILDINGS : {
             state_ = BUILDINGS_MENU;
+            break;
+        }
+        case ACTION_POINTS : {
+            state_ = AP_MENU;
             break;
         }
         case 0 : {
@@ -752,7 +769,7 @@ int Client::askForManagerInfos(){
     return sendOnSocket(sockfd_, serialized);
 }
 
-void Client::receiveManagerInfos(int *nbPlayers, int * money, int * nbFans){
+void Client::receiveManagerInfos(int *nbPlayers, int * money, int * nbFans, int * actionPoints){
     //écrit les données sur les objets pointés
     SerializedObject received = receiveOnSocket(sockfd_);
     char * position = received.stringData;
@@ -762,6 +779,8 @@ void Client::receiveManagerInfos(int *nbPlayers, int * money, int * nbFans){
         memcpy(money,position, sizeof(int));
         position += sizeof(int);
         memcpy(nbFans,position, sizeof(int));
+        position += sizeof(int);
+        memcpy(actionPoints,position, sizeof(int));
         position += sizeof(int);
     }
 }
@@ -1027,6 +1046,8 @@ int Client::sendMoves(int moves[][4]){
     return sendOnSocket(sockfd_, serialized);
 }
 
+
+
 //TODO : useless
 //int Client::isMatchWaiting(){
 //    SerializedObject serialized;
@@ -1118,6 +1139,46 @@ int Client::receiveAuctionResult() {
     return result;
 }
 
+int Client::startPromotionCampaign(){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = START_PROMOTION;
+    return sendOnSocket(sockfd_, serialized);
+}
+
+int Client::endPromotionCampaign(){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = END_PROMOTION;
+    return sendOnSocket(sockfd_, serialized);
+}
+
+int Client::getPromotionResult() {
+    int result;
+    SerializedObject received = receiveOnSocket(sockfd_);
+    char * position = received.stringData;
+    //TODO : vérifier qu'il s'agit bien d'un message de confirmation
+    memcpy(&result,position, sizeof(result));
+    return result;
+}
+
+int Client::buyActionPoints(int amount) {
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = BUY_ACTION_POINTS;
+    memcpy(position, &amount, sizeof(amount));
+    return sendOnSocket(sockfd_, serialized);
+}
+
+int Client::getPriceForAP(){    
+    int result;
+    SerializedObject received = receiveOnSocket(sockfd_);
+    char * position = received.stringData;
+    //TODO : vérifier qu'il s'agit bien d'un message de confirmation
+    memcpy(&result,position, sizeof(result));
+    return result;
+}
+
 void *auctionTurn(void* data) {
 
   //int* sockfd = (int *)data;
@@ -1129,7 +1190,7 @@ void *auctionTurn(void* data) {
 
 
   int choice;
-  cout<<" -----> ";
+  cout<<"-----> ";
   cin>>choice;
 
   if (choice==1) {
@@ -1214,13 +1275,16 @@ void Client::handleAuctions(){
         displayAuctionsList(auctionsList);
         if (auctionsList.size()!=0) {
             int auctionToInspect;
+            cout<<" -----> ";
             cin>>auctionToInspect;
             if (auctionToInspect!=0) {
                 askForAuctionInfos(auctionToInspect-1);
                 vector<int> playerAuctionInfos = receivePlayerInfo();
                 string timeLeft = displayAuctionInfos(auctionsList,playerAuctionInfos,auctionToInspect-1);
+                cout<<" ---- Entering an auction costs "<<AP_ENTER_AUCTION<<" action points ----"<<endl;
                 cout<<"Do you want to join this auction ? [1 to enter, 0 to quit] \n -----> ";
                 int enterAuction;
+                cout<<" -----> ";
                 cin>>enterAuction;
                 if (enterAuction==1) {
                     joinAuction(auctionToInspect-1);
@@ -1253,6 +1317,7 @@ void Client::handleAuctions(){
             }
         } while (sellPlayerChoice!=ABORT);
     }
+    else if (input_==ABORT) state_ = FREE;
 }
 
 void Client::handlePlayersMenu(){
@@ -1277,7 +1342,7 @@ void Client::handlePlayersMenu(){
 }
 
 void Client::kbMgr() {
-    std::cin>>input_;
+    cin>>input_;
     //TODO : s'assurer de la gestion des retours en arrière
     //TODO : tester input
     switch(state_) {
@@ -1322,7 +1387,7 @@ void Client::kbMgr() {
             //contexte verrouillé par facilité
             if(input_ != ABORT){
 				int capacityNumber;
-				cout<<"Indicate the number of the capacity you wish to train [or 0 to abort]  \n -----> ";
+				cout<<"Indicate the number of the capacity you wish to train [or 0 to abort]  \n-----> ";
 				cin>>capacityNumber;
 				if ((input_>0)&&(capacityNumber>0)) {
 				  trainPlayer(input_-1,capacityNumber-1);
@@ -1349,7 +1414,7 @@ void Client::kbMgr() {
                     cout<<"-------------\n This player has been sent to the hospital !"<<endl;
                     cout<<" Player will leave the hospital in "<<hospitalInfos[2]<<" minutes"<<endl;
                 }
-                else cout<<"-------------\n This player cannot be send to the hospital, he's blocked or in full health"<<endl;
+                else cout<<"-------------\n This player cannot be send to the hospital, he's blocked or in full health or you don't have enough action points"<<endl;
             }
             state_ = FREE;
             break;
@@ -1361,6 +1426,7 @@ void Client::kbMgr() {
 				askForBuildingInfos(input_);
 				vector<int> buildingInfos = receiveBuildingInfos();
 				displayBuildingInfos(buildingInfos,input_);
+                cout<<"\n ---- Upgrading a building costs "<<AP_UPGRADE<<" action points ----"<<endl;
 				cout<<"\n---------------\nEnter 1 if you wish to upgrade this building [or 0 to abort] \n -----> ";
 				//TODO : tester niveau client si argent suffisant
 				int upgrade;
@@ -1377,13 +1443,46 @@ void Client::kbMgr() {
 			}
 			state_ = FREE;
 			break;
-		}
+        }
+
+        case AP_MENU : {
+            if (input_==BUY_AP){
+
+                cout<<"Price : "<<GOLD_FOR_ONE_AP<<" gold for 1 action point"<<endl;
+                cout<<"Indicate the amount of action points you wish to buy : " << flush;
+                int amount;
+                cin>>amount;
+                buyActionPoints(amount);
+                int result = getPriceForAP();
+                if (result>0) cout<<" ----- You successfully bought "<<amount<<" action points for "<<result<<" gold."<<endl;
+                else cout<<" ----- You don't have enough money"<<endl;
+                state_=AP_MENU;
+            }
+
+            else if (input_==WAIT_FOR_AP) {
+                startPromotionCampaign();
+                cout<<"Press 0 to stop the promotion campaign : "<< flush;
+                int end;
+                cin>>end;
+                if (end==0) {
+                    endPromotionCampaign();
+                    int APGained = getPromotionResult();
+                    cout<<"You gained "<<APGained<<" from promotion"<<endl;
+                    state_=FREE;
+                }
+            }
+            else if (input_==ABORT){
+                state_=FREE;
+            }
+            break;
+        }
+
         case ADMIN : {
             //menu d'administration, contexte bloqué, pas de push du serveur possible dans cette configuration
             break;
         }
         default : {//ne devrait jamais passer par ici
-            std::cout<<"Nothing to do here."<<std::endl;
+            std::cout<<"Nothing to do here."<<std::endl; // *flies away*
         }
     }
 }
@@ -1420,11 +1519,13 @@ void Client::askInput() {
         }
         case TRAINING_MENU : {
             displayPlayersList();
-            cout<<"Indicate the number of the player you wish to train  \n -----> " << flush;
+            cout<<" ---- A training costs "<<AP_TRAINING<<" action points ----"<<endl;
+            cout<<"Indicate the number of the player you wish to train [or 0 to abort]  \n -----> " << flush;
             break;
         }
         case HEALING_MENU : {
             displayPlayersList();
+            cout<<" ---- Healing a player costs "<<AP_HOSPITAL<<" action points ----"<<endl;
             cout<<"Indicate the number of the player you wish to heal [or 0 to abort] : " << flush;
             break;
         }
@@ -1435,6 +1536,12 @@ void Client::askInput() {
 			break;
 		}
 		
+        case AP_MENU : {
+            displayActionPointsMenu();
+            break;
+        }
+
+        
         default : {
             std::cout<<"No options available."<<std::endl;
             break;

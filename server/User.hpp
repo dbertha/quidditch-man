@@ -9,18 +9,21 @@
 
 
 
+#include <string> 
 #include <sys/stat.h>
 #include <iostream>
 #include <stdlib.h>     /* atoi */
 #include <ctime>
-#include <cstdlib>
-#include <vector>
+#include <cstdlib> 
+#include <stdio.h>
+#include <string.h>
 
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <vector>
+
 #include <pthread.h>
-#include <string>
 #include <sstream>
 
 
@@ -74,6 +77,7 @@ private:
 	Calendar* calendar_;
 	Auction* auction_;
     int **__moves;
+    struct tm timeOfStart_;
 };
 
 #endif

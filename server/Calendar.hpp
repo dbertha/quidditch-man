@@ -18,7 +18,7 @@ class Calendar {
  	void updateCalendar(string file, bool isBlockCalendar); //will call checkTime for every line in the calendar "file"
  	bool checkTime(char* line, bool isBlockCalendar); //verify a line in a calender (block is bool parameter is true, construction otherwise)
  	bool compareToCurrentDate(int day, int month, int hour, int minute); //true if current date is later in time, false otherwise
-
+ 	int getElapsedTime(struct tm startTime);
 };
 
 

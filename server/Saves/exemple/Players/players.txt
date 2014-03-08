@@ -1,7 +1,0 @@
-MasonFlores.txt
-CalebRodriguez.txt
-NolanMartin.txt
-AndrewWhite.txt
-AdamEdwards.txt
-AustinRamirez.txt
-ElijahReed.txt

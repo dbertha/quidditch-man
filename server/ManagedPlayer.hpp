@@ -19,7 +19,6 @@ class ManagedPlayer : public Player {
  public:
 
  	ManagedPlayer();
- 	ManagedPlayer(string playerSaveFile);
 
  	ManagedPlayer& operator= (const ManagedPlayer&);
 

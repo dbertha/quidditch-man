@@ -23,8 +23,8 @@ HEADERS += server/Auction.hpp \
            server/MatchesHandler.hpp \
            server/Player.hpp \
            server/PlayingPlayer.hpp \
-           server/RecruitmentCenter.hpp \
-           server/Saver.hpp \
+           server/PromotionCenter.hpp \
+           server/DataBase.hpp \
            server/Server.hpp \
            server/Stadium.hpp \
            server/TrainingCenter.hpp \
@@ -43,8 +43,8 @@ SOURCES += server/Auction.cpp \
            server/MatchesHandler.cpp \
            server/Player.cpp \
            server/PlayingPlayer.cpp \
-           server/RecruitmentCenter.cpp \
-           server/Saver.cpp \
+           server/PromotionCenter.cpp \
+           server/DataBase.cpp \
            server/Server.cpp \
            server/ServerMain.cpp \
            server/Stadium.cpp \

@@ -1,6 +1,4 @@
 Login#Password#
 Manager#mdp#
-Manon#a#
-david#pass#
-exemple#33#
 admin#admin#
+Manon#Legrand#

@@ -164,3 +164,25 @@ bool Calendar::compareToCurrentDate(int day, int month, int hour, int minute) {
 
    return hasTimePassed;
 }
+
+int Calendar::getElapsedTime(struct tm startTime) {
+	int elapsedTime;
+	int minutesOfStart, minutesNow;
+
+	minutesOfStart=startTime.tm_min + 60 * startTime.tm_hour + 24 * 60 * startTime.tm_mday;
+
+	time_t secondes;
+	struct tm instant;
+	time(&secondes);
+	instant=*localtime(&secondes);
+
+	minutesNow=instant.tm_min + 60 * instant.tm_hour + 24 * 60 * instant.tm_mday;
+
+	elapsedTime = minutesNow-minutesOfStart;
+
+	std::cout<<"MINUTES NOW : "<<minutesNow<<std::endl;
+	std::cout<<"MINUTES OF START : "<<minutesOfStart<<std::endl;
+	std::cout<<"ELAPSED TIME : "<<elapsedTime<<std::endl;
+
+	return elapsedTime;
+}
