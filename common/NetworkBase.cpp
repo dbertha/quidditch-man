@@ -29,6 +29,7 @@ SerializedObject receiveOnSocket(int socketfd){
     received.typeOfInfos = ntohs(received.typeOfInfos);
     if(result != sizeof(SerializedObject)){
         printf("%s\n", "receiveOnSocket : Erreur dans l'envoi des données");
+        received.typeOfInfos = SERVER_DOWN;
     }
     return received;
 }

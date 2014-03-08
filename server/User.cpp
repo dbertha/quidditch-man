@@ -660,7 +660,7 @@ void User::cmdHandler(SerializedObject *received) {
 			sendOnSocket(sockfd_, answer);
 			break;
 
-		case END_AUCTION_TURN :
+		case END_AUCTION_TURN : {
 			//no details to read : possible improvement : participation to several auctions at a same time. No.
 #ifdef __DEBUG
 			std::cout<<"Tour d'enchère fini sur le socket "<<getSockfd()<<std::endl;
@@ -691,7 +691,29 @@ void User::cmdHandler(SerializedObject *received) {
 			memcpy(answerPosition, &auctionPrice, sizeof(auctionPrice));
             sendOnSocket(sockfd_, answer); 
 			break;	
-
+		}
+		case CREATE_TOURNAMENT : {
+			//reading details
+			int nbOfPlayers;
+			int startingPrice;
+			position = received->stringData;
+			memcpy(&nbOfPlayers, position, sizeof(nbOfPlayers));
+			position += sizeof(nbOfPlayers);
+			memcpy(&startingPrice, position, sizeof(startingPrice));
+#ifdef __DEBUG
+			std::cout<<"Demande de création d'un match reçue sur le socket "<<getSockfd()<<std::endl;
+			std::cout<<"nbOfplayers :  "<<nbOfPlayers<< " startingPrice : " << startingPrice << std::endl;
+#endif
+			//handling request
+			//TODO
+			
+			//answering
+			//answer in confirmation
+			answer.typeOfInfos = NEWTOURNAMENT_CONFIRM;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); 
+			break;
+		}
 		default :
 #ifdef __DEBUG
 			std::cout<<"En-tête inconnu : "<<received->typeOfInfos<<std::endl;

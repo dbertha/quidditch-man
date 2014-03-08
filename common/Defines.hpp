@@ -15,6 +15,7 @@
 #define ADMIN_LOGIN 2
 
 //TODO : regrouper les types de jeu sur un intervalle continu
+#define SERVER_DOWN -1
 #define LOGIN 1
 #define LOGIN_CONFIRM 2
 #define GETBUILDINGINFOS 3
@@ -65,6 +66,8 @@
 #define DRAW_CONFIRM 48
 #define OPPONENTASKFORDRAW 49
 #define ANSWERTODRAWPROPOSITION 50
+#define CREATE_TOURNAMENT 51
+#define NEWTOURNAMENT_CONFIRM 52
 
 
 #define STADIUM 1

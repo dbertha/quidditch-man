@@ -38,10 +38,14 @@
 #define INSPECT_PLAYER 1
 #define TRAIN_PLAYER_OPTION 2
 #define HEAL_PLAYER_OPTION 3
+
 #define ENTER_STADIUM 1
 #define ENTER_TRAININGCENTER 2
 #define ENTER_HOSPITAL 3
 #define ENTER_FANSHOP 4
+
+#define SEE_TOURNAMENTS 1
+#define CREATE_TOURNAMENT_OPTION 2
 
 #define ABORT 0
 
@@ -79,6 +83,7 @@ private:
     //~ void login();
     //display :
     void displayMainMenu();
+    void displayAdminMenu();
     void displayConnexionMenu();
     void displayManagerInfos();
     void displayPlayersList();
@@ -96,6 +101,7 @@ private:
     void kbMgr();
     void handleLogin();
     void handleMainMenu();
+    void handleAdminMenu();
     void handleOpponentChoice();
     void handleAuctions();
     void handlePlayersMenu();
@@ -147,6 +153,8 @@ private:
     
     int checkAuction();
     int receiveAuctionResult();
+    
+    int sendTournamentCreation(int nbOfPlayers, int startingPrice);
 };
 
 

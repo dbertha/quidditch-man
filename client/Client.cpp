@@ -55,6 +55,16 @@ void Client::displayMainMenu(){
     cout<<"-----> " << flush;
 }
 
+void Client::displayAdminMenu(){
+    cout<<" --------------------------------------------------------------------------------------"<<endl;
+    cout<<"You are the administrator"<<endl;
+    cout<<"What do you want to do ?"<<endl;
+    cout<<" [1] See current tournaments (not yet implemented)"<<endl;
+    cout<<" [2] Create a tournament"<<endl;
+    cout<<" [0] Quit game"<<endl;
+    cout<<"-----> " << flush;
+}
+
 //Log in\\
 
 void Client::displayConnexionMenu(){
@@ -321,12 +331,41 @@ void Client::handleMainMenu(){
             state_ = BUILDINGS_MENU;
             break;
         }
-        case 0 : {
+        default : {
 			state_ = DISCONNECTING;
 			break;
 		}
         
 
+    }
+}
+
+void Client::handleAdminMenu(){
+    switch(input_){
+        case SEE_TOURNAMENTS : {
+            //TODO
+            break;
+        }
+        case CREATE_TOURNAMENT_OPTION : {
+            int nbOfPlayers, startingPrice, result;
+            cout << "Please choose the number of participants wanted "<<
+            "(the tournament will only start when enough suscribers). "<<
+            "It must be a power of two : " << endl;
+            cin >> nbOfPlayers;
+            if(not ((not nbOfPlayers) or (nbOfPlayers & (nbOfPlayers - 1)))) { //if power of two
+                cout << "Please choose the prize-money for the first level "<<
+                "(next levels' prize-moneys will be calculated automatically) : " << endl;
+                cin >> startingPrice;
+                sendTournamentCreation(nbOfPlayers, startingPrice);
+                result = getConfirmation();
+            }
+            break;
+        }
+        default : {
+			state_ = DISCONNECTING;
+			break;
+		}
+        
     }
 }
 
@@ -449,15 +488,25 @@ int Client::sendAnswerToDrawProposition(int code){
 
 int Client::sendForfeit(){
     SerializedObject serialized;
-    char * position = serialized.stringData;
+    //char * position = serialized.stringData;
     serialized.typeOfInfos = FORFEIT;
     return sendOnSocket(sockfd_, serialized);
 }
 
 int Client::sendDrawRequest(){
     SerializedObject serialized;
-    char * position = serialized.stringData;
+    //char * position = serialized.stringData;
     serialized.typeOfInfos = ASKFORDRAW;
+    return sendOnSocket(sockfd_, serialized);
+}
+
+int Client::sendTournamentCreation(int nbOfPlayers, int startingPrice){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = CREATE_TOURNAMENT;
+    memcpy(position, &nbOfPlayers, sizeof(nbOfPlayers));
+    position += sizeof(nbOfPlayers);
+    memcpy(position, &startingPrice, sizeof(startingPrice));
     return sendOnSocket(sockfd_, serialized);
 }
 
@@ -650,6 +699,7 @@ void Client::askAndSendMoves(int numTeam, HexagonalField &field, std::vector<Axi
 void Client::commMgr() {
 //gère les messages non sollicités (exemple : invitation à un match amical)
 	SerializedObject received = receiveOnSocket(sockfd_);
+    //TODO : tester retour recv
 	switch(received.typeOfInfos){
 		case MATCH_INVITATION : {
             int IDInvitor;
@@ -672,6 +722,12 @@ void Client::commMgr() {
                 startMatch( 2); //invité a l'équipe 2
                 state_ = FREE;
             }
+            break;
+        }
+        case SERVER_DOWN : {
+            state_ = DISCONNECTING;
+            cout << "Server is down." << endl;
+            break;
         }
 	}
 }
@@ -1299,6 +1355,11 @@ void Client::kbMgr() {
             
             break;
         }
+        case ADMIN : {
+            //verrouilage du contexte
+            handleAdminMenu();
+            break;
+        }
         case MANAGERS_MENU : {
             //verrouillage du contexte
             handleOpponentChoice();
@@ -1384,10 +1445,6 @@ void Client::kbMgr() {
 			state_ = FREE;
 			break;
 		}
-        case ADMIN : {
-            //menu d'administration, contexte bloqué, pas de push du serveur possible dans cette configuration
-            break;
-        }
         default : {//ne devrait jamais passer par ici
             std::cout<<"Nothing to do here."<<std::endl;
         }
@@ -1403,6 +1460,10 @@ void Client::askInput() {
         case FREE : {
             displayManagerInfos();
             displayMainMenu();
+            break;
+        }
+        case ADMIN : {
+            displayAdminMenu();
             break;
         }
         case MANAGERS_MENU :{
