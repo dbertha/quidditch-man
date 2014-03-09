@@ -262,7 +262,7 @@ void DataBase::saveBuildings(string file, Stadium stadium, TrainingCenter traini
 	toWrite=intToString(promotionCenter.getPriceForConstruction());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
-	toWrite=intToString(promotionCenter.getActionPointsGain());
+	toWrite=intToString(promotionCenter.getGainAtFirstLevel());
 	write(fd,toWrite.c_str(),toWrite.size());
 	write(fd,"\n",1);
 	toWrite=intToString(promotionCenter.isUpgrading());

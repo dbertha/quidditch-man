@@ -17,6 +17,8 @@ gold PromotionCenter::getPriceForNextLevel(){
 	return priceForNextLevel;
 }
 
+int PromotionCenter::getGainAtFirstLevel() {return _gainAtFirstLevel;}
+
 int PromotionCenter::getActionPointsGain(){
 	int gain = _gainAtFirstLevel;
 	for (int i=1;i<_level;++i) {

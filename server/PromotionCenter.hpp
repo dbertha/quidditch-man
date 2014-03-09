@@ -16,6 +16,7 @@ class PromotionCenter : public Building {
 
     gold getPriceForNextLevel();
     
+    int getGainAtFirstLevel();
     int getActionPointsGain();
 
     std::vector<int> getInformations();
