@@ -1,15 +1,14 @@
 #include "selectionDialog.hpp"
 
 SelectionDialog::SelectionDialog(const QStringList &items,QWidget *parent)
-    : QDialog(parent), row(-1)
-{
+    : QDialog(parent), row(-1) {
     model = new QStringListModel(this);
     model->setStringList(items);
     listView = new QListView;
     listView->setModel(model);
     listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    selectButton = new QPushButton(tr("Select"));
+    selectButton = new QPushButton(tr("Current select"));
     selectButton->setDefault(true);
     cancelButton= new QPushButton(tr("Cancel"));
     bottomLayout = new QHBoxLayout;

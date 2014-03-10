@@ -1,12 +1,13 @@
 #include "mainGui.hpp"
 
 MainGui::MainGui(int sockfd,QMainWindow *parent) : sockfd_(sockfd), parent_(parent) {
-    setFixedSize(1200,600);
+    setFixedSize(800,480);
     createActions();
     firstMenu();
     setWindowTitle(tr("Quidditch Manager 2014"));
     loginDialog = new LoginDialog(sockfd_,this);
-    ticker = new Ticker(sockfd_,this);
+    nbPlayers=money=nbFans=nbActionPoints=0;
+    ticker = new Ticker(sockfd_, this);
     login();
 }
 
@@ -22,6 +23,10 @@ int MainGui::badConnection() {
     QErrorMessage *errorMessageDialog = new QErrorMessage(this);
     errorMessageDialog->showMessage(tr("No connection with the server."));
     return (0);
+}
+void MainGui::buildings() {
+    buildingsDialog = new BuildingsDialog(sockfd_,this);
+    buildingsDialog->exec();
 }
 
 void MainGui::listMgrs() {
@@ -57,10 +62,7 @@ void MainGui::createActions() {
     listAuctionsAction=new QAction(tr("List auctions"),this);
     newAuctionAction=new QAction(tr("New"),this);
     listPlayersAction=new QAction(tr("List my players"),this);
-    enterStadiumAction=new QAction(tr("Enter Stadium"),this);
-    enterTrainingCenterAction=new QAction(tr("Enter Training Center"),this);
-    enterHospitalAction=new QAction(tr("Enter Hospital"),this);
-    enterFanShopAction=new QAction(tr("Enter FanShop"),this);
+    buildingsAction=new QAction(tr("Open board"),this);
 }
 
 void MainGui::firstMenu() {
@@ -90,10 +92,8 @@ void MainGui::createMenu() {
         playersMenu=menuBar()->addMenu(tr("Players"));
         playersMenu->addAction(listPlayersAction);
         buildingsMenu=menuBar()->addMenu(tr("Buildings"));
-        buildingsMenu->addAction(enterStadiumAction);
-        buildingsMenu->addAction(enterTrainingCenterAction);
-        buildingsMenu->addAction(enterHospitalAction);
-        buildingsMenu->addAction(enterFanShopAction);
+        buildingsMenu->addAction(buildingsAction);
+        connect(buildingsAction,SIGNAL(triggered()),this,SLOT(buildings()));
 }
 void MainGui::about() {
     QMessageBox::about(this, tr("Quidditch Manager 2014"),
@@ -102,3 +102,11 @@ void MainGui::about() {
                "<p>DAVID BERTHA"
                "<p>AUDRY DELESTREE");
 }
+int MainGui::getMoney() {return money;}
+int MainGui::getNbPlayers() {return nbPlayers;}
+int MainGui::getNbFans() {return nbFans;}
+int MainGui::getActionPoints() {return nbActionPoints;}
+void MainGui::setMoney(const int m) {money=m;}
+void MainGui::setNbPlayers(const int m) {nbPlayers=m;}
+void MainGui::setNbFans(const int m) {nbFans=m;}
+void MainGui::setActionPoints(const int m) {nbActionPoints=m;}

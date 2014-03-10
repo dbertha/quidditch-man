@@ -12,8 +12,7 @@
 class QStringListModel;
 class QListView;
 
-class SelectionDialog : public QDialog
-{
+class SelectionDialog : public QDialog {
     Q_OBJECT
 
 public:

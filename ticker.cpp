@@ -1,52 +1,50 @@
 #include "ticker.hpp"
-// This is not a toy : it is used to accept unexpected messages while the manager is idle
-// The display tell us when the timer used to accept() is working...
-Ticker::Ticker(const int sockfd, QWidget *parent)
-    : sockfd_(sockfd), QWidget(parent), money(0), nbFans(0) {
-    offset = 0; // starting position of the text displayed
+#include "mainGui.hpp"
+Ticker::Ticker(const int sockfd, MainGui *parent)
+    : sockfd_(sockfd), QWidget(parent), parent_(parent) {
     myTimerId = 0; // no timer started yet
-    move(100,50); // position in parent window
-    setWindowTitle(tr("Attention"));
+    counter =nbPlayers=money=nbFans=actionPoints=0;
+    move(0,50); // position in parent window
+    label = new QLabel(tr("you have"));
+//  label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addWidget(label);
+    layout->setSizeConstraint(QLayout::SetFixedSize);
+    setLayout(layout);
+    setFixedHeight(sizeHint().height());
 }
-
-void Ticker::paintEvent(QPaintEvent * /* event */) {
-    QPainter painter(this);
-
-    int textWidth = fontMetrics().width(myText);
-    if (textWidth < 1) return;
-    int x = -offset;
-    //if banner is larger than the text, the text is repeated
-    while (x < width()) {
-        painter.drawText(x, 0, textWidth, height(),
-                         Qt::AlignLeft | Qt::AlignVCenter, myText);
-        x += textWidth;
-    }
-}
-
-void Ticker::showEvent(QShowEvent * /* event */) {
-    //starts the timer when the widget is visible
+void Ticker::showInfo() {
+    move(0,50-counter%5); //this is to show its activity
     askForManagerInfos(sockfd_);
-    receiveManagerInfos(sockfd_,&nbPlayers,&money,&nbFans);
-    myText=QString(" --- MONEY : %1 ||| NUMBER OF FANS : %2").arg(money).arg(nbFans);
-    myTimerId = startTimer(30);
+    receiveManagerInfos(sockfd_,&nbPlayers,&money,&nbFans,&actionPoints);
+    parent_->setMoney(money);
+    parent_->setNbPlayers(nbPlayers);
+    parent_->setNbPlayers(nbPlayers);
+    parent_->setActionPoints(actionPoints);
+    myText=QString("You have : MONEY : %1 - NUMBER OF FANS : %2 - PLAYERS : %3 - ACTION POINTS : %4").arg(money).arg(nbFans).arg(nbPlayers).arg(actionPoints);
+    label->setText(myText);
+    update();
+    ++counter;
+}
+
+void Ticker::paintEvent(QPaintEvent *) {
+    QPainter painter(this);
+}
+
+void Ticker::showEvent(QShowEvent *) {
+    //starts the timer when the widget is visible
+    showInfo();
+    myTimerId = startTimer(5000);
 }
 
 void Ticker::timerEvent(QTimerEvent *event) {
     //checks first it's about our event !
-    if (event->timerId() == myTimerId) {
-        //here we put the non blocking recv of the message
-        //...
-        //and manage it with appropriate dialog
-        ++offset;
-        if (offset >= fontMetrics().width(myText)) offset = 0;
-        scroll(-1, 0);
-        //scrolls the banner 1 pixel left
-    }
+    if (event->timerId() == myTimerId) showInfo();
     else QWidget::timerEvent(event);
     //it's not about our event - let's give it to our base class
 }
 
-void Ticker::hideEvent(QHideEvent * /* event */) {
+void Ticker::hideEvent(QHideEvent *) {
     //timer stops when widget is hidden
     killTimer(myTimerId);
     myTimerId = 0;

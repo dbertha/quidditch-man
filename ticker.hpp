@@ -3,20 +3,21 @@
 
 #include <QWidget>
 #include <QString>
-#include <QSize>
+#include <QLabel>
+#include <QHBoxLayout>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QTimerEvent>
 #include <QShowEvent>
 #include <QHideEvent>
 #include "common/NetworkInterface.hpp"
-
-class Ticker : public QWidget
-{
+#include "mainGui.hpp"
+class MainGui;
+class Ticker : public QWidget {
     Q_OBJECT
 
 public:
-    Ticker(const int, QWidget *parent = 0);
+    Ticker(const int, MainGui *parent = 0);
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -26,7 +27,10 @@ protected:
 
 private:
     QString myText;
-    int sockfd_, offset, myTimerId, money, nbFans, nbPlayers;
+    QLabel *label;
+    MainGui *parent_;
+    int sockfd_,myTimerId,counter,nbPlayers,money,nbFans,actionPoints;
+    void showInfo();
 };
 
 #endif
