@@ -47,7 +47,7 @@ public :
     bool isInVector(std::vector<int> toTest, int value);
     int getScoreTeam1(){return __scoreTeam1;}
     int getScoreTeam2(){return __scoreTeam2;}
-    void serializeScoreAndPositions(char * bufferPosition);
+    int serializeScoreAndPositions(char * bufferPosition); //retourne aussi le gagnant
     void serializePlayerAttr(int playerID, char * bufferPosition);
 };
 

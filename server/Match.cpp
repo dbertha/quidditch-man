@@ -474,7 +474,7 @@ bool Match::isInVector(std::vector<int> toTest, int value){
     return result;
 }
 
-void Match::serializeScoreAndPositions(char * bufferPosition){
+int Match::serializeScoreAndPositions(char * bufferPosition){
     memcpy(bufferPosition, &__winner, sizeof(__winner));
     bufferPosition += sizeof(__winner);
     memcpy(bufferPosition, &__scoreTeam1, sizeof(__scoreTeam1));
@@ -499,6 +499,7 @@ void Match::serializeScoreAndPositions(char * bufferPosition){
         memcpy(bufferPosition, &line, sizeof(line));
         bufferPosition += sizeof(line);
     }
+    return __winner;
 }
 
 void Match::serializePlayerAttr(int playerID, char * bufferPosition){

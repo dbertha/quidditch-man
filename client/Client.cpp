@@ -404,8 +404,8 @@ void Client::handleOpponentChoice(){
     proposeMatchTo(input_,  playersInTeam);
     if(receiveMatchConfirmation() == MATCH_STARTING){
         startMatch(1); //inviteur a l'équipe 1
-        state_ = FREE; //on suppose que la fonction ne retourne qu'à la fin du match
     }
+    state_=FREE;
 }
 
 void Client::startMatch(int numTeam){
@@ -416,6 +416,7 @@ void Client::startMatch(int numTeam){
     std::vector<AxialCoordinates> allPositions;
     getAllPositions();
     allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
+    cout << "Your are team n° " << numTeam << endl;
     while(winner == 0){
         winner = testifContinue(numTeam); //demande match nul ou forfait + écoute socket pour match nul ou socket
         if(winner == 0){ 
@@ -744,8 +745,8 @@ void Client::commMgr() {
             answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
             if(receiveMatchConfirmation() == MATCH_STARTING){
                 startMatch( 2); //invité a l'équipe 2
-                state_ = FREE;
             }
+            state_ = FREE;
             break;
         }
         case SERVER_DOWN : {

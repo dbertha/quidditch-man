@@ -352,8 +352,7 @@ void User::cmdHandler(SerializedObject *received) {
 				team1.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
 			}
             User *invited = NULL;
-            for(unsigned int i; i < server_->usersList_.size(); ++i){
-
+            for(unsigned int i = 0; i < server_->usersList_.size(); ++i){
                 if(server_->usersList_[i]->getUserID() == targetedUser){
                     invited = server_->usersList_[i];
                 }
@@ -368,12 +367,10 @@ void User::cmdHandler(SerializedObject *received) {
 			position = received->stringData;
 			memcpy(&confirmation, position, sizeof(confirmation));
 			position += sizeof(confirmation);
-			std::cout << "size of confirmation : " << sizeof(confirmation) << std::endl;
 			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
 			if(confirmation){
 				for(int i = 0; i < 7; ++i){
 					int value;
-					std::cout << "départ : " << position - received->stringData << std::endl;
 					memcpy(&value,position, sizeof(value));
 					position += sizeof(value);
 					playersInTeam.push_back(value); //ajout à la liste

@@ -9,7 +9,9 @@
 #include "Ball.hpp"
 #include "Match.hpp"
 #include "User.hpp"
-#include <vector>
+//#include <vector>
+#include <list> //plutôt que vector car suppression plus efficace
+#include <algorithm>
 #include <iostream>
 #include <cstring> //memcpy
 #include <string>
@@ -70,6 +72,7 @@ public :
     int sendEndOfMatch(User * receiver, int code);
     void transmitDrawRequest(User * demander);
     void confirmDraw(User * responder, int confirmation);
+    void deleteMatch(int index);
 };
 
 #endif

@@ -4,21 +4,32 @@
 
 void MatchesHandler::proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1, int **movesTeam1){
     //TODO : tester si invited non null
+#ifdef __DEBUG
+    std::cout << "Invitation à un match " << std::endl;
+#endif
     if((invitor->state_ == FREE) and (invited->state_ == FREE)){
-        //int **emptyMoves = NULL;
+#ifdef __DEBUG
+        std::cout << "Tous les deux disponibles " << std::endl;
+#endif
         invitors.push_back(invitor);
         inviteds.push_back(invited);
         statesOfMatches.push_back(WAITINGACCEPTMATCH);
-        matchesVector.push_back(new Match(team1, movesTeam1)); //oblige à un delete lors de la suppression d'un match (TODO)
-        //movesLists.push_back(movesTeam1); //2 listes de mouvements par match, on enregistre déjà le pointeur vers les déplacements
-        //movesLists.push_back(emptyMoves);
+#ifdef __DEBUG
+        std::cout << "On va initialiser le match" << std::endl;
+#endif
+        matchesVector.push_back(new Match(team1, movesTeam1)); //oblige à un delete lors de la suppression d'un match
+#ifdef __DEBUG
+        std::cout << "On change les status" << std::endl;
+#endif
         invitor->state_ = MATCH_INVITING;
         invited->state_ = MATCH_INVITED;
         sendInvitation(invitor, invited);
     }else{
         sendConfirmationTo(invitor, INVITATION_NOT_POSSIBLE);
-        //code to invitor: INVITATION_NOT_POSSIBLE
     }
+#ifdef __DEBUG
+    std::cout << "Fin invitation à un match " << std::endl;
+#endif
 }
 
 int MatchesHandler::sendInvitation(User * invitor, User * invited){
@@ -57,7 +68,7 @@ void MatchesHandler::forfeit(User * demander){
             sendEndOfMatch(invitors[matchIndex], FORFEIT);
         }
     }
-    statesOfMatches[matchIndex] = OVER;
+    deleteMatch(matchIndex);
 }
 
 void MatchesHandler::transmitDrawRequest(User * demander){
@@ -100,6 +111,8 @@ void MatchesHandler::confirmDraw(User * responder, int confirmation){
     sendEndOfMatch(receiver, confirmation);
     if(confirmation == DRAWACCEPTED){
         statesOfMatches[matchIndex] = OVER;
+    }else{
+        deleteMatch(matchIndex);
     }
 }
 
@@ -132,7 +145,7 @@ void MatchesHandler::respondToMatchProposal(User * invited, std::vector<ManagedP
 #endif
         sendConfirmationTo(invited, MATCH_DENIED);
         sendConfirmationTo(invitors[matchIndex], MATCH_DENIED);
-        //TODO : supprimer les infos de ce match des vecteurs
+        deleteMatch(matchIndex);
     }else{
 #ifdef __DEBUG
         std::cout << "Match lauched " << std::endl;
@@ -158,6 +171,7 @@ int MatchesHandler::sendConfirmationTo(User * client, int answerCode){
 }
 
 void MatchesHandler::getScoresAndPositions(User * demander){
+    int winner;
     int matchIndex = std::find(inviteds.begin(), inviteds.end(), demander) - inviteds.begin();
     if(matchIndex > int(inviteds.size())-1){
         matchIndex = std::find(invitors.begin(), invitors.end(), demander) - invitors.begin(); 
@@ -167,7 +181,14 @@ void MatchesHandler::getScoresAndPositions(User * demander){
 #endif
     SerializedObject answer;
     answer.typeOfInfos = POSITIONS;
-    matchesVector[matchIndex]->serializeScoreAndPositions(answer.stringData);
+    winner = matchesVector[matchIndex]->serializeScoreAndPositions(answer.stringData);
+    if(winner != 0){ //si match terminé
+        if(statesOfMatches[matchIndex] == OVER){ //si autre équipe a déjà vérifié
+            deleteMatch(matchIndex);
+        }else{
+            statesOfMatches[matchIndex] = OVER;
+        }
+    }
     sendOnSocket(demander->getSockfd(), answer);
 }
 
@@ -192,7 +213,6 @@ void MatchesHandler::recordMoves(User * demander){
         matchIndex = std::find(invitors.begin(), invitors.end(), demander) - invitors.begin(); 
         if(statesOfMatches[matchIndex] == WAITINGFIRSTMOVE){ // mouvements de l'équipe 2 déjà reçu
             statesOfMatches[matchIndex] = WAITING_MOVES;
-            //TODO : comme il s'agit toujours du même pointeur, enregistrer les pointeurs dans l'objet match
             matchesVector[matchIndex]->makeMoves();
             sendConfirmationTo(inviteds[matchIndex], MOVES_CONFIRM);
             sendConfirmationTo(invitors[matchIndex], MOVES_CONFIRM);
@@ -202,7 +222,6 @@ void MatchesHandler::recordMoves(User * demander){
     }else{ //il s'agit de l'invité, soit de l'équipe 2
         if(statesOfMatches[matchIndex] == WAITINGSECONDMOVE){ // mouvements de l'équipe 1 déjà reçu
             statesOfMatches[matchIndex] = WAITING_MOVES;
-            //TODO : comme il s'agit toujours du même pointeur, enregistrer les pointeurs dans l'objet match
             matchesVector[matchIndex]->makeMoves();
             sendConfirmationTo(inviteds[matchIndex], MOVES_CONFIRM);
             sendConfirmationTo(invitors[matchIndex], MOVES_CONFIRM);
@@ -210,4 +229,20 @@ void MatchesHandler::recordMoves(User * demander){
             statesOfMatches[matchIndex] = WAITINGFIRSTMOVE;
         }
     }
+}
+
+void MatchesHandler::deleteMatch(int index){
+#ifdef __DEBUG
+    std::cout << "Suppression du match à l'index " << index << std::endl;
+#endif
+    delete matchesVector[index];
+    matchesVector.erase(matchesVector.begin() + index);
+    invitors[index]->state_ = FREE;
+    invitors.erase(invitors.begin() + index);
+    inviteds[index]->state_ = FREE;
+    inviteds.erase(inviteds.begin() + index);
+    statesOfMatches.erase(statesOfMatches.begin() + index);
+#ifdef __DEBUG
+    std::cout << "Fin suppression du match " << std::endl;
+#endif
 }
