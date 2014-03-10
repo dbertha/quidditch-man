@@ -383,13 +383,9 @@ void User::cmdHandler(SerializedObject *received) {
 
 			std::vector<ManagedPlayer> team2;
             for(unsigned int i = 0; i < playersInTeam.size(); ++i){
-				std::cout << " on récupère les objets correspondants " << playersInTeam[i] <<std::endl;
                 //TODO : éviter des copies ?
 				team2.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
 			}
-#ifdef __DEBUG
-			std::cout<<"On passe le relais à matchesHandler"<<std::endl;
-#endif
 			__matchesHandler->respondToMatchProposal(this, team2, __moves);
 
 			break;
@@ -832,7 +828,7 @@ void User::auctionWin(Manager* manager, ManagedPlayer player) {
 	manager->save();
 }
 
-string User::intToString(int value) {
+string User::intToString(int value) { //TODO : dans une classe générique ?
 	char buffer[20];
 	sprintf(buffer,"%d",value);
 	string tmp = "";
@@ -842,4 +838,14 @@ string User::intToString(int value) {
 		++i;
 	}
 	return tmp;
+}
+
+void User::handleEndOfMatch(int numTeam, int numWinningTeam){
+	int money = manager_->getIncomeFromMatch(numTeam == numWinningTeam, numTeam == 1); //host if team 1
+	manager_->addMoney(money);
+}
+
+void User::handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice){
+	int money = manager_->getIncomeFromMatch(numTeam == numWinningTeam, numTeam == 1); //host if team 1
+	manager_->addMoney(money + tournamentPrice);
 }

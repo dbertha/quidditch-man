@@ -184,6 +184,8 @@ void MatchesHandler::getScoresAndPositions(User * demander){
     winner = matchesVector[matchIndex]->serializeScoreAndPositions(answer.stringData);
     if(winner != 0){ //si match terminé
         if(statesOfMatches[matchIndex] == OVER){ //si autre équipe a déjà vérifié
+            inviteds[matchIndex]->handleEndOfMatch(2, winner); //numteam, winningTeam
+            invitors[matchIndex]->handleEndOfMatch(1, winner); //numteam, winningTeam
             deleteMatch(matchIndex);
         }else{
             statesOfMatches[matchIndex] = OVER;

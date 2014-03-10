@@ -58,6 +58,9 @@ public:
 	Manager* getManager();
 
 	void auctionWin(Manager* manager, ManagedPlayer player);
+	void handleEndOfMatch(int numTeam, int numWinningTeam);
+	
+	void handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice); //normal price + tournamentPrice
 
 	std::string intToString(int value);
 
