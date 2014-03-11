@@ -28,7 +28,8 @@ HEADERS += server/Auction.hpp \
            server/Server.hpp \
            server/Stadium.hpp \
            server/TrainingCenter.hpp \
-           server/User.hpp
+           server/User.hpp \
+           server/Tournament.hpp
            
 SOURCES += server/Auction.cpp \
            server/Broomstick.cpp \
@@ -49,4 +50,5 @@ SOURCES += server/Auction.cpp \
            server/ServerMain.cpp \
            server/Stadium.cpp \
            server/TrainingCenter.cpp \
-           server/User.cpp
+           server/User.cpp \
+           server/Tournament.cpp

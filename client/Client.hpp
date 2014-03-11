@@ -25,27 +25,36 @@
 
 
 #define DIM 100
-
+//connexion menu :
 #define LOG_IN 1
 #define NEW_MANAGER 2
+//main menu :
 #define SEE_MANAGERS 1
 #define AUCTION_ROOM 2
 #define MANAGE_PLAYERS 3
 #define MANAGE_BUILDINGS 4
 #define ACTION_POINTS 5
-
+#define SEE_TOURNAMENTS 6
+//auctions menu
 #define SEE_AUCTIONS 1
 #define SELL_PLAYER 2
+//players menu :
 #define INSPECT_PLAYER 1
 #define TRAIN_PLAYER_OPTION 2
 #define HEAL_PLAYER_OPTION 3
+//buildings menu :
 #define ENTER_STADIUM 1
 #define ENTER_TRAININGCENTER 2
 #define ENTER_HOSPITAL 3
 #define ENTER_FANSHOP 4
+
 #define ENTER_PROMOTIONCENTER 5
 #define BUY_AP 1
 #define WAIT_FOR_AP 2
+
+//admin menu :
+#define SEE_TOURNAMENTS_ADMIN 1
+#define CREATE_TOURNAMENT_OPTION 2
 
 #define ABORT 0
 
@@ -73,16 +82,21 @@ private:
     int input_;
     char opponent_[10];
     fd_set FDSet_;
-    enum Status {INIT,ADMIN,FREE,MANAGERS_MENU, AUCTION_MENU, PLAYERS_MENU, BUILDINGS_MENU, PLAYERSLIST_MENU, TRAINING_MENU, HEALING_MENU, MATCH_LIST,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING, AP_MENU, BUY_AP_MENU, WAIT_AP_MENU};
+
+    enum Status {INIT,ADMIN,FREE, AVAILABLE, MANAGERS_MENU, AUCTION_MENU, PLAYERS_MENU, BUILDINGS_MENU, \
+    TOURNAMENTS_MENU, PLAYERSLIST_MENU, TRAINING_MENU, HEALING_MENU, \
+    MATCH_LIST,MATCH_INVITING,MATCH_INVITED,MATCH_INGAME,DISCONNECTING, \
+    AP_MENU, BUY_AP_MENU, WAIT_AP_MENU};
     Status state_;
 
     int mainLoop();
     void loadFDSet();
     bool keyboard();
     void askInput();
-    void login();
+    //~ void login();
     //display :
     void displayMainMenu();
+    void displayAdminMenu();
     void displayConnexionMenu();
     void displayManagerInfos();
     void displayPlayersList();
@@ -95,12 +109,15 @@ private:
     void displayManageBuildingsMenu();
     void displayActionPointsMenu();
     void displayAvailableManagers();
+    void displayTournamentMenu();
+    void displayTournamentList(std::vector<int> tournamentsList);  
     std::vector<int> displayAndAskPlayersForMatch();
     int testifContinue(int numTeam); //combo display + select + handler pour la poursuite d'un match
     //handlers :
     void kbMgr();
     void handleLogin();
     void handleMainMenu();
+    void handleAdminMenu();
     void handleOpponentChoice();
     void handleAuctions();
     void handlePlayersMenu();
@@ -109,9 +126,6 @@ private:
     void startMatch(int numTeam);
     void askAndSendMoves(int numTeam, HexagonalField &field, std::vector<AxialCoordinates> &positions);
     void commMgr();
-    void matchTentative();
-    void contactServer();
-    void receiveMessage();
     //network :
     int sendLoginToServer(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
     int sendNewManagerToServer(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
@@ -133,13 +147,14 @@ private:
     void receiveManagersIDandNames(std::vector<int> * IDList, std::vector<std::string> * namesList);
     int proposeMatchTo(int userID, std::vector<int> playersInTeam);
     int answerMatchProposal(bool confirmation, std::vector<int> playersInTeam);
+    int sendTeamForMatchTournament(std::vector<int> playersInTeam);
     int receiveMatchConfirmation();
     int getAllPositions();
     std::vector<AxialCoordinates> receiveScoresAndPositions(int * winner, int * scoreTeam1, int * scoreTeam2);
     int selectPlayer(int playerID);
     playerAttr receiveSelectedPlayerInfos();
-    int sendMoves(int moves[][4]); //TODO : moves confirmation ?
-    int sendForfeit();
+    int sendMoves(int moves[][4]); 
+    int sendForfeit(); 
     int sendDrawRequest();
     int sendAnswerToDrawProposition(int code);
     
@@ -159,6 +174,12 @@ private:
     int startPromotionCampaign();
     int endPromotionCampaign();
     int getPromotionResult();
+    
+    int sendTournamentCreation(int nbOfPlayers, int startingPrice);
+    int askForTournamentList();
+    std::vector<int> getTournamentList();
+    int askToJoinTournament(int tournamentID = 0);
+    int receiveNumOfTeam();
 };
 
 

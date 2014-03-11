@@ -1,7 +1,0 @@
-HudsonSimmons.txt
-ParkerWatson.txt
-TylerHayes.txt
-JacksonEvans.txt
-BlakeBailey.txt
-LeviRivera.txt
-NathanHill.txt

@@ -1,7 +1,7 @@
 #ifndef USER_H
 #define USER_H
 
-#include "NetworkBase.hpp"
+#include "../common/NetworkBase.hpp"
 
 #include "Manager.hpp"
 #include "ManagedPlayer.hpp"
@@ -26,6 +26,7 @@
 #include <pthread.h>
 #include <sstream>
 
+//TODO : handleDisconnection() with testing state_
 
 class Server;
 class Auction;
@@ -37,6 +38,7 @@ class MatchesHandler;
 #define MATCH_INVITED 3
 #define MATCH_INGAME 4
 #define DISCONNECTING 5
+#define ADMIN 6
 
 
 class User {
@@ -60,12 +62,14 @@ public:
 	Manager* getManager();
 
 	void auctionWin(Manager* manager, ManagedPlayer player);
+	void handleEndOfMatch(int numTeam, int numWinningTeam);
+	
+	void handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice); //normal price + tournamentPrice
 
 	std::string intToString(int value);
 
 private:
 	Server* server_;
-	//CommonMgr* commonMgr_;  inutilisé
     MatchesHandler *__matchesHandler;
 	//User* opponent_;
 	int sockfd_; //socket de communication du client

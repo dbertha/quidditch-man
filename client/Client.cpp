@@ -52,6 +52,17 @@ void Client::displayMainMenu(){
     cout<<" [3] Manage players"<<endl;
     cout<<" [4] Manage buildings"<<endl;
     cout<<" [5] Get action points"<<endl;
+    cout<<" [6] See open tournaments"<<endl;
+    cout<<" [0] Quit game"<<endl;
+    cout<<"-----> " << flush;
+}
+
+void Client::displayAdminMenu(){
+    cout<<" --------------------------------------------------------------------------------------"<<endl;
+    cout<<"You are the administrator"<<endl;
+    cout<<"What do you want to do ?"<<endl;
+    cout<<" [1] See current tournaments "<<endl;
+    cout<<" [2] Create a tournament"<<endl;
     cout<<" [0] Quit game"<<endl;
     cout<<"-----> " << flush;
 }
@@ -176,6 +187,20 @@ void Client::displayAvailableManagers(){
     cout<<"Indicate the ID of the player you want to challenge [-1 to go back]: " << flush;
 }
 
+void Client::displayTournamentMenu(){
+    askForTournamentList();
+    std::vector<int> tournamentList = getTournamentList();
+    displayTournamentList(tournamentList);
+    //~ cout<<"Indicate the ID of the tournament you want to join " << \
+    //~ "(you can't join several tournaments at the same time) [-1 to go back]: " << flush;
+    if(tournamentList.size() > 0) cout<<"Do you wanna join this tournament ? [-1 for no, other number for yes]: " << flush;
+    else{
+        cout<<"No tournament available." << endl;
+        state_ = FREE;
+        displayMainMenu();
+    }
+}
+
 
 
 std::vector<int> Client::displayAndAskPlayersForMatch(){
@@ -264,10 +289,10 @@ void Client::loadFDSet() {
 
 bool Client::keyboard() {return FD_ISSET(STDIN_FILENO,&FDSet_);}
 
-void Client::login() {
-    contactServer();
-    state_=FREE;
-}
+//~ void Client::login() {
+    //~ contactServer();
+    //~ state_=FREE;
+//~ }
 
 
 
@@ -302,6 +327,9 @@ void Client::handleLogin(){
         else{
             //ADMIN_LOGIN
             state_ = ADMIN;
+#ifdef __DEBUG
+            cout << "You are in admin mode." << endl;
+#endif
         }
     }
 }
@@ -315,6 +343,7 @@ void Client::handleMainMenu(){
 //#define AUCTION_ROOM 2
 //#define MANAGE_PLAYERS 3
 //#define MANAGE_BUILDINGS 4
+//#define SEE_TOURNAMENTS 5
         case SEE_MANAGERS : {
             state_ = MANAGERS_MENU;
             break;
@@ -335,12 +364,100 @@ void Client::handleMainMenu(){
             state_ = AP_MENU;
             break;
         }
-        case 0 : {
+        case SEE_TOURNAMENTS : {
+            state_ = TOURNAMENTS_MENU;
+            break;
+        }
+        default : {
+			state_ = DISCONNECTING;
+            break;
+		}
+        
+
+    }
+}
+
+int Client::askForTournamentList(){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = GETTOURNAMENTSLIST;
+    return sendOnSocket(sockfd_, serialized);
+}
+
+std::vector<int> Client::getTournamentList(){
+    //nbOfTournaments then __startingNbOfPlayers, __currentNbOfPlayers, __startingPrice for each
+    int nbOfTournaments, startingNbOfPlayers, currentNbOfPlayers, startingPrice;
+    std::vector<int> tournamentsList;
+    SerializedObject received = receiveOnSocket(sockfd_);
+    char * position = received.stringData;
+    std::cout << "header : " << received.typeOfInfos << std::endl;
+
+    memcpy(&nbOfTournaments, position, sizeof(nbOfTournaments));
+    position += sizeof(nbOfTournaments);
+    std::cout << "Nb of tournaments : " << nbOfTournaments << std::endl;
+    for(int i = 0; i < nbOfTournaments; ++i){
+        memcpy(&startingNbOfPlayers, position, sizeof(startingNbOfPlayers));
+        position += sizeof(startingNbOfPlayers);
+        memcpy(&currentNbOfPlayers, position, sizeof(currentNbOfPlayers));
+        position += sizeof(currentNbOfPlayers);
+        memcpy(&startingPrice, position, sizeof(startingPrice));
+        position += sizeof(startingPrice);
+        std::cout << "Nb of players to start : " << startingNbOfPlayers << std::endl;
+        std::cout << "Nb of players susbcibe : " << currentNbOfPlayers << std::endl;
+        std::cout << "price : " << startingPrice << std::endl;
+        tournamentsList.push_back(startingNbOfPlayers);
+        tournamentsList.push_back(currentNbOfPlayers);
+        tournamentsList.push_back(startingPrice);
+    }
+    return tournamentsList;
+        
+}
+
+void Client::displayTournamentList(std::vector<int> tournamentsList){
+    std::cout << "A tournament starts when all places are taken" << std::endl;
+    for(unsigned int i = 0; i < tournamentsList.size(); i += 3){
+        std::cout << "Starting Number of Players : " << tournamentsList[i] << std::endl;
+        std::cout << "Current Number of Players : " << tournamentsList[i+1] << std::endl;
+        std::cout << "Starting price : " << tournamentsList[i+2] << std::endl;
+    }
+}
+
+void Client::handleAdminMenu(){
+    switch(input_){
+        case SEE_TOURNAMENTS_ADMIN : {
+            std::vector<int> tournamentsList;
+            askForTournamentList();
+            tournamentsList = getTournamentList();
+            displayTournamentList(tournamentsList);
+
+            break;
+        }
+        case CREATE_TOURNAMENT_OPTION : {
+            int nbOfPlayers, startingPrice, result;
+            cout << "Please choose the number of participants wanted "<<
+            "(the tournament will only start when enough suscribers). "<<
+            "It must be a power of two : " << endl;
+            cin >> nbOfPlayers;
+            if(not ((not nbOfPlayers) or (nbOfPlayers & (nbOfPlayers - 1)))) { //if power of two
+                cout << "Please choose the prize-money for the first level "<<
+                "(next levels' prize-moneys will be calculated automatically) : " << endl;
+                cin >> startingPrice;
+                sendTournamentCreation(nbOfPlayers, startingPrice);
+                result = getConfirmation();
+                if(result == 0){
+                    cout << "Creation failed, maybe there is still an active tournament"  << endl;
+                }else{
+                    cout << "Tournament created ! " << endl;
+                }
+                              
+            }
+            break;
+        }
+        default : {
 			state_ = DISCONNECTING;
 			break;
 		}
         
-
     }
 }
 
@@ -355,8 +472,8 @@ void Client::handleOpponentChoice(){
     proposeMatchTo(input_,  playersInTeam);
     if(receiveMatchConfirmation() == MATCH_STARTING){
         startMatch(1); //inviteur a l'équipe 1
-        state_ = FREE; //on suppose que la fonction ne retourne qu'à la fin du match
     }
+    state_=FREE;
 }
 
 void Client::startMatch(int numTeam){
@@ -367,6 +484,7 @@ void Client::startMatch(int numTeam){
     std::vector<AxialCoordinates> allPositions;
     getAllPositions();
     allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
+    cout << "Your are team n° " << numTeam << endl;
     while(winner == 0){
         winner = testifContinue(numTeam); //demande match nul ou forfait + écoute socket pour match nul ou socket
         if(winner == 0){ 
@@ -397,8 +515,9 @@ void Client::startMatch(int numTeam){
 
 int Client::testifContinue(int numTeam){
     int winner = 0;
-    cout << "You are in a match, what do you want to do :  " << numTeam << endl;
-    cout << "[1] Continue the tour " << endl;
+    cout << "You are team n° :  " << numTeam << endl;
+    cout << "You are in a match, what do you want to do :  " << endl;
+    cout << "[1] Make next turn " << endl;
     cout << "[2] Forfeit "  << endl;
     cout << "[3] Suggest a draw (in a tournament, the one who suggest is considered as the loser) " << endl;
     loadFDSet();
@@ -463,15 +582,25 @@ int Client::sendAnswerToDrawProposition(int code){
 
 int Client::sendForfeit(){
     SerializedObject serialized;
-    char * position = serialized.stringData;
+    //char * position = serialized.stringData;
     serialized.typeOfInfos = FORFEIT;
     return sendOnSocket(sockfd_, serialized);
 }
 
 int Client::sendDrawRequest(){
     SerializedObject serialized;
-    char * position = serialized.stringData;
+    //char * position = serialized.stringData;
     serialized.typeOfInfos = ASKFORDRAW;
+    return sendOnSocket(sockfd_, serialized);
+}
+
+int Client::sendTournamentCreation(int nbOfPlayers, int startingPrice){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = CREATE_TOURNAMENT;
+    memcpy(position, &nbOfPlayers, sizeof(nbOfPlayers));
+    position += sizeof(nbOfPlayers);
+    memcpy(position, &startingPrice, sizeof(startingPrice));
     return sendOnSocket(sockfd_, serialized);
 }
 
@@ -664,6 +793,7 @@ void Client::askAndSendMoves(int numTeam, HexagonalField &field, std::vector<Axi
 void Client::commMgr() {
 //gère les messages non sollicités (exemple : invitation à un match amical)
 	SerializedObject received = receiveOnSocket(sockfd_);
+    //TODO : tester retour recv
 	switch(received.typeOfInfos){
 		case MATCH_INVITATION : {
             int IDInvitor;
@@ -684,41 +814,44 @@ void Client::commMgr() {
             answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
             if(receiveMatchConfirmation() == MATCH_STARTING){
                 startMatch( 2); //invité a l'équipe 2
-                state_ = FREE;
             }
+            state_ = FREE;
+            break;
+        }
+        case SERVER_DOWN : {
+            state_ = DISCONNECTING;
+            cout << "Server is down." << endl;
+            break;
+        }
+        case MATCH_TOURNAMENT_START : {
+            int IDOpponent, numTeam;
+            char name[USERNAME_LENGTH];
+            char * position = received.stringData;
+            cout << "A tournament turn starts now !" << endl;
+            memcpy(&IDOpponent, position, sizeof(IDOpponent));
+            position += sizeof(IDOpponent);
+            memcpy(&name, position, sizeof(name));
+            position += sizeof(name);
+            //memcpy(&numTeam, position, sizeof(numTeam));
+            cout << "Opponent ID : " << IDOpponent << " name : " << name << endl;
+            //forced to accept
+            std::vector<int> playersInTeam;
+            playersInTeam = displayAndAskPlayersForMatch();
+            sendTeamForMatchTournament(playersInTeam);
+            numTeam = receiveNumOfTeam();
+            if(numTeam > 0){
+                startMatch(numTeam);
+            }
+            state_ = AVAILABLE;
+            break;
         }
 	}
 }
 
-void Client::matchTentative() {
-//    msg[0]='M';
-//    msg[1]=' ';
-//        std::cout<<"Managers disponibles :"<<std::endl;
-//        contactServer();
-//        if(msg[1]==' ') {//il y a des managers disponibles
-//                state_=MATCH_INVITING;
-//                std::cin>>input_; //nom du manager choisi comme adversaire
-//                msg[1]='S';
-//                strcpy(opponent_,input_);
-//                strcpy(&msg[2],opponent_);
-//                contactServer();
-//                if(msg[1]==' ') //le match peut commencer
-//                        state_=MATCH_INGAME;
-//                        std::cout<<"C'est parti pour un match amical !"<<std::endl;
-//// le nom de mon adversaire se trouve dans opponent_
-////                      startGame()
-//                state_=FREE;
-//        }
+int Client::receiveNumOfTeam(){
+    return receiveMatchConfirmation();
 }
 
-void Client::contactServer() {
-        //sendMsg(sockfd_,msg,strlen(msg));
-        //receiveMessage();
-}
-void Client::receiveMessage() {
-        //receiveMsg(sockfd_,msg,INPUTSIZE);
-        //std::cout<<&msg[2]<<std::endl;
-}
 
 ////////Network\\\\\\\\
 
@@ -764,7 +897,7 @@ int Client::getConfirmation(){ //valable pour LOGIN_CONFIRM, UPGRADE_CONFIRM, TR
 
 int Client::askForManagerInfos(){
     SerializedObject serialized;
-    char * position = serialized.stringData;
+    //char * position = serialized.stringData;
     serialized.typeOfInfos = GETMANAGERINFOS;
     return sendOnSocket(sockfd_, serialized);
 }
@@ -822,7 +955,7 @@ int Client::askForBuildingUpgrade(int buildingID){
 
 int Client::askForPlayersList(){
     SerializedObject serialized;
-    char * position = serialized.stringData;
+    //char * position = serialized.stringData;
     serialized.typeOfInfos = GETPLAYERSLIST;
     return sendOnSocket(sockfd_, serialized);
 }
@@ -947,7 +1080,21 @@ int Client::answerMatchProposal(bool confirmation, std::vector<int> playersInTea
     memcpy(position, &confirmation, sizeof(confirmation));
     position += sizeof(confirmation);
     int value;
-    for(unsigned int i = 0; i < playersInTeam.size();++i){ //joueurs choisi pour joueur le match
+    for(unsigned int i = 0; i < playersInTeam.size();++i){ //joueurs choisis pour jouer le match
+        value = playersInTeam[i];
+        memcpy(position, &value, sizeof(value));
+        position += sizeof(value);
+    }
+    return sendOnSocket(sockfd_, serialized);
+}
+
+int Client::sendTeamForMatchTournament(std::vector<int> playersInTeam){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = STARTTOURNAMENTMATCH;
+    int value;
+    //TODO : éviter redondance du code
+    for(unsigned int i = 0; i < playersInTeam.size();++i){ //joueurs choisis pour jouer le match
         value = playersInTeam[i];
         memcpy(position, &value, sizeof(value));
         position += sizeof(value);
@@ -1179,6 +1326,14 @@ int Client::getPriceForAP(){
     return result;
 }
 
+int Client::askToJoinTournament(int tournamentID){
+    SerializedObject serialized;
+    serialized.typeOfInfos = JOINTOURNAMENT;
+    char * position = serialized.stringData;
+    memcpy(position, &tournamentID, sizeof(tournamentID));
+    return sendOnSocket(sockfd_, serialized);
+}
+
 void *auctionTurn(void* data) {
 
   //int* sockfd = (int *)data;
@@ -1317,7 +1472,7 @@ void Client::handleAuctions(){
             }
         } while (sellPlayerChoice!=ABORT);
     }
-    else if (input_==ABORT) state_ = FREE;
+    else state_ = FREE;
 }
 
 void Client::handlePlayersMenu(){
@@ -1356,6 +1511,11 @@ void Client::kbMgr() {
         //affichage du sous-menu avec adaptation du contexte
             handleMainMenu();
             
+            break;
+        }
+        case ADMIN : {
+            //verrouilage du contexte
+            handleAdminMenu();
             break;
         }
         case MANAGERS_MENU : {
@@ -1471,14 +1631,27 @@ void Client::kbMgr() {
                     state_=FREE;
                 }
             }
-            else if (input_==ABORT){
-                state_=FREE;
-            }
+            else state_=FREE;
             break;
         }
 
-        case ADMIN : {
-            //menu d'administration, contexte bloqué, pas de push du serveur possible dans cette configuration
+        case TOURNAMENTS_MENU : {
+            int confirmation;
+            
+            if(input_ == -1){
+                state_ = FREE;
+                return;
+            }
+            //TODO : tester input ?
+            askToJoinTournament();
+            confirmation = getConfirmation();
+            if(confirmation == 0){
+                cout << "Impossible to join this tournament !" << endl;
+            }else{
+                cout << "You are recorded as a participant of this tournament. " << \
+                "Be ready for when it will start !" << endl;
+            }
+            state_ = AVAILABLE;
             break;
         }
         default : {//ne devrait jamais passer par ici
@@ -1496,6 +1669,10 @@ void Client::askInput() {
         case FREE : {
             displayManagerInfos();
             displayMainMenu();
+            break;
+        }
+        case ADMIN : {
+            displayAdminMenu();
             break;
         }
         case MANAGERS_MENU :{
@@ -1529,12 +1706,20 @@ void Client::askInput() {
             cout<<"Indicate the number of the player you wish to heal [or 0 to abort] : " << flush;
             break;
         }
-        
+        case AVAILABLE : { //back to the menu without direct request to server
+            displayMainMenu();
+            state_ = FREE;
+            break;
+        }
         case BUILDINGS_MENU : {
 			displayManagerInfos();
 			displayManageBuildingsMenu();
 			break;
 		}
+        case TOURNAMENTS_MENU : {
+            displayTournamentMenu();
+            break;
+        }
 		
         case AP_MENU : {
             displayActionPointsMenu();

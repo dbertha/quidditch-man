@@ -29,8 +29,11 @@ private :
     int __scoreTeam2;
     int **__movesTeam1;
     int **__movesTeam2;
+    bool __isInTournament;
 public :
-    Match(std::vector<ManagedPlayer> &team1, int ** movesTeam1); //match en attente de recevoir l'équipe adverse
+    Match(std::vector<ManagedPlayer> &team1, int ** movesTeam1, bool tournament = false); //match en attente de recevoir l'équipe adverse
+    //~ Match();
+    //~ void addTeam(std::vector<ManagedPlayer> &team, int ** movesTeam, int numTeam);
     void launch(std::vector<ManagedPlayer> &team2, int ** movesTeam2);
     Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team2, int ** movesTeam1, int **movesTeam2);
     //Listes ordonnées de 7 joueurs telles que 
@@ -41,14 +44,16 @@ public :
     //~ CHASER3 4
     //~ BEATER1 5
     //~ BEATER2 6
+    void sortBySpeed(); //update __indexesSortedBySpeed
     void makeMoves();
     int getWinner();
     PlayingPlayer * getPlayer(int indexObject);
     bool isInVector(std::vector<int> toTest, int value);
     int getScoreTeam1(){return __scoreTeam1;}
     int getScoreTeam2(){return __scoreTeam2;}
-    void serializeScoreAndPositions(char * bufferPosition);
+    int serializeScoreAndPositions(char * bufferPosition); //retourne aussi le gagnant
     void serializePlayerAttr(int playerID, char * bufferPosition);
+    bool isInTournament(){return __isInTournament;}
 };
 
 #endif

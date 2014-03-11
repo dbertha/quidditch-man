@@ -5,6 +5,7 @@
 #include "Server.hpp"
 #include "DataBase.hpp"
 
+//TODO : éviter redondance des includes avec le hpp
 #include <string> 
 #include <sys/stat.h>
 #include <iostream>
@@ -19,6 +20,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+
+
+
 User::User(Server * server, MatchesHandler *matchesHandler, int sockfd, int userID): state_(INIT), server_(server), __matchesHandler(matchesHandler), sockfd_(sockfd), userId_(userID), manager_(NULL), calendar_(NULL), auction_(NULL) {
     __moves = new int*[7]; //7 lignes
     for(int i =0; i < 7; ++i){
@@ -26,8 +30,6 @@ User::User(Server * server, MatchesHandler *matchesHandler, int sockfd, int user
     }
     //TODO : delete correspondant dans le destructeur
 }
-
-//TODO : initialisation dans le bon ordre
 
 void User::cmdHandler(SerializedObject *received) {
 	SerializedObject answer;
@@ -76,12 +78,18 @@ void User::cmdHandler(SerializedObject *received) {
 				manager_ = new Manager(username);
 				userName_=username;
 				//userId_=server_->usersList_.size();
-				calendar_ = new Calendar(manager_);
-				calendar_->update();
-				DataBase::save(*manager_);
+
+				if(!strcmp(username, "admin")){ //return 0 if equal
+					state_= ADMIN;
+					confirmation = ADMIN_LOGIN;
+				}else{
+					calendar_ = new Calendar(manager_);
+					calendar_->update();
+					DataBase::save(*manager_);
 				
-				state_=FREE;
-				confirmation = NORMAL_LOGIN;
+					state_=FREE;
+					confirmation = NORMAL_LOGIN;
+				}
 			}
 			else {
 				std::cout<<"WRONG LOGIN/PASSWORD"<<std::endl;
@@ -431,8 +439,7 @@ void User::cmdHandler(SerializedObject *received) {
 				team1.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
 			}
             User *invited = NULL;
-            for(unsigned int i; i < server_->usersList_.size(); ++i){
-
+            for(unsigned int i = 0; i < server_->usersList_.size(); ++i){
                 if(server_->usersList_[i]->getUserID() == targetedUser){
                     invited = server_->usersList_[i];
                 }
@@ -447,12 +454,10 @@ void User::cmdHandler(SerializedObject *received) {
 			position = received->stringData;
 			memcpy(&confirmation, position, sizeof(confirmation));
 			position += sizeof(confirmation);
-			std::cout << "size of confirmation : " << sizeof(confirmation) << std::endl;
 			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
 			if(confirmation){
 				for(int i = 0; i < 7; ++i){
 					int value;
-					std::cout << "départ : " << position - received->stringData << std::endl;
 					memcpy(&value,position, sizeof(value));
 					position += sizeof(value);
 					playersInTeam.push_back(value); //ajout à la liste
@@ -465,13 +470,9 @@ void User::cmdHandler(SerializedObject *received) {
 
 			std::vector<ManagedPlayer> team2;
             for(unsigned int i = 0; i < playersInTeam.size(); ++i){
-				std::cout << " on récupère les objets correspondants " << playersInTeam[i] <<std::endl;
                 //TODO : éviter des copies ?
 				team2.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
 			}
-#ifdef __DEBUG
-			std::cout<<"On passe le relais à matchesHandler"<<std::endl;
-#endif
 			__matchesHandler->respondToMatchProposal(this, team2, __moves);
 
 			break;
@@ -739,7 +740,7 @@ void User::cmdHandler(SerializedObject *received) {
 			sendOnSocket(sockfd_, answer);
 			break;
 
-		case END_AUCTION_TURN :
+		case END_AUCTION_TURN : {
 			//no details to read : possible improvement : participation to several auctions at a same time. No.
 #ifdef __DEBUG
 			std::cout<<"Tour d'enchère fini sur le socket "<<getSockfd()<<std::endl;
@@ -770,7 +771,89 @@ void User::cmdHandler(SerializedObject *received) {
 			memcpy(answerPosition, &auctionPrice, sizeof(auctionPrice));
             sendOnSocket(sockfd_, answer); 
 			break;	
+		}
+		case CREATE_TOURNAMENT : {
+			//reading details
+			int nbOfPlayers;
+			int startingPrice;
+			position = received->stringData;
+			memcpy(&nbOfPlayers, position, sizeof(nbOfPlayers));
+			position += sizeof(nbOfPlayers);
+			memcpy(&startingPrice, position, sizeof(startingPrice));
+#ifdef __DEBUG
+			std::cout<<"Demande de création d'un tournoi reçue sur le socket "<<getSockfd()<<std::endl;
+			std::cout<<"nbOfplayers :  "<<nbOfPlayers<< " startingPrice : " << startingPrice << std::endl;
+#endif
+			//handling request
+			confirmation = __matchesHandler->createTournament(nbOfPlayers, startingPrice);
+			
+			//answering
+			//answer in confirmation
+			answer.typeOfInfos = NEWTOURNAMENT_CONFIRM;
+			memcpy(answerPosition, &confirmation, sizeof(confirmation));
+            sendOnSocket(sockfd_, answer); 
+			break;
+		}
+		case GETTOURNAMENTSLIST : {
+			//no details to read
+#ifdef __DEBUG
+			std::cout<<"Demande de la liste des tournois reçue sur le socket "<<getSockfd()<<std::endl;
+#endif
+			//handling request and answering
 
+			answer.typeOfInfos = TOURNAMENTSLIST;
+			confirmation = __matchesHandler->serializeTournaments(answerPosition); //always true ?
+			sendOnSocket(sockfd_, answer); 
+			break;
+		}
+		case JOINTOURNAMENT : {
+			//reading details
+			int tournamentID;
+			position = received->stringData;
+			memcpy(&tournamentID, position, sizeof(tournamentID));
+#ifdef __DEBUG
+			std::cout<<"Demande de participation à un tournoi reçue sur le socket "<<getSockfd()<<std::endl;
+			std::cout<<"tournamentID :  "<<tournamentID<< std::endl;
+#endif
+			//handling request
+			confirmation = __matchesHandler->addPlayerToTournament(this); //return -1 if already in list, 0 if not full, 1 if full after addition
+			
+			//TODO
+			//answering by matchesHandler to handle potential launch of the tournament
+			
+			break;
+		}
+		case STARTTOURNAMENTMATCH : {
+			//reading details
+			position = received->stringData;
+			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
+			for(int i = 0; i < 7; ++i){
+				int value;
+				memcpy(&value,position, sizeof(value));
+				position += sizeof(value);
+				playersInTeam.push_back(value); //ajout à la liste
+			}
+			
+#ifdef __DEBUG
+			std::cout<<"Demande d'acceptation d'un match de tournoi reçue sur socket "<<getSockfd()<<std::endl;
+#endif
+
+			std::vector<ManagedPlayer> team;
+            for(unsigned int i = 0; i < playersInTeam.size(); ++i){
+                //TODO : éviter des copies ?
+				team.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
+			}
+#ifdef __DEBUG
+			std::cout<<"On passe le relais à matchesHandler"<<std::endl;
+#endif
+			try{
+			__matchesHandler->respondToTournamentMatch(this, team, __moves);
+			}
+			catch(const char * msg){
+				std::cout<<msg<<std::endl;
+			}
+			break;
+		}
 		default :
 #ifdef __DEBUG
 			std::cout<<"En-tête inconnu : "<<received->typeOfInfos<<std::endl;
@@ -862,7 +945,7 @@ void User::auctionWin(Manager* manager, ManagedPlayer player) {
 	DataBase::save(*manager);
 }
 
-string User::intToString(int value) {
+string User::intToString(int value) { //TODO : dans une classe générique ?
 	char buffer[20];
 	sprintf(buffer,"%d",value);
 	string tmp = "";
@@ -872,4 +955,14 @@ string User::intToString(int value) {
 		++i;
 	}
 	return tmp;
+}
+
+void User::handleEndOfMatch(int numTeam, int numWinningTeam){
+	int money = manager_->getIncomeFromMatch(numTeam == numWinningTeam, numTeam == 1); //host if team 1
+	manager_->addMoney(money);
+}
+
+void User::handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice){
+	int money = manager_->getIncomeFromMatch(numTeam == numWinningTeam, numTeam == 1); //host if team 1
+	manager_->addMoney(numTeam == numWinningTeam ? money + tournamentPrice : money);
 }

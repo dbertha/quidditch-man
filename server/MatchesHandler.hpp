@@ -9,7 +9,9 @@
 #include "Ball.hpp"
 #include "Match.hpp"
 #include "User.hpp"
+#include "Tournament.hpp" //the only one to know this class
 #include <vector>
+#include <algorithm>
 #include <iostream>
 #include <cstring> //memcpy
 #include <string>
@@ -46,6 +48,8 @@
 #define INVITEDASKENDOFMATCH 4
 #define WAITING_MOVES 5
 #define OVER 6
+#define WAITINGTWOPLAYERS 7
+#define WAITINGSECONDPLAYER 8
 
 class User;
 class MatchesHandler{
@@ -56,12 +60,15 @@ private :
     std::vector<int> statesOfMatches; //WAITINGACCEPTMATCH, WAITINGFIRSTMOVE, WAITINGSECONDMOVE, INVITORSASKENDOFMATCH, INVITEDASKENDOFMATCH
     //std::vector<int**> movesLists; //pour chaque match, enregistre les déplacements des deux joueurs avant de les passer à l'instance de Match
     //enregistrement dans user de l'équipe
+    Tournament * __tournament; //gère l'ordonnancement des matchs dans le cas d'un tournoi
 public :
-    MatchesHandler(){} //construction par défaut des listes
+    MatchesHandler() : __tournament(NULL) {} //construction par défaut des listes
     void proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1, int **movesTeam1);
     void respondToMatchProposal(User * invited, std::vector<ManagedPlayer> &team2, int **movesTeam2);
+    void respondToTournamentMatch(User * responder, std::vector<ManagedPlayer> &team, int **movesTeam);
     bool isInvited(User * user);
     int sendConfirmationTo(User * client, int answerCode);
+    //~ int sendConfirmationTo(User * client, int answerCode, int numTeam);
     void getScoresAndPositions(User * demander);
     void getPlayerInfos(User * demander, int playerID);
     void recordMoves(User * demander);
@@ -70,6 +77,16 @@ public :
     int sendEndOfMatch(User * receiver, int code);
     void transmitDrawRequest(User * demander);
     void confirmDraw(User * responder, int confirmation);
+    void handleEndOfMatch(int winnerTeam, int matchIndex);
+    void handleEndOfMatch(User * winner, int winnerTeam, int matchIndex);
+    void deleteMatch(int index);
+    
+    int createTournament(int nbOfParticipants, int startingPrice);
+    int serializeTournaments(char * buffer);
+    int addPlayerToTournament(User * subscriber);
+    void launchNextTournamentTurn();
+    int inviteForTournamentMatch(User * firstPlayer, User * secondPlayer);
+    void handleEndOfTournamentMatch(User * winningUser);
 };
 
 #endif
