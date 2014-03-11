@@ -180,7 +180,12 @@ void Client::displayTournamentMenu(){
     displayTournamentList(tournamentList);
     //~ cout<<"Indicate the ID of the tournament you want to join " << \
     //~ "(you can't join several tournaments at the same time) [-1 to go back]: " << flush;
-    cout<<"Do you wanna join this tournament ? [-1 for no, other number for yes]: " << flush;
+    if(tournamentList.size() > 0) cout<<"Do you wanna join this tournament ? [-1 for no, other number for yes]: " << flush;
+    else{
+        cout<<"No tournament available." << endl;
+        state_ = FREE;
+        displayMainMenu();
+    }
 }
 
 
@@ -820,7 +825,7 @@ void Client::commMgr() {
             if(numTeam > 0){
                 startMatch(numTeam);
             }
-            state_ = FREE;
+            state_ = AVAILABLE;
             break;
         }
 	}

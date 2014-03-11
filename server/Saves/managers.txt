@@ -4,3 +4,4 @@ Manon#a#
 david#pass#
 exemple#33#
 admin#admin#
+player1#pass1#

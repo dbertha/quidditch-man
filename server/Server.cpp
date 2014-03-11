@@ -134,7 +134,7 @@ int Server::receive(User * aUser, SerializedObject * received) {
 	else {
 		received->typeOfInfos = ntohs(received->typeOfInfos);
 #ifdef __DEBUG
-		std::cout<<"**got a SerializedObject on "<<clientSockfd_<<std::endl;
+		std::cout<<"**got a SerializedObject on "<<aUser->getSockfd()<<std::endl;
 #endif
 	}
 	return length;

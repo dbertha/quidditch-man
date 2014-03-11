@@ -756,8 +756,15 @@ void User::cmdHandler(SerializedObject *received) {
                 //TODO : éviter des copies ?
 				team.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
 			}
+#ifdef __DEBUG
+			std::cout<<"On passe le relais à matchesHandler"<<std::endl;
+#endif
+			try{
 			__matchesHandler->respondToTournamentMatch(this, team, __moves);
-
+			}
+			catch(const char * msg){
+				std::cout<<msg<<std::endl;
+			}
 			break;
 		}
 		default :
@@ -870,5 +877,5 @@ void User::handleEndOfMatch(int numTeam, int numWinningTeam){
 
 void User::handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice){
 	int money = manager_->getIncomeFromMatch(numTeam == numWinningTeam, numTeam == 1); //host if team 1
-	manager_->addMoney(money + tournamentPrice);
+	manager_->addMoney(numTeam == numWinningTeam ? money + tournamentPrice : money);
 }

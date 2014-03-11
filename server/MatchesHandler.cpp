@@ -37,31 +37,37 @@ int MatchesHandler::sendInvitation(User * invitor, User * invited){
 }
 
 void MatchesHandler::forfeit(User * demander){
-    
+    User * winner;
+    int winningTeam;
     int matchIndex = std::find(inviteds.begin(), inviteds.end(), demander) - inviteds.begin();
     if(matchIndex > int(inviteds.size())-1){ 
         //il s'agit de l'hôte, soit de l'équipe 1
         matchIndex = std::find(invitors.begin(), invitors.end(), demander) - invitors.begin(); 
+        winner = inviteds[matchIndex];
+        winningTeam = 2;
         if(statesOfMatches[matchIndex] == WAITINGFIRSTMOVE){ // mouvements de l'équipe 2 déjà reçu
             statesOfMatches[matchIndex] = OVER;
             sendConfirmationTo(inviteds[matchIndex], MOVES_CONFIRM); //on envoie la confirmation à l'équipe en attente
-            sendEndOfMatch(inviteds[matchIndex], FORFEIT);
+            //sendEndOfMatch(inviteds[matchIndex], FORFEIT);
         }else{ //équipe 2 n'a pas encore envoyé ses mouvements
-            sendEndOfMatch(inviteds[matchIndex], FORFEIT);
+            //sendEndOfMatch(inviteds[matchIndex], FORFEIT);
         }
     }else{ //il s'agit de l'invité, soit de l'équipe 2
+        winner = invitors[matchIndex];
+        winningTeam = 1;
         if(statesOfMatches[matchIndex] == WAITINGSECONDMOVE){ // mouvements de l'équipe 1 déjà reçu
             sendConfirmationTo(invitors[matchIndex], MOVES_CONFIRM);//on envoie la confirmation à l'équipe en attente
-            sendEndOfMatch(invitors[matchIndex], FORFEIT);
+            //sendEndOfMatch(invitors[matchIndex], FORFEIT);
         }else{ //équipe 1 n'a pas encore envoyé ses mouvements
-            sendEndOfMatch(invitors[matchIndex], FORFEIT);
+            //sendEndOfMatch(invitors[matchIndex], FORFEIT);
         }
     }
-    deleteMatch(matchIndex);
+    sendEndOfMatch(winner, FORFEIT);
+    handleEndOfMatch(winner, winningTeam, matchIndex);
+    
 }
 
 void MatchesHandler::transmitDrawRequest(User * demander){
-    int result;
     User * receiver;
     int matchIndex = std::find(inviteds.begin(), inviteds.end(), demander) - inviteds.begin();
     if(matchIndex > int(inviteds.size())-1){ 
@@ -71,37 +77,43 @@ void MatchesHandler::transmitDrawRequest(User * demander){
         if(statesOfMatches[matchIndex] == WAITINGFIRSTMOVE){ // mouvements de l'équipe 2 déjà reçu
             statesOfMatches[matchIndex] = OVER;
             sendConfirmationTo(inviteds[matchIndex], MOVES_CONFIRM); //on envoie la confirmation à l'équipe en attente
-            sendEndOfMatch(inviteds[matchIndex], ASKFORDRAW);
+            //sendEndOfMatch(inviteds[matchIndex], ASKFORDRAW);
         }else{ //équipe 2 n'a pas encore envoyé ses mouvements
-            sendEndOfMatch(inviteds[matchIndex], ASKFORDRAW);
+            //sendEndOfMatch(inviteds[matchIndex], ASKFORDRAW);
         }
     }else{ //il s'agit de l'invité, soit de l'équipe 2
         receiver = invitors[matchIndex];
         if(statesOfMatches[matchIndex] == WAITINGSECONDMOVE){ // mouvements de l'équipe 1 déjà reçu
             sendConfirmationTo(invitors[matchIndex], MOVES_CONFIRM);//on envoie la confirmation à l'équipe en attente
-            sendEndOfMatch(invitors[matchIndex], ASKFORDRAW);
+            //sendEndOfMatch(invitors[matchIndex], ASKFORDRAW);
         }else{ //équipe 1 n'a pas encore envoyé ses mouvements
-            sendEndOfMatch(invitors[matchIndex], ASKFORDRAW);
+            //sendEndOfMatch(invitors[matchIndex], ASKFORDRAW);
         }
     }
+    sendEndOfMatch(receiver, ASKFORDRAW);
 }
 
 void MatchesHandler::confirmDraw(User * responder, int confirmation){
     //confirmation : DRAWACCEPTED or DRAWDENIED
     User * receiver;
+    int winningTeam = 2;
     int matchIndex = std::find(inviteds.begin(), inviteds.end(), responder) - inviteds.begin();
     if(matchIndex > int(inviteds.size())-1){ 
         //il s'agit de l'hôte, soit de l'équipe 1
         matchIndex = std::find(invitors.begin(), invitors.end(), responder) - invitors.begin(); 
         receiver = inviteds[matchIndex];
+        winningTeam = 1;
     }else{
         receiver = invitors[matchIndex];
     }
     sendEndOfMatch(receiver, confirmation);
     if(confirmation == DRAWACCEPTED){
-        statesOfMatches[matchIndex] = OVER;
-    }else{
-        deleteMatch(matchIndex);
+        if(matchesVector[matchIndex]->isInTournament()){
+            //si tournoi, celui qui fait la demande est perdant
+            handleEndOfMatch(responder, winningTeam, matchIndex);
+        }else{
+            deleteMatch(matchIndex);
+        }
     }
 }
 
@@ -183,17 +195,60 @@ void MatchesHandler::getScoresAndPositions(User * demander){
     SerializedObject answer;
     answer.typeOfInfos = POSITIONS;
     winner = matchesVector[matchIndex]->serializeScoreAndPositions(answer.stringData);
+    sendOnSocket(demander->getSockfd(), answer);
     if(winner != 0){ //si match terminé
         if(statesOfMatches[matchIndex] == OVER){ //si autre équipe a déjà vérifié
-            inviteds[matchIndex]->handleEndOfMatch(2, winner); //numteam, winningTeam
-            invitors[matchIndex]->handleEndOfMatch(1, winner); //numteam, winningTeam
-            deleteMatch(matchIndex);
+            handleEndOfMatch(winner, matchIndex);
         }else{
             statesOfMatches[matchIndex] = OVER;
         }
     }
-    sendOnSocket(demander->getSockfd(), answer);
 }
+
+void MatchesHandler::handleEndOfMatch(int winner, int matchIndex){
+    User * winningUser;
+    winningUser = winner == 1 ? invitors[matchIndex] : inviteds[matchIndex];
+    handleEndOfMatch(winningUser, winner, matchIndex); //surcharge
+}
+
+void MatchesHandler::handleEndOfMatch(User * winningUser, int winnerTeam, int matchIndex){
+#ifdef __DEBUG
+    std::cout << "Nom du gagnant : " << winningUser->getUserName() << std::endl;
+#endif
+    int tournamentPrice = 0;
+    if(matchesVector[matchIndex]->isInTournament()){
+        tournamentPrice = __tournament->getReward();
+    }
+    inviteds[matchIndex]->handleEndOfMatch(2, winnerTeam, tournamentPrice); //numteam, winningTeam
+    invitors[matchIndex]->handleEndOfMatch(1, winnerTeam, tournamentPrice); //numteam, winningTeam
+    
+    if(matchesVector[matchIndex]->isInTournament()){
+        deleteMatch(matchIndex);
+        handleEndOfTournamentMatch(winningUser); //after deletion, recording winner and test if next level should start (and start it then)
+    }else{
+        deleteMatch(matchIndex);
+    }
+}
+
+void MatchesHandler::handleEndOfTournamentMatch(User * winningUser){
+    int result = __tournament->recordResult(winningUser);
+    if(result == -1){
+#ifdef __DEBUG
+    std::cout << "Tournoi terminé, nom du gagnant final : " << winningUser->getUserName() << std::endl;
+#endif
+        //tournament is over
+        delete __tournament;
+        __tournament = NULL;
+        //TODO : send message to the ultimate winner about his final victory
+    }else if(result == 1){
+        //next level is ready to start
+#ifdef __DEBUG
+    std::cout << "On lance le tour suivant du tournoi " << std::endl;
+#endif
+        launchNextTournamentTurn();
+    }
+}
+    
 
 void MatchesHandler::getPlayerInfos(User * demander, int playerID){
     int matchIndex = std::find(inviteds.begin(), inviteds.end(), demander) - inviteds.begin();
@@ -239,6 +294,7 @@ void MatchesHandler::deleteMatch(int index){
     std::cout << "Suppression du match à l'index " << index << std::endl;
 #endif
     delete matchesVector[index];
+    matchesVector[index] = NULL;
     matchesVector.erase(matchesVector.begin() + index);
     invitors[index]->state_ = FREE;
     invitors.erase(invitors.begin() + index);
@@ -259,9 +315,9 @@ int MatchesHandler::createTournament(int nbOfParticipants, int startingPrice){
 }
 
 int MatchesHandler::serializeTournaments(char * buffer){
-    //only one => size fixed
+    //only one ==> size fixed
     int nbOfTournaments;
-    if(not __tournament == NULL and not __tournament->isStarted()){ //only if not started
+    if(not (__tournament == NULL) and not (__tournament->isStarted())){ //only if not started
         nbOfTournaments = 1;
         memcpy(buffer, &nbOfTournaments, sizeof(nbOfTournaments));
         buffer += sizeof(nbOfTournaments);
@@ -289,6 +345,9 @@ int MatchesHandler::addPlayerToTournament(User * subscriber){
 
 void MatchesHandler::launchNextTournamentTurn(){
     std::vector<User *> turnParticipants = __tournament->getNextMatches();
+#ifdef __DEBUG
+    std::cout << "Nombre de participants pour le prochain tour : " << turnParticipants.size() << std::endl;
+#endif
     for(unsigned int i = 0; i < turnParticipants.size(); i+=2){
         inviteForTournamentMatch(turnParticipants[i], turnParticipants[i+1]);
         invitors.push_back(turnParticipants[i]);
@@ -303,7 +362,7 @@ void MatchesHandler::launchNextTournamentTurn(){
 void MatchesHandler::respondToTournamentMatch(User * responder, std::vector<ManagedPlayer> &team, int **movesTeam){
     int matchIndex = std::find(invitors.begin(), invitors.end(), responder) - invitors.begin(); 
     
-    if(matchIndex > int(inviteds.size())-1){ 
+    if(matchIndex > int(invitors.size())-1){ 
         matchIndex = std::find(inviteds.begin(), inviteds.end(), responder) - inviteds.begin();
         if(statesOfMatches[matchIndex] == WAITINGTWOPLAYERS){
             //première équipe à répondre doit être dans le vecteur invitors
@@ -317,7 +376,7 @@ void MatchesHandler::respondToTournamentMatch(User * responder, std::vector<Mana
         std::cout << "Team for match received" << std::endl;
 #endif
     if(statesOfMatches[matchIndex] == WAITINGTWOPLAYERS){
-        matchesVector[matchIndex] = new Match(team, movesTeam); //initialisation
+        matchesVector[matchIndex] = new Match(team, movesTeam, true); //initialisation
         statesOfMatches[matchIndex] = WAITINGSECONDPLAYER;
     }else{
         matchesVector[matchIndex]->launch(team,movesTeam);

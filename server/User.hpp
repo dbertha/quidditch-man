@@ -23,6 +23,7 @@
 #include <string>
 #include <sstream>
 
+//TODO : handleDisconnection() with testing state_
 
 class Server;
 class Auction;

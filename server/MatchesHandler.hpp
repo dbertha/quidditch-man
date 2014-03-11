@@ -77,6 +77,8 @@ public :
     int sendEndOfMatch(User * receiver, int code);
     void transmitDrawRequest(User * demander);
     void confirmDraw(User * responder, int confirmation);
+    void handleEndOfMatch(int winnerTeam, int matchIndex);
+    void handleEndOfMatch(User * winner, int winnerTeam, int matchIndex);
     void deleteMatch(int index);
     
     int createTournament(int nbOfParticipants, int startingPrice);
@@ -84,6 +86,7 @@ public :
     int addPlayerToTournament(User * subscriber);
     void launchNextTournamentTurn();
     int inviteForTournamentMatch(User * firstPlayer, User * secondPlayer);
+    void handleEndOfTournamentMatch(User * winningUser);
 };
 
 #endif
