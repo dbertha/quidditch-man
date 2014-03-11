@@ -31,6 +31,8 @@ private :
     int **__movesTeam2;
 public :
     Match(std::vector<ManagedPlayer> &team1, int ** movesTeam1); //match en attente de recevoir l'équipe adverse
+    //~ Match();
+    //~ void addTeam(std::vector<ManagedPlayer> &team, int ** movesTeam, int numTeam);
     void launch(std::vector<ManagedPlayer> &team2, int ** movesTeam2);
     Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team2, int ** movesTeam1, int **movesTeam2);
     //Listes ordonnées de 7 joueurs telles que 
@@ -41,6 +43,7 @@ public :
     //~ CHASER3 4
     //~ BEATER1 5
     //~ BEATER2 6
+    void sortBySpeed(); //update __indexesSortedBySpeed
     void makeMoves();
     int getWinner();
     PlayingPlayer * getPlayer(int indexObject);

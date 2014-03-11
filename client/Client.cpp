@@ -60,7 +60,7 @@ void Client::displayAdminMenu(){
     cout<<" --------------------------------------------------------------------------------------"<<endl;
     cout<<"You are the administrator"<<endl;
     cout<<"What do you want to do ?"<<endl;
-    cout<<" [1] See current tournaments (not yet implemented)"<<endl;
+    cout<<" [1] See current tournaments "<<endl;
     cout<<" [2] Create a tournament"<<endl;
     cout<<" [0] Quit game"<<endl;
     cout<<"-----> " << flush;
@@ -493,8 +493,9 @@ void Client::startMatch(int numTeam){
 
 int Client::testifContinue(int numTeam){
     int winner = 0;
-    cout << "You are in a match, what do you want to do :  " << numTeam << endl;
-    cout << "[1] Continue the tour " << endl;
+    cout << "You are team n° :  " << numTeam << endl;
+    cout << "You are in a match, what do you want to do :  " << endl;
+    cout << "[1] Make next turn " << endl;
     cout << "[2] Forfeit "  << endl;
     cout << "[3] Suggest a draw (in a tournament, the one who suggest is considered as the loser) " << endl;
     loadFDSet();
@@ -809,14 +810,14 @@ void Client::commMgr() {
             position += sizeof(IDOpponent);
             memcpy(&name, position, sizeof(name));
             position += sizeof(name);
-            memcpy(&numTeam, position, sizeof(numTeam));
+            //memcpy(&numTeam, position, sizeof(numTeam));
             cout << "Opponent ID : " << IDOpponent << " name : " << name << endl;
-            cout << "You are team n° : " << numTeam << endl;
             //forced to accept
             std::vector<int> playersInTeam;
             playersInTeam = displayAndAskPlayersForMatch();
-            answerMatchProposal(true, playersInTeam);
-            if(receiveMatchConfirmation() == MATCH_STARTING){
+            sendTeamForMatchTournament(playersInTeam);
+            numTeam = receiveNumOfTeam();
+            if(numTeam > 0){
                 startMatch(numTeam);
             }
             state_ = FREE;
@@ -825,35 +826,10 @@ void Client::commMgr() {
 	}
 }
 
-void Client::matchTentative() {
-//    msg[0]='M';
-//    msg[1]=' ';
-//        std::cout<<"Managers disponibles :"<<std::endl;
-//        contactServer();
-//        if(msg[1]==' ') {//il y a des managers disponibles
-//                state_=MATCH_INVITING;
-//                std::cin>>input_; //nom du manager choisi comme adversaire
-//                msg[1]='S';
-//                strcpy(opponent_,input_);
-//                strcpy(&msg[2],opponent_);
-//                contactServer();
-//                if(msg[1]==' ') //le match peut commencer
-//                        state_=MATCH_INGAME;
-//                        std::cout<<"C'est parti pour un match amical !"<<std::endl;
-//// le nom de mon adversaire se trouve dans opponent_
-////                      startGame()
-//                state_=FREE;
-//        }
+int Client::receiveNumOfTeam(){
+    return receiveMatchConfirmation();
 }
 
-void Client::contactServer() {
-        //sendMsg(sockfd_,msg,strlen(msg));
-        //receiveMessage();
-}
-void Client::receiveMessage() {
-        //receiveMsg(sockfd_,msg,INPUTSIZE);
-        //std::cout<<&msg[2]<<std::endl;
-}
 
 ////////Network\\\\\\\\
 
@@ -1080,7 +1056,21 @@ int Client::answerMatchProposal(bool confirmation, std::vector<int> playersInTea
     memcpy(position, &confirmation, sizeof(confirmation));
     position += sizeof(confirmation);
     int value;
-    for(unsigned int i = 0; i < playersInTeam.size();++i){ //joueurs choisi pour joueur le match
+    for(unsigned int i = 0; i < playersInTeam.size();++i){ //joueurs choisis pour jouer le match
+        value = playersInTeam[i];
+        memcpy(position, &value, sizeof(value));
+        position += sizeof(value);
+    }
+    return sendOnSocket(sockfd_, serialized);
+}
+
+int Client::sendTeamForMatchTournament(std::vector<int> playersInTeam){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = STARTTOURNAMENTMATCH;
+    int value;
+    //TODO : éviter redondance du code
+    for(unsigned int i = 0; i < playersInTeam.size();++i){ //joueurs choisis pour jouer le match
         value = playersInTeam[i];
         memcpy(position, &value, sizeof(value));
         position += sizeof(value);

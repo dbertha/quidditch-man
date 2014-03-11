@@ -736,6 +736,30 @@ void User::cmdHandler(SerializedObject *received) {
 			
 			break;
 		}
+		case STARTTOURNAMENTMATCH : {
+			//reading details
+			position = received->stringData;
+			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
+			for(int i = 0; i < 7; ++i){
+				int value;
+				memcpy(&value,position, sizeof(value));
+				position += sizeof(value);
+				playersInTeam.push_back(value); //ajout à la liste
+			}
+			
+#ifdef __DEBUG
+			std::cout<<"Demande d'acceptation d'un match de tournoi reçue sur socket "<<getSockfd()<<std::endl;
+#endif
+
+			std::vector<ManagedPlayer> team;
+            for(unsigned int i = 0; i < playersInTeam.size(); ++i){
+                //TODO : éviter des copies ?
+				team.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
+			}
+			__matchesHandler->respondToTournamentMatch(this, team, __moves);
+
+			break;
+		}
 		default :
 #ifdef __DEBUG
 			std::cout<<"En-tête inconnu : "<<received->typeOfInfos<<std::endl;

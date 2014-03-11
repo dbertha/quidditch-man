@@ -35,6 +35,7 @@ server.out: server/Auction.hpp \
 			server/Stadium.hpp \
 			server/TrainingCenter.hpp \
 			server/User.hpp \
+			server/Tournament.hpp \
 			common/commAPI.hpp \
 			common/Coordinates.hpp \
 			common/Defines.hpp \
@@ -61,6 +62,7 @@ server.out: server/Auction.hpp \
 			server/Stadium.cpp \
 			server/TrainingCenter.cpp \
 			server/User.cpp \
+			server/Tournament.cpp \
 			common/commAPI.cpp \
 			common/HexagonalField.cpp \
 			common/NetworkBase.cpp

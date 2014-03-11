@@ -72,7 +72,8 @@
 #define TOURNAMENTSLIST 54
 #define JOINTOURNAMENT 55
 #define JOINTOURNAMENT_CONFIRM 56
-#define MATCH_TOURNAMENT_START 57
+#define MATCH_TOURNAMENT_START 57 //server to client
+#define STARTTOURNAMENTMATCH 58 //client to server
 
 
 #define STADIUM 1

@@ -159,6 +159,18 @@ int MatchesHandler::sendConfirmationTo(User * client, int answerCode){
     return sendOnSocket(client->getSockfd(), answer); //TODO : tester valeur retour
 }
 
+//~ int MatchesHandler::sendConfirmationTo(User * client, int answerCode, int numTeam){
+    //~ //idem but with numTeam at the end of buffer
+    //~ SerializedObject answer;
+    //~ answer.typeOfInfos = MATCH_CONFIRM;
+    //~ char * answerPosition = answer.stringData;
+    //~ int confirmation = answerCode;
+    //~ memcpy(answerPosition, &confirmation, sizeof(confirmation));
+    //~ answerPosition += sizeof(confirmation));
+    //~ memcpy(answerPosition, &numTeam, sizeof(numTeam));
+    //~ return sendOnSocket(client->getSockfd(), answer); //TODO : tester valeur retour
+//~ }
+
 void MatchesHandler::getScoresAndPositions(User * demander){
     int winner;
     int matchIndex = std::find(inviteds.begin(), inviteds.end(), demander) - inviteds.begin();
@@ -279,6 +291,42 @@ void MatchesHandler::launchNextTournamentTurn(){
     std::vector<User *> turnParticipants = __tournament->getNextMatches();
     for(unsigned int i = 0; i < turnParticipants.size(); i+=2){
         inviteForTournamentMatch(turnParticipants[i], turnParticipants[i+1]);
+        invitors.push_back(turnParticipants[i]);
+        inviteds.push_back(turnParticipants[i+1]);
+        statesOfMatches.push_back(WAITINGTWOPLAYERS);
+        matchesVector.push_back(NULL); //initialisé à la réception de la première équipe
+        turnParticipants[i]->state_ = MATCH_INVITED;
+        turnParticipants[i+1]->state_ = MATCH_INVITED;
+    }
+}
+
+void MatchesHandler::respondToTournamentMatch(User * responder, std::vector<ManagedPlayer> &team, int **movesTeam){
+    int matchIndex = std::find(invitors.begin(), invitors.end(), responder) - invitors.begin(); 
+    
+    if(matchIndex > int(inviteds.size())-1){ 
+        matchIndex = std::find(inviteds.begin(), inviteds.end(), responder) - inviteds.begin();
+        if(statesOfMatches[matchIndex] == WAITINGTWOPLAYERS){
+            //première équipe à répondre doit être dans le vecteur invitors
+            User * temp = invitors[matchIndex];
+            invitors[matchIndex] = inviteds[matchIndex];
+            inviteds[matchIndex] = temp;
+        }
+    }
+         
+#ifdef __DEBUG
+        std::cout << "Team for match received" << std::endl;
+#endif
+    if(statesOfMatches[matchIndex] == WAITINGTWOPLAYERS){
+        matchesVector[matchIndex] = new Match(team, movesTeam); //initialisation
+        statesOfMatches[matchIndex] = WAITINGSECONDPLAYER;
+    }else{
+        matchesVector[matchIndex]->launch(team,movesTeam);
+        sendConfirmationTo(invitors[matchIndex], 1); //code = numTeam
+        sendConfirmationTo(inviteds[matchIndex], 2);
+#ifdef __DEBUG
+        std::cout << "Confirmations sent " << std::endl;
+#endif
+        statesOfMatches[matchIndex] = WAITING_MOVES;
     }
 }
 
@@ -290,14 +338,12 @@ int MatchesHandler::inviteForTournamentMatch(User * firstPlayer, User * secondPl
 	int IDOpponent = secondPlayer->getUserID();
 	std::string nameOpponent = secondPlayer->getUserName();
 	char name[USERNAME_LENGTH];
-    int numTeam, result;
+    int  result;
 	strcpy(name, nameOpponent.c_str());
     memcpy(position, &IDOpponent, sizeof(IDOpponent));
     position += sizeof(IDOpponent);
     memcpy(position, &name, sizeof(name));
     position += sizeof(name);
-    numTeam = 1;
-    memcpy(position, &numTeam, sizeof(numTeam));
     
     //second player oppose first player :
     position = msgForSecondPlayer.stringData;
@@ -308,8 +354,7 @@ int MatchesHandler::inviteForTournamentMatch(User * firstPlayer, User * secondPl
     position += sizeof(IDOpponent);
     memcpy(position, &name, sizeof(name));
     position += sizeof(name);
-    numTeam = 2;
-    memcpy(position, &numTeam, sizeof(numTeam));
+
     result = sendOnSocket(firstPlayer->getSockfd(), msgForFirstPlayer);
     result = result and sendOnSocket(secondPlayer->getSockfd(), msgForSecondPlayer);
     return result;

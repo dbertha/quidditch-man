@@ -8,6 +8,48 @@
 //si chaser (poursuiveur : quaffle)
 //si beater (batteur)
 //si bludger collisionne joueur, handlerBludger
+
+//~ void Match::addTeam(std::vector<ManagedPlayer> &team, int ** movesTeam, int numTeam){
+    //~ if(numTeam == 1){
+        //~ __movesTeam1 = movesTeam;
+//~ #ifdef __DEBUG
+        //~ std::cout << "Match reçoit équipe 1" << std::endl;
+//~ #endif
+        //~ for(int i = 0; i < 7; ++i){
+            //~ int role = i; //les 2 premiers roles correspondent déjà
+            //~ if((role < TEAM1_BEATER1) and (role > TEAM1_SEEKER)) {role = ROLE_CHASER;}
+            //~ else if((role < TEAM2_KEEPER) and (role > TEAM1_CHASER3)) {role = ROLE_BEATER;}
+            //~ AxialCoordinates position;
+            //~ switch(i){
+                //~ case TEAM1_KEEPER :
+                    //~ position = AxialCoordinates(STARTINGDIAG_TEAM1_KEEPER, STARTINGLINE_TEAM1_KEEPER);
+                    //~ break;
+                //~ case TEAM1_SEEKER :
+                    //~ position = AxialCoordinates(STARTINGDIAG_TEAM1_SEEKER, STARTINGLINE_TEAM1_SEEKER);
+                    //~ break;
+                //~ case TEAM1_CHASER1 :
+                    //~ position = AxialCoordinates(STARTINGDIAG_TEAM1_CHASER1, STARTINGLINE_TEAM1_CHASER1);
+                    //~ break;
+                //~ case TEAM1_CHASER2 :
+                    //~ position = AxialCoordinates(STARTINGDIAG_TEAM1_CHASER2, STARTINGLINE_TEAM1_CHASER2);
+                    //~ break;
+                //~ case TEAM1_CHASER3 :
+                    //~ position = AxialCoordinates(STARTINGDIAG_TEAM1_CHASER3, STARTINGLINE_TEAM1_CHASER3);
+                    //~ break;
+                //~ case TEAM1_BEATER1 :
+                    //~ position = AxialCoordinates(STARTINGDIAG_TEAM1_BEATER1, STARTINGLINE_TEAM1_BEATER1);
+                    //~ break;
+                //~ case TEAM1_BEATER2 :
+                    //~ position = AxialCoordinates(STARTINGDIAG_TEAM1_BEATER2, STARTINGLINE_TEAM1_BEATER2);
+                    //~ break;
+            //~ }
+            //~ __players.push_back(PlayingPlayer((team1[i]), role, position));
+            //~ __field.setOccupant(position, i);
+        //~ }
+    //~ }else if(numTeam == 2 and __movesTeam1 != nullptr){ //if team 1 already registred
+        //~ launch(team, movesTeam);
+//~ }
+
 Match::Match(std::vector<ManagedPlayer> &team1, int ** movesTeam1): __players(), __field(), __winner(0), __movesTeam1(movesTeam1), __movesTeam2(NULL){
 #ifdef __DEBUG
         std::cout << "Match généré à partir de la première équipe" << std::endl;
@@ -95,10 +137,17 @@ void Match::launch(std::vector<ManagedPlayer> &team2, int ** movesTeam2){ //suit
     std::cout << "On passe aux priorités." << std::endl;
 #endif
     
+    sortBySpeed();
+#ifdef __DEBUG
+    std::cout << "Fin priorités." << std::endl;
+#endif
+}
+
+void Match::sortBySpeed(){
     //on enregistre les priorités de déplacements :
     //TODO : à optimiser
     int maxIndex, maxSpeedValue;
-    for(unsigned int i = 0; i < 18; ++i){
+    for(int i = 0; i < 18; ++i){
         maxIndex = -1;
         maxSpeedValue = 0;
         for(unsigned int player = 0; player < __players.size(); ++player){
@@ -109,7 +158,6 @@ void Match::launch(std::vector<ManagedPlayer> &team2, int ** movesTeam2){ //suit
                 }
             }
         }
-        std::cout << "On regarde les balles. i : " << i << std::endl;
         for(unsigned int ball = GOLDENSNITCH; ball < (GOLDENSNITCH + __balls.size()); ++ball){
             if(not isInVector(__indexesSortedBySpeed, ball)){
                 if(__balls[ball - GOLDENSNITCH].getSpeed() > maxSpeedValue){
@@ -118,11 +166,8 @@ void Match::launch(std::vector<ManagedPlayer> &team2, int ** movesTeam2){ //suit
                 }
             }
         }
-        std::cout << "nouvel index choisi." << maxIndex << std::endl;
         __indexesSortedBySpeed.push_back(maxIndex);
     }
-    std::cout << "Match constructed" << std::endl;
-    
 }
 
 Match::Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team2, int ** movesTeam1, int ** movesTeam2) :
@@ -202,30 +247,7 @@ Match::Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE), QUAFFLE);
     __field.display();
     
-    //on enregistre les priorités de déplacements :
-    //TODO : à optimiser
-    int maxIndex, maxSpeedValue;
-    for(int i; i < 18; ++i){
-        maxIndex = -1;
-        maxSpeedValue = 0;
-        for(unsigned int player = 0; player < __players.size(); ++player){
-            if(not isInVector(__indexesSortedBySpeed, player)){
-                if(__players[player].getCapacity(SPEED) > maxSpeedValue){
-                    maxIndex = player;
-                    maxSpeedValue = __players[player].getCapacity(SPEED);
-                }
-            }
-        }
-        for(unsigned int ball = GOLDENSNITCH; ball < (GOLDENSNITCH + __balls.size()); ++ball){
-            if(not isInVector(__indexesSortedBySpeed, ball)){
-                if(__balls[ball - GOLDENSNITCH].getSpeed() > maxSpeedValue){
-                    maxIndex = ball;
-                    maxSpeedValue = __balls[ball - GOLDENSNITCH].getSpeed();
-                }
-            }
-        }
-        __indexesSortedBySpeed.push_back(maxIndex);
-    }
+    sortBySpeed();
     
 }
 

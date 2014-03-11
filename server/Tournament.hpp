@@ -7,7 +7,7 @@
 #include <iostream>
 #include <cassert>
 #include <cmath>
-//rem : l'hôte du match est celui à gauche dans l'arbre
+//rem : l'hôte du match est le premier à répondre au début du match
 //rem : actuellement, un seul tournoi à la fois, un seul niveau à la fois
 //TODO : gérer déconnexions
 //TODO : backup par DataBase

@@ -72,6 +72,7 @@ int Tournament::serialize(char * buffer){
     buffer += sizeof(__currentNbOfPlayers);
     memcpy(buffer, &__startingPrice, sizeof(__startingPrice));
     //buffer += sizeof(__startingPrice);
+    return 1; //TODO : tester retour memcpy
 }
 
 

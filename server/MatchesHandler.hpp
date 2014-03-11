@@ -48,6 +48,8 @@
 #define INVITEDASKENDOFMATCH 4
 #define WAITING_MOVES 5
 #define OVER 6
+#define WAITINGTWOPLAYERS 7
+#define WAITINGSECONDPLAYER 8
 
 class User;
 class MatchesHandler{
@@ -63,8 +65,10 @@ public :
     MatchesHandler() : __tournament(NULL) {} //construction par défaut des listes
     void proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1, int **movesTeam1);
     void respondToMatchProposal(User * invited, std::vector<ManagedPlayer> &team2, int **movesTeam2);
+    void respondToTournamentMatch(User * responder, std::vector<ManagedPlayer> &team, int **movesTeam);
     bool isInvited(User * user);
     int sendConfirmationTo(User * client, int answerCode);
+    //~ int sendConfirmationTo(User * client, int answerCode, int numTeam);
     void getScoresAndPositions(User * demander);
     void getPlayerInfos(User * demander, int playerID);
     void recordMoves(User * demander);

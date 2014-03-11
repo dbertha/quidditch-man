@@ -117,9 +117,6 @@ private:
     void startMatch(int numTeam);
     void askAndSendMoves(int numTeam, HexagonalField &field, std::vector<AxialCoordinates> &positions);
     void commMgr();
-    void matchTentative();
-    void contactServer();
-    void receiveMessage();
     //network :
     int sendLoginToServer(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
     int sendNewManagerToServer(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
@@ -141,6 +138,7 @@ private:
     void receiveManagersIDandNames(std::vector<int> * IDList, std::vector<std::string> * namesList);
     int proposeMatchTo(int userID, std::vector<int> playersInTeam);
     int answerMatchProposal(bool confirmation, std::vector<int> playersInTeam);
+    int sendTeamForMatchTournament(std::vector<int> playersInTeam);
     int receiveMatchConfirmation();
     int getAllPositions();
     std::vector<AxialCoordinates> receiveScoresAndPositions(int * winner, int * scoreTeam1, int * scoreTeam2);
@@ -165,6 +163,7 @@ private:
     int askForTournamentList();
     std::vector<int> getTournamentList();
     int askToJoinTournament(int tournamentID = 0);
+    int receiveNumOfTeam();
 };
 
 
