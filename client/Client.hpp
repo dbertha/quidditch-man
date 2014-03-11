@@ -101,6 +101,7 @@ private:
     void displayManageBuildingsMenu();
     void displayAvailableManagers();
     void displayTournamentMenu();
+    void displayTournamentList(std::vector<int> tournamentsList);  
     std::vector<int> displayAndAskPlayersForMatch();
     int testifContinue(int numTeam); //combo display + select + handler pour la poursuite d'un match
     //handlers :
@@ -162,8 +163,8 @@ private:
     
     int sendTournamentCreation(int nbOfPlayers, int startingPrice);
     int askForTournamentList();
-    int getTournamentList();
-    int askToJoinTournament(int tournamentID);
+    std::vector<int> getTournamentList();
+    int askToJoinTournament(int tournamentID = 0);
 };
 
 

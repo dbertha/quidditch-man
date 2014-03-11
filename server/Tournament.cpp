@@ -58,9 +58,21 @@ int Tournament::getReward(int level){
 int Tournament::getReward(){
     return getReward(__nbOfLevels + 1); //__nbOfLevels already adapted
 }
-    
-    
 
+bool Tournament::isStarted(){
+    return __started;
+}
+    
+    
+int Tournament::serialize(char * buffer){
+    //order : __startingNbOfPlayers, __currentNbOfPlayers, __startingPrice
+    memcpy(buffer, &__startingNbOfPlayers, sizeof(__startingNbOfPlayers));
+    buffer += sizeof(__startingNbOfPlayers);
+    memcpy(buffer, &__currentNbOfPlayers, sizeof(__currentNbOfPlayers));
+    buffer += sizeof(__currentNbOfPlayers);
+    memcpy(buffer, &__startingPrice, sizeof(__startingPrice));
+    //buffer += sizeof(__startingPrice);
+}
 
 
 

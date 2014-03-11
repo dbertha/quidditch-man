@@ -11,6 +11,7 @@
 //rem : actuellement, un seul tournoi à la fois, un seul niveau à la fois
 //TODO : gérer déconnexions
 //TODO : backup par DataBase
+//TODO : User limité dans ses actions quand attente du début d'un tournoi
 
 #define REWARDGROWINGRATE 1.1
 
@@ -34,6 +35,8 @@ public :
     int getStartingNbOfPlayers()const {return __startingNbOfPlayers;}
     int getCurrentNbOfPlayers() const {return __currentNbOfPlayers;}
     int getCurrentLevel() const {return __nbOfLevels;}
+    bool isStarted();
+    int serialize(char * buffer);
 };
 
 int log2(int x);

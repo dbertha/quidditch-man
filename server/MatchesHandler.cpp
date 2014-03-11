@@ -245,3 +245,22 @@ int MatchesHandler::createTournament(int nbOfParticipants, int startingPrice){
     __tournament = new Tournament(nbOfParticipants, startingPrice);
     return 1;
 }
+
+int MatchesHandler::serializeTournaments(char * buffer){
+    //only one => size fixed
+    int nbOfTournaments;
+    if(not __tournament == NULL and not __tournament->isStarted()){ //only if not started
+        nbOfTournaments = 1;
+        memcpy(buffer, &nbOfTournaments, sizeof(nbOfTournaments));
+        buffer += sizeof(nbOfTournaments);
+        return __tournament->serialize(buffer);
+    }
+    nbOfTournaments = 0;
+    memcpy(buffer, &nbOfTournaments, sizeof(nbOfTournaments));
+    return 1;
+}
+
+
+int MatchesHandler::addPlayerToTournament(User * subscriber){
+    return __tournament->subscribeManager(subscriber);
+}

@@ -176,10 +176,11 @@ void Client::displayAvailableManagers(){
 
 void Client::displayTournamentMenu(){
     askForTournamentList();
-    getTournamentList();
-    //TODO : afficher la liste des tournois
-    cout<<"Indicate the ID of the tournament you want to join " << \
-    "(you can't join several tournaments at the same time) [-1 to go back]: " << flush;
+    std::vector<int> tournamentList = getTournamentList();
+    displayTournamentList(tournamentList);
+    //~ cout<<"Indicate the ID of the tournament you want to join " << \
+    //~ "(you can't join several tournaments at the same time) [-1 to go back]: " << flush;
+    cout<<"Do you wanna join this tournament ? [-1 for no, other number for yes]: " << flush;
 }
 
 
@@ -361,13 +362,52 @@ int Client::askForTournamentList(){
     return sendOnSocket(sockfd_, serialized);
 }
 
-int Client::getTournamentList(){return 1;} //TODO
+std::vector<int> Client::getTournamentList(){
+    //nbOfTournaments then __startingNbOfPlayers, __currentNbOfPlayers, __startingPrice for each
+    int nbOfTournaments, startingNbOfPlayers, currentNbOfPlayers, startingPrice;
+    std::vector<int> tournamentsList;
+    SerializedObject received = receiveOnSocket(sockfd_);
+    char * position = received.stringData;
+    std::cout << "header : " << received.typeOfInfos << std::endl;
+
+    memcpy(&nbOfTournaments, position, sizeof(nbOfTournaments));
+    position += sizeof(nbOfTournaments);
+    std::cout << "Nb of tournaments : " << nbOfTournaments << std::endl;
+    for(int i = 0; i < nbOfTournaments; ++i){
+        memcpy(&startingNbOfPlayers, position, sizeof(startingNbOfPlayers));
+        position += sizeof(startingNbOfPlayers);
+        memcpy(&currentNbOfPlayers, position, sizeof(currentNbOfPlayers));
+        position += sizeof(currentNbOfPlayers);
+        memcpy(&startingPrice, position, sizeof(startingPrice));
+        position += sizeof(startingPrice);
+        std::cout << "Nb of players to start : " << startingNbOfPlayers << std::endl;
+        std::cout << "Nb of players susbcibe : " << currentNbOfPlayers << std::endl;
+        std::cout << "price : " << startingPrice << std::endl;
+        tournamentsList.push_back(startingNbOfPlayers);
+        tournamentsList.push_back(currentNbOfPlayers);
+        tournamentsList.push_back(startingPrice);
+    }
+    return tournamentsList;
+        
+}
+
+void Client::displayTournamentList(std::vector<int> tournamentsList){
+    std::cout << "A tournament starts when all places are taken" << std::endl;
+    for(unsigned int i = 0; i < tournamentsList.size(); i += 3){
+        std::cout << "Starting Number of Players : " << tournamentsList[i] << std::endl;
+        std::cout << "Current Number of Players : " << tournamentsList[i+1] << std::endl;
+        std::cout << "Starting price : " << tournamentsList[i+2] << std::endl;
+    }
+}
 
 void Client::handleAdminMenu(){
     switch(input_){
         case SEE_TOURNAMENTS_ADMIN : {
+            std::vector<int> tournamentsList;
             askForTournamentList();
-            getTournamentList();
+            tournamentsList = getTournamentList();
+            displayTournamentList(tournamentsList);
+
             break;
         }
         case CREATE_TOURNAMENT_OPTION : {
@@ -1492,9 +1532,9 @@ void Client::kbMgr() {
                 return;
             }
             //TODO : tester input ?
-            askToJoinTournament(input_);
+            askToJoinTournament();
             confirmation = getConfirmation();
-            if(confirmation == TOURNAMENT_NOT_JOINED){
+            if(confirmation == 0){
                 cout << "Impossible to join this tournament !" << endl;
             }else{
                 cout << "You are recorded as a participant of this tournament. " << \

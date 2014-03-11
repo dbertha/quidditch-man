@@ -58,7 +58,7 @@ private :
     std::vector<int> statesOfMatches; //WAITINGACCEPTMATCH, WAITINGFIRSTMOVE, WAITINGSECONDMOVE, INVITORSASKENDOFMATCH, INVITEDASKENDOFMATCH
     //std::vector<int**> movesLists; //pour chaque match, enregistre les déplacements des deux joueurs avant de les passer à l'instance de Match
     //enregistrement dans user de l'équipe
-    Tournament * __tournament;
+    Tournament * __tournament; //gère l'ordonnancement des matchs dans le cas d'un tournoi
 public :
     MatchesHandler() : __tournament(NULL) {} //construction par défaut des listes
     void proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1, int **movesTeam1);
@@ -74,7 +74,10 @@ public :
     void transmitDrawRequest(User * demander);
     void confirmDraw(User * responder, int confirmation);
     void deleteMatch(int index);
+    
     int createTournament(int nbOfParticipants, int startingPrice);
+    int serializeTournaments(char * buffer);
+    int addPlayerToTournament(User * subscriber);
 };
 
 #endif

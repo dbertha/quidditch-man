@@ -712,11 +712,11 @@ void User::cmdHandler(SerializedObject *received) {
 #ifdef __DEBUG
 			std::cout<<"Demande de la liste des tournois reçue sur le socket "<<getSockfd()<<std::endl;
 #endif
-			//handling request
-			//TODO
-			//answering
-			//TODO
+			//handling request and answering
+
 			answer.typeOfInfos = TOURNAMENTSLIST;
+			confirmation = __matchesHandler->serializeTournaments(answerPosition); //always true ?
+			sendOnSocket(sockfd_, answer); 
 			break;
 		}
 		case JOINTOURNAMENT : {
@@ -729,6 +729,8 @@ void User::cmdHandler(SerializedObject *received) {
 			std::cout<<"tournamentID :  "<<tournamentID<< std::endl;
 #endif
 			//handling request
+			confirmation = __matchesHandler->addPlayerToTournament(this); //return -1 if already in list, 0 if not full, 1 if full after addition
+			++confirmation; //adaptation du code de retour pour le client
 			//TODO
 			//answering
 			//answer in confirmation
