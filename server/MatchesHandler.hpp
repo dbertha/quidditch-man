@@ -9,8 +9,7 @@
 #include "Ball.hpp"
 #include "Match.hpp"
 #include "User.hpp"
-//#include <vector>
-#include <list> //plutôt que vector car suppression plus efficace
+#include <vector>
 #include <algorithm>
 #include <iostream>
 #include <cstring> //memcpy

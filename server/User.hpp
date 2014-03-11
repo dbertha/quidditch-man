@@ -1,7 +1,7 @@
 #ifndef USER_H
 #define USER_H
 
-#include "NetworkBase.hpp"
+#include "../common/NetworkBase.hpp"
 
 #include "Manager.hpp"
 #include "ManagedPlayer.hpp"

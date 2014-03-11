@@ -4,32 +4,21 @@
 
 void MatchesHandler::proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1, int **movesTeam1){
     //TODO : tester si invited non null
-#ifdef __DEBUG
-    std::cout << "Invitation à un match " << std::endl;
-#endif
+
     if((invitor->state_ == FREE) and (invited->state_ == FREE)){
-#ifdef __DEBUG
-        std::cout << "Tous les deux disponibles " << std::endl;
-#endif
+
         invitors.push_back(invitor);
         inviteds.push_back(invited);
         statesOfMatches.push_back(WAITINGACCEPTMATCH);
-#ifdef __DEBUG
-        std::cout << "On va initialiser le match" << std::endl;
-#endif
+
         matchesVector.push_back(new Match(team1, movesTeam1)); //oblige à un delete lors de la suppression d'un match
-#ifdef __DEBUG
-        std::cout << "On change les status" << std::endl;
-#endif
+
         invitor->state_ = MATCH_INVITING;
         invited->state_ = MATCH_INVITED;
         sendInvitation(invitor, invited);
     }else{
         sendConfirmationTo(invitor, INVITATION_NOT_POSSIBLE);
     }
-#ifdef __DEBUG
-    std::cout << "Fin invitation à un match " << std::endl;
-#endif
 }
 
 int MatchesHandler::sendInvitation(User * invitor, User * invited){
