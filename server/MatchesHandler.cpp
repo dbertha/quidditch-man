@@ -262,5 +262,55 @@ int MatchesHandler::serializeTournaments(char * buffer){
 
 
 int MatchesHandler::addPlayerToTournament(User * subscriber){
-    return __tournament->subscribeManager(subscriber);
+    int result = __tournament->subscribeManager(subscriber);
+    SerializedObject answer;
+    char * answerPosition = answer.stringData;
+    int answerResult = result + 1; //adaptation pour le client
+    answer.typeOfInfos = JOINTOURNAMENT_CONFIRM;
+    memcpy(answerPosition, &answerResult, sizeof(answerResult));
+    sendOnSocket(subscriber->getSockfd(), answer); //TODO : tester retour
+    if(result == 1){ //tournament starts
+        launchNextTournamentTurn();
+    }
+    return result;
+}
+
+void MatchesHandler::launchNextTournamentTurn(){
+    std::vector<User *> turnParticipants = __tournament->getNextMatches();
+    for(unsigned int i = 0; i < turnParticipants.size(); i+=2){
+        inviteForTournamentMatch(turnParticipants[i], turnParticipants[i+1]);
+    }
+}
+
+int MatchesHandler::inviteForTournamentMatch(User * firstPlayer, User * secondPlayer){
+	SerializedObject msgForFirstPlayer, msgForSecondPlayer;
+	msgForFirstPlayer.typeOfInfos = msgForSecondPlayer.typeOfInfos = MATCH_TOURNAMENT_START; //paquet header
+    //first player oppose second player :
+	char * position = msgForFirstPlayer.stringData;
+	int IDOpponent = secondPlayer->getUserID();
+	std::string nameOpponent = secondPlayer->getUserName();
+	char name[USERNAME_LENGTH];
+    int numTeam, result;
+	strcpy(name, nameOpponent.c_str());
+    memcpy(position, &IDOpponent, sizeof(IDOpponent));
+    position += sizeof(IDOpponent);
+    memcpy(position, &name, sizeof(name));
+    position += sizeof(name);
+    numTeam = 1;
+    memcpy(position, &numTeam, sizeof(numTeam));
+    
+    //second player oppose first player :
+    position = msgForSecondPlayer.stringData;
+    IDOpponent = firstPlayer->getUserID();
+    nameOpponent = firstPlayer->getUserName();
+    strcpy(name, nameOpponent.c_str());
+    memcpy(position, &IDOpponent, sizeof(IDOpponent));
+    position += sizeof(IDOpponent);
+    memcpy(position, &name, sizeof(name));
+    position += sizeof(name);
+    numTeam = 2;
+    memcpy(position, &numTeam, sizeof(numTeam));
+    result = sendOnSocket(firstPlayer->getSockfd(), msgForFirstPlayer);
+    result = result and sendOnSocket(secondPlayer->getSockfd(), msgForSecondPlayer);
+    return result;
 }

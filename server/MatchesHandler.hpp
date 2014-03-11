@@ -78,6 +78,8 @@ public :
     int createTournament(int nbOfParticipants, int startingPrice);
     int serializeTournaments(char * buffer);
     int addPlayerToTournament(User * subscriber);
+    void launchNextTournamentTurn();
+    int inviteForTournamentMatch(User * firstPlayer, User * secondPlayer);
 };
 
 #endif

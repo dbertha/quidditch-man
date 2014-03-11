@@ -26,7 +26,7 @@ private :
 public :
     Tournament(int nbOfParticipants, int startingPrice);
     int subscribeManager(User * participant); //return -1 if already in list, 0 if not full, 1 if full after addition
-    int recordResult(User * winner); //return -1 if already in list, 0 if not full, 1 if full (next level should start)
+    int recordResult(User * winner); //return -1 if end of tournament, 0 if not full, 1 if full (next level should start)
     std::vector<User *> getNextMatches(); //return a power of two number of the players for the next level
     
     int getReward(int level);

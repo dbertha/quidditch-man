@@ -730,13 +730,10 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 			//handling request
 			confirmation = __matchesHandler->addPlayerToTournament(this); //return -1 if already in list, 0 if not full, 1 if full after addition
-			++confirmation; //adaptation du code de retour pour le client
+			
 			//TODO
-			//answering
-			//answer in confirmation
-			answer.typeOfInfos = JOINTOURNAMENT_CONFIRM;
-			memcpy(answerPosition, &confirmation, sizeof(confirmation));
-            sendOnSocket(sockfd_, answer); 
+			//answering by matchesHandler to handle potential launch of the tournament
+			
 			break;
 		}
 		default :

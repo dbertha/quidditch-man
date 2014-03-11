@@ -39,10 +39,10 @@ int Tournament::recordResult(User * winner){
     if(__nbOfLevels > 1){
         __tournamentTree[__nbOfLevels - 1].push_back(winner);
         ++__currentNbOfPlayers;
-        return log2(__currentNbOfPlayers) == __nbOfLevels ? 0 : -1; //test if next level should start
+        return log2(__currentNbOfPlayers) == __nbOfLevels ? 1 : 0; //test if next level should start
     }
     __started = false;
-    return 1; //tournament over
+    return -1; //tournament over
 }
 
 std::vector<User *> Tournament::getNextMatches(){

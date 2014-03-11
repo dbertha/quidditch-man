@@ -800,6 +800,28 @@ void Client::commMgr() {
             cout << "Server is down." << endl;
             break;
         }
+        case MATCH_TOURNAMENT_START : {
+            int IDOpponent, numTeam;
+            char name[USERNAME_LENGTH];
+            char * position = received.stringData;
+            cout << "A tournament turn starts now !" << endl;
+            memcpy(&IDOpponent, position, sizeof(IDOpponent));
+            position += sizeof(IDOpponent);
+            memcpy(&name, position, sizeof(name));
+            position += sizeof(name);
+            memcpy(&numTeam, position, sizeof(numTeam));
+            cout << "Opponent ID : " << IDOpponent << " name : " << name << endl;
+            cout << "You are team n° : " << numTeam << endl;
+            //forced to accept
+            std::vector<int> playersInTeam;
+            playersInTeam = displayAndAskPlayersForMatch();
+            answerMatchProposal(true, playersInTeam);
+            if(receiveMatchConfirmation() == MATCH_STARTING){
+                startMatch(numTeam);
+            }
+            state_ = FREE;
+            break;
+        }
 	}
 }
 
@@ -1540,7 +1562,7 @@ void Client::kbMgr() {
                 cout << "You are recorded as a participant of this tournament. " << \
                 "Be ready for when it will start !" << endl;
             }
-            state_ = FREE;
+            state_ = AVAILABLE;
             break;
         }
         default : {//ne devrait jamais passer par ici
@@ -1593,7 +1615,11 @@ void Client::askInput() {
             cout<<"Indicate the number of the player you wish to heal [or 0 to abort] : " << flush;
             break;
         }
-        
+        case AVAILABLE : { //back to the menu without direct request to server
+            displayMainMenu();
+            state_ = FREE;
+            break;
+        }
         case BUILDINGS_MENU : {
 			displayManagerInfos();
 			displayManageBuildingsMenu();
