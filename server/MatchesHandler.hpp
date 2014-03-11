@@ -9,6 +9,7 @@
 #include "Ball.hpp"
 #include "Match.hpp"
 #include "User.hpp"
+#include "Tournament.hpp" //the only one to know this class
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -57,8 +58,9 @@ private :
     std::vector<int> statesOfMatches; //WAITINGACCEPTMATCH, WAITINGFIRSTMOVE, WAITINGSECONDMOVE, INVITORSASKENDOFMATCH, INVITEDASKENDOFMATCH
     //std::vector<int**> movesLists; //pour chaque match, enregistre les déplacements des deux joueurs avant de les passer à l'instance de Match
     //enregistrement dans user de l'équipe
+    Tournament * __tournament;
 public :
-    MatchesHandler(){} //construction par défaut des listes
+    MatchesHandler() : __tournament(NULL) {} //construction par défaut des listes
     void proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1, int **movesTeam1);
     void respondToMatchProposal(User * invited, std::vector<ManagedPlayer> &team2, int **movesTeam2);
     bool isInvited(User * user);
@@ -72,6 +74,7 @@ public :
     void transmitDrawRequest(User * demander);
     void confirmDraw(User * responder, int confirmation);
     void deleteMatch(int index);
+    int createTournament(int nbOfParticipants, int startingPrice);
 };
 
 #endif

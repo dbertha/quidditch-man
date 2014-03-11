@@ -694,11 +694,11 @@ void User::cmdHandler(SerializedObject *received) {
 			position += sizeof(nbOfPlayers);
 			memcpy(&startingPrice, position, sizeof(startingPrice));
 #ifdef __DEBUG
-			std::cout<<"Demande de création d'un match reçue sur le socket "<<getSockfd()<<std::endl;
+			std::cout<<"Demande de création d'un tournoi reçue sur le socket "<<getSockfd()<<std::endl;
 			std::cout<<"nbOfplayers :  "<<nbOfPlayers<< " startingPrice : " << startingPrice << std::endl;
 #endif
 			//handling request
-			//TODO
+			confirmation = __matchesHandler->createTournament(nbOfPlayers, startingPrice);
 			
 			//answering
 			//answer in confirmation

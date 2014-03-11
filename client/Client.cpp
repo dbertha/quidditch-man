@@ -382,6 +382,12 @@ void Client::handleAdminMenu(){
                 cin >> startingPrice;
                 sendTournamentCreation(nbOfPlayers, startingPrice);
                 result = getConfirmation();
+                if(result == 0){
+                    cout << "Creation failed, maybe there is still an active tournament"  << endl;
+                }else{
+                    cout << "Tournament created ! " << endl;
+                }
+                              
             }
             break;
         }

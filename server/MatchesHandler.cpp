@@ -237,3 +237,11 @@ void MatchesHandler::deleteMatch(int index){
     std::cout << "Fin suppression du match " << std::endl;
 #endif
 }
+
+int MatchesHandler::createTournament(int nbOfParticipants, int startingPrice){
+    if(__tournament != NULL){
+        return 0; //error, only one tournament at the same time
+    }
+    __tournament = new Tournament(nbOfParticipants, startingPrice);
+    return 1;
+}
