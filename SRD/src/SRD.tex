@@ -48,6 +48,8 @@
 \usepackage{array} %tableaux
 \usepackage{xcolor} % Required for specifying custom colors
 \usepackage{fix-cm} % Allows increasing the font size of specific fonts beyond LaTeX default specifications
+\usepackage{algorithm} %pseudo-code
+\usepackage{algorithmic}
 
 %POUR LE TITRE :
 \setlength{\oddsidemargin}{0mm} % Adjust margins to center the colored title box
@@ -393,8 +395,7 @@
           \end{itemize}
       \end{itemize}
 
-     \\
-     \\
+
       Concrètement, l'implémentation des actions sur les bâtiments est la suivante; le client entre dans un bâtiment et a ainsi accès aux informations concernant ce bâtiment. Ces informations sont : le niveau du bâtiment, le prix pour passer au niveau suivant, une caractéristique propre au bâtiment concerné et une indication si des travaux de construction ou d'amélioration sont déjà en cours, ce qui empêcherait le lancement de tout nouveau projet. Enfin, le client peut donc également lancer un projet d'amélioration directement via le bâtiment, à condition bien sûr qu'il possède suffisamment d'argent et que le bâtiment ne soit pas déjà en travaux.
 
   \subsection{Cas d'utilisation 4: gérer son équipe}
@@ -443,8 +444,7 @@
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
 
-     \\
-     \\
+
      Actuellement, il n'est pas possible de changer le balai d'un joueur, et aucun balai ne présente des bonus de capacité. Si l'avenir nous le permet, nous intègrerons de façon plus significative les balais dans le jeu.
 
   \subsection{Cas d'utilisation 5: magasins}
@@ -522,12 +522,11 @@
         \item \textbf{Cas exceptionnels} : 
         \begin{itemize}
             \item Le Manager se débarrasse de ses balais de base lorsqu'il n'en a plus besoin. Cette vente ne lui rapporte rien.
-          \end{itemize}
+        \end{itemize}
       \end{itemize}
 
 
-     \\
-     \\
+
      Etant donné qu'aucun balai ne présente un avantage pour un joueur dans l'état actuel du jeu, il va de soi qu'il n'est pas possible d'en acheter ou d'en vendre (ce qui serait une perte de temps, et de lignes de code). Concernant la vente et l'achat de joueurs, cela ne peut se faire que via les enchères entre managers. Une enchère est lancée par un certain manager qui souhaite vendre un joueur. Il choisit le joueur, ainsi que le prix de départ. La vente peut commencer, et se déroule tour par tour. Le premier tour est plus long que les suivants et permet à des managers intéressés de se manifester et rejoindre l'enchère. Chaque manager dans la vente ne peut enchérir qu'une fois par tour. Ceux n'ayant pas enchéri durant un tour quittent l'enchère et ne participeront pas au tour suivant. L'acquéreur est le dernier manager restant, c'est-à-dire qu'il est le seul à avoir enchéri pendant un tour. Le prix de vente est déterminé par le prix de départ fixé par le propriétaire du joueur, et par le nombre d'enchères. En effet, chaque enchère fait augmenter le prix d'une certaine somme (un dixième du prix de départ). Si le manager qui a remporté l'enchère n'a pas les moyens financiers de couvrir les frais d'achat, l'enchère est annulée, mais il devra néanmoins verser une pénalité en contrepartie au propriétaire du joueur.
 
   \subsection{Cas d'utilisation 6: améliorer ses joueurs}
@@ -587,7 +586,7 @@
           \end{itemize}
       \end{itemize}
 
-\\\\L'agence de publicité et la caractéristique popularité des joueurs ont été mises de côté car leur utilité est négligeable par rapport au reste. Pour ce qui est des entraînements, le passage d'un niveau à un autre, pour une certaine caractéristique, est divisée en plusieurs sessions d'entraînement, dont le nombre dépend du niveau actuel. Au plus le niveau est élevé, au plus il faudra faire de séances. Chacune de celles-ci bloque le joueur que l'on entraîne durant un certain temps (déterminé par le niveau du bâtiment Centre d'entraînement). 
+  L'agence de publicité et la caractéristique popularité des joueurs ont été mises de côté car leur utilité est négligeable par rapport au reste. Pour ce qui est des entraînements, le passage d'un niveau à un autre, pour une certaine caractéristique, est divisée en plusieurs sessions d'entraînement, dont le nombre dépend du niveau actuel. Au plus le niveau est élevé, au plus il faudra faire de séances. Chacune de celles-ci bloque le joueur que l'on entraîne durant un certain temps (déterminé par le niveau du bâtiment Centre d'entraînement). 
 
   \subsection{Cas d'utilisation 7: le stade}
   \begin{figure}[H]
@@ -961,77 +960,111 @@ lorsqu'ils ne sont pas occupés par une activité, de recevoir des messages non 
 nous avons donc dû revoir notre design initial en conséquence, tel qu'il apparaîtra ci-après.\\
 
 \subsubsection{Echange de messages serveur-client}
-Les messages échangés entre la partie serveur et la partie client du projet sont transmis selon un principe de sérialisation et désérialisation qui permet de faire transiter sur le réseau des messages totalement différents qu'on identifie par une en-tête. Cette en-tête permet au code qui reçoit ce message de savoir comment le traiter.
-\subsubsection{Synopsis du serveur}
-\begin{itemize}
-  \item Au démarrage, le serveur crée une instance de la classe CommonMgr, destinée à gérer initialisation et clôture des activités fonctionnelles sur le serveur;
-  \item Le serveur se place en attente (fonction select()) d'une activité sur son clavier
-  (pour commander l'arrêt du serveur par exemple ou obtenir la liste des utilisateurs connectés...), sur
-  son socket destiné à recevoir les nouvelles connexions et sur les sockets des clients déjà connectés (voir figure \ref{diag-serveur});
-  \item Lors d'une nouvelle connexion, le serveur crée une instance de la classe User; il y a donc un objet User par client;
-  \item Tout nouveau message reçu par le serveur est confié à la méthode cmdHandler de l'objet User, qui assure le dispatching
-  vers le module fonctionnel concerné, en se basant et mettant à jour la variable d'état state;
-  \item Cela assure un contrôle global des activités du client (et de l'arrêt de celles-ci) et,
-  dans le futur (interface graphique), devrait lui permettre éventuellement d'entreprendre plusieurs activités en parallèle.
-\end{itemize}
-    \begin{figure}[H]
-    \center
-    \includegraphics[scale=0.4]{uml/Serveur.jpeg}
-    \caption{Diagramme d'activité réseau du serveur} \label{diag-serveur}
-    \end{figure}
-Aucune des méthodes du serveur n'étant bloquante pendant plus d'une fraction de seconde (peu d'I/O) et compte tenu des délais très courts pour la mise en oeuvre, nous avons opté à ce stade pour une solution mono-thread;
-travailler avec un seul thread supprime la nécessité de devoir gérer l'accès concurrent aux données (en mémoire ou sur disque) et la communication entre threads (arrêt du serveur par exemple) :
-une solution multi-threads rendrait la gestion de ressources communes par les fonctions applicatives plus complexe (sérialisation de sections critiques), tout en étant beaucoup plus gourmande en ressources CPU et présentant des risques de deadlocks (tests plus délicats à réaliser!). Seul le déroulement d'une vente aux enchères devra être accompagné par un thread de cadencement (un par vente).\\
+Les messages échangés entre la partie serveur et la partie client du projet sont transmis selon un principe de sérialisation et désérialisation qui permet de faire transiter sur le réseau des messages totalement différents qu'on identifie par un en-tête. Cet en-tête permet au code qui reçoit ce message de savoir comment le traiter.
 
-En pratique, la séparation du code est réalisée ainsi :
-\begin{itemize}
-  \item Serveur-communication : ServerMain.cpp, Server.cpp, commAPI.cpp;
-  \item Serveur-fonctionnel : CommonMgr.cpp, User.cpp, ...
-\end{itemize}
-Si les messages sont de longueur fixe prévisible, un buffer de taille fixe (INPUTSIZE) peut être utilisé de part et d'autre.
-Sinon (par exemple pour une liste), deux solutions sont possibles :
-\begin{itemize}
-  \item Un message par ligne de la liste;
-  \item Utiliser de part et d'autre des zones de mémoire allouées dynamiquement et envoyer tout en un seul message, après un premier message indiquant au client la taille du buffer.
-\end{itemize}
-Pour l'instant, le code de communication est écrit pour Linux et n'est pas portable tel quel vers Windows (mais une version multi-compatible est réalisable...).\\
-Améliorations prévues dans le futur : gestion du terminal du serveur, détection des sockets morts (clients qui n'ont pas fait disconnect suite à un crash par ex.), ...
-
-\subsubsection{Synopsis du client}
-Comme le serveur, le client utilise la fonction select() afin de pouvoir capter indiféremment des messages d'origine différente,
- en l'occurence en provenance du clavier et du socket de communication, ceci pour pouvoir recevoir des messages non sollicités.
-      \begin{figure}[H]
-    \center
-    \includegraphics[scale=0.4]{uml/Client.jpeg}
-    \caption{Diagramme d'activité réseau du client} \label{diag-client}
-    \end{figure}
- Mais cette faculté ne peut exister que lorsque le client
- n'est pas occupé dans une activité particulière, c'est-à-dire lorsqu'il se voit proposer le menu (state=FREE).\\
- Le client est donc, tout comme son image User chez le serveur, contrôlé par une variable d'état et les deux variables d'état
- évoluent de part et d'autre de concert.\\
-      \begin{figure}[H]
-    \center
-    \includegraphics[scale=0.4]{uml/PROPOSEMATCH.jpeg}
-    \caption{Exemple de diagramme d'interaction client-serveur} \label{diag-client-serveur}
-    \end{figure}
- Lorsque le manager choisit une activité, le client entre dans un dialogue avec à la fois le serveur et le manager,
- sans qu'il puisse être interrompu par un message non sollicité; d'ailleurs, le serveur ne va pas lui en envoyer,
- puisqu'il connaît l'état dans lequel se trouve le client :
- ne peuvent par exemple être invités à un match que les managers dont state=FREE.\\
- Le serveur travaillant en mode répétitif (pas de parallélisme), la variable d'état suffit donc à contrôler l'accès
- aux sections critiques que sont les différentes activités (voir par exemple la figure \ref{diag-client-serveur}).\\
- De même, lorsque le client reçoit un message non sollicité, il entre dans un dialogue avec à la fois le serveur et le manager,
- sans qu'il puisse être interrompu par un autre message non sollicité ou par une autre demande du manager au clavier.\\
- On constate donc (voir figure \ref{diag-client}) la présence de deux structures de séquencement fort similaires, en forme de rateau :
+ On constate donc la présence de deux structures de séquencement fort similaires, en forme de rateau :
  \begin{itemize}
    \item un input;
    \item le choix d'une séquence d'instruction (une méthode) en fonction de cet input;
    \item un output.
  \end{itemize}
- Cette structure sera celle que nous généraliserons lors de la mise en \oe uvre de l'interface graphique !
+ \begin{algorithm}
+  \caption{Traitement séquentiel partagé par le serveur et le client}
+  \begin{algorithmic}
+  \REQUIRE socket(s) ouvert(s)
+  \STATE écoute sur les sockets ouverts et sur le flux d'entrée
+  \IF{input sur flux d'entrée}
+  \STATE traitement : a l'initiative
+  \ELSE[message sur le socket]
+  \STATE traitement : sollicité
+  \ENDIF
+\end{algorithmic}
+\label{pseudo-code-select}
+\end{algorithm}
+
+\subsubsection{Synopsis du serveur}
+\begin{itemize}
+  \item Au démarrage, le serveur crée une instance de la classe \emph{MatchesHandler}, destinée à gérer l'interconnexion
+   de clients au travers du serveur dans le cas des matchs;
+  \item Le serveur se met en attente (fonction select()) d'une activité sur son clavier
+  (pour commander l'arrêt du serveur par exemple ou obtenir la liste des utilisateurs connectés...), sur
+  son socket destiné à recevoir les nouvelles connexions et sur les sockets des clients déjà connectés (voir diagrammes);
+  \item Lors d'une nouvelle connexion, le serveur crée une instance de la classe User; il y a donc un objet User par client;
+  \item Tout nouveau message reçu par le serveur est confié à la méthode \emph{commandHandler} de l'objet de type User, qui assure le dispatching
+  vers le module fonctionnel concerné, en se basant et mettant à jour la variable d'état state;
+  \item Cela assure un contrôle global des activités du client (et de l'arrêt de celles-ci).
+  Remarquons que cela pourrait permettre d'entreprendre plusieurs activités en parallèle.
+\end{itemize}
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/Serveur.png}
+    \caption{Diagramme d'activité : cycle de vie du serveur} \label{diag-serveur}
+    \end{figure}
+Aucune des méthodes du serveur n'étant bloquante pendant plus d'une fraction de seconde (peu d'I/O) et compte tenu des délais très courts pour la mise en œuvre, nous avons opté à ce stade pour une solution mono-thread;
+travailler avec un seul thread supprime la nécessité de devoir gérer l'accès concurrent aux données (en mémoire ou sur disque) et la communication entre threads (arrêt du serveur par exemple) :
+une solution multi-threads rendrait la gestion de ressources communes par les fonctions applicatives plus complexe (sérialisation de sections critiques), 
+tout en étant beaucoup plus gourmande en ressources CPU et présentant des risques de deadlocks (tests plus délicats à réaliser!). 
+Pour la gestion des time-out (dans le cas d'une enchère uniquement jusqu'à présent), 
+cela est actuellement géré au niveau client par un thread de cadencement (qui ne tourne que le temps d'un tour),
+mais cela pourra évoluer vers une utilisation du paramètre temporel de l'appel système \emph{select}.
+
+Si les messages sont de longueur fixe prévisible, un buffer de taille fixe peut être utilisé de part et d'autre.
+Sinon (par exemple pour une liste), deux solutions sont possibles :
+\begin{itemize}
+  \item Envoyer une série de messages de taille fixe;
+  \item Utiliser de part et d'autre des zones de mémoire allouées dynamiquement et envoyer tout en un seul message, après un premier message indiquant au client la taille du buffer.
+\end{itemize}
+Jusqu'à présent nous allouons un buffer de taille fixe.
+
+  \subsubsection{Synopsis du client}
+Comme le serveur, le client utilise la fonction select() afin de pouvoir capter indifféremment des messages d'origine différente,
+ en l’occurrence en provenance du clavier ou du socket de communication, ceci pour pouvoir recevoir des messages non sollicités dans une solution mono-thread.
+      \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/Client.png}
+    \caption{Diagramme d'activité : cycle de vie du client} \label{diag-client}
+    \end{figure}
+ La disponibilité aux messages non sollicités ne peut exister que lorsque le client
+ n'est pas dans un contexte verrouillé, c'est-à-dire dans les menus principaux ou au début du tour d'un match.
+ 
+ Lorsque le manager choisit une activité, le client entre dans un dialogue avec à la fois le serveur et le manager,
+ sans qu'il puisse être interrompu par un message non sollicité; d'ailleurs, le serveur ne va pas lui en envoyer,
+ puisqu'il connaît l'état dans lequel se trouve le client.
+ 
+ Le serveur travaillant en mode répétitif (pas de parallélisme), la variable d'état suffit donc à contrôler l'accès
+ aux sections critiques que sont les différentes activités.
+ 
+ De même, lorsque le client reçoit un message non sollicité, il entre dans un dialogue avec à la fois le serveur et le manager,
+ sans qu'il puisse être interrompu par un autre message non sollicité ou par une autre demande du manager au clavier.
+ 
+  \subsubsection{Exemples}
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/Activity_Login.png}
+    \caption{Exemple d'interaction par diagramme d'activité : identification} \label{diag-login}
+    \end{figure}
+    Cas où le client prend l'initiative de la communication : le code client récupère les identifiants et les envoie au serveur.
+    Celui-ci transmet la requête à l'instance User correspondante qui va traiter la demande et communiquer la confirmation au client.
+    En fonction de cette confirmation, le code client fera évoluer son contexte et affichera le menu adapté.
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/Activity_Tournamentmatch.png}
+    \caption{Exemple d'interaction par diagramme d'activité : démarrage d'un tournoi} \label{diag-tournament}
+    \end{figure}
+    L'inscription et le démarrage d'un tournoi impliquent les deux modes du client : l'initiative et la sollicitation.
+    L'inscription se fait par l'input reçu sur le flux d'entrée, par lequel l'utilisateur donne ses instructions.
+    L'enregistrement de cette inscription est similaire au processus d'identification, à la différence
+    qu'une instance commune à tous les \emph{Users} se charge du traitement et de la réponse.
+    
+    Quand le nombre d'inscrits requis est atteint, le serveur va inviter les clients à jouer leur match.
+    Dans ce cas, le serveur prend l'initiative d'une communication vers le client et c'est le client
+    qui va devoir confirmer en envoyer l'équipe de joueurs choisie.
+    
+    
+
 
 \subsubsection{Diagramme de séquence}
-  Voici un diagramme de séquence qui illustre les relations entre différents objets du code server
+  Voici un diagramme de séquence qui illustre les relations entre différents objets du code serveur
   et du code client, dans le cas d'un match amical.
     \begin{figure}[H]
     \center
@@ -1060,7 +1093,7 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
 \subsection{Diagramme de composants}
       \begin{figure}[H]
     \center
-    \includegraphics[scale=0.4]{uml/Components.png}
+    \includegraphics[scale=0.4]{uml/Diagrammededeploiement.png}
     \caption{Diagramme de composants}
     \end{figure}
 %\chapter{Index des termes utilisés}
