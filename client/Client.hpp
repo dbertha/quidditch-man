@@ -58,7 +58,7 @@
 
 #define ABORT 0
 
-#define TIMESCALE 1
+
 
 typedef struct { //pas besoin de la classe complète
     int attributes[5];

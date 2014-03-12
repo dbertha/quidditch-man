@@ -7,6 +7,8 @@
 #define INPUTSIZE 100 //taille du message envoyé du client vers le serveur
 #define __DEBUG
 
+#define TIMESCALE 1
+
 #define USERNAME_LENGTH 30
 #define PASSWORD_LENGTH 30
 

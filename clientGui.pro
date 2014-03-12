@@ -10,7 +10,7 @@ HEADERS += client/clientMatchHandler.hpp \
            client/mainGui.hpp \
            client/selectionDialog.hpp \
            client/ticker.hpp \
-           client/BuildingsDialog.hpp \
+           client/buildingsDialog.hpp \
            client/buildingsModel.hpp \
            client/playerMgr.hpp \
            common/NetworkInterface.hpp \
@@ -21,7 +21,7 @@ SOURCES += client/clientMatchHandler.cpp \
            client/mainGui.cpp \
            client/selectionDialog.cpp \
            client/ticker.cpp \
-           client/BuildingsDialog.cpp \
+           client/buildingsDialog.cpp \
            client/buildingsModel.cpp \
            client/playerMgr.cpp \
            common/NetworkInterface.cpp \
