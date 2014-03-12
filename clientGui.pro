@@ -1,26 +1,28 @@
 include (common.pri)
 TEMPLATE = app
-TARGET = clientGui
-DEPENDPATH += . common
+TARGET = clientGui.out
+DEPENDPATH += . client common
 
 
 # Input
-HEADERS += clientMatchHandler.hpp \
-           loginDialog.hpp \
-           mainGui.hpp \
-           selectionDialog.hpp \
-           ticker.hpp \
-           BuildingsDialog.hpp \
-           buildingsModel.hpp \
-           playerMgr.hpp \
+HEADERS += client/clientMatchHandler.hpp \
+           client/loginDialog.hpp \
+           client/mainGui.hpp \
+           client/selectionDialog.hpp \
+           client/ticker.hpp \
+           client/BuildingsDialog.hpp \
+           client/buildingsModel.hpp \
+           client/playerMgr.hpp \
+           common/NetworkInterface.hpp \
 
-SOURCES += clientMatchHandler.cpp \
-           loginDialog.cpp \
-           main.cpp \
-           mainGui.cpp \
-           selectionDialog.cpp \
-           ticker.cpp \
-           BuildingsDialog.cpp \
-           buildingsModel.cpp \
-           playerMgr.cpp \
+SOURCES += client/clientMatchHandler.cpp \
+           client/loginDialog.cpp \
+           client/GUImain.cpp \
+           client/mainGui.cpp \
+           client/selectionDialog.cpp \
+           client/ticker.cpp \
+           client/BuildingsDialog.cpp \
+           client/buildingsModel.cpp \
+           client/playerMgr.cpp \
+           common/NetworkInterface.cpp \
 

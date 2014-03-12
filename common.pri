@@ -12,9 +12,7 @@ HEADERS += common/commAPI.hpp \
            common/Defines.hpp \
            common/HexagonalField.hpp \
            common/NetworkBase.hpp \
-           common/NetworkInterface.hpp 
            
 SOURCES += common/commAPI.cpp \
            common/HexagonalField.cpp \
-           common/NetworkBase.cpp \
-           common/NetworkInterface.cpp
+           common/NetworkBase.cpp
