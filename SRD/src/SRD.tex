@@ -48,6 +48,8 @@
 \usepackage{array} %tableaux
 \usepackage{xcolor} % Required for specifying custom colors
 \usepackage{fix-cm} % Allows increasing the font size of specific fonts beyond LaTeX default specifications
+\usepackage{algorithm} %pseudo-code
+\usepackage{algorithmic}
 
 %POUR LE TITRE :
 \setlength{\oddsidemargin}{0mm} % Adjust margins to center the colored title box
@@ -101,7 +103,7 @@
 \hfill Groupe 4 : Manon Legrand, Hélène Plisnier, Audry Delestree, David Bertha \\
 \hfill INFOF209 \\
 \hfill Université Libre de Bruxelles \\
-\hfill Version 1.0 \\
+\hfill Version 3.0 \\
 
 \HRule{1pt}} % Horizontal line, thickness changed here
 
@@ -116,7 +118,7 @@
   % et aboutissants du projet, et énumérant les différents types de
   % personnes qui vont bénéficier de la réalisation du projet.
   Le \gls{Quidditch}\index{Quidditch} \gls{manager}\index{manager} est un jeu multi-joueurs de gestion
-  et de stratégie, se jouant par réseau.
+  et de stratégie, se jouant en réseau.
   Un manager (l'utilisateur) gère son équipe de \gls{joueur}s, qu'il peut entrainer
   au travers des bâtiments construits sur la \index{parcelle}parcelle qui lui est attribuée. Certains de ces bâtiments permettent aussi de faire des achats et des ventes de balais ou de joueurs.
   Le but pour le manager est de déveloper son \gls{club} aussi bien au niveau commercial
@@ -163,6 +165,14 @@
     0.7 & David & 20/12/13 & Glossaire et Index \\
     1.0 & Manon & 20/12/13 & Relecture et révision \\
     1.1 & Hélène & 07/02/14 & 1ère correction \\
+    1.2 & Hélène & 20/02/14 & Communication réseau et Qt \\    
+    1.3 & Audry & 21/02/14 & Nouveaux diagrammes de classes \\
+    1.4 & Manon & 21/02/14 & Commentaires par rapport aux Use Case \\
+    1.5 & Manon & 21/02/14 & Explications des diagrammes de classes \\
+    1.6 & Audry & 21/02/14 & Nouveaux diagrammes de classes (2) \\
+    1.7 & Manon & 21/02/14 & Modif de certains commentaires de diag \\
+    2.0 & Manon & 21/02/14 & Jeu sur terminal et Echange de messages \\
+    2.1 & David & 11/03/14 & Précisions de l'architecture réseau \\
     \hline
   \end{tabular}
 
@@ -208,7 +218,7 @@
         \item \textbf{Cas général} : Le client veut créer une nouvelle partie. Il devra alors rentrer toute une série d’informations concernant cette partie nécessaire à l’identification de cette partie et au bon fonctionnement du jeu (nom du \index{manager}manager, nom de l’équipe, mot de passe, etc.)
         \item \textbf{Cas exceptionnels} :
           \begin{itemize}
-            \item Un manager avec le nom indiqué par le client existe déjà. Le programme le signale au client et lui demande d'entrer un autre nom. Ceci termine ce use case.
+            \item Un manager avec le nom indiqué par le client existe déjà. Le programme le signale au client qui doit de nouveau choisir ce qu'il veut faire.
           \end{itemize}
       \end{itemize}
     \subsubsection{Charger partie existante}
@@ -219,8 +229,7 @@
         \item \textbf{Cas général} : Le client souhaite continuer une partie déjà entamée et rentre le nom de la partie ainsi que le mot de passe pour récupérer les informations concernant cette partie.
         \item \textbf{Cas exceptionnels} :
           \begin{itemize}
-            \item Il n’y a pas de partie existante. Le programme le signale au client et lui propose de se créer une nouvelle partie. Ceci termine ce use case.
-			\item L’identification de la partie a échoué (mauvais nom ou mot de passe). Le programme le signale au client et lui redemande d'entrer le nom de la partie ainsi que le mot de passe. Ceci termine ce use case.
+			\item L’identification de la partie a échoué (mauvais nom ou mot de passe). Le programme le signale au client qui doit de nouveau choisir ce qu'il veut faire.
           \end{itemize}
       \end{itemize}
 
@@ -276,7 +285,7 @@
         \item \textbf{Cas exceptionnels} :
         \begin{itemize}
             \item Le joueur est heurté par un \gls{cognard}\index{balle!cognard}. La passe échoue. 
-          \end{itemize}
+        \end{itemize}
       \end{itemize}
      \subsubsection{Tirer aux buts}
       \begin{itemize}
@@ -285,6 +294,7 @@
         \item \textbf{Post-conditions} : Qu’il y ait but ou non, le joueur ne tiendra plus le souafle.
         \item \textbf{Cas général} : Le client essaie de marquer un but en indiquant au poursuiveur détenant le souafle vers quel but il doit tirer. Intercepter le souafle se fait automatiquement par le \gls{gardien}\index{joueur!gardien} ou les \gls{poursuiveur}s \index{joueur!poursuiveur} adverses s’ils se trouvent sur la trajectoire du souafle. Si le tir est réussi, l'équipe qui vient de marquer gagne 10 points.
         \item \textbf{Cas exceptionnels} :
+          \begin{itemize}
         \item Le poursuiveur qui s'apprête à tirer est heurté par un \gls{cognard}\index{balle!cognard}. Le tir au but échoue. 
           \end{itemize}
       \end{itemize}
@@ -294,7 +304,8 @@
         \item \textbf{Pré-conditions} : Le joueur qui va essayer de frapper un \gls{cognard}\index{balle!cognard} doit être un batteur\index{joueur!batteur} et doit se situer près du cognard.
         \item \textbf{Post-conditions} : Le cognard est projeté dans la direction voulue.
         \item \textbf{Cas général} : Le client indique dans quelle direction le batteur doit frapper le cognard.
-        \item \textbf{Cas exceptionnels} : 
+        \item \textbf{Cas exceptionnels} :
+          \begin{itemize}
         \item Le batteur rate son coup. Le cognard heurte le joueur.
           \end{itemize}
       \end{itemize}
@@ -340,7 +351,7 @@
     \includegraphics[scale=0.5]{uml/useCaseView/Gestiondesbatimentsstructure.png}
     \caption{Cas d'utilisation 3: Gérer ses bâtiments}
   \end{figure}	
-  Différents bâtiments sont disponibles à la construction pour le Manager, \index{manager}
+ Différents bâtiments sont disponibles à la construction pour le Manager, \index{manager}
   moyennant un certain coût et un temps d'attente (avant fin des travaux). 
   Généralement: une fois construits, le Manager peut améliorer ses bâtiments 
   et accéder aux informations les concernant. Certains bâtiments offrent 
@@ -383,6 +394,9 @@
             \item Le bâtiment sélectionné est à son niveau maximum. Aucune évolution supplémentaire ne peut être effectuée sur ce bâtiment.
           \end{itemize}
       \end{itemize}
+
+
+      Concrètement, l'implémentation des actions sur les bâtiments est la suivante; le client entre dans un bâtiment et a ainsi accès aux informations concernant ce bâtiment. Ces informations sont : le niveau du bâtiment, le prix pour passer au niveau suivant, une caractéristique propre au bâtiment concerné et une indication si des travaux de construction ou d'amélioration sont déjà en cours, ce qui empêcherait le lancement de tout nouveau projet. Enfin, le client peut donc également lancer un projet d'amélioration directement via le bâtiment, à condition bien sûr qu'il possède suffisamment d'argent et que le bâtiment ne soit pas déjà en travaux.
 
   \subsection{Cas d'utilisation 4: gérer son équipe}
   \begin{figure}[H]
@@ -429,6 +443,9 @@
         \item \textbf{Cas général} : Le client choisit le balai qu’il va assigner à un joueur. Une fois assigné, le balai ne sera plus disponible.
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
+
+
+     Actuellement, il n'est pas possible de changer le balai d'un joueur, et aucun balai ne présente des bonus de capacité. Si l'avenir nous le permet, nous intègrerons de façon plus significative les balais dans le jeu.
 
   \subsection{Cas d'utilisation 5: magasins}
   \begin{figure}[H]
@@ -505,8 +522,12 @@
         \item \textbf{Cas exceptionnels} : 
         \begin{itemize}
             \item Le Manager se débarrasse de ses balais de base lorsqu'il n'en a plus besoin. Cette vente ne lui rapporte rien.
-          \end{itemize}
+        \end{itemize}
       \end{itemize}
+
+
+
+     Etant donné qu'aucun balai ne présente un avantage pour un joueur dans l'état actuel du jeu, il va de soi qu'il n'est pas possible d'en acheter ou d'en vendre (ce qui serait une perte de temps, et de lignes de code). Concernant la vente et l'achat de joueurs, cela ne peut se faire que via les enchères entre managers. Une enchère est lancée par un certain manager qui souhaite vendre un joueur. Il choisit le joueur, ainsi que le prix de départ. La vente peut commencer, et se déroule tour par tour. Le premier tour est plus long que les suivants et permet à des managers intéressés de se manifester et rejoindre l'enchère. Chaque manager dans la vente ne peut enchérir qu'une fois par tour. Ceux n'ayant pas enchéri durant un tour quittent l'enchère et ne participeront pas au tour suivant. L'acquéreur est le dernier manager restant, c'est-à-dire qu'il est le seul à avoir enchéri pendant un tour. Le prix de vente est déterminé par le prix de départ fixé par le propriétaire du joueur, et par le nombre d'enchères. En effet, chaque enchère fait augmenter le prix d'une certaine somme (un dixième du prix de départ). Si le manager qui a remporté l'enchère n'a pas les moyens financiers de couvrir les frais d'achat, l'enchère est annulée, mais il devra néanmoins verser une pénalité en contrepartie au propriétaire du joueur.
 
   \subsection{Cas d'utilisation 6: améliorer ses joueurs}
   \begin{figure}[H]
@@ -565,6 +586,8 @@
           \end{itemize}
       \end{itemize}
 
+  L'agence de publicité et la caractéristique popularité des joueurs ont été mises de côté car leur utilité est négligeable par rapport au reste. Pour ce qui est des entraînements, le passage d'un niveau à un autre, pour une certaine caractéristique, est divisée en plusieurs sessions d'entraînement, dont le nombre dépend du niveau actuel. Au plus le niveau est élevé, au plus il faudra faire de séances. Chacune de celles-ci bloque le joueur que l'on entraîne durant un certain temps (déterminé par le niveau du bâtiment Centre d'entraînement). 
+
   \subsection{Cas d'utilisation 7: le stade}
   \begin{figure}[H]
     \center
@@ -603,6 +626,7 @@
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
 
+A ce niveau-ci du jeu, il n'y a pas encore de championnat, et seuls des matchs amicaux entre managers connectés simultanément sont possibles.
   
 \section{Exigences non fonctionnelles}
   Pour le confort de l'utilisateur, il faudra  une interface graphique très intuitive, 
@@ -741,6 +765,7 @@
         \item \textbf{Cas exceptionnels} : 
         \begin{itemize}
          \item Le client ne donne aucune instruction au joueur. Le joueur reste sur place.
+        \end{itemize}
       \end{itemize}
     \subsubsection{Réaliser action des joueurs}
       \begin{itemize}
@@ -773,9 +798,6 @@
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
 
-
-
-
 \section{Exigences non fonctionnelles}
   \subsection{Le réseau}
   Au niveau du réseau, le problème de la synchronisation n'est pas préoccupant, 
@@ -799,23 +821,55 @@
   L'environement d'exécution étant fixé (les machines des salles informatiques du NO), 
   le code se limitera à l'utilisation des librairies C++ standards. 
   Le système d'exploitation visé est GNU/Linux.
+  \subsection{Choix d'une librairie graphique}
+  Qt est un framework d'interface graphique orienté objet et développé en C++ par la PME norvégienne Trolltech.
+La première version gratuite fut mise à disposition du public en mai 1995\cite{Blanchette2006}. \\
+Il offre des composants d'interface graphique (widgets), d'accès aux données, de communication réseau, de gestion des threads. \\
+Il permet la portabilité des applications qui n'utilisent que ses composants par simple recompilation du code source.
+Les environnements supportés sont les Unix (dont Linux) qui utilisent le système graphique X Window System, Windows et Mac OS X,
+mais aussi Android, iOS et QNX (BlackBerry). \\
+Il peut s'intégrer dans des développements réalisés dans la plupart des langages de programmation modernes, d'Ada à Python. \\
+Ses librairies sont accompagnées de plusieurs outils de développement, parmi lesquels :
+\begin{itemize}
+\item Un IDE;
+\item Un concepteur d'interface graphique;
+\item Des plugins pour Eclipse et Visual Studio.
+\end{itemize}
+
+Qt est notamment connu pour être la bibliothèque sur laquelle repose l'environnement graphique KDE, l'un des environnements de bureau les plus utilisés dans le monde Linux;
+des logiciels commerciaux comme Adobe Photoshop Album, Autodesk Maya et Mathematica, et
+des logiciels gratuits omniprésents comme Skype, VLC media player et VirtualBox, l'utilisent également. \\
+La popularité de Qt (des milliers de clients et des dizaines de milliers de programmeurs) est un point important dans le choix de la bibliothèque graphique.
+Elle permet en effet d'assurer :
+\begin{itemize}
+\item Sa pérennité et son adaptation aux évolutions technologiques;
+\item Sa fiabilité et la qualité de son support;
+\item Une communauté d'utilisateurs actifs sur de nombreux forums d'entraide;
+\item Une documentation abondante et de qualité.
+\end{itemize}
+
 \section{Design et fonctionnement du système}
   % Cette partie sera décrite à l’aide des différents diagrammes UML
   % vus au cours théorique et aux exercices.
+  \subsection{Le jeu sur terminal}
+Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvons tout d'abord distinguer 2 parties différentes, la gestion et le match.\\
+\textbf{Gestion} : La partie gestion du jeu permet donc au Manager, le client, de gérer une équipe ainsi qu'un domaine. Ce domaine se compose de plusieurs bâtiments, ayant chacun leur particularité et avantage. Le Manager peut donc se balader au travers des différents menus qui lui permettent d'accéder aux informations de ses joueurs (leurs capacités, etc) et de ses bâtiments et d'effectuer des actions de gestion telles qu'entraîner ou soigner un joueur, participer à une enchère ou améliorer un bâtiment. \\
+\textbf{Match} : A tout moment, s'il possède au moins 7 joueurs disponibles, le Manager peut envoyer une demande de match amical à un autre client connecté. Si la réponse de ce dernier est positive, le match débutera. Ce match de Quidditch se déroule au tour par tour. Chacun de leur côté, les adversaires choisissent les mouvements qu'ils veulent que leurs joueurs fassent, sans savoir ce qu'a préparé l'autre manager. Et ainsi de suite jusqu'à une situation de fin de partie. \\
+
   \subsection{Diagrammes de classes}
   Nous allons ici présenter les différentes classes et leurs relations.
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.3]{uml/class/ClassDiagram.png}
+    \includegraphics[scale=0.3]{uml/class/Global.png}
     \caption{Diagramme de classe général}
   \end{figure}	
   \subsubsection{Les joueurs}
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.4]{uml/class/DiagrammedeclassesJoueurs.png}
+    \includegraphics[scale=0.4]{uml/class/Players.png}
     \caption{Diagramme des classes joueurs}
   \end{figure}	
-    Une classe abstraite réprésente le \gls{joueur}\index{joueur} avec ses caractéristiques de base.
+    Une classe générale Player réprésente le \gls{joueur}\index{joueur} avec ses caractéristiques de base (vitesse, force, précision, réflexe et résistance).
     Dans un soucis de découplage, nous différencions deux classes spécialisées à partir de cette base.
     Le joueur au niveau de la gestion est distingué du joueur au niveau du match\index{match}.
     En effet, ils nécessitent chacun des méthodes fort différentes :
@@ -823,73 +877,233 @@
     de l'autre des méthodes d'actions spécifiques à un match.
     Les attributs du joueur de match, ce dernier pouvant se construire depuis un joueur
     au niveau de la gestion, ne sont pas une simple transposition des caractéristiques
-    du joueur en gestion. En effet, intervient notamment le calcul du bonus lié au balai.
+    du joueur en gestion. En effet, intervient notamment le calcul du bonus lié au balai (même si actuellement le balai n'apporte aucun bonus).
   \subsubsection{Concernant le réseau}
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.5]{uml/class/Diagrammedeclasses.png}
-    \caption{Diagramme des classes impliquées dans le réseau}
+    \includegraphics[scale=0.5]{uml/class/Server.png}
     \end{figure}	
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.5]{uml/class/User.png}
+    \caption{Diagrammes des classes impliquées dans le réseau}
+    \end{figure}
     La relation avec le client est gérée par une classe principale, qui va assurer la communication
-    à travers une classe de messages (un \emph{struct} puisque la base réseau sera écrite en C).
+    à travers une classe de messages (un \emph{struct} puisque la base réseau consiste en des appels systèmes C).
     C'est cette classe principale qui va gérer les alternances entre le côté gestion et le côté match. Le match nécessite une connexion entre deux clients, elle est donc très différente de la gestion
     à ce niveau-là aussi.
   \subsubsection{Concernant la gestion générale}
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.5]{uml/class/DiagrammedeclassesManagement.png}
-    \caption{Diagramme des classes impliquées dans la partie gestion}
+    \includegraphics[scale=0.4]{uml/class/ClassManagement.png}
+    \caption{Diagramme des classes concernant le Manager}
     \end{figure}	
-    Le manager est la classe dédiée à la partie gestion. Elle représente une partie du jeu,
-    composée d'un ensemble de joueurs\index{joueur}, de balais\index{balai}, de bâtiments\index{bâtiment}, d'un calendrier\index{calendrier} et d'un trésor\index{trésor}.
-    Elle donne accès aux bâtiments qui chacun donne accès aux possibilités d'améliorations, d'achats et de vente.
+    Le manager est la classe dédiée à l'alias du client. C'est l'objet Manager qui lie toutes les classes de gestion telles les bâtiments et les joueurs. Il représente en quelque sorte la session de jeu du client. Le manager possède ainsi un certain nombre de joueurs et de bâtiments, ainsi que des fans et de l'argent. Une classe indépendante Saver permet de sauvegarder dans des fichiers toutes les informations essentielles à la construction du manager, et donc à l'avancée logique d'une partie. Les fichiers sauvegardes du manager se trouvent tous dans un dossier portant le nom du Manager. Dans ce dossier se trouve les calendriers du Manager, qui tiennent compte des joueurs bloqués par un entraînement ou par l'hôpital, ainsi que des bâtiments en travaux. On trouve un fichier avec les attributs principaux du manager, et un autre avec les informations des bâtiments. Enfin, un sous-dossier "Players" comprend les informations relatives au joueur; nous avons là un fichier par joueur, qui reprend l'ensemble de ces attributs, ainsi qu'un fichier listant tous les joueurs du manager, et qui permet donc de les charger sans problème.
   \subsubsection{Concernant le match}
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.4]{uml/class/Diagrammedeclassesmatch.png}
-    \caption{Diagramme des classes impliquées dans les matchs}
+    \includegraphics[scale=0.4]{uml/class/Match.png}
+    \end{figure}	
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/class/MatchesHandler.png}
+    \caption{Diagrammes des classes impliquées dans les matchs}
     \end{figure}	
     Le match relie deux clients différents dans un affrontement sur un \gls{terrain}\index{terrain} 
-    où se déplacent à la fois des joueurs et des \index{balle}balles, les joueurs pouvant faire se déplacer les balles. La classe \emph{Position} regroupe les informations de position d'un joueur ou d'une balle sur le terrain.
+    où se déplacent à la fois des joueurs et des \index{balle}balles, les joueurs pouvant faire se déplacer les balles. Le terrain est représenté par un hexagone allongé et respecte le format "case hexagonale", c'est-à-dire qu'il y a 6 cases de destination adjacentes à une case donnée (si elle n'est pas sur les bords).
   \subsubsection{Les bâtiments}
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.4]{uml/class/DiagrammedeclassesBuildings.png}
+    \includegraphics[scale=0.4]{uml/class/Buildings.png}
     \caption{Diagramme des classes de bâtiments}
     \end{figure}	
-  Une classe abstraite représente tout bâtiment. Cette classe est dérivée dans d'autres classes abstraites
-  qui regroupent les types de bâtiments\index{bâtiment} selon leur rôle principal (achat/vente, augmentation
-  d'une capacité), plus le stade\index{bâtiment!Stade} à partir duquel un nouveau match peut démarrer. Par exemple, l'\gls{infirmerie}\index{bâtiment!infirmerie} fait partie des bâtiments
-  améliorant les joueurs puisqu'elle soigne leurs blessures.
-  Les attributs communs sont le niveau (chaque bâtiment à un niveau, le niveau 0
+  Une classe abstraite "Building" représente tout bâtiment. Cette classe est dérivée dans d'autres classes qui regroupent les types de bâtiments\index{bâtiment} selon leur rôle principal (achat/vente, augmentation
+  d'une capacité), plus le stade\index{bâtiment!Stade} à partir duquel un nouveau match peut démarrer. Par exemple, l'\gls{infirmerie}\index{bâtiment!infirmerie} fait partie des bâtiments améliorant les joueurs puisqu'elle soigne leurs blessures (causées par les cognards au cours d'un match). Pour plus de faciliter, l'infirmerie s'appelle Hospital (hôpital donc).
+  Les attributs communs sont le niveau (chaque bâtiment a un niveau, le niveau 0
   signifiant \enquote{pas encore construit}) ainsi que le prix pour passer au niveau suivant.
-  \subsubsection{Concernant les fichiers}
-    \begin{figure}[H]
-    \center
-    \includegraphics[scale=0.4]{uml/class/Fichiers.png}
-    \caption{Diagramme des classes impliquées dans l'enregistrement}
-    \end{figure}	
-  L'état d'une partie aussi bien que les actions bloquantes ou planifiées doivent
-  être enregistrées pour perdurer entre deux connexions. Pour cela, nous utilisons
-  deux classes qui vont permettre de charger des données depuis le disque ou
-  de les y sauvegarder.
-  \subsection{Diagramme de séquence}
-  Voici un diagramme de séquence qui illustre la gestion des différents
-  rôles du serveur au travers de différents processus.
-    \begin{figure}[H]
-    \center
-    \includegraphics[scale=0.4]{uml/class/connexionserveurclient.png}
-    \caption{Diagramme des classes impliquées dans le réseau}
-    \end{figure}	
-  Le côté gestion est bien dissocié du côté match, et le \emph{clientHandler} assure la communication avec le client.
-  C'est le \emph{clientHandler} du manager\index{manager} qui reçoit le match dans son stade
-  qui va créer l'instance en charge du match.
-  
+  4 bâtiments ont été complètement implémentés : 
+  \begin{itemize}
+  \item Le stade, dont le nombre maximum de places détermine la recette maximale possible réalisable lors d'un match à domicile.
+  \item Le centre d'entraînement, qui permet de faire avancer les capacités des joueurs, les blocant un certain temps en contrepartie.
+  \item L'hôpital, qui permet de soigner complètement la vie d'un joueur, le blocant également un certain.
+  \item Le fan shop, dont le nombre maximum de clients (=articles vendus), détermine les recettes possibles pendant un macth.
+  \end{itemize}
 
+  On peut également noter que le bâtiment "Centre de recrutement" a été implémenté mais n'a actuellement aucune utilité. Dans le cadre de l'interface graphique qui devrait suivre, c'est par ce bâtiment qu'il sera possible de créer ou participer à une enchère.
+
+  \subsubsection{Concernant les enchères}
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/class/ClassAuction.png}
+    \caption{Diagramme de la classe enchère}
+    \end{figure}	
+  Les enchères se déroulent au tour par tour. A chaque tour, les managers désireux de poursuivre la vente doivent enchérir. S'ils ne le font pas dans le temps imparti, ou qu'ils souhaitent quitter l'enchère, ils devront attendre la fin du tour avant d'avoir à nouveau accès aux menus de jeu. Le dernier tour est atteint quand il n'y a plus qu'un seul manager qui enchérit, il gagne alors la vente.
+  Pour gérer le temps imparti par tour, la solution adoptée est l'utilisation de threads. Le thread principal lance à chaque début de tour un thread sur une méthode qui enregistre le choix du manager (enchérir ou non). Après avoir lancé ce thread secondaire, le thread principal s'endort pour une durée déterminée. A son réveil, il invite cordialement l'autre thread à s'arrêter. Le tour est fini et les managers ne peuvent plus enchérir. On répète donc cela jusqu'à ce qu'il n'y ait plus qu'un seul manager à avoir enchéri.
+  
+\subsection{Le réseau}
+  L'interface réseau doit permettre une communication bidirectionnelle :
+\begin{itemize}
+  \item des clients chargés de communiquer chacun avec un User : affichage d'informations et enregistrement de commandes;
+  \item un serveur chargé de partager de l'information entre les clients en la centralisant et en la conservant sur disque.
+\end{itemize}
+La logique applicative peut être répartie entre ces deux entités, comme elle peut être concentrée sur le serveur (le client se comporte alors comme un browser sans scripts) ou sur le client (le serveur peut se limiter aux fonctions de gestionnaire de fichiers ou de bases de données et de données temporaires en mémoire centralisée).\\
+Entre les deux, l'interface réseau, comme tout middleware, ne doit pas connaître les formats internes des messages échangés entre clients et serveur. Le respect de ce principe doit permettre d'assurer à la fois l'indépendance entre le fonctionnel et le technique, et une séparation du code réalisé pour couvrir ces deux aspects du projet.\\
+En général, le modèle client-serveur \cite{Bulfone} est serveur-centrique :
+\begin{itemize}
+  \item les clients ne communiquent qu'avec le serveur, pas entre eux; le partage d'informations entre les clients
+  se fait donc via le serveur, selon un modèle de tableau d'affichage (tableau noir), partagé par les/certains clients;
+  \item la communication et les dialogues qui s'en suivent se font à l'initiative des clients.
+\end{itemize}
+Ce deuxième principe ne permet cependant pas de répondre à tous les besoins exprimés pour ce projet :
+les clients doivent pouvoir être invités dans des dialogues; ils doivent donc être en mesure,
+lorsqu'ils ne sont pas occupés par une activité, de recevoir des messages non sollicités;
+nous avons donc dû revoir notre design initial en conséquence, tel qu'il apparaîtra ci-après.\\
+
+\subsubsection{Echange de messages serveur-client}
+Les messages échangés entre la partie serveur et la partie client du projet sont transmis selon un principe de sérialisation et désérialisation qui permet de faire transiter sur le réseau des messages totalement différents qu'on identifie par un en-tête. Cet en-tête permet au code qui reçoit ce message de savoir comment le traiter.
+
+ On constate donc la présence de deux structures de séquencement fort similaires, en forme de rateau :
+ \begin{itemize}
+   \item un input;
+   \item le choix d'une séquence d'instruction (une méthode) en fonction de cet input;
+   \item un output.
+ \end{itemize}
+ \begin{algorithm}
+  \caption{Traitement séquentiel partagé par le serveur et le client}
+  \begin{algorithmic}
+  \REQUIRE socket(s) ouvert(s)
+  \STATE écoute sur les sockets ouverts et sur le flux d'entrée
+  \IF{input sur flux d'entrée}
+  \STATE traitement : a l'initiative
+  \ELSE[message sur le socket]
+  \STATE traitement : sollicité
+  \ENDIF
+\end{algorithmic}
+\label{pseudo-code-select}
+\end{algorithm}
+
+\subsubsection{Synopsis du serveur}
+\begin{itemize}
+  \item Au démarrage, le serveur crée une instance de la classe \emph{MatchesHandler}, destinée à gérer l'interconnexion
+   de clients au travers du serveur dans le cas des matchs;
+  \item Le serveur se met en attente (fonction select()) d'une activité sur son clavier
+  (pour commander l'arrêt du serveur par exemple ou obtenir la liste des utilisateurs connectés...), sur
+  son socket destiné à recevoir les nouvelles connexions et sur les sockets des clients déjà connectés (voir diagrammes);
+  \item Lors d'une nouvelle connexion, le serveur crée une instance de la classe User; il y a donc un objet User par client;
+  \item Tout nouveau message reçu par le serveur est confié à la méthode \emph{commandHandler} de l'objet de type User, qui assure le dispatching
+  vers le module fonctionnel concerné, en se basant et mettant à jour la variable d'état state;
+  \item Cela assure un contrôle global des activités du client (et de l'arrêt de celles-ci).
+  Remarquons que cela pourrait permettre d'entreprendre plusieurs activités en parallèle.
+\end{itemize}
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/Serveur.png}
+    \caption{Diagramme d'activité : cycle de vie du serveur} \label{diag-serveur}
+    \end{figure}
+Aucune des méthodes du serveur n'étant bloquante pendant plus d'une fraction de seconde (peu d'I/O) et compte tenu des délais très courts pour la mise en œuvre, nous avons opté à ce stade pour une solution mono-thread;
+travailler avec un seul thread supprime la nécessité de devoir gérer l'accès concurrent aux données (en mémoire ou sur disque) et la communication entre threads (arrêt du serveur par exemple) :
+une solution multi-threads rendrait la gestion de ressources communes par les fonctions applicatives plus complexe (sérialisation de sections critiques), 
+tout en étant beaucoup plus gourmande en ressources CPU et présentant des risques de deadlocks (tests plus délicats à réaliser!). 
+Pour la gestion des time-out (dans le cas d'une enchère uniquement jusqu'à présent), 
+cela est actuellement géré au niveau client par un thread de cadencement (qui ne tourne que le temps d'un tour),
+mais cela pourra évoluer vers une utilisation du paramètre temporel de l'appel système \emph{select}.
+
+Si les messages sont de longueur fixe prévisible, un buffer de taille fixe peut être utilisé de part et d'autre.
+Sinon (par exemple pour une liste), deux solutions sont possibles :
+\begin{itemize}
+  \item Envoyer une série de messages de taille fixe;
+  \item Utiliser de part et d'autre des zones de mémoire allouées dynamiquement et envoyer tout en un seul message, après un premier message indiquant au client la taille du buffer.
+\end{itemize}
+Jusqu'à présent nous allouons un buffer de taille fixe.
+
+  \subsubsection{Synopsis du client}
+Comme le serveur, le client utilise la fonction select() afin de pouvoir capter indifféremment des messages d'origine différente,
+ en l’occurrence en provenance du clavier ou du socket de communication, ceci pour pouvoir recevoir des messages non sollicités dans une solution mono-thread.
+      \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/Client.png}
+    \caption{Diagramme d'activité : cycle de vie du client} \label{diag-client}
+    \end{figure}
+ La disponibilité aux messages non sollicités ne peut exister que lorsque le client
+ n'est pas dans un contexte verrouillé, c'est-à-dire dans les menus principaux ou au début du tour d'un match.
+ 
+ Lorsque le manager choisit une activité, le client entre dans un dialogue avec à la fois le serveur et le manager,
+ sans qu'il puisse être interrompu par un message non sollicité; d'ailleurs, le serveur ne va pas lui en envoyer,
+ puisqu'il connaît l'état dans lequel se trouve le client.
+ 
+ Le serveur travaillant en mode répétitif (pas de parallélisme), la variable d'état suffit donc à contrôler l'accès
+ aux sections critiques que sont les différentes activités.
+ 
+ De même, lorsque le client reçoit un message non sollicité, il entre dans un dialogue avec à la fois le serveur et le manager,
+ sans qu'il puisse être interrompu par un autre message non sollicité ou par une autre demande du manager au clavier.
+ 
+  \subsubsection{Exemples}
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/Activity_Login.png}
+    \caption{Exemple d'interaction par diagramme d'activité : identification} \label{diag-login}
+    \end{figure}
+    Cas où le client prend l'initiative de la communication : le code client récupère les identifiants et les envoie au serveur.
+    Celui-ci transmet la requête à l'instance User correspondante qui va traiter la demande et communiquer la confirmation au client.
+    En fonction de cette confirmation, le code client fera évoluer son contexte et affichera le menu adapté.
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/Activity_Tournamentmatch.png}
+    \caption{Exemple d'interaction par diagramme d'activité : démarrage d'un tournoi} \label{diag-tournament}
+    \end{figure}
+    L'inscription et le démarrage d'un tournoi impliquent les deux modes du client : l'initiative et la sollicitation.
+    L'inscription se fait par l'input reçu sur le flux d'entrée, par lequel l'utilisateur donne ses instructions.
+    L'enregistrement de cette inscription est similaire au processus d'identification, à la différence
+    qu'une instance commune à tous les \emph{Users} se charge du traitement et de la réponse.
+    
+    Quand le nombre d'inscrits requis est atteint, le serveur va inviter les clients à jouer leur match.
+    Dans ce cas, le serveur prend l'initiative d'une communication vers le client et c'est le client
+    qui va devoir confirmer en envoyer l'équipe de joueurs choisie.
+    
+    
+
+
+\subsubsection{Diagramme de séquence}
+  Voici un diagramme de séquence qui illustre les relations entre différents objets du code serveur
+  et du code client, dans le cas d'un match amical.
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/Sequence_matchStarting.png}
+    \caption{Diagramme de séquence : démarrage d'un match amical}
+    \end{figure}
+  À la connexion d'un client, le serveur instancie un User, classe chargé d'interpréter
+  les messages reçus sur le socket de communication correspondant.
+  Si cette requête concerne la gestion d'un match, alors le User\index{User} transmet l'information
+  au matchesHandler, qui a lui-même été instancié par le serveur à son initialisation et dont chaque
+  User reçoit un pointeur.
+  L'invitation d'un autre utilisateur est bloquante, le serveur ne répondant que
+  lorsque l'utilisateur invité aura lui-même répondu. La réception d'une invitation
+  du côté client implique une écoute du socket, qui se fait en même temps que l'écoute du flux
+  d'entrée grâce à l'appel système \emph{select} \index{select}. Une gestion du contexte
+  permet de savoir comment réagir lors d'un input sur le flux d'entrée, tandis que
+  l'en-tête des messages reçus du serveur permet de savoir comment réagir 
+  lors d'un push (message non attendu) du serveur
+  vers le client.
+  
+  Une fois le match démarré, le code client se charge de remplir une matrice d'entiers caractérisant
+  une liste de déplacements ou d'actions, qu'il envoie au serveur. Le premier client à répondre
+  est bloqué le temps que le deuxième client ne réponde. 
+  Une gestion de time-out pourra être intégrée plus tard.
+
+\subsection{Diagramme de composants}
+      \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/Diagrammededeploiement.png}
+    \caption{Diagramme de composants}
+    \end{figure}
 %\chapter{Index des termes utilisés}
 %  Contiendra, au moins, toutes les entrées du glossaire (avec les numéros des pages correspondantes).
 \addcontentsline{toc}{chapter}{4 Index}
 \phantomsection
+\begin{thebibliography}{9}
+\bibitem{Blanchette2006} Blanchette Jasmin, Summerfield Mark - Trolltech 2006 - C++ GUI programming with Qt4 - ISBN 0-13-187249-4
+\bibitem{Bulfone} Bulfone Christian - 2012 - Le modèle client-serveur - www.gipsa-lab.fr/~christian.bulfone/IC2A-DCISS
+\end{thebibliography}
 \printindex
 
 \end{document}

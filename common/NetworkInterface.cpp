@@ -2,31 +2,31 @@
 /* recv(socket, *message, sizeToWrite, 0) return sizeWriten if ok
 //send(socket, *message, sizeToRead, 0) return sizeRead if ok */
 
-SerializedObject receiveOnSocket(int socketfd){
-    SerializedObject received;
+//~ SerializedObject receiveOnSocket(int socketfd){
+    //~ SerializedObject received;
+//~ 
+    //~ int result;
+    //~ result = recv(socketfd, &received, sizeof(SerializedObject), 0);
+    //~ //Attention, on ne renvoie pas la valeur de retour
+    //~ received.typeOfInfos = ntohs(received.typeOfInfos);
+    //~ if(result != sizeof(SerializedObject))
+        //~ std::cout<<"receiveOnSocket : Erreur dans la reception des données"<<std::endl;
+    //~ return received;
+//~ }
 
-    int result;
-    result = recv(socketfd, &received, sizeof(SerializedObject), 0);
-    //Attention, on ne renvoie pas la valeur de retour
-    received.typeOfInfos = ntohs(received.typeOfInfos);
-    if(result != sizeof(SerializedObject))
-        std::cout<<"receiveOnSocket : Erreur dans la reception des données"<<std::endl;
-    return received;
-}
-
-int sendOnSocket(int socketfd, SerializedObject toSend){
-    int result;
-    toSend.typeOfInfos = htons(toSend.typeOfInfos);
-    result =  send(socketfd, &toSend, sizeof(SerializedObject), 0);
-    if(result != sizeof(SerializedObject))
-        std::cout<<"sendOnSocket : Erreur dans l'envoi des données"<<std::endl; //TODO : sur le flux err
-    else{
-#ifdef __DEBUG
-        std::cout<<"SendOnSocket : Paquet envoyé"<<std::endl;
-#endif
-    }
-    return result;
-}
+//~ int sendOnSocket(int socketfd, SerializedObject toSend){
+    //~ int result;
+    //~ toSend.typeOfInfos = htons(toSend.typeOfInfos);
+    //~ result =  send(socketfd, &toSend, sizeof(SerializedObject), 0);
+    //~ if(result != sizeof(SerializedObject))
+        //~ std::cout<<"sendOnSocket : Erreur dans l'envoi des données"<<std::endl; //TODO : sur le flux err
+    //~ else{
+//~ #ifdef __DEBUG
+        //~ std::cout<<"SendOnSocket : Paquet envoyé"<<std::endl;
+//~ #endif
+    //~ }
+    //~ return result;
+//~ }
 
 //appelée dans login() du client :
 int sendLoginToServer(int sockfd, char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]){
