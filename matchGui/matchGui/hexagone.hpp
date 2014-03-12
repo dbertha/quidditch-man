@@ -24,12 +24,12 @@
 
 //construit un hexagone grace a 6 point, l'hexagone peut etre vu comme un triangle (partie superieur) + un rectangle + triangle retourné
 static const QPointF baseCoord[6] =
-    {QPointF(  0.0, -20.0), //0. pointe haute
-     QPointF( 10.0, -10.0), //1. haut-droite
-     QPointF( 10.0,  10.0), //2. bas-droite
-     QPointF(  0.0,  20.0), //3. pointe bas
-     QPointF(-10.0,  10.0), //4. bas-gauche
-     QPointF(-10.0, -10.0)};//5. haut-gauche
+	{QPointF(  0.0, -15.0), //0. pointe haute
+	 QPointF( 10.0, -7.0), //1. haut-droite
+	 QPointF( 10.0,  7.0), //2. bas-droite
+	 QPointF(  0.0,  15.0), //3. pointe bas
+	 QPointF(-10.0,  7.0), //4. bas-gauche
+	 QPointF(-10.0, -7.0)};//5. haut-gauche
 
 static const qreal hauteur = pBas.y() - pHaut.y() ;
 static const qreal largeur = pHautDroite.x() - pHautGauche.x() ;
@@ -47,8 +47,14 @@ static const QPointF pasIndiceJ(largeur/2,hauteurTiers);
 //defini les couleurs utilise pour le coloriage selon le type de case (vide,joueur,but,balle)
 static const QColor _couleurFondSelect=Qt::cyan;
 static const QColor _couleurFondNoSelect=Qt::white;
+static const QColor _couleurFondGoal=Qt::darkCyan;
+
 static const QColor _couleurEquipe1=Qt::blue;
 static const QColor _couleurEquipe2=Qt::black;
+
+static const QColor _couleurQuaffle=QColor (222,184,135);//burlywood
+static const QColor _couleurGoldenSnitch=Qt::yellow;
+static const QColor _couleurBludger=Qt::darkRed;
 
 
 class hexagone : public QGraphicsObject
@@ -73,7 +79,7 @@ class hexagone : public QGraphicsObject
         void changerCouleur();
 
     signals:
-        void hexagoneSelect(int,int);
+		void hexagoneSelect(int,int);
 
     protected:
         void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -82,17 +88,27 @@ class hexagone : public QGraphicsObject
         int _typeCase;//indique le type de case (vide, contient un joueur,balle,...)
         int _indiceI;
         int _indiceJ;
+		bool _ifGoal;
         bool _ifSelect;
 
 
         void dessinerHexagone(QPainter *painter);//dessine le coutour de la case
         void dessinerType(QPainter *painter);//dessine le type de la case (balle,joueur,...)
-        QPolygonF hexagoneBuilt() const;
-        QRectF rectangleInterne() const;
-        void dessinerKeeper(QPainter *painter,QColor colorEquipe );
+
+		void dessinerCaseVide(QPainter *painter);
+		void dessinerKeeper(QPainter *painter,QColor colorEquipe );
         void dessinerSeeker(QPainter *painter,QColor colorEquipe );
         void dessinerChaser(QPainter *painter,QColor colorEquipe );
-        void dessinerBeater(QPainter *painter,QColor colorEquipe );
+		void dessinerBeater(QPainter *painter,QColor colorEquipe );
+		void dessinerQuaffle(QPainter *painter);
+		void dessinerGoldenSnitch(QPainter *painter);
+		void dessinerBludger(QPainter *painter);
+
+        QPolygonF hexagoneBuilt() const;//hexagone pre-fabriquer
+        QRectF rectangleInterne() const;
+        QPointF centreHexagon() const;
+
+
 };
 
 

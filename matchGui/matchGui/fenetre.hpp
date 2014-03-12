@@ -17,17 +17,23 @@
 #include <QDebug> //permet de dispose d'un affichage dans console debug
 
 #include "hexagone.hpp"
+
 #include "Coordinates.hpp" //permet d'avoir MATRIX_SIZE et systeme de coord
+#include "HexagonalField.hpp"
+#include "PlayingPlayer.hpp"
+#include "Ball.hpp"
+
 
 class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 {
     Q_OBJECT //vas permettre de def ces propres slot et signaux
 
     public:
-        fenetre();//constructeur de la fenetre
+		fenetre();//constructeur pour test
+		fenetre(HexagonalField,std::vector <PlayingPlayer>,std::vector <Ball>);//constructeur de la fenetre
 
     public slots:
-        void changerTexte(int,int);//peut etre fait parceque j'ai mis Q_OBJECT
+		void changerTexte(int,int);//peut etre fait parceque j'ai mis Q_OBJECT
 
     signals:
 //    void agrandissementMax();
@@ -40,6 +46,12 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
         QGraphicsView *view;
         hexagone *hexa;
         hexagone *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
+
+		HexagonalField _fieldMatrice;
+		std::vector <PlayingPlayer> _listeJoueur;
+		std::vector <Ball> _listeBall;
+
+		void initFieldGui();
 //        AxialCoordinates coord;
 //    QPushButton *m_bouton;
 //    QLCDNumber *m_lcd;

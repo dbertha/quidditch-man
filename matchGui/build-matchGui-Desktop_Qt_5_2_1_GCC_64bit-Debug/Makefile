@@ -47,11 +47,21 @@ OBJECTS_DIR   = ./
 
 SOURCES       = ../matchGui/main.cpp \
 		../matchGui/fenetre.cpp \
-		../matchGui/hexagone.cpp moc_fenetre.cpp \
+		../matchGui/hexagone.cpp \
+		../matchGui/ManagedPlayer.cpp \
+		../matchGui/PlayingPlayer.cpp \
+		../matchGui/Broomstick.cpp \
+		../matchGui/Player.cpp \
+		../matchGui/HexagonalField.cpp moc_fenetre.cpp \
 		moc_hexagone.cpp
 OBJECTS       = main.o \
 		fenetre.o \
 		hexagone.o \
+		ManagedPlayer.o \
+		PlayingPlayer.o \
+		Broomstick.o \
+		Player.o \
+		HexagonalField.o \
 		moc_fenetre.o \
 		moc_hexagone.o
 DIST          = ../../../../Qt5.2.1/5.2.1/gcc_64/mkspecs/features/spec_pre.prf \
@@ -417,7 +427,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/matchGui1.0.0 || mkdir -p .tmp/matchGui1.0.0
-	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/matchGui1.0.0/ && $(COPY_FILE) --parents ../matchGui/fenetre.hpp ../matchGui/hexagone.hpp ../matchGui/Coordinates.hpp ../matchGui/Defines.hpp .tmp/matchGui1.0.0/ && $(COPY_FILE) --parents ../matchGui/main.cpp ../matchGui/fenetre.cpp ../matchGui/hexagone.cpp .tmp/matchGui1.0.0/ && (cd `dirname .tmp/matchGui1.0.0` && $(TAR) matchGui1.0.0.tar matchGui1.0.0 && $(COMPRESS) matchGui1.0.0.tar) && $(MOVE) `dirname .tmp/matchGui1.0.0`/matchGui1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/matchGui1.0.0
+	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/matchGui1.0.0/ && $(COPY_FILE) --parents ../matchGui/fenetre.hpp ../matchGui/hexagone.hpp ../matchGui/Coordinates.hpp ../matchGui/Defines.hpp ../matchGui/ManagedPlayer.hpp ../matchGui/PlayingPlayer.hpp ../matchGui/Ball.hpp ../matchGui/Broomstick.hpp ../matchGui/Player.hpp ../matchGui/HexagonalField.hpp .tmp/matchGui1.0.0/ && $(COPY_FILE) --parents ../matchGui/main.cpp ../matchGui/fenetre.cpp ../matchGui/hexagone.cpp ../matchGui/ManagedPlayer.cpp ../matchGui/PlayingPlayer.cpp ../matchGui/Broomstick.cpp ../matchGui/Player.cpp ../matchGui/HexagonalField.cpp .tmp/matchGui1.0.0/ && (cd `dirname .tmp/matchGui1.0.0` && $(TAR) matchGui1.0.0.tar matchGui1.0.0 && $(COMPRESS) matchGui1.0.0.tar) && $(MOVE) `dirname .tmp/matchGui1.0.0`/matchGui1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/matchGui1.0.0
 
 
 clean:compiler_clean 
@@ -585,6 +595,7 @@ moc_fenetre.cpp: ../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QApplication
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QColor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QCursor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/qmath.h \
+		../matchGui/Defines.hpp \
 		../matchGui/Coordinates.hpp \
 		../matchGui/fenetre.hpp
 	/home/pidy/Qt5.2.1/5.2.1/gcc_64/bin/moc $(DEFINES) $(INCPATH) ../matchGui/fenetre.hpp -o moc_fenetre.cpp
@@ -695,6 +706,7 @@ moc_hexagone.cpp: ../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QGraphicsIt
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qcursor.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/qmath.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/QDebug \
+		../matchGui/Defines.hpp \
 		../matchGui/hexagone.hpp
 	/home/pidy/Qt5.2.1/5.2.1/gcc_64/bin/moc $(DEFINES) $(INCPATH) ../matchGui/hexagone.hpp -o moc_hexagone.cpp
 
@@ -861,8 +873,15 @@ main.o: ../matchGui/main.cpp ../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QColor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QCursor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/qmath.h \
+		../matchGui/Defines.hpp \
 		../matchGui/Coordinates.hpp \
-		../matchGui/Defines.hpp
+		../matchGui/ManagedPlayer.hpp \
+		../matchGui/Player.hpp \
+		../matchGui/Broomstick.hpp \
+		../matchGui/PlayingPlayer.hpp \
+		../common/HexagonalField.hpp \
+		../common/Coordinates.hpp \
+		../matchGui/Ball.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../matchGui/main.cpp
 
 fenetre.o: ../matchGui/fenetre.cpp ../matchGui/fenetre.hpp \
@@ -1008,6 +1027,7 @@ fenetre.o: ../matchGui/fenetre.cpp ../matchGui/fenetre.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QColor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QCursor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/qmath.h \
+		../matchGui/Defines.hpp \
 		../matchGui/Coordinates.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fenetre.o ../matchGui/fenetre.cpp
 
@@ -1117,8 +1137,34 @@ hexagone.o: ../matchGui/hexagone.cpp ../matchGui/hexagone.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QCursor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qcursor.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/qmath.h \
-		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/QDebug
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/QDebug \
+		../matchGui/Defines.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o hexagone.o ../matchGui/hexagone.cpp
+
+ManagedPlayer.o: ../matchGui/ManagedPlayer.cpp ../matchGui/Player.hpp \
+		../matchGui/Broomstick.hpp \
+		../matchGui/ManagedPlayer.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ManagedPlayer.o ../matchGui/ManagedPlayer.cpp
+
+PlayingPlayer.o: ../matchGui/PlayingPlayer.cpp ../matchGui/Player.hpp \
+		../matchGui/Broomstick.hpp \
+		../matchGui/ManagedPlayer.hpp \
+		../matchGui/PlayingPlayer.hpp \
+		../common/HexagonalField.hpp \
+		../common/Coordinates.hpp \
+		../matchGui/Ball.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o PlayingPlayer.o ../matchGui/PlayingPlayer.cpp
+
+Broomstick.o: ../matchGui/Broomstick.cpp ../matchGui/Broomstick.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Broomstick.o ../matchGui/Broomstick.cpp
+
+Player.o: ../matchGui/Player.cpp ../matchGui/Player.hpp \
+		../matchGui/Broomstick.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Player.o ../matchGui/Player.cpp
+
+HexagonalField.o: ../matchGui/HexagonalField.cpp ../matchGui/HexagonalField.hpp \
+		../matchGui/Coordinates.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o HexagonalField.o ../matchGui/HexagonalField.cpp
 
 moc_fenetre.o: moc_fenetre.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_fenetre.o moc_fenetre.cpp
