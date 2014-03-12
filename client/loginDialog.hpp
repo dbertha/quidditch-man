@@ -35,6 +35,7 @@ public:
     LoginDialog(int, QWidget *parent = 0);
     void init();
     QString getName();
+    int getRole();
 
 signals:
     void login(const QString &,const QString &);
@@ -45,7 +46,7 @@ private slots:
     void enableloginButton(const QString &text);
 
 private:
-    int sockfd_;
+    int sockfd_, role;
     char username[USERNAME_LENGTH];
     char password[PASSWORD_LENGTH];
     QLabel *label;

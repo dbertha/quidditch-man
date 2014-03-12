@@ -7,7 +7,6 @@ MainGui::MainGui(int sockfd,QMainWindow *parent) : sockfd_(sockfd), parent_(pare
     setWindowTitle(tr("Quidditch Manager 2014"));
     loginDialog = new LoginDialog(sockfd_,this);
     nbPlayers=money=nbFans=nbActionPoints=0;
-    ticker = new Ticker(sockfd_, this);
     login();
 }
 
@@ -28,6 +27,15 @@ void MainGui::buildings() {
     buildingsDialog = new BuildingsDialog(sockfd_,this);
     buildingsDialog->exec();
 }
+void MainGui::listPlayers() {
+    ticker->hide();
+    int res = choosePlayer(sockfd_,this);
+    if (res==BAD_CONNECTION) badConnection();
+    else {
+// .............
+    }
+    ticker->show();
+}
 
 void MainGui::listMgrs() {
     ticker->hide();
@@ -40,12 +48,10 @@ void MainGui::listMgrs() {
 }
 void MainGui::login() {
     loginDialog->init();
-    if (loginDialog->exec()==loginDialog->Accepted) {//le mgr est connecte; on cree le menu
-        std::cout<<"Manager identifie"<<std::endl;
+    if (loginDialog->exec()==loginDialog->Accepted) {//connecte; on cree le menu
+        role=loginDialog->getRole();
         createMenu();
-        ticker->show();
     }
-    else ticker->hide();
 }
 void MainGui::logout() {
     menuBar()->clear();
@@ -60,9 +66,12 @@ void MainGui::createActions() {
     logoutAction=new QAction(tr("Logout"),this);
     listMgrsAction=new QAction(tr("List available managers"),this);
     listAuctionsAction=new QAction(tr("List auctions"),this);
-    newAuctionAction=new QAction(tr("New"),this);
     listPlayersAction=new QAction(tr("List my players"),this);
     buildingsAction=new QAction(tr("Open board"),this);
+    listTournamentsAction=new QAction(tr("List tournaments"),this);
+    newTournamentAction=new QAction(tr("New tournament"),this);
+    newPromotionAction=new QAction(tr("Start a new promotion campaign"),this);
+    buyAPAction=new QAction(tr("Buy action points"),this);
 }
 
 void MainGui::firstMenu() {
@@ -80,20 +89,34 @@ void MainGui::firstMenu() {
 }
 
 void MainGui::createMenu() {
-        fileMenu->removeAction(loginAction);
+    fileMenu->removeAction(loginAction);
 //        fileMenu->addAction(logoutAction);
 //        connect(logoutAction,SIGNAL(triggered()),this,SLOT(logout()));
+    if (role==NORMAL_LOGIN) {
         matchMenu=menuBar()->addMenu(tr("Match"));
         matchMenu->addAction(listMgrsAction);
         connect(listMgrsAction,SIGNAL(triggered()),this,SLOT(listMgrs()));
         auctionMenu=menuBar()->addMenu(tr("Auctions"));
-        auctionMenu->addAction(newAuctionAction);
         auctionMenu->addAction(listAuctionsAction);
         playersMenu=menuBar()->addMenu(tr("Players"));
         playersMenu->addAction(listPlayersAction);
+        connect(listPlayersAction,SIGNAL(triggered()),this,SLOT(listPlayers()));
         buildingsMenu=menuBar()->addMenu(tr("Buildings"));
         buildingsMenu->addAction(buildingsAction);
         connect(buildingsAction,SIGNAL(triggered()),this,SLOT(buildings()));
+        tournamentsMenu=menuBar()->addMenu(tr("Tournaments"));
+        tournamentsMenu->addAction(listTournamentsAction);
+        actionPointsMenu=menuBar()->addMenu(tr("Action Points"));
+        actionPointsMenu->addAction(newPromotionAction);
+        actionPointsMenu->addAction(buyAPAction);
+        ticker = new Ticker(sockfd_, this);
+        ticker->show();
+    }
+    else if (role==ADMIN_LOGIN) {
+        tournamentsMenu=menuBar()->addMenu(tr("Tournaments"));
+        tournamentsMenu->addAction(newTournamentAction);
+        tournamentsMenu->addAction(listTournamentsAction);
+    }
 }
 void MainGui::about() {
     QMessageBox::about(this, tr("Quidditch Manager 2014"),

@@ -56,6 +56,7 @@ void LoginDialog::init() {
 }
 
 QString LoginDialog::getName() {return userName;}
+int LoginDialog::getRole() {return role;}
 
 void LoginDialog::loginClicked()
 {
@@ -80,13 +81,15 @@ void LoginDialog::loginClicked()
                     else {//on tente le login
                         strncpy(username,userName.toAscii().data(),USERNAME_LENGTH);
                         strncpy(password,password1.toAscii().data(),PASSWORD_LENGTH);
-                        if(sendLoginToServer(sockfd_,username,password)!=0)
-                             if (getConfirmation(sockfd_)) accept();
+                        if(sendLoginToServer(sockfd_,username,password)!=0) {
+                            role=getConfirmation(sockfd_);
+                             if (role) accept();
                              else {
                                  errorMessageDialog->showMessage(
                                          tr("Name or password invalid."));
                                  init();
                              }
+                        }
                     }
             }
             else //vérifions si les 2 mots de passe sont identiques
@@ -118,7 +121,6 @@ void LoginDialog::loginClicked()
     }
 }
 
-void LoginDialog::enableloginButton(const QString &text)
-{
+void LoginDialog::enableloginButton(const QString &text) {
     loginButton->setEnabled(!text.isEmpty());
 }

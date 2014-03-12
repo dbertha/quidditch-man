@@ -13,7 +13,9 @@
 #include "ticker.hpp"
 #include "loginDialog.hpp"
 #include "clientMatchHandler.hpp"
+#include "playerMgr.hpp"
 #include "buildingsDialog.hpp"
+
 class Ticker;
 class BuildingsDialog;
 class MainGui : public QMainWindow{
@@ -36,6 +38,7 @@ private slots:
         void login();
         void logout();
         void listMgrs();
+        void listPlayers();
         void buildings();
 private:
         int badConnection();
@@ -48,19 +51,24 @@ private:
         QAction *aboutAction;
         QAction *listMgrsAction;
         QAction *listAuctionsAction;
-        QAction *newAuctionAction;
         QAction *listPlayersAction;
         QAction *buildingsAction;
+        QAction *listTournamentsAction;
+        QAction *newTournamentAction;
+        QAction *newPromotionAction;
+        QAction *buyAPAction;
         QMenu *fileMenu;
         QMenu *matchMenu;
         QMenu *auctionMenu;
         QMenu *playersMenu;
         QMenu *buildingsMenu;
+        QMenu *tournamentsMenu;
+        QMenu *actionPointsMenu;
         QMenu *helpMenu;
         Ticker *ticker;
         BuildingsDialog *buildingsDialog;
         LoginDialog *loginDialog;
-        int sockfd_, nbPlayers, money, nbFans, nbActionPoints;
+        int sockfd_, role, nbPlayers, money, nbFans, nbActionPoints;
         QMainWindow parent_;
 };
 
