@@ -53,6 +53,5 @@ int main(int argc, char *argv[])
     MainGui * window=new MainGui(sockfd_);
     window->show();
     std::cout<<"Client GUI started"<<std::endl;
-    window->run();
     return application.exec();
 }

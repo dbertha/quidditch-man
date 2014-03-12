@@ -1,4 +1,8 @@
 #include "playerMgr.hpp"
+#include "Defines.hpp"
+#include "selectionDialog.hpp"
+#include "common/NetworkInterface.hpp"
+#include "playersDialog.hpp"
 
 int choosePlayer(const int sockfd_, QWidget *parent) {
     int pos = NO_CHOISE;
@@ -15,13 +19,14 @@ int choosePlayer(const int sockfd_, QWidget *parent) {
     SelectionDialog *selectionDialog = new SelectionDialog(items,parent);
     selectionDialog->setWindowTitle("Select a player");
     if (selectionDialog->exec()==selectionDialog->Accepted) {
-        int pos = selectionDialog->getPosition()+1;
-        std::cout<<pos<<"eme joueur selectionne"<<std::endl;
+        pos = selectionDialog->getPosition();
+        std::cout<<pos+1<<"eme joueur selectionne"<<std::endl;
+        PlayersDialog *playersDialog = new PlayersDialog(sockfd_,pos,parent);
+        strncpy(username,playersList[2*pos].c_str(),USERNAME_LENGTH);
+        strcat(username," ");
+        strncat(username,playersList[2*pos+1].c_str(),USERNAME_LENGTH);
+        playersDialog->setWindowTitle(username);
+        playersDialog->exec();
     }
     return pos;
 }
-/*
-askForPlayerInfos(input_-1);
-vector<int> playerInfos = receivePlayerInfo();
-displayPlayerInfos(playerInfos,input_-1);
-*/

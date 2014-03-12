@@ -10,20 +10,20 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QStringList>
+
 #include "ticker.hpp"
 #include "loginDialog.hpp"
-#include "clientMatchHandler.hpp"
-#include "playerMgr.hpp"
+#include "mainMenu.hpp"
 #include "buildingsDialog.hpp"
-
+class MainMenu;
 class Ticker;
 class BuildingsDialog;
-class MainGui : public QMainWindow{
+
+class MainGui : public QMainWindow {
     Q_OBJECT
 public:
         MainGui(int,QMainWindow *parent=0);
-        ~ MainGui();
-        void run();
+        ~MainGui();
         int getMoney();
         int getNbPlayers();
         int getNbFans();
@@ -34,7 +34,6 @@ public:
         void setActionPoints(const int);
 private slots:
         void about();
-        void quit();
         void login();
         void logout();
         void listMgrs();
@@ -45,6 +44,7 @@ private:
         void createActions();
         void firstMenu();
         void createMenu();
+        void createButtons();
         QAction *loginAction;
         QAction *logoutAction;
         QAction *exitAction;
@@ -66,10 +66,11 @@ private:
         QMenu *actionPointsMenu;
         QMenu *helpMenu;
         Ticker *ticker;
+        MainMenu *mainMenu;
         BuildingsDialog *buildingsDialog;
         LoginDialog *loginDialog;
         int sockfd_, role, nbPlayers, money, nbFans, nbActionPoints;
-        QMainWindow parent_;
+        QMainWindow *parent_;
 };
 
-#endif // MAINGUI_H
+#endif

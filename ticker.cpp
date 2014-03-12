@@ -4,9 +4,8 @@ Ticker::Ticker(const int sockfd, MainGui *parent)
     : sockfd_(sockfd), QWidget(parent), parent_(parent) {
     myTimerId = 0; // no timer started yet
     counter =nbPlayers=money=nbFans=actionPoints=0;
-    move(0,50); // position in parent window
+    move(0,25); // position in parent window
     label = new QLabel(tr("you have"));
-//  label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     QHBoxLayout *layout = new QHBoxLayout;
     layout->addWidget(label);
     layout->setSizeConstraint(QLayout::SetFixedSize);

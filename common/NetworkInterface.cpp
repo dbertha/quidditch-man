@@ -94,6 +94,31 @@ int askForPlayerInfos(int sockfd, int playerID){
     memcpy(position, &playerID, sizeof(playerID));
     return sendOnSocket(sockfd, serialized);
 }
+int trainPlayer(int sockfd_, int playerID, int capacity){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = TRAIN_PLAYER;
+    memcpy(position, &playerID, sizeof(playerID));
+    position += sizeof(playerID);
+    memcpy(position, &capacity, sizeof(capacity));
+    return sendOnSocket(sockfd_, serialized);
+}
+int healPlayer(int sockfd_, int playerID){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = HEAL_PLAYER;
+    memcpy(position, &playerID, sizeof(playerID));
+    return sendOnSocket(sockfd_, serialized);
+}
+int sellPlayer(int sockfd_, int playerID, int startingPrice){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = CREATEAUCTION;
+    memcpy(position, &playerID, sizeof(playerID));
+    position += sizeof(playerID);
+    memcpy(position, &startingPrice, sizeof(startingPrice));
+    return sendOnSocket(sockfd_, serialized);
+}
 int proposeMatchTo(int sockfd, int userID, std::vector<int> playersInTeam){
     SerializedObject serialized;
     char * position = serialized.stringData;

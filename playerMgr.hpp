@@ -1,8 +1,5 @@
 #ifndef PLAYERMGR_HPP
 #define PLAYERMGR_HPP
-#include "Defines.hpp"
-#include "selectionDialog.hpp"
-#include "common/NetworkInterface.hpp"
 
 #define BAD_CONNECTION -1
 #define NO_CHOISE 0

@@ -1,7 +1,9 @@
 #include "mainGui.hpp"
+#include "clientMatchHandler.hpp"
+#include "playerMgr.hpp"
 
 MainGui::MainGui(int sockfd,QMainWindow *parent) : sockfd_(sockfd), parent_(parent) {
-    setFixedSize(800,480);
+    setFixedSize(800,640);
     createActions();
     firstMenu();
     setWindowTitle(tr("Quidditch Manager 2014"));
@@ -9,15 +11,8 @@ MainGui::MainGui(int sockfd,QMainWindow *parent) : sockfd_(sockfd), parent_(pare
     nbPlayers=money=nbFans=nbActionPoints=0;
     login();
 }
-
 MainGui::~ MainGui() {}
 
-void MainGui::run() {
-   this->show();
-}
-void MainGui::quit() {
-    std::cout<<"quit"<<std::endl;
-}
 int MainGui::badConnection() {
     QErrorMessage *errorMessageDialog = new QErrorMessage(this);
     errorMessageDialog->showMessage(tr("No connection with the server."));
@@ -28,15 +23,8 @@ void MainGui::buildings() {
     buildingsDialog->exec();
 }
 void MainGui::listPlayers() {
-    ticker->hide();
-    int res = choosePlayer(sockfd_,this);
-    if (res==BAD_CONNECTION) badConnection();
-    else {
-// .............
-    }
-    ticker->show();
+    if (choosePlayer(sockfd_,this)==BAD_CONNECTION) badConnection();
 }
-
 void MainGui::listMgrs() {
     ticker->hide();
     int res = choosePartner(sockfd_,this);
@@ -67,7 +55,7 @@ void MainGui::createActions() {
     listMgrsAction=new QAction(tr("List available managers"),this);
     listAuctionsAction=new QAction(tr("List auctions"),this);
     listPlayersAction=new QAction(tr("List my players"),this);
-    buildingsAction=new QAction(tr("Open board"),this);
+    buildingsAction=new QAction(tr("List my buildings"),this);
     listTournamentsAction=new QAction(tr("List tournaments"),this);
     newTournamentAction=new QAction(tr("New tournament"),this);
     newPromotionAction=new QAction(tr("Start a new promotion campaign"),this);
@@ -111,6 +99,9 @@ void MainGui::createMenu() {
         actionPointsMenu->addAction(buyAPAction);
         ticker = new Ticker(sockfd_, this);
         ticker->show();
+        mainMenu = new MainMenu(this);
+        setCentralWidget(mainMenu);
+        mainMenu->show();
     }
     else if (role==ADMIN_LOGIN) {
         tournamentsMenu=menuBar()->addMenu(tr("Tournaments"));
