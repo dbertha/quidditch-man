@@ -1,12 +1,12 @@
 #ifndef MATCHESHANDLER_HPP
 #define MATCHESHANDLER_HPP
 
-#include "../common/HexagonalField.hpp"
+//#include "../common/HexagonalField.hpp"
 #include "../common/Defines.hpp"
 #include "../common/NetworkBase.hpp"
 #include "ManagedPlayer.hpp"
-#include "PlayingPlayer.hpp"
-#include "Ball.hpp"
+//#include "PlayingPlayer.hpp"
+//#include "Ball.hpp"
 #include "Match.hpp"
 #include "User.hpp"
 #include "Tournament.hpp" //the only one to know this class

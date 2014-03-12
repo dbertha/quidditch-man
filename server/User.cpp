@@ -4,7 +4,7 @@
 #include "Auction.hpp"
 #include "Server.hpp"
 #include "DataBase.hpp"
-
+	
 //TODO : éviter redondance des includes avec le hpp
 #include <string> 
 #include <sys/stat.h>
