@@ -71,3 +71,4 @@ server.out: server/Auction.hpp \
 clean:
 	make clean -f Makefile.server
 	make clean -f Makefile.client
+
