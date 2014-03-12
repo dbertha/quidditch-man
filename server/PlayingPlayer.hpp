@@ -6,7 +6,7 @@
 #include "../common/Defines.hpp"
 #include "Player.hpp"
 #include "ManagedPlayer.hpp"
-#include "Ball.hpp"
+//#include "Ball.hpp"
 #include <cstring> //memcpy
 
 
