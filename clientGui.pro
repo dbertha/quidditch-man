@@ -10,6 +10,9 @@ HEADERS += clientMatchHandler.hpp \
            mainGui.hpp \
            selectionDialog.hpp \
            ticker.hpp \
+           BuildingsDialog.hpp \
+           buildingsModel.hpp \
+           playerMgr.hpp \
 
 SOURCES += clientMatchHandler.cpp \
            loginDialog.cpp \
@@ -17,4 +20,7 @@ SOURCES += clientMatchHandler.cpp \
            mainGui.cpp \
            selectionDialog.cpp \
            ticker.cpp \
+           BuildingsDialog.cpp \
+           buildingsModel.cpp \
+           playerMgr.cpp \
 
