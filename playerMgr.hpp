@@ -1,5 +1,5 @@
-#ifndef CLIENTMATCHHANDLER_HPP
-#define CLIENTMATCHHANDLER_HPP
+#ifndef PLAYERMGR_HPP
+#define PLAYERMGR_HPP
 #include "Defines.hpp"
 #include "selectionDialog.hpp"
 #include "common/NetworkInterface.hpp"
@@ -16,7 +16,6 @@
 #include <QStringList>
 #include <QWidget>
 
-int choosePartner(const int, QWidget *parent);
-
+int choosePlayer(const int, QWidget *parent);
 
 #endif

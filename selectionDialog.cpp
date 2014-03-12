@@ -8,7 +8,7 @@ SelectionDialog::SelectionDialog(const QStringList &items,QWidget *parent)
     listView->setModel(model);
     listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    selectButton = new QPushButton(tr("Current select"));
+    selectButton = new QPushButton(tr("Select Current"));
     selectButton->setDefault(true);
     cancelButton= new QPushButton(tr("Cancel"));
     bottomLayout = new QHBoxLayout;

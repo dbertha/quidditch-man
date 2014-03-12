@@ -1,6 +1,7 @@
 #include "clientMatchHandler.hpp"
 
 int choosePartner(const int sockfd_, QWidget *parent) {
+    int pos = NO_CHOISE;
     std::vector<int> IDList;
     std::vector<std::string> namesList;
     if (getManagersList(sockfd_)==0) return BAD_CONNECTION;
@@ -15,8 +16,8 @@ int choosePartner(const int sockfd_, QWidget *parent) {
     SelectionDialog *selectionDialog = new SelectionDialog(items,parent);
     selectionDialog->setWindowTitle("Select a partner");
     if (selectionDialog->exec()==selectionDialog->Accepted) {
-        int pos = selectionDialog->getPosition();
-        std::cout<<pos+1<<"eme manager selectionne"<<std::endl;
-
+        int pos = selectionDialog->getPosition()+1;
+        std::cout<<pos<<"eme manager selectionne"<<std::endl;
     }
+    return pos;
 }
