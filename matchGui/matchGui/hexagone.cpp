@@ -64,6 +64,7 @@ void hexagone::dessinerType(QPainter *painter){
 
 //les 4 fonctions vont la meme chose, laissez pour pouvoir changer affichage d'un joueur en particulier
 void hexagone::dessinerKeeper(QPainter *painter,QColor colorEquipe ){
+    setToolTip("Keeper");
     painter->setPen(QPen(colorEquipe));
     painter->drawText(rectangleInterne(), Qt::AlignCenter, tr("K"));
 }
@@ -75,7 +76,9 @@ void hexagone::dessinerChaser(QPainter *painter,QColor colorEquipe ){
     painter->setPen(QPen(colorEquipe));
     painter->drawText(rectangleInterne(), Qt::AlignCenter, tr("K"));
 }
+
 void hexagone::dessinerBeater(QPainter *painter,QColor colorEquipe ){
+    setToolTip("Keeper");
     painter->setPen(QPen(colorEquipe));
     painter->drawText(rectangleInterne(), Qt::AlignCenter, tr("K"));
 }
