@@ -101,7 +101,7 @@
 \hfill Groupe 4 : Manon Legrand, Hélène Plisnier, Audry Delestree, David Bertha \\
 \hfill INFOF209 \\
 \hfill Université Libre de Bruxelles \\
-\hfill Version 1.0 \\
+\hfill Version 3.0 \\
 
 \HRule{1pt}} % Horizontal line, thickness changed here
 
@@ -170,6 +170,7 @@
     1.6 & Audry & 21/02/14 & Nouveaux diagrammes de classes (2) \\
     1.7 & Manon & 21/02/14 & Modif de certains commentaires de diag \\
     2.0 & Manon & 21/02/14 & Jeu sur terminal et Echange de messages \\
+    2.1 & David & 11/03/14 & Précisions de l'architecture réseau \\
     \hline
   \end{tabular}
 
@@ -939,22 +940,11 @@ Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvo
     \end{figure}	
   Les enchères se déroulent au tour par tour. A chaque tour, les managers désireux de poursuivre la vente doivent enchérir. S'ils ne le font pas dans le temps imparti, ou qu'ils souhaitent quitter l'enchère, ils devront attendre la fin du tour avant d'avoir à nouveau accès aux menus de jeu. Le dernier tour est atteint quand il n'y a plus qu'un seul manager qui enchérit, il gagne alors la vente.
   Pour gérer le temps imparti par tour, la solution adoptée est l'utilisation de threads. Le thread principal lance à chaque début de tour un thread sur une méthode qui enregistre le choix du manager (enchérir ou non). Après avoir lancé ce thread secondaire, le thread principal s'endort pour une durée déterminée. A son réveil, il invite cordialement l'autre thread à s'arrêter. Le tour est fini et les managers ne peuvent plus enchérir. On répète donc cela jusqu'à ce qu'il n'y ait plus qu'un seul manager à avoir enchéri.
-  \subsection{Diagramme de séquence}
-  Voici un diagramme de séquence qui illustre la gestion des différents
-  rôles du serveur au travers de différents processus.
-    \begin{figure}[H]
-    \center
-    \includegraphics[scale=0.4]{uml/class/connexionserveurclient.png}
-    \caption{Diagramme des classes impliquées dans le réseau}
-    \end{figure}
-
-  Le côté gestion est bien dissocié du côté match, et le \emph{clientHandler} assure la communication avec le client.
-  C'est le \emph{clientHandler} du manager\index{manager} qui reçoit le match dans son stade
-  qui va créer l'instance en charge du match.
+  
 \subsection{Le réseau}
-  L'interface réseau a pour fonction de faire communiquer de façon bidirectionnelle :
+  L'interface réseau doit permettre une communication bidirectionnelle :
 \begin{itemize}
-  \item des clients chargés de communiquer chacun avec un manager : affichage d'informations et enregistrement de commandes;
+  \item des clients chargés de communiquer chacun avec un User : affichage d'informations et enregistrement de commandes;
   \item un serveur chargé de partager de l'information entre les clients en la centralisant et en la conservant sur disque.
 \end{itemize}
 La logique applicative peut être répartie entre ces deux entités, comme elle peut être concentrée sur le serveur (le client se comporte alors comme un browser sans scripts) ou sur le client (le serveur peut se limiter aux fonctions de gestionnaire de fichiers ou de bases de données et de données temporaires en mémoire centralisée).\\
@@ -969,9 +959,10 @@ Ce deuxième principe ne permet cependant pas de répondre à tous les besoins e
 les clients doivent pouvoir être invités dans des dialogues; ils doivent donc être en mesure,
 lorsqu'ils ne sont pas occupés par une activité, de recevoir des messages non sollicités;
 nous avons donc dû revoir notre design initial en conséquence, tel qu'il apparaîtra ci-après.\\
-\subsection{Echange de messages serveur-client}
+
+\subsubsection{Echange de messages serveur-client}
 Les messages échangés entre la partie serveur et la partie client du projet sont transmis selon un principe de sérialisation et désérialisation qui permet de faire transiter sur le réseau des messages totalement différents qu'on identifie par une en-tête. Cette en-tête permet au code qui reçoit ce message de savoir comment le traiter.
-\subsection{Synopsis du serveur}
+\subsubsection{Synopsis du serveur}
 \begin{itemize}
   \item Au démarrage, le serveur crée une instance de la classe CommonMgr, destinée à gérer initialisation et clôture des activités fonctionnelles sur le serveur;
   \item Le serveur se place en attente (fonction select()) d'une activité sur son clavier
@@ -1006,7 +997,7 @@ Sinon (par exemple pour une liste), deux solutions sont possibles :
 Pour l'instant, le code de communication est écrit pour Linux et n'est pas portable tel quel vers Windows (mais une version multi-compatible est réalisable...).\\
 Améliorations prévues dans le futur : gestion du terminal du serveur, détection des sockets morts (clients qui n'ont pas fait disconnect suite à un crash par ex.), ...
 
-\subsection{Synopsis du client}
+\subsubsection{Synopsis du client}
 Comme le serveur, le client utilise la fonction select() afin de pouvoir capter indiféremment des messages d'origine différente,
  en l'occurence en provenance du clavier et du socket de communication, ceci pour pouvoir recevoir des messages non sollicités.
       \begin{figure}[H]
@@ -1039,12 +1030,38 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
  \end{itemize}
  Cette structure sera celle que nous généraliserons lors de la mise en \oe uvre de l'interface graphique !
 
+\subsubsection{Diagramme de séquence}
+  Voici un diagramme de séquence qui illustre les relations entre différents objets du code server
+  et du code client, dans le cas d'un match amical.
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/Sequence_matchStarting.png}
+    \caption{Diagramme de séquence : démarrage d'un match amical}
+    \end{figure}
+  À la connexion d'un client, le serveur instancie un User, classe chargé d'interpréter
+  les messages reçus sur le socket de communication correspondant.
+  Si cette requête concerne la gestion d'un match, alors le User\index{User} transmet l'information
+  au matchesHandler, qui a lui-même été instancié par le serveur à son initialisation et dont chaque
+  User reçoit un pointeur.
+  L'invitation d'un autre utilisateur est bloquante, le serveur ne répondant que
+  lorsque l'utilisateur invité aura lui-même répondu. La réception d'une invitation
+  du côté client implique une écoute du socket, qui se fait en même temps que l'écoute du flux
+  d'entrée grâce à l'appel système \emph{select} \index{select}. Une gestion du contexte
+  permet de savoir comment réagir lors d'un input sur le flux d'entrée, tandis que
+  l'en-tête des messages reçus du serveur permet de savoir comment réagir 
+  lors d'un push (message non attendu) du serveur
+  vers le client.
+  
+  Une fois le match démarré, le code client se charge de remplir une matrice d'entiers caractérisant
+  une liste de déplacements ou d'actions, qu'il envoie au serveur. Le premier client à répondre
+  est bloqué le temps que le deuxième client ne réponde. 
+  Une gestion de time-out pourra être intégrée plus tard.
 
-\subsection{Diagramme de composantes}
+\subsection{Diagramme de composants}
       \begin{figure}[H]
     \center
     \includegraphics[scale=0.4]{uml/Components.png}
-    \caption{Diagramme de composantes}
+    \caption{Diagramme de composants}
     \end{figure}
 %\chapter{Index des termes utilisés}
 %  Contiendra, au moins, toutes les entrées du glossaire (avec les numéros des pages correspondantes).
