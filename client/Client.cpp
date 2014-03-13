@@ -787,7 +787,6 @@ void Client::askAndSendMoves(int numTeam, HexagonalField &field, std::vector<Axi
 void Client::commMgr() {
 //gère les messages non sollicités (exemple : invitation à un match amical)
 	SerializedObject received = receiveOnSocket(sockfd_);
-    //TODO : tester retour recv
 	switch(received.typeOfInfos){
 		case MATCH_INVITATION : {
             int IDInvitor;
@@ -826,7 +825,7 @@ void Client::commMgr() {
             position += sizeof(IDOpponent);
             memcpy(&name, position, sizeof(name));
             position += sizeof(name);
-            //memcpy(&numTeam, position, sizeof(numTeam));
+            
             cout << "Opponent ID : " << IDOpponent << " name : " << name << endl;
             //forced to accept
             std::vector<int> playersInTeam;

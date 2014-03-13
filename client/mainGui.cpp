@@ -21,12 +21,57 @@ MainGui::~ MainGui() {
 }
 void MainGui::pushesHandler(){
     __pushesNotifier->setEnabled(false);
-    QErrorMessage *errorMessageDialog = new QErrorMessage(this);
-    errorMessageDialog->showMessage(tr("Push venant du serveur !"));
     //receive
     SerializedObject received = receiveOnSocket(__client->getSockfd());
     __pushesNotifier->setEnabled(true);
     //handle
+    switch(received.typeOfInfos){
+		case MATCH_INVITATION : {
+            int IDInvitor;
+            char name[USERNAME_LENGTH];
+            char * position = received.stringData;
+            memcpy(&IDInvitor, position, sizeof(IDInvitor));
+            position += sizeof(IDInvitor);
+            memcpy(&name, position, sizeof(name));
+            
+            //~ bool confirmation;
+            //~ std::vector<int> playersInTeam;
+            //~ if(confirmation){
+                //~ playersInTeam = displayAndAskPlayersForMatch();
+            //~ }
+            //~ answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
+            //~ if(receiveMatchConfirmation() == MATCH_STARTING){
+                //~ //startMatch( 2); //invité a l'équipe 2
+            //~ }
+            //~ state_ = FREE;
+            break;
+        }
+        case SERVER_DOWN : {
+            badConnection();
+            break;
+        }
+        case MATCH_TOURNAMENT_START : {
+            int IDOpponent, numTeam;
+            char name[USERNAME_LENGTH];
+            char * position = received.stringData;
+            //~ cout << "A tournament turn starts now !" << endl;
+            memcpy(&IDOpponent, position, sizeof(IDOpponent));
+            position += sizeof(IDOpponent);
+            memcpy(&name, position, sizeof(name));
+            position += sizeof(name);
+            //memcpy(&numTeam, position, sizeof(numTeam));
+            //cout << "Opponent ID : " << IDOpponent << " name : " << name << endl;
+            //forced to accept
+            std::vector<int> playersInTeam;
+            //~ playersInTeam = displayAndAskPlayersForMatch();
+            __client->sendTeamForMatchTournament(playersInTeam);
+            numTeam = __client->receiveNumOfTeam();
+            if(numTeam > 0){
+                //~ startMatch(numTeam);
+            }
+            break;
+        }
+	}
 }
 int MainGui::badConnection() {
     QErrorMessage *errorMessageDialog = new QErrorMessage(this);
