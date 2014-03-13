@@ -251,7 +251,7 @@
       \begin{itemize}
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Inclut Sélectionner joueur.
         \item \textbf{Pré-conditions} : Néant.
-        \item \textbf{Post-conditions} : Une \"fiche d'identité\" du joueur est affichée.
+        \item \textbf{Post-conditions} : Une "fiche d'identité" du joueur est affichée.
         \item \textbf{Cas général} : Le client/manager souhaite se renseigner sur un de ses joueurs. Il sélectionne le joueur concerné pour avoir les informations sur ce dernier. Ces informations sont : les capacités, l'avancement des entraînements par capacité, une indication quant au blocage (entraînement/hôpital/enchères) éventuel du joueur, les informations sur le balai du joueur et une estimation de la valeur du joueur.
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
@@ -305,7 +305,7 @@
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Inclut Voir les propriétés du bâtiment et Construire/Améliorer le bâtiment.
         \item \textbf{Pré-conditions} : Néant.
         \item \textbf{Post-conditions} : Le client est dans le bâtiment.
-        \item \textbf{Cas général} : Le client \"rentre\" dans le bâtiment et a la possibilité de lancer un projet de construction ou d'obtenir les informations concernant ce bâtiment.
+        \item \textbf{Cas général} : Le client "rentre" dans le bâtiment et a la possibilité de lancer un projet de construction ou d'obtenir les informations concernant ce bâtiment.
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
 
@@ -669,7 +669,7 @@
     \includegraphics[scale=0.7]{uml/QM2014.png}
     \caption{Cas d'utilisation 1: Quidditch Manager 2014}
   \end{figure}	
-    Ce diagramme représente le fonctionnement de base du jeu avec la répartition des \"tâches\" au niveau serveur et client.
+    Ce diagramme représente le fonctionnement de base du jeu avec la répartition des "tâches" au niveau serveur et client.
     \subsubsection{Se connecter}
       \begin{itemize}
         \item \textbf{Acteur} : Client.
@@ -868,11 +868,11 @@ Elle permet en effet d'assurer :
   % vus au cours théorique et aux exercices.
   \subsection{Le jeu sur terminal}
 Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvons tout d'abord distinguer 2 parties différentes, la gestion et le match.
-\textbf{Gestion} : La partie gestion du jeu permet donc au Manager, le client, de gérer une équipe ainsi qu'un domaine. Ce domaine se compose de plusieurs bâtiments, ayant chacun leur particularité et avantage. Le Manager peut donc se balader au travers des différents menus qui lui permettent d'accéder aux informations de ses joueurs (leurs capacités, etc) et de ses bâtiments et d'effectuer des actions de gestion telles qu'entraîner ou soigner un joueur, participer à une enchère ou améliorer un bâtiment. \\
-\textbf{Match} : A tout moment, s'il possède au moins 7 joueurs disponibles, le Manager peut envoyer une demande de match amical à un autre client connecté. Si la réponse de ce dernier est positive, le match débutera. Ce match de Quidditch se déroule au tour par tour. Chacun de leur côté, les adversaires choisissent les mouvements qu'ils veulent que leurs joueurs fassent, sans savoir ce qu'a préparé l'autre manager. Et ainsi de suite jusqu'à une situation de fin de partie. \\
+\textbf{Gestion} : La partie gestion du jeu permet donc au Manager, le client, de gérer une équipe ainsi qu'un domaine. Ce domaine se compose de plusieurs bâtiments, ayant chacun leur particularité et avantage. Le Manager peut donc se balader au travers des différents menus qui lui permettent d'accéder aux informations de ses joueurs (leurs capacités, etc) et de ses bâtiments et d'effectuer des actions de gestion telles qu'entraîner ou soigner un joueur, participer à une enchère ou améliorer un bâtiment.
+\textbf{Match} : A tout moment, s'il possède au moins 7 joueurs disponibles, le Manager peut envoyer une demande de match amical à un autre client connecté. Si la réponse de ce dernier est positive, le match débutera. Ce match de Quidditch se déroule au tour par tour. Chacun de leur côté, les adversaires choisissent les mouvements qu'ils veulent que leurs joueurs fassent, sans savoir ce qu'a préparé l'autre manager. Et ainsi de suite jusqu'à une situation de fin de partie. 
 
   \subsection{Implémentation}
-  \\ 
+  
   Dans cette partie sera expliquée l'implémentation générale du jeu; de quelles façons les fonctionnalités ont été mises en place, les choix faits, etc. Des diagrammes de classes viendront détailler ces explications.
 
     \begin{figure}[H]
@@ -887,7 +887,7 @@ Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvo
          \caption{Diagramme des classes impliquées dans la gestion générale}
          \end{figure}
 
-        Un manager est le \"personnage virtuel\" qu'incarne un client. Il est le propriétaire d'un domaine et d'une équipe de quidditch. Au départ du jeu, il possède quelques bâtiments sur son domaine, et sept joueurs de qualité moyenne, si pas médiocre. Pour améliorer ses bâtiments, ou les capacités de ses joueurs, le manager doit dépenser des points d'action, de l'argent, et attendre. L'attente en temps réel est gérée par la classe Calendrier.
+        Un manager est le "personnage virtuel" qu'incarne un client. Il est le propriétaire d'un domaine et d'une équipe de quidditch. Au départ du jeu, il possède quelques bâtiments sur son domaine, et sept joueurs de qualité moyenne, si pas médiocre. Pour améliorer ses bâtiments, ou les capacités de ses joueurs, le manager doit dépenser des points d'action, de l'argent, et attendre. L'attente en temps réel est gérée par la classe Calendrier.
 
 
       \subsubsection{Bâtiments}
@@ -916,7 +916,7 @@ Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvo
          \end{figure}
 
         Du point de vue de l'implémentation, les joueurs sont différenciés s'ils sont en phase de gestion ou en train de jouer un match, d'où les deux classes ManagedPlayer, pour la gestion, et PlayingPlayer, pour les matches. La seule différence entre les deux est que le bonus lié au balai (actuellement toujours à 0) est absorbé dans les capacités du joueur telles qu'elles sont vues pendant un match.\\
-\\
+
         Un joueur se distingue des autres par son nom, choisi au hasard à la création du joueur. Les différents postes que peuvent occuper les joueurs, à savoir attrapeur, gardien, poursuiveur et batteur, ne sont pas prédéterminés. Le manager peut choisir à quel poste faire jouer ses joueurs avant chaque match. Néanmoins, dans un souci d'équité, lors de la création de l'équipe de base (nouvelle partie), les joueurs par défaut attribués au client présentent des capacités axées sur un poste particulier. \\
 
         Les capacités, ou caractéristiques des joueurs, sont les suivantes :
@@ -954,7 +954,7 @@ Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvo
         \item Argent
         \item Nombre de fans
         \item Nombre de points d’action
-        \end{itemize} \\
+        \end{itemize}
 
          
          Le fichier buildings.txt contient les informations relatives à chaque bâtiment du client ; le stade, le centre d’entraînement, l’hôpital, le fan shop et le centre de promotion. Il y a 4 informations pour chaque bâtiment : son niveau actuel, le prix pour la construction (passage du niveau 0 au niveau 1), la valeur au niveau 1 de l’attribut particulier à chaque bâtiment et un indicateur de projet (0 si le bâtiment est libre, 1 si on a lancé une construction ou une amélioration et qu’elle n’est pas encore terminée). Le format du fichier est donc :\\
@@ -980,19 +980,19 @@ Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvo
             \item Prix de construction du centre de promotion
             \item Nombre de points d’action gagnés par tranche de temps au niveau 1
             \item Indicateur de projet
-        \end{itemize} \\
+        \end{itemize} 
 
         Le fichier blockCalendar.txt contient les informations concernant les blocages des joueurs quand ceux-ci sont à l’hôpital ou à l’entraînement. Chaque ligne représente un blocage et a donc le nom du joueur concerné, la date de début du blocage ainsi que la durée en minutes de ce blocage. Le format d’une ligne du fichier est donc :\\
 
           \begin{itemize}
             \item Prénom Nom\#Date de début (au format jour:mois:heure:minute)\#Durée du blocage\#
-          \end{itemize} \\
+          \end{itemize} 
 
         Le fichier constructionCalendar.txt contient les informations concernant les projets de construction ou d’amélioration des bâtiments. Chaque ligne correspond à un projet et a donc le nom du bâtiment concerné, la date de début de construction ou d’amélioration et la durée en minutes du projet. Le format d’une ligne du fichier est donc :\\
 
           \begin{itemize}
             \item Nom du bâtiment\#Date de début (au format jour:mois:heure:minute)\#Durée du projet\#
-          \end{itemize} \\
+          \end{itemize} 
 
         En plus de ces 4 fichiers, le dossier de sauvegarde du client contient un sous-dossier nommé Players. Ce sous-dossier contient un fichier players.txt qui est une liste de tous les autres fichiers contenus dans ce sous-dossier. Ces autres fichiers « PrénomNom.txt » correspondent chacun à un joueur de l’équipe du client et possèdent toutes les informations relatives à ce joueur. Le fichier players.txt permet donc de savoir quels fichiers il faut lire quand on va charger une partie.\\
 
@@ -1034,7 +1034,7 @@ Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvo
          \caption{Diagramme de classes pour les matches}
          \end{figure}
 
-            Le match relie deux clients différents dans un affrontement sur un \gls{terrain}\index{terrain} où se déplacent à la fois des joueurs et des \index{balle}balles, les joueurs pouvant faire se déplacer les balles. Le terrain est représenté par un hexagone allongé et respecte le format \"case hexagonale\", c'est-à-dire qu'il y a 6 cases de destination adjacentes à une case donnée (si elle n'est pas sur les bords). Un client peut participer à deux \"types\" de match, soit un match amical, en invitant un autre joueur ou en étant invité, soit un match de tournoi, qui offre des récompenses plus importantes. Au début de chaque match, le client choisit quels joueurs seront sur le terrain, et à quel poste ils joueront. Le déroulement des matches consiste en du tour par tour.
+            Le match relie deux clients différents dans un affrontement sur un \gls{terrain}\index{terrain} où se déplacent à la fois des joueurs et des \index{balle}balles, les joueurs pouvant faire se déplacer les balles. Le terrain est représenté par un hexagone allongé et respecte le format "case hexagonale", c'est-à-dire qu'il y a 6 cases de destination adjacentes à une case donnée (si elle n'est pas sur les bords). Un client peut participer à deux "types" de match, soit un match amical, en invitant un autre joueur ou en étant invité, soit un match de tournoi, qui offre des récompenses plus importantes. Au début de chaque match, le client choisit quels joueurs seront sur le terrain, et à quel poste ils joueront. Le déroulement des matches consiste en du tour par tour.
 
       \subsubsection{Tournois}
           \begin{figure}[H]
