@@ -20,10 +20,11 @@ MainGui::~ MainGui() {
     __client = NULL;
 }
 void MainGui::pushesHandler(){
+    ticker->hide();
     __pushesNotifier->setEnabled(false);
     //receive
     SerializedObject received = receiveOnSocket(__client->getSockfd());
-    __pushesNotifier->setEnabled(true);
+    
     //handle
     switch(received.typeOfInfos){
 		case MATCH_INVITATION : {
@@ -68,26 +69,36 @@ void MainGui::pushesHandler(){
             int IDOpponent, numTeam;
             char name[USERNAME_LENGTH];
             char * position = received.stringData;
+            QString texte;
             //~ cout << "A tournament turn starts now !" << endl;
             memcpy(&IDOpponent, position, sizeof(IDOpponent));
             position += sizeof(IDOpponent);
             memcpy(&name, position, sizeof(name));
             position += sizeof(name);
-            //memcpy(&numTeam, position, sizeof(numTeam));
-            //cout << "Opponent ID : " << IDOpponent << " name : " << name << endl;
+            texte = QString("%1, with ID %2 is your opponent !").arg(name, QString::number(IDOpponent));
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("A tournament match starts now !");
+            msgBox.setText(texte);
+            msgBox.setInformativeText("You have to accept.");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            msgBox.exec();
             //forced to accept
-            std::vector<int> playersInTeam;
-            //~ playersInTeam = displayAndAskPlayersForMatch();
+            std::vector<int> playersInTeam = chooseTeamForMatch(__client, this);
             __client->sendTeamForMatchTournament(playersInTeam);
+            //bloquant, l'adversaire doit avoir répondu aussi :
             numTeam = __client->receiveNumOfTeam();
-            if(numTeam > 0){
+            if(numTeam > 0){ //first to answer is the team 1
                 //~ startMatch(numTeam);
             }
             break;
         }
 	}
+    __pushesNotifier->setEnabled(true);
+    ticker->show();
 }
 int MainGui::badConnection() {
+    ticker->hide();
     QErrorMessage *errorMessageDialog = new QErrorMessage(this);
     errorMessageDialog->showMessage(tr("No connection with the server."));
     return (0);
@@ -100,10 +111,16 @@ void MainGui::listPlayers() {
     if (choosePlayer(__client,this)==BAD_CONNECTION) badConnection();
 }
 void MainGui::tournaments() {
+    if (role==NORMAL_LOGIN) {
+        ticker->hide();
+    }
     //this slots acts for both manager and administrator as well :
     //if manager, the user may choose to participate to a tournament
     //if administrator, the user can create a new tournament
     chooseTournament(__client,role,this);
+    if(role == NORMAL_LOGIN){
+        ticker->show();
+    }    
 }
 
 void MainGui::listMgrs() {

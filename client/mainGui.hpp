@@ -19,6 +19,8 @@
 #include "mainMenu.hpp"
 #include "buildingsDialog.hpp"
 
+//TODO : exceptions notifier
+
 
 class MainMenu;
 class Ticker;

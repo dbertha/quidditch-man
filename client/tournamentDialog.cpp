@@ -1,7 +1,7 @@
 #include "tournamentDialog.hpp"
 
 TournamentDialog::TournamentDialog(Client * client,const QStringList &items,const int role, QWidget *parent)
-    : QDialog(parent), row(-1),role_(role), __client(client) {
+    : QDialog(parent), row(-1),role_(role), __client(client), __parent(parent) {
     model = new QStringListModel(this);
     model->setStringList(items);
     listView = new QListView;
@@ -35,9 +35,16 @@ void TournamentDialog::select() {
            QMessageBox::Ok | QMessageBox::Cancel)!=QMessageBox::Ok) return;
         if(__client->askToJoinTournament()==0) reject();
         if(__client->getConfirmation()) {
-            str="You are recorded as a participant of this tournament.\n"
-                    "Be ready for when it will start !";
-            QMessageBox::information(this,tr("Tournament"),str,QMessageBox::Ok);
+            str="You are recorded as a participant of this tournament.";
+            //QMessageBox::information(this,tr("Tournament"),str,QMessageBox::Ok);
+            //rester dans la liste d'events de mainGUI pour gérer un démarrage immédiat du tournoi
+            QMessageBox msgBox(__parent); 
+            msgBox.setWindowTitle(tr("Tournament"));
+            msgBox.setText(str);
+            msgBox.setInformativeText("Be ready for when it will start !");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            msgBox.exec();
             accept();
         }
         else {

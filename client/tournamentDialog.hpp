@@ -34,6 +34,7 @@ private:
     int row, role_;
     Client * __client;
     void technicalProblem();
+    QWidget * __parent;
 };
 
 #endif
