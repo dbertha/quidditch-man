@@ -21,5 +21,3 @@ HEADERS += \
     Broomstick.hpp \
     Player.hpp \
     HexagonalField.hpp
-
-OTHER_FILES +=

@@ -67,8 +67,15 @@ class hexagone : public QGraphicsObject
         //paint => comment dessiner l'objet
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
+		void setType(int);
+		int getType();
+
         void select();
         void unselect();
+
+		void isAGoal();
+		void isAccessible();
+		void isNonAccessible();
 
         //boudingRect => defnie la region frontiere de l'objet
         QRectF boundingRect() const;
@@ -90,6 +97,7 @@ class hexagone : public QGraphicsObject
         int _indiceJ;
 		bool _ifGoal;
         bool _ifSelect;
+		bool _ifAccesible;
 
 
         void dessinerHexagone(QPainter *painter);//dessine le coutour de la case

@@ -155,6 +155,11 @@ int main(int argc, char *argv[])
 	fenetre test2(__field,__players,__balls);
 	test2.show();
 
+//	fenetre test3(1,__players,__balls);
+//	test3.show();
+
+//	fenetre test4(0);
+//	test4.show();
 
     return app.exec();
 }

@@ -587,6 +587,12 @@ moc_fenetre.cpp: ../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QApplication
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qabstractscrollarea.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QGraphicsPolygonItem \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qgraphicsitem.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QGroupBox \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qgroupbox.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QRadioButton \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qradiobutton.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qicon.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/QDebug \
 		../matchGui/hexagone.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QGraphicsItem \
@@ -597,6 +603,14 @@ moc_fenetre.cpp: ../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QApplication
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/qmath.h \
 		../matchGui/Defines.hpp \
 		../matchGui/Coordinates.hpp \
+		../matchGui/HexagonalField.hpp \
+		../matchGui/PlayingPlayer.hpp \
+		../common/HexagonalField.hpp \
+		../common/Coordinates.hpp \
+		../matchGui/Player.hpp \
+		../matchGui/Broomstick.hpp \
+		../matchGui/ManagedPlayer.hpp \
+		../matchGui/Ball.hpp \
 		../matchGui/fenetre.hpp
 	/home/pidy/Qt5.2.1/5.2.1/gcc_64/bin/moc $(DEFINES) $(INCPATH) ../matchGui/fenetre.hpp -o moc_fenetre.cpp
 
@@ -865,6 +879,10 @@ main.o: ../matchGui/main.cpp ../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qlabel.h \
 		../matchGui/fenetre.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QWidget \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QGroupBox \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qgroupbox.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QRadioButton \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qradiobutton.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/QDebug \
 		../matchGui/hexagone.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QGraphicsItem \
@@ -875,12 +893,13 @@ main.o: ../matchGui/main.cpp ../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/qmath.h \
 		../matchGui/Defines.hpp \
 		../matchGui/Coordinates.hpp \
-		../matchGui/ManagedPlayer.hpp \
-		../matchGui/Player.hpp \
-		../matchGui/Broomstick.hpp \
+		../matchGui/HexagonalField.hpp \
 		../matchGui/PlayingPlayer.hpp \
 		../common/HexagonalField.hpp \
 		../common/Coordinates.hpp \
+		../matchGui/Player.hpp \
+		../matchGui/Broomstick.hpp \
+		../matchGui/ManagedPlayer.hpp \
 		../matchGui/Ball.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../matchGui/main.cpp
 
@@ -1019,6 +1038,12 @@ fenetre.o: ../matchGui/fenetre.cpp ../matchGui/fenetre.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qabstractscrollarea.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QGraphicsPolygonItem \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qgraphicsitem.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QGroupBox \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qgroupbox.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QRadioButton \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qradiobutton.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qicon.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/QDebug \
 		../matchGui/hexagone.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QGraphicsItem \
@@ -1028,7 +1053,15 @@ fenetre.o: ../matchGui/fenetre.cpp ../matchGui/fenetre.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QCursor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/qmath.h \
 		../matchGui/Defines.hpp \
-		../matchGui/Coordinates.hpp
+		../matchGui/Coordinates.hpp \
+		../matchGui/HexagonalField.hpp \
+		../matchGui/PlayingPlayer.hpp \
+		../common/HexagonalField.hpp \
+		../common/Coordinates.hpp \
+		../matchGui/Player.hpp \
+		../matchGui/Broomstick.hpp \
+		../matchGui/ManagedPlayer.hpp \
+		../matchGui/Ball.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fenetre.o ../matchGui/fenetre.cpp
 
 hexagone.o: ../matchGui/hexagone.cpp ../matchGui/hexagone.hpp \
