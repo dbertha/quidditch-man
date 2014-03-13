@@ -96,13 +96,15 @@ void LoginDialog::loginClicked()
                 if (password1==text) {//on tente l'enregistrement
                     strncpy(username,userName.toAscii().data(),USERNAME_LENGTH);
                     strncpy(password,password1.toAscii().data(),PASSWORD_LENGTH);
-                    if(__client->sendNewManagerToServer(username,password)!=0)
-                        if (__client->getConfirmation() == NORMAL_LOGIN) accept();
+                    if(__client->sendNewManagerToServer(username,password)!=0){
+                        role=__client->getConfirmation();
+                        if (role == NORMAL_LOGIN) accept();
                         else {
                             errorMessageDialog->showMessage(
                                 tr("User name already registred."));
                             init();
                         }
+                    }
                 }
                 else {
                     std::cout<<"pswd "<<text.toStdString()<<std::endl;

@@ -12,9 +12,11 @@ SelectionDialog::SelectionDialog(const QStringList &items,QWidget *parent)
     selectButton->setDefault(true);
     cancelButton= new QPushButton(tr("Cancel"));
     bottomLayout = new QHBoxLayout;
-    bottomLayout->addWidget(selectButton);
+    if (items.length()>0) {
+        bottomLayout->addWidget(selectButton);
+        connect(selectButton, SIGNAL(clicked()), this, SLOT(select()));
+    }
     bottomLayout->addWidget(cancelButton);
-    connect(selectButton, SIGNAL(clicked()), this, SLOT(select()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
     mainLayout = new QVBoxLayout;

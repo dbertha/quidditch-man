@@ -19,7 +19,7 @@
 #include <QString>
 
 int choosePartner(Client * client, QWidget *parent);
-int chooseTournament(Client * client, QWidget *parent);
+//~ int chooseTournament(Client * client, QWidget *parent);
 
 std::vector<int> chooseTeamForMatch(Client * client, QWidget *parent);
 

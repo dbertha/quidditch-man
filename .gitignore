@@ -26,3 +26,4 @@
 *.out
 *.o
 *.synctex.gz
+moc*

@@ -1,7 +1,9 @@
 #include "mainGui.hpp"
+#include "clientMatchHandler.hpp"
+#include "playerMgr.hpp"
 
 MainGui::MainGui(int sockfd,QMainWindow *parent) : parent_(parent), __client(new Client(sockfd, true)) {
-    setFixedSize(800,480);
+    setFixedSize(800,640);
     createActions();
     firstMenu();
     setWindowTitle(tr("Quidditch Manager 2014"));
@@ -15,12 +17,6 @@ MainGui::~ MainGui() {
     __client = NULL;
 }
 
-void MainGui::run() {
-   this->show();
-}
-void MainGui::quit() {
-    std::cout<<"quit"<<std::endl;
-}
 int MainGui::badConnection() {
     QErrorMessage *errorMessageDialog = new QErrorMessage(this);
     errorMessageDialog->showMessage(tr("No connection with the server."));
@@ -31,13 +27,13 @@ void MainGui::buildings() {
     buildingsDialog->exec();
 }
 void MainGui::listPlayers() {
-    ticker->hide();
-    int res = choosePlayer(__client,this);
-    if (res==BAD_CONNECTION) badConnection();
-    else {
-// .............
-    }
-    ticker->show();
+    if (choosePlayer(__client,this)==BAD_CONNECTION) badConnection();
+}
+void MainGui::tournaments() {
+    //this slots acts for both manager and administrator as well :
+    //if manager, the user may choose to participate to a tournament
+    //if administrator, the user can create a new tournament
+    chooseTournament(__client,role,this);
 }
 
 void MainGui::listMgrs() {
@@ -62,27 +58,27 @@ void MainGui::listMgrs() {
     }
     ticker->show();
 }
+    
 
-void MainGui::listAndChooseTournaments(){
-    ticker->hide();
-    int res = chooseTournament(__client,this);
-    if (res==BAD_CONNECTION) badConnection();
-    else if(res != NO_CHOICE){
-        __client->askToJoinTournament(); //pour le moment, un seul tournoi à la fois
-        int confirmation = __client->getConfirmation();
-        QMessageBox msgBox;
- 
- 
-        if(confirmation == 0){
-            msgBox.setText("Impossible to join this tournament !");
-        }else{
-            msgBox.setText("You are recorded as a participant of this tournament. Be ready for when it will start !");
+//~ void MainGui::listAndChooseTournaments(){
+    //~ ticker->hide();
+    //~ int res = chooseTournament(__client,this);
+    //~ if (res==BAD_CONNECTION) badConnection();
+    //~ else if(res != NO_CHOICE){
+        //~ __client->askToJoinTournament(); //pour le moment, un seul tournoi à la fois
+        //~ int confirmation = __client->getConfirmation();
+        //~ QMessageBox msgBox;
+ //~ 
+ //~ 
+        //~ if(confirmation == 0){
+            //~ msgBox.setText("Impossible to join this tournament !");
+        //~ }else{
+            //~ msgBox.setText("You are recorded as a participant of this tournament. Be ready for when it will start !");
+//~ 
+        //~ }
+        //~ msgBox.exec();
+    //~ }
 
-        }
-        msgBox.exec();
-    }
-    ticker->show();
-}
 void MainGui::login() {
     loginDialog->init();
     if (loginDialog->exec()==loginDialog->Accepted) {//connecte; on cree le menu
@@ -104,9 +100,8 @@ void MainGui::createActions() {
     listMgrsAction=new QAction(tr("List available managers"),this);
     listAuctionsAction=new QAction(tr("List auctions"),this);
     listPlayersAction=new QAction(tr("List my players"),this);
-    buildingsAction=new QAction(tr("Open board"),this);
+    buildingsAction=new QAction(tr("List my buildings"),this);
     listTournamentsAction=new QAction(tr("List tournaments"),this);
-    newTournamentAction=new QAction(tr("New tournament"),this);
     newPromotionAction=new QAction(tr("Start a new promotion campaign"),this);
     buyAPAction=new QAction(tr("Buy action points"),this);
 }
@@ -143,17 +138,20 @@ void MainGui::createMenu() {
         connect(buildingsAction,SIGNAL(triggered()),this,SLOT(buildings()));
         tournamentsMenu=menuBar()->addMenu(tr("Tournaments"));
         tournamentsMenu->addAction(listTournamentsAction);
-        connect(listTournamentsAction,SIGNAL(triggered()),this,SLOT(listAndChooseTournaments()));
+        connect(listTournamentsAction,SIGNAL(triggered()),this,SLOT(tournaments()));
         actionPointsMenu=menuBar()->addMenu(tr("Action Points"));
         actionPointsMenu->addAction(newPromotionAction);
         actionPointsMenu->addAction(buyAPAction);
         ticker = new Ticker(__client, this);
         ticker->show();
+        mainMenu = new MainMenu(this);
+        setCentralWidget(mainMenu);
+        mainMenu->show();
     }
     else if (role==ADMIN_LOGIN) {
         tournamentsMenu=menuBar()->addMenu(tr("Tournaments"));
-        tournamentsMenu->addAction(newTournamentAction);
         tournamentsMenu->addAction(listTournamentsAction);
+        connect(listTournamentsAction,SIGNAL(triggered()),this,SLOT(tournaments()));
     }
 }
 void MainGui::about() {

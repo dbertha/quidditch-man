@@ -4,13 +4,11 @@ all: client.out server.out clientGUI.out
 client.out: client/Client.cpp \
 			client/Client.hpp \
 			client/ClientMain.cpp \
-			common/commAPI.hpp \
 			common/Coordinates.hpp \
 			common/Defines.hpp \
 			common/HexagonalField.hpp \
 			common/NetworkBase.hpp \
 			common/NetworkInterface.hpp \
-			common/commAPI.cpp \
 			common/HexagonalField.cpp \
 			common/NetworkBase.cpp
 	make -f Makefile.client
@@ -36,12 +34,10 @@ server.out: server/Auction.hpp \
 			server/TrainingCenter.hpp \
 			server/User.hpp \
 			server/Tournament.hpp \
-			common/commAPI.hpp \
 			common/Coordinates.hpp \
 			common/Defines.hpp \
 			common/HexagonalField.hpp \
 			common/NetworkBase.hpp \
-			common/NetworkInterface.hpp \
 			server/Auction.cpp \
 			server/Broomstick.cpp \
 			server/Building.cpp \
@@ -63,7 +59,6 @@ server.out: server/Auction.hpp \
 			server/TrainingCenter.cpp \
 			server/User.cpp \
 			server/Tournament.cpp \
-			common/commAPI.cpp \
 			common/HexagonalField.cpp \
 			common/NetworkBase.cpp
 	make -f Makefile.server
@@ -77,6 +72,10 @@ clientGUI.out: client/clientMatchHandler.hpp \
            client/buildingsModel.hpp \
            client/playerMgr.hpp \
            client/Client.hpp \
+           client/mainMenu.hpp \
+           client/playersDialog.hpp \
+           client/tournamentDialog.hpp \
+           client/tournaments.hpp \
            client/clientMatchHandler.cpp \
            client/loginDialog.cpp \
            client/GUImain.cpp \
@@ -86,7 +85,11 @@ clientGUI.out: client/clientMatchHandler.hpp \
            client/buildingsDialog.cpp \
            client/buildingsModel.cpp \
            client/playerMgr.cpp \
-           client/Client.cpp 
+           client/Client.cpp \
+           client/mainMenu.cpp \
+           client/playersDialog.cpp \
+           client/tournamentDialog.cpp \
+           client/tournaments.cpp 
 	make -f Makefile.GUI
 	
 clean:
