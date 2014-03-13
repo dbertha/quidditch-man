@@ -30,12 +30,27 @@ void DataBase::save(Manager manager) {
 
 	string directory = "server/Saves/"+login+"/Players";
 	mkdir(directory.c_str(),0777);
+	
+	string calendar = "server/Saves/"+login+"/blockCalendar.txt";
+	int fd = open(calendar.c_str(),O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+	if (fd==-1){
+		cerr<<"Error while opening file\n";
+	}
+	close(fd);
 
+	calendar = "server/Saves/"+login+"/constructionCalendar.txt";
+	fd = open(calendar.c_str(),O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+	if (fd==-1){
+		cerr<<"Error while opening file\n";
+	}
+	close(fd);
 	for (int i=0;i<manager.getNumberOfPlayers();++i) {
-		ManagedPlayer player = manager.getPlayer(i);
-		cout<<player.getFirstName()<<endl;
-		file = "server/Saves/"+login+"/Players/"+player.getFirstName()+player.getLastName()+".txt";
-		savePlayer(file,player);
+		try {
+			ManagedPlayer player = manager.getPlayer(i);
+			cout<<player.getFirstName()<<endl;
+			file = "server/Saves/"+login+"/Players/"+player.getFirstName()+player.getLastName()+".txt";
+			savePlayer(file,player);
+		} catch (const char err[]) {cout<<err<<endl;}
 	}
 
 	cout<<"savePlayers done"<<endl;
@@ -93,6 +108,9 @@ void DataBase::load(Manager& manager) {
 	if (result==-1) file = "server/Saves/"+login+"/buildings.txt";
 	else file = "server/Saves/defaultBuildings.txt";
 	loadBuildings(file,manager.getStadium(),manager.getTrainingCenter(),manager.getHospital(),manager.getFanShop(),manager.getPromotionCenter());
+
+	save(manager);
+
 }
 
 void DataBase::saveManager(string file, Manager manager) {
@@ -409,7 +427,7 @@ void DataBase::loadBuildings(string file, Stadium& stadium, TrainingCenter& trai
 		Max clients in the fan shop at level 1
 		Level of the promotion center
 		Price to build the promotion center
-		Amout of action points gained every 10 minutes at level 1
+		Amout of action points gained every x minutes at level 1
 	The price to upgrade a building is calculated by the building itself and depends on the price of construction and the current level
 	The special attribute of the stadium, the training center, the hospital and the fan shop is calculated by the building and depends
 	 on the current level
@@ -419,6 +437,7 @@ void DataBase::loadBuildings(string file, Stadium& stadium, TrainingCenter& trai
 
 	int fd = open(file.c_str(),O_RDONLY);
 	if (fd==-1) {
+		cout<<file<<endl;
 		cerr<<"Error while opening file\n";
 		return;
 	}
