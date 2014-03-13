@@ -30,20 +30,34 @@ void MainGui::pushesHandler(){
             int IDInvitor;
             char name[USERNAME_LENGTH];
             char * position = received.stringData;
+            bool confirmation;
+            QString texte;
+            std::vector<int> playersInTeam;
             memcpy(&IDInvitor, position, sizeof(IDInvitor));
             position += sizeof(IDInvitor);
             memcpy(&name, position, sizeof(name));
+            //texte << "Do you want to fight against " << name << "with ID : " << QString::number(IDInvitor) << " ?";
+            texte = QString("%1, with ID %2 wants to play a match against you !").arg(name, QString::number(IDInvitor));
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("You've got a match proposal !");
+            msgBox.setText(texte);
+            msgBox.setInformativeText("Do you accept the match ?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msgBox.setDefaultButton(QMessageBox::Yes);
+            if(msgBox.exec() == QMessageBox::Yes){
+                confirmation = true;
+            }else {
+                confirmation = false;
+            }
             
-            //~ bool confirmation;
-            //~ std::vector<int> playersInTeam;
-            //~ if(confirmation){
-                //~ playersInTeam = displayAndAskPlayersForMatch();
-            //~ }
+            if(confirmation){
+                playersInTeam = chooseTeamForMatch(__client, this);
+            }
+            __client->answerMatchProposal(confirmation, playersInTeam);
             //~ answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
-            //~ if(receiveMatchConfirmation() == MATCH_STARTING){
+            if(__client->receiveMatchConfirmation() == MATCH_STARTING){
                 //~ //startMatch( 2); //invité a l'équipe 2
-            //~ }
-            //~ state_ = FREE;
+            }
             break;
         }
         case SERVER_DOWN : {
