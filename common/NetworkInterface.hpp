@@ -45,6 +45,9 @@ int sellPlayer(int, int, int);
 int proposeMatchTo(int, int, std::vector<int> playersInTeam);
 int answerMatchProposal(int, bool, std::vector<int> playersInTeam);
 int getManagersList(int);
+int askForTournamentList(int);
+int askToJoinTournament(int, int);
+int sendTournamentCreation(int, int, int);
 
 //réception des données du serveur :
 bool getConfirmation(int);
@@ -55,5 +58,5 @@ std::vector<std::string> receivePlayersList(int);
     //pour chaque ManagedPlayer, on reçoit un string firstname et un lastname, de façon ordonnée (indice 0 à 1 : playerID = 0, etc)
 std::vector<int> receivePlayerInfo(int);
 std::vector<int> receiveBuildingInfos(int);
-
+std::vector<int> getTournamentList(int);
 #endif

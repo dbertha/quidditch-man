@@ -14,7 +14,11 @@ Ticker::Ticker(const int sockfd, MainGui *parent)
 }
 void Ticker::showInfo() {
     move(0,50-counter%5); //this is to show its activity
-    askForManagerInfos(sockfd_);
+    if(askForManagerInfos(sockfd_)==0) {
+        QErrorMessage *errorMessageDialog = new QErrorMessage(this);
+        errorMessageDialog->showMessage(tr("No connection with the server."));
+        close();
+    }
     receiveManagerInfos(sockfd_,&nbPlayers,&money,&nbFans,&actionPoints);
     parent_->setMoney(money);
     parent_->setNbPlayers(nbPlayers);

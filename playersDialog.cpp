@@ -81,7 +81,7 @@ void PlayersDialog::select(const int action) {
     QString str ="Are you sure to "+strActions.at(action);
     if (action==TRAIN) str = str+" the "+vAxe.at(row)+" of";
     str +=" your player ?";
-    if(QMessageBox::question(this,tr("Upgrade"),str,
+    if(QMessageBox::question(this,tr("Player"),str,
        QMessageBox::Ok | QMessageBox::Cancel)!=QMessageBox::Ok) return;
 
     switch (action) {
@@ -106,11 +106,12 @@ void PlayersDialog::select(const int action) {
                     str="Auction started !";
                     QMessageBox::information(this,tr("New auction"),str,QMessageBox::Ok);
                     accept();
+                    return;
                 }
             }
             else return;
     }
-    str="Impossible : the player is blocked or you do'nt have enough action points.";
+    str="Impossible : the player is blocked, this action is not needed or you do'nt have enough action points.";
     QMessageBox::critical(this,tr("Upgrade"),str,QMessageBox::Ok);
 }
 void PlayersDialog::confirmation() {

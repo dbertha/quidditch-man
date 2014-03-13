@@ -154,7 +154,28 @@ int getManagersList(int sockfd){
     serialized.typeOfInfos = GETMANAGERSLIST;
     return sendOnSocket(sockfd, serialized);
 }
-
+int askForTournamentList(int sockfd){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = GETTOURNAMENTSLIST;
+    return sendOnSocket(sockfd, serialized);
+}
+int askToJoinTournament(int sockfd, int tournamentID){
+    SerializedObject serialized;
+    serialized.typeOfInfos = JOINTOURNAMENT;
+    char * position = serialized.stringData;
+    memcpy(position, &tournamentID, sizeof(tournamentID));
+    return sendOnSocket(sockfd, serialized);
+}
+int sendTournamentCreation(int sockfd, int nbOfPlayers, int startingPrice){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = CREATE_TOURNAMENT;
+    memcpy(position, &nbOfPlayers, sizeof(nbOfPlayers));
+    position += sizeof(nbOfPlayers);
+    memcpy(position, &startingPrice, sizeof(startingPrice));
+    return sendOnSocket(sockfd, serialized);
+}
 //réception des données du serveur :
 
 bool getConfirmation(int sockfd){
@@ -269,4 +290,27 @@ std::vector<int> receiveBuildingInfos(int sockfd){
         }
     }
     return buildingInfos;
+}
+std::vector<int> getTournamentList(int sockfd_) {
+    //nbOfTournaments then __startingNbOfPlayers, __currentNbOfPlayers, __startingPrice for each
+    int nbOfTournaments, startingNbOfPlayers, currentNbOfPlayers, startingPrice;
+    std::vector<int> tournamentsList;
+    SerializedObject received = receiveOnSocket(sockfd_);
+    char * position = received.stringData;
+    memcpy(&nbOfTournaments, position, sizeof(nbOfTournaments));
+    position += sizeof(nbOfTournaments);
+    //std::cout << "Nb of tournaments : " << nbOfTournaments << std::endl;
+    for(int i = 0; i < nbOfTournaments; ++i){
+        memcpy(&startingNbOfPlayers, position, sizeof(startingNbOfPlayers));
+        position += sizeof(startingNbOfPlayers);
+        memcpy(&currentNbOfPlayers, position, sizeof(currentNbOfPlayers));
+        position += sizeof(currentNbOfPlayers);
+        memcpy(&startingPrice, position, sizeof(startingPrice));
+        position += sizeof(startingPrice);
+        tournamentsList.push_back(startingNbOfPlayers);
+        tournamentsList.push_back(currentNbOfPlayers);
+        tournamentsList.push_back(startingPrice);
+    }
+    return tournamentsList;
+
 }

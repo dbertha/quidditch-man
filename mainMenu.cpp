@@ -23,11 +23,12 @@ MainMenu::MainMenu(MainGui *parent) : QWidget(parent), parent_(parent) {
     menuLayout->addWidget(matchButton);
     menuLayout->addWidget(tournamentButton);
     menuLayout->addWidget(playersButton);
-    menuLayout->addWidget(auctionButton);
+  //  menuLayout->addWidget(auctionButton);
     menuLayout->addWidget(buildingsButton);
-    menuLayout->addWidget(APButton);
+  //  menuLayout->addWidget(APButton);
     setLayout(menuLayout);
     connect(matchButton,SIGNAL(clicked()),parent_,SLOT(listMgrs()));
     connect(playersButton,SIGNAL(clicked()),parent_,SLOT(listPlayers()));
     connect(buildingsButton,SIGNAL(clicked()),parent_,SLOT(buildings()));
+    connect(tournamentButton,SIGNAL(clicked()),parent_,SLOT(tournaments()));
 }

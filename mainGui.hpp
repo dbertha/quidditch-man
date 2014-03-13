@@ -10,7 +10,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QStringList>
-
+#include "tournaments.hpp"
 #include "ticker.hpp"
 #include "loginDialog.hpp"
 #include "mainMenu.hpp"
@@ -32,13 +32,15 @@ public:
         void setNbPlayers(const int);
         void setNbFans(const int);
         void setActionPoints(const int);
+public slots:
+        void listMgrs();
+        void listPlayers();
+        void buildings();
+        void tournaments();
 private slots:
         void about();
         void login();
         void logout();
-        void listMgrs();
-        void listPlayers();
-        void buildings();
 private:
         int badConnection();
         void createActions();
@@ -54,7 +56,6 @@ private:
         QAction *listPlayersAction;
         QAction *buildingsAction;
         QAction *listTournamentsAction;
-        QAction *newTournamentAction;
         QAction *newPromotionAction;
         QAction *buyAPAction;
         QMenu *fileMenu;

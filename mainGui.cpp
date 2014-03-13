@@ -25,12 +25,19 @@ void MainGui::buildings() {
 void MainGui::listPlayers() {
     if (choosePlayer(sockfd_,this)==BAD_CONNECTION) badConnection();
 }
+void MainGui::tournaments() {
+    //this slots acts for both manager and administrator as well :
+    //if manager, the user may choose to participate to a tournament
+    //if administrator, the user can create a new tournament
+    chooseTournament(sockfd_,role,this);
+}
+
 void MainGui::listMgrs() {
     ticker->hide();
     int res = choosePartner(sockfd_,this);
     if (res==BAD_CONNECTION) badConnection();
     else {
-// .............
+        QMessageBox::information(this,tr("Match"),tr("In construction !"),QMessageBox::Ok);
     }
     ticker->show();
 }
@@ -57,7 +64,6 @@ void MainGui::createActions() {
     listPlayersAction=new QAction(tr("List my players"),this);
     buildingsAction=new QAction(tr("List my buildings"),this);
     listTournamentsAction=new QAction(tr("List tournaments"),this);
-    newTournamentAction=new QAction(tr("New tournament"),this);
     newPromotionAction=new QAction(tr("Start a new promotion campaign"),this);
     buyAPAction=new QAction(tr("Buy action points"),this);
 }
@@ -94,6 +100,7 @@ void MainGui::createMenu() {
         connect(buildingsAction,SIGNAL(triggered()),this,SLOT(buildings()));
         tournamentsMenu=menuBar()->addMenu(tr("Tournaments"));
         tournamentsMenu->addAction(listTournamentsAction);
+        connect(listTournamentsAction,SIGNAL(triggered()),this,SLOT(tournaments()));
         actionPointsMenu=menuBar()->addMenu(tr("Action Points"));
         actionPointsMenu->addAction(newPromotionAction);
         actionPointsMenu->addAction(buyAPAction);
@@ -105,8 +112,8 @@ void MainGui::createMenu() {
     }
     else if (role==ADMIN_LOGIN) {
         tournamentsMenu=menuBar()->addMenu(tr("Tournaments"));
-        tournamentsMenu->addAction(newTournamentAction);
         tournamentsMenu->addAction(listTournamentsAction);
+        connect(listTournamentsAction,SIGNAL(triggered()),this,SLOT(tournaments()));
     }
 }
 void MainGui::about() {
