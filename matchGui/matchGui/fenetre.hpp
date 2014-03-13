@@ -30,7 +30,8 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 
     public:
 		fenetre();//constructeur pour test
-		fenetre(HexagonalField,std::vector <PlayingPlayer>,std::vector <Ball>);//constructeur de la fenetre
+		fenetre(HexagonalField,std::vector <PlayingPlayer>,std::vector <Ball>);
+		fenetre(int idMaTeam,std::vector <PlayingPlayer>,std::vector <Ball>);//constructeur de la fenetre
 
     public slots:
 		void changerTexte(int,int);//peut etre fait parceque j'ai mis Q_OBJECT
@@ -40,18 +41,30 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 //    void agrandissementMaxV2(int);//test perso pour renvoyé des valeur
 
     private:
-        QLabel *texte;
+		int numMaTeam;
+		QLabel *texte;
         QGridLayout *layout;
         QGraphicsScene *scene;
         QGraphicsView *view;
         hexagone *hexa;
         hexagone *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
 
-		HexagonalField _fieldMatrice;
+		HexagonalField __field;
 		std::vector <PlayingPlayer> _listeJoueur;
 		std::vector <Ball> _listeBall;
 
-		void initFieldGui();
+		std::vector <PlayingPlayer> __players;
+		std::vector <Ball> __balls;
+
+		void initFieldGuiWithHexagonalField();
+		void initHexagonalFieldWithDefine();
+
+
+		void marquerCaseAccessibleDepuis(int iAxial,int jAxial,int maxDistance);
+		void marquerToutesCaseNonAccessible();
+
+
+
 //        AxialCoordinates coord;
 //    QPushButton *m_bouton;
 //    QLCDNumber *m_lcd;
