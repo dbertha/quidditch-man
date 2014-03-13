@@ -11,21 +11,21 @@
 #include <QMessageBox>
 #include <QStringList>
 #include "Client.hpp"
+#include "tournaments.hpp"
 #include "ticker.hpp"
 #include "loginDialog.hpp"
-#include "clientMatchHandler.hpp"
-#include "playerMgr.hpp"
+#include "mainMenu.hpp"
 #include "buildingsDialog.hpp"
 
-
+class MainMenu;
 class Ticker;
 class BuildingsDialog;
-class MainGui : public QMainWindow{
+
+class MainGui : public QMainWindow {
     Q_OBJECT
 public:
         MainGui(int,QMainWindow *parent=0);
-        ~ MainGui();
-        void run();
+        ~MainGui();
         int getMoney();
         int getNbPlayers();
         int getNbFans();
@@ -34,20 +34,22 @@ public:
         void setNbPlayers(const int);
         void setNbFans(const int);
         void setActionPoints(const int);
-private slots:
-        void about();
-        void quit();
-        void login();
-        void logout();
+public slots:
         void listMgrs();
         void listPlayers();
         void buildings();
-        void listAndChooseTournaments();
+        void tournaments();
+private slots:
+        void about();
+        void login();
+        void logout();
+
 private:
         int badConnection();
         void createActions();
         void firstMenu();
         void createMenu();
+        void createButtons();
         QAction *loginAction;
         QAction *logoutAction;
         QAction *exitAction;
@@ -57,7 +59,6 @@ private:
         QAction *listPlayersAction;
         QAction *buildingsAction;
         QAction *listTournamentsAction;
-        QAction *newTournamentAction;
         QAction *newPromotionAction;
         QAction *buyAPAction;
         QMenu *fileMenu;
@@ -69,11 +70,13 @@ private:
         QMenu *actionPointsMenu;
         QMenu *helpMenu;
         Ticker *ticker;
+        MainMenu *mainMenu;
         BuildingsDialog *buildingsDialog;
         LoginDialog *loginDialog;
         int role, nbPlayers, money, nbFans, nbActionPoints;
         QMainWindow parent_;
         Client * __client;
+
 };
 
-#endif // MAINGUI_H
+#endif

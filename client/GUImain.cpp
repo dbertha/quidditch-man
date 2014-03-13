@@ -37,10 +37,10 @@ int main(int argc, char *argv[])
             std::cout<<"Adresse du serveur "<<argv[1]<<" : "<<inet_ntoa(serverAddr.sin_addr)<<std::endl;
             break;
        case 3 :if (inet_aton(argv[2],&serverAddr.sin_addr) != 0) break;
-       case 1 :if (inet_aton("127.0.1.1",&serverAddr.sin_addr) != 0) break;
+       case 1 :if (inet_aton("127.0.1.1",&serverAddr.sin_addr) != 0) break; //machine locale
     default : std::cout<<"Donner le nom de la machine distante en argument."<<std::endl	\
-                <<"ou son adresse IP sous la forme <IP adresse>. Exemples :"<<std::endl		\
-                <<"client nom-machine-serveur"<<std::endl<<"client IP 192.168.1.6"<<std::endl;
+                <<"ou son adresse IP sous la forme \"IP <adresse>\". Exemples :"<<std::endl		\
+                <<"[exécutable] nom-machine-serveur"<<std::endl<<"[exécutable] IP 192.168.1.6"<<std::endl;
             return EXIT_FAILURE;
     }
     sockfd_ = socket(PF_INET,SOCK_STREAM, 0);
@@ -53,6 +53,5 @@ int main(int argc, char *argv[])
     MainGui * window=new MainGui(sockfd_);
     window->show();
     std::cout<<"Client GUI started"<<std::endl;
-    window->run();
     return application.exec();
 }

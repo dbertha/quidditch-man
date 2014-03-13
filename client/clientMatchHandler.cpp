@@ -56,25 +56,25 @@ std::vector<int> chooseTeamForMatch(Client * client, QWidget *parent){
     return chosenPlayersIndexes;
 }
 
-int chooseTournament(Client * client, QWidget *parent){
-    int pos = NO_CHOICE;
-    
-    if (client->askForTournamentList()==0) return BAD_CONNECTION;
-    std::vector<int> tournamentList = client->getTournamentList();
-    QStringList items;
-    
-    for(unsigned int i = 0; i < tournamentList.size(); i += 3){
-        QString tournament = QString("Starting Number of Players : %1, Current Number of Players : %2, Starting price : %3").arg(tournamentList[i],tournamentList[i+1], tournamentList[i+2]);
-        items.append(tournament);
-    }
-    SelectionDialog *selectionDialog = new SelectionDialog(items,parent);
-    selectionDialog->setWindowTitle("Select a tournament");
-    if (selectionDialog->exec()==selectionDialog->Accepted) {
-        pos = selectionDialog->getPosition();
-        //pos = IDList[pos]; //on renvoie l'ID correspondant
-        //std::cout<<pos<<"eme manager selectionne"<<std::endl;
-        
-    }
-    return pos;
-}
+//~ int chooseTournament(Client * client, QWidget *parent){
+    //~ int pos = NO_CHOICE;
+    //~ 
+    //~ if (client->askForTournamentList()==0) return BAD_CONNECTION;
+    //~ std::vector<int> tournamentList = client->getTournamentList();
+    //~ QStringList items;
+    //~ 
+    //~ for(unsigned int i = 0; i < tournamentList.size(); i += 3){
+        //~ QString tournament = QString("Starting Number of Players : %1, Current Number of Players : %2, Starting price : %3").arg(tournamentList[i],tournamentList[i+1], tournamentList[i+2]);
+        //~ items.append(tournament);
+    //~ }
+    //~ SelectionDialog *selectionDialog = new SelectionDialog(items,parent);
+    //~ selectionDialog->setWindowTitle("Select a tournament");
+    //~ if (selectionDialog->exec()==selectionDialog->Accepted) {
+        //~ pos = selectionDialog->getPosition();
+        //~ //pos = IDList[pos]; //on renvoie l'ID correspondant
+        //~ //std::cout<<pos<<"eme manager selectionne"<<std::endl;
+        //~ 
+    //~ }
+    //~ return pos;
+//~ }
 

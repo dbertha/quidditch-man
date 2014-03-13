@@ -4,9 +4,8 @@ Ticker::Ticker(Client * client, MainGui *parent)
     : QWidget(parent), parent_(parent), __client(client) {
     myTimerId = 0; // no timer started yet
     counter =nbPlayers=money=nbFans=actionPoints=0;
-    move(0,50); // position in parent window
+    move(0,25); // position in parent window
     label = new QLabel(tr("you have"));
-//  label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     QHBoxLayout *layout = new QHBoxLayout;
     layout->addWidget(label);
     layout->setSizeConstraint(QLayout::SetFixedSize);
@@ -15,7 +14,11 @@ Ticker::Ticker(Client * client, MainGui *parent)
 }
 void Ticker::showInfo() {
     move(0,50-counter%5); //this is to show its activity
-    __client->askForManagerInfos();
+    if(_client->askForManagerInfos()==0) {
+        QErrorMessage *errorMessageDialog = new QErrorMessage(this);
+        errorMessageDialog->showMessage(tr("No connection with the server."));
+        close();
+    }
     __client->receiveManagerInfos(&nbPlayers,&money,&nbFans,&actionPoints);
     parent_->setMoney(money);
     parent_->setNbPlayers(nbPlayers);
