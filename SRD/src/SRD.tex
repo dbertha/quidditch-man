@@ -398,7 +398,7 @@
     \includegraphics[scale=0.5]{uml/useCaseView/Matches.png}
     \caption{Cas d'utilisation 5: Matches}
   \end{figure}  
-    L'utilisateur a la possibilité de mettre ses joueurs en action au cours de vrais matches de Quidditch. Pour cela, il peut soit s'inscrire à un tournoi, soit proposer un match amical à un autre utilisateur connecté. Dans le cadre d'un tournoi, les échéances des matches sont fixées une fois que le bon nombre d'inscrits est atteint. L'utilisateur qui jouera le mieux, ou qui sera le plus chanceux, remportera le tournoi et les récompenses qui vont avec. Gagner un match amical offre également des avantages mais qui sont, bien entendu, moins conséquents.
+    L'utilisateur a la possibilité de mettre ses joueurs en action au cours de vrais matches de Quidditch. Pour cela, il peut soit s'inscrire à un tournoi, soit proposer un match amical à un autre utilisateur connecté. Dans le cadre d'un tournoi, les tours de matchs démarrent une fois que le bon nombre d'inscrits est atteint. L'utilisateur qui jouera le mieux, ou qui sera le plus chanceux, remportera le tournoi et les récompenses qui vont avec. Gagner un match amical offre également des avantages mais qui sont, bien entendu, moins conséquents.
 
     \subsubsection{Jouer un match amical}
       \begin{itemize}
@@ -414,7 +414,8 @@
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Inclut S'inscrire au tournoi et Disputer match.
         \item \textbf{Pré-conditions} : Néant.
         \item \textbf{Post-conditions} : A chaque match gagné lors du tournoi, le client reçoit de l'argent en récompense.
-        \item \textbf{Cas général} : Le client s'est inscrit à un tournoi (créé par l'administrateur).
+        \item \textbf{Cas général} : Le client s'est inscrit à un tournoi (créé par l'administrateur). Lorsqu'il y a suffisament d'inscrits, le tournoi démarre tous les matchs du premier tour. Dès qu'un tour est terminé, le tour suivant
+        commence (avec les joueurs ayant gagné leur match du tour précédent), jusqu'à ce qu'il n'y ait qu'un gagnant.
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
 
@@ -453,8 +454,8 @@
         \item \textbf{Cas général} : Le jour de l'affrontement dans le cadre du tournoi est arrivé et le client va jouer son match contre son adversaire.
         \item \textbf{Cas exceptionnels} :
           \begin{itemize}
-            \item Si l'adversaire ne se présente pas au match, le client connecté est désigné vainqueur par défaut et passe au tour suivant.
-            \item Si le résultat est un match nul, le gagnant est alors tiré au sort.
+            \item Le match était le dernier du tour du tournoi. Le tour suivant commence alors.
+            \item Si le résultat est un match nul, le gagnant est alors celui qui a proposé le match nul.
           \end{itemize}
       \end{itemize}
 
