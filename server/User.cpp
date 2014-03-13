@@ -599,7 +599,7 @@ void User::cmdHandler(SerializedObject *received) {
             int counter;
             counter = 0;
             for (unsigned int i=0;i<server_->usersList_.size();++i){
-                if(server_->usersList_[i]->state_==FREE) { //TODO : ne pas reprendre l'user qui fait la demande dans la liste
+                if((server_->usersList_[i]->state_==FREE) and (server_->usersList_[i] != this)) { //on ne reprend pas celui qui fait la demande
                     ++counter;
                     IDList.push_back(server_->usersList_[i]->getUserID());
                     std::cout << "userId " << server_->usersList_[i]->getUserID() << std::endl;

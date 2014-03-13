@@ -2,7 +2,10 @@
 #include "clientMatchHandler.hpp"
 #include "playerMgr.hpp"
 
-MainGui::MainGui(int sockfd,QMainWindow *parent) : parent_(parent), __client(new Client(sockfd, true)) {
+MainGui::MainGui(int sockfd,QMainWindow *parent) : 
+parent_(parent), __client(new Client(sockfd, true)), __pushesNotifier(new QSocketNotifier(sockfd, QSocketNotifier::Read, this)) {
+    __pushesNotifier->setEnabled(false); //genère le signal
+    connect(__pushesNotifier,SIGNAL(activated(int)),this,SLOT(pushesHandler()));
     setFixedSize(800,640);
     createActions();
     firstMenu();
@@ -16,7 +19,15 @@ MainGui::~ MainGui() {
     delete __client;
     __client = NULL;
 }
-
+void MainGui::pushesHandler(){
+    __pushesNotifier->setEnabled(false);
+    QErrorMessage *errorMessageDialog = new QErrorMessage(this);
+    errorMessageDialog->showMessage(tr("Push venant du serveur !"));
+    //receive
+    SerializedObject received = receiveOnSocket(__client->getSockfd());
+    __pushesNotifier->setEnabled(true);
+    //handle
+}
 int MainGui::badConnection() {
     QErrorMessage *errorMessageDialog = new QErrorMessage(this);
     errorMessageDialog->showMessage(tr("No connection with the server."));
@@ -52,9 +63,20 @@ void MainGui::listMgrs() {
 #endif
         //send invitation
         __client->proposeMatchTo(res,  chosenPlayers);
-        if(__client->receiveMatchConfirmation() == MATCH_STARTING){
+        //~ QProgressDialog *progress = new QProgressDialog("Waiting answer from opponent...", QString(), 0, 3, this);
+        //~ progress->setWindowModality(Qt::WindowModal);
+        //~ progress->show();
+        //~ progress->setValue(0);
+        //TODO : afficher un message d'attente (le programme se bloque)
+        int confirmation = __client->receiveMatchConfirmation();
+        //~ progress->setValue(1);
+        if(confirmation == MATCH_STARTING){
             //startMatch(1); //inviteur a l'équipe 1
-        }      
+        }else{
+            QMessageBox msgBox;
+            msgBox.setText("Invitation denied !");
+            msgBox.exec();
+        }
     }
     ticker->show();
 }
@@ -142,7 +164,7 @@ void MainGui::createMenu() {
         actionPointsMenu=menuBar()->addMenu(tr("Action Points"));
         actionPointsMenu->addAction(newPromotionAction);
         actionPointsMenu->addAction(buyAPAction);
-        ticker = new Ticker(__client, this);
+        ticker = new Ticker(__client, __pushesNotifier, this);
         ticker->show();
         mainMenu = new MainMenu(this);
         setCentralWidget(mainMenu);

@@ -1,7 +1,7 @@
 #include "ticker.hpp"
 #include "mainGui.hpp"
-Ticker::Ticker(Client * client, MainGui *parent)
-    : QWidget(parent), parent_(parent), __client(client) {
+Ticker::Ticker(Client * client, QSocketNotifier * notifier, MainGui *parent)
+    : QWidget(parent), parent_(parent), __client(client), __pushesNotifier(notifier) {
     myTimerId = 0; // no timer started yet
     counter =nbPlayers=money=nbFans=actionPoints=0;
     move(0,25); // position in parent window
@@ -42,8 +42,13 @@ void Ticker::showEvent(QShowEvent *) {
 
 void Ticker::timerEvent(QTimerEvent *event) {
     //checks first it's about our event !
-    if (event->timerId() == myTimerId) showInfo();
-    else QWidget::timerEvent(event);
+    if (event->timerId() == myTimerId) {
+        std::cout << "Socket Notifier coupé" << std::endl;
+        __pushesNotifier->setEnabled(false); //on n'écoute plus le socket car on prend l'initiative
+        showInfo();
+        __pushesNotifier->setEnabled(true);
+        std::cout << "Socket Notifier activé" << std::endl;
+    }else QWidget::timerEvent(event);
     //it's not about our event - let's give it to our base class
 }
 

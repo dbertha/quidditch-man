@@ -10,12 +10,15 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QStringList>
+#include <QProgressDialog>
+#include <QSocketNotifier>
 #include "Client.hpp"
 #include "tournaments.hpp"
 #include "ticker.hpp"
 #include "loginDialog.hpp"
 #include "mainMenu.hpp"
 #include "buildingsDialog.hpp"
+
 
 class MainMenu;
 class Ticker;
@@ -39,6 +42,7 @@ public slots:
         void listPlayers();
         void buildings();
         void tournaments();
+        void pushesHandler();
 private slots:
         void about();
         void login();
@@ -76,6 +80,7 @@ private:
         int role, nbPlayers, money, nbFans, nbActionPoints;
         QMainWindow parent_;
         Client * __client;
+        QSocketNotifier * __pushesNotifier;
 
 };
 
