@@ -3,7 +3,6 @@
 
 #include "../common/Defines.hpp"
 #include "../common/NetworkBase.hpp"
-#include "../common/commAPI.hpp"
 #include "MatchesHandler.hpp"
 #include "User.hpp"
 #include "Auction.hpp"

@@ -1,8 +1,8 @@
 #ifndef TOURNAMENTS_HPP
 #define TOURNAMENTS_HPP
 
-#define BAD_CONNECTION -1
-#define NO_CHOISE 0
+
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +17,7 @@
 
 #include "tournamentDialog.hpp"
 #include "Client.hpp"
+#include "../common/Defines.hpp"
 
 int chooseTournament(Client *, const int, QWidget *parent);
 

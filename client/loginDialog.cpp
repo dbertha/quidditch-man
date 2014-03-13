@@ -97,7 +97,7 @@ void LoginDialog::loginClicked()
                     strncpy(username,userName.toAscii().data(),USERNAME_LENGTH);
                     strncpy(password,password1.toAscii().data(),PASSWORD_LENGTH);
                     if(__client->sendNewManagerToServer(username,password)!=0){
-                        role=__client->getConfirmation()
+                        role=__client->getConfirmation();
                         if (role == NORMAL_LOGIN) accept();
                         else {
                             errorMessageDialog->showMessage(

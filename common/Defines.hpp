@@ -12,6 +12,8 @@
 #define USERNAME_LENGTH 30
 #define PASSWORD_LENGTH 30
 
+#define BAD_CONNECTION -1
+#define NO_CHOICE -2
 
 #define LOGIN_FAILED 0 
 #define NORMAL_LOGIN 1

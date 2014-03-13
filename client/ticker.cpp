@@ -14,7 +14,7 @@ Ticker::Ticker(Client * client, MainGui *parent)
 }
 void Ticker::showInfo() {
     move(0,50-counter%5); //this is to show its activity
-    if(_client->askForManagerInfos()==0) {
+    if(__client->askForManagerInfos()==0) {
         QErrorMessage *errorMessageDialog = new QErrorMessage(this);
         errorMessageDialog->showMessage(tr("No connection with the server."));
         close();

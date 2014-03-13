@@ -1,5 +1,4 @@
 #include "Client.hpp"
-#include "commAPI.hpp"
 // Documentation : voir Readme.txt
 
 using namespace std; //TODO : rajouter tous les spécificateurs de namespace

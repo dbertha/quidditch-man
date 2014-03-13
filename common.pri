@@ -7,12 +7,10 @@ QMAKE_CXXFLAGS += -Wextra
 
 
 # Input
-HEADERS += common/commAPI.hpp \
-           common/Coordinates.hpp \
+HEADERS += common/Coordinates.hpp \
            common/Defines.hpp \
            common/HexagonalField.hpp \
            common/NetworkBase.hpp \
            
-SOURCES += common/commAPI.cpp \
-           common/HexagonalField.cpp \
+SOURCES += common/HexagonalField.cpp \
            common/NetworkBase.cpp
