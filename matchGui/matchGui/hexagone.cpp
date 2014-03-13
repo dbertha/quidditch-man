@@ -188,6 +188,14 @@ QPointF hexagone::centreHexagon() const{
 				,pHaut.y() +(_indiceI*pasIndiceI.y())+(_indiceJ*pasIndiceJ.y()) + hauteur/2);
 
 }
+//----------------------------------------------------------------------------------------------
+void hexagone::setType(int typeCase){
+	_typeCase = typeCase;
+	update();
+}
+int hexagone::getType(){
+	return _typeCase ;
+}
 
 //----------------------------------------------------------------------------------------------
 //Changement d'etat d'une case (selection ou pas, si c'est un goal, si case accessible,...)
@@ -218,6 +226,7 @@ void hexagone::isNonAccessible(){
 }
 
 //----------------------------------------------------------------------------------------------
+//fonction test pour voir la reaction a un signal
 void hexagone::changerCouleur(){//slots de reaction a un signal
 
 	if(_ifSelect){
@@ -235,7 +244,7 @@ void hexagone::changerCouleur(){//slots de reaction a un signal
 void hexagone::mousePressEvent(QGraphicsSceneMouseEvent *)
  {//test pour voir les reaction possible a un clickage
 	 //setCursor(Qt::ClosedHandCursor);
-	 changerCouleur();
+	 //changerCouleur();
 	 emit hexagoneSelect(_indiceI,_indiceJ);
 
  }

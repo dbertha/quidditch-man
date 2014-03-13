@@ -67,6 +67,9 @@ class hexagone : public QGraphicsObject
         //paint => comment dessiner l'objet
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
+		void setType(int);
+		int getType();
+
         void select();
         void unselect();
 

@@ -13,6 +13,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsPolygonItem>
+#include <QGroupBox>
+#include <QRadioButton>
 
 #include <QDebug> //permet de dispose d'un affichage dans console debug
 
@@ -33,8 +35,11 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		fenetre(HexagonalField,std::vector <PlayingPlayer>,std::vector <Ball>);
 		fenetre(int idMaTeam,std::vector <PlayingPlayer>,std::vector <Ball>);//constructeur de la fenetre
 
+		fenetre(int idMaTeam);
+
     public slots:
 		void changerTexte(int,int);//peut etre fait parceque j'ai mis Q_OBJECT
+		void handlerMove(int,int);
 
     signals:
 //    void agrandissementMax();
@@ -42,11 +47,25 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 
     private:
 		int numMaTeam;
+		bool iHaveASelection;
+
+
+
+
+
+		QLabel *infoJoueur;
 		QLabel *texte;
         QGridLayout *layout;
         QGraphicsScene *scene;
-        QGraphicsView *view;
-        hexagone *hexa;
+		QGraphicsView *view;
+
+		QGroupBox *groupbox ;
+		QRadioButton *deplacer ;
+		QRadioButton *lancer ;
+		QRadioButton *taper ;
+
+
+		hexagone *joueurSelect;
         hexagone *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
 
 		HexagonalField __field;
@@ -56,14 +75,17 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		std::vector <PlayingPlayer> __players;
 		std::vector <Ball> __balls;
 
+		std::vector<AxialCoordinates> allPositions;
+
+
 		void initFieldGuiWithHexagonalField();
 		void initHexagonalFieldWithDefine();
 
+		void initListeHexa();
+		void updateListeHexa(std::vector<AxialCoordinates> allPositions);
 
 		void marquerCaseAccessibleDepuis(int iAxial,int jAxial,int maxDistance);
 		void marquerToutesCaseNonAccessible();
-
-
 
 //        AxialCoordinates coord;
 //    QPushButton *m_bouton;
