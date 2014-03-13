@@ -18,4 +18,6 @@
 
 int choosePlayer(const int, QWidget *parent);
 
+std::vector<int> chooseTeamForMatch(const int sockfd_, QWidget *parent);
+
 #endif

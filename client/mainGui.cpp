@@ -42,6 +42,13 @@ void MainGui::listMgrs() {
     int res = choosePartner(sockfd_,this);
     if (res==BAD_CONNECTION) badConnection();
     else {
+        std::vector<int> chosenPlayers;
+        chosenPlayers = chooseTeamForMatch(sockfd_, this); //tous les rôles sont nécessairement remplis 
+        //(on suppose suffisament de joueurs)
+        std::cout << "index choisi : " << std::endl;
+        for(unsigned int i = 0; i < chosenPlayers.size() ; ++i){
+            std::cout << chosenPlayers[i] << std::endl;
+        }
 // .............
     }
     ticker->show();

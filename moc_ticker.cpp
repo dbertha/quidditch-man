@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'ticker.hpp'
 **
-** Created: Wed Mar 12 19:21:10 2014
+** Created: Thu Mar 13 09:52:45 2014
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.3)
 **
 ** WARNING! All changes made in this file will be lost!
