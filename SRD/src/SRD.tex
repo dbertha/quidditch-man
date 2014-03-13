@@ -53,6 +53,7 @@
 \usepackage{fix-cm} % Allows increasing the font size of specific fonts beyond LaTeX default specifications
 \usepackage{algorithm} %pseudo-code
 \usepackage{algorithmic}
+\usepackage{lscape} %paysage
 
 %POUR LE TITRE :
 \setlength{\oddsidemargin}{0mm} % Adjust margins to center the colored title box
@@ -886,11 +887,12 @@ Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvo
   \subsection{Implémentation}
   
   Dans cette partie sera expliquée l'implémentation générale du jeu; de quelles façons les fonctionnalités ont été mises en place, les choix faits, etc. Des diagrammes de classes viendront détailler ces explications.
-
+    \begin{landscape} %mode paysage
     \begin{figure}[H]
-      \includegraphics[scale=0.27]{uml/class/Global.png}%<---angle here
+      \includegraphics[scale=0.35]{uml/class/Global.png}%<---angle here
       \caption{Diagramme de classes global}
     \end{figure}
+    \end{landscape}
 
       \subsubsection{Gestion générale}
           \begin{figure}[H]
