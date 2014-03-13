@@ -16,14 +16,14 @@
 #include <QTimerEvent>
 #include <QShowEvent>
 #include <QHideEvent>
-#include "common/NetworkInterface.hpp"
+#include "Client.hpp"
 #include "buildingsModel.hpp"
 #include "mainGui.hpp"
 class MainGui;
 class BuildingsDialog : public QDialog {
     Q_OBJECT
 public:
-    BuildingsDialog(const int, MainGui *parent = 0);
+    BuildingsDialog(Client * client, MainGui *parent = 0);
     
 private slots:
     void select();
@@ -48,8 +48,10 @@ private:
     QVector<QStringList> loadedData;
     QStringList hAxe, vAxe;
     std::vector<int> buildingInfos;
-    int sockfd_, row, myTimerId, i;
+    int row, myTimerId, i;
+   
     MainGui *parent_;
+    Client * __client;
 };
 
 #endif

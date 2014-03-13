@@ -127,6 +127,7 @@ private:
     void askAndSendMoves(int numTeam, HexagonalField &field, std::vector<AxialCoordinates> &positions);
     void commMgr();
     //network :
+public :
     int sendLoginToServer(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
     int sendNewManagerToServer(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
     

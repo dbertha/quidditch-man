@@ -1,7 +1,7 @@
 #include "buildingsDialog.hpp"
 
-BuildingsDialog::BuildingsDialog(const int sockfd, MainGui *parent)
-    : sockfd_(sockfd), QDialog(parent),parent_(parent), row(-1), myTimerId(0) {
+BuildingsDialog::BuildingsDialog(Client * client, MainGui *parent)
+    : QDialog(parent),parent_(parent), row(-1), myTimerId(0), __client(client) {
     setWindowTitle(tr("Buildings"));
     buildingsModel=new BuildingsModel(this);
     hAxe<<"Current level"<<"Upgrade cost"<<"Max. seats"<<"Upgrading";
@@ -36,8 +36,8 @@ void BuildingsDialog::select() {
     //interacts when the selectButton is clicked
     row = selectionModel->currentIndex().row();
     if(row<0 || row >=vAxe.length()) return;
-    askForBuildingInfos(sockfd_,row+1);
-    buildingInfos = receiveBuildingInfos(sockfd_);
+    __client->askForBuildingInfos(row+1);
+    buildingInfos = __client->receiveBuildingInfos();
     //is the cost not too high ?
     //is this building not undergoing an upgrade ?
     //has the manager enough action points ?
@@ -46,8 +46,8 @@ void BuildingsDialog::select() {
         str ="Are you sure to upgrade "+vAxe.at(row)+" ?";
         if(QMessageBox::question(this,tr("Upgrade"),str,
            QMessageBox::Ok | QMessageBox::Cancel)!=QMessageBox::Ok) return;
-        askForBuildingUpgrade(sockfd_,row+1);
-        if (getConfirmation(sockfd_)) {
+        __client->askForBuildingUpgrade(row+1);
+        if (__client->getConfirmation()) {
             str="This building has started upgrading !\n"
                     "Upgrade will be complete in "+
                     QString::number((1+buildingInfos[0])*TIMESCALE)+" minutes !";
@@ -63,8 +63,8 @@ void BuildingsDialog::showInfo() {
     //updates the data presented by the model
 //    std::cout<<"**buildingsDialog "<<i<<" ";
     for (int j=0;j<vAxe.length();++j) {
-        askForBuildingInfos(sockfd_,j+1);
-        buildingInfos = receiveBuildingInfos(sockfd_);
+        __client->askForBuildingInfos(j+1);
+        buildingInfos = __client->receiveBuildingInfos();
         loadedData[j].clear();
         for (int k=0;k<hAxe.length()-1;++k) {
             if (k!=2 || (j==0 || j==3)) {

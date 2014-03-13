@@ -1,16 +1,19 @@
 #include "mainGui.hpp"
 
-MainGui::MainGui(int sockfd,QMainWindow *parent) : sockfd_(sockfd), parent_(parent) {
+MainGui::MainGui(int sockfd,QMainWindow *parent) : parent_(parent), __client(new Client(sockfd, true)) {
     setFixedSize(800,480);
     createActions();
     firstMenu();
     setWindowTitle(tr("Quidditch Manager 2014"));
-    loginDialog = new LoginDialog(sockfd_,this);
+    loginDialog = new LoginDialog(__client,this);
     nbPlayers=money=nbFans=nbActionPoints=0;
     login();
 }
 
-MainGui::~ MainGui() {}
+MainGui::~ MainGui() {
+    delete __client;
+    __client = NULL;
+}
 
 void MainGui::run() {
    this->show();
@@ -24,12 +27,12 @@ int MainGui::badConnection() {
     return (0);
 }
 void MainGui::buildings() {
-    buildingsDialog = new BuildingsDialog(sockfd_,this);
+    buildingsDialog = new BuildingsDialog(__client,this);
     buildingsDialog->exec();
 }
 void MainGui::listPlayers() {
     ticker->hide();
-    int res = choosePlayer(sockfd_,this);
+    int res = choosePlayer(__client,this);
     if (res==BAD_CONNECTION) badConnection();
     else {
 // .............
@@ -39,17 +42,44 @@ void MainGui::listPlayers() {
 
 void MainGui::listMgrs() {
     ticker->hide();
-    int res = choosePartner(sockfd_,this);
+    int res = choosePartner(__client,this);
     if (res==BAD_CONNECTION) badConnection();
-    else {
+    else if(res != NO_CHOICE){
         std::vector<int> chosenPlayers;
-        chosenPlayers = chooseTeamForMatch(sockfd_, this); //tous les rôles sont nécessairement remplis 
+        chosenPlayers = chooseTeamForMatch(__client, this); //tous les rôles sont nécessairement remplis 
         //(on suppose suffisament de joueurs)
+#ifdef __DEBUG
         std::cout << "index choisi : " << std::endl;
         for(unsigned int i = 0; i < chosenPlayers.size() ; ++i){
             std::cout << chosenPlayers[i] << std::endl;
+        }      
+#endif
+        //send invitation
+        __client->proposeMatchTo(res,  chosenPlayers);
+        if(__client->receiveMatchConfirmation() == MATCH_STARTING){
+            //startMatch(1); //inviteur a l'équipe 1
+        }      
+    }
+    ticker->show();
+}
+
+void MainGui::listAndChooseTournaments(){
+    ticker->hide();
+    int res = chooseTournament(__client,this);
+    if (res==BAD_CONNECTION) badConnection();
+    else if(res != NO_CHOICE){
+        __client->askToJoinTournament(); //pour le moment, un seul tournoi à la fois
+        int confirmation = __client->getConfirmation();
+        QMessageBox msgBox;
+ 
+ 
+        if(confirmation == 0){
+            msgBox.setText("Impossible to join this tournament !");
+        }else{
+            msgBox.setText("You are recorded as a participant of this tournament. Be ready for when it will start !");
+
         }
-// .............
+        msgBox.exec();
     }
     ticker->show();
 }
@@ -113,10 +143,11 @@ void MainGui::createMenu() {
         connect(buildingsAction,SIGNAL(triggered()),this,SLOT(buildings()));
         tournamentsMenu=menuBar()->addMenu(tr("Tournaments"));
         tournamentsMenu->addAction(listTournamentsAction);
+        connect(listTournamentsAction,SIGNAL(triggered()),this,SLOT(listAndChooseTournaments()));
         actionPointsMenu=menuBar()->addMenu(tr("Action Points"));
         actionPointsMenu->addAction(newPromotionAction);
         actionPointsMenu->addAction(buyAPAction);
-        ticker = new Ticker(sockfd_, this);
+        ticker = new Ticker(__client, this);
         ticker->show();
     }
     else if (role==ADMIN_LOGIN) {

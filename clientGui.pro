@@ -13,7 +13,7 @@ HEADERS += client/clientMatchHandler.hpp \
            client/buildingsDialog.hpp \
            client/buildingsModel.hpp \
            client/playerMgr.hpp \
-           common/NetworkInterface.hpp \
+           client/Client.hpp \
 
 SOURCES += client/clientMatchHandler.cpp \
            client/loginDialog.cpp \
@@ -24,5 +24,5 @@ SOURCES += client/clientMatchHandler.cpp \
            client/buildingsDialog.cpp \
            client/buildingsModel.cpp \
            client/playerMgr.cpp \
-           common/NetworkInterface.cpp \
+           client/Client.cpp \
 

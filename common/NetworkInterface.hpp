@@ -21,16 +21,16 @@
 /* recv(socket, *message, sizeToWrite, 0) return sizeWriten if ok
 //send(socket, *message, sizeToRead, 0) return sizeRead if ok */
 
-typedef struct {
-    /* on manipule des short pour correspondre aux fonctions et htons/ntohs
-    on suppose que les types de bases sont de taille identique sur chaque machine */
-    short typeOfInfos;
-    char stringData[SERIALISATION_MAXSIZE];
-} SerializedObject;
-
-SerializedObject receiveOnSocket(int);
-
-int sendOnSocket(int socketfd, SerializedObject toSend);
+//~ typedef struct {
+    //~ /* on manipule des short pour correspondre aux fonctions et htons/ntohs
+    //~ on suppose que les types de bases sont de taille identique sur chaque machine */
+    //~ short typeOfInfos;
+    //~ char stringData[SERIALISATION_MAXSIZE];
+//~ } SerializedObject;
+//~ 
+//~ SerializedObject receiveOnSocket(int);
+//~ 
+//~ int sendOnSocket(int socketfd, SerializedObject toSend);
 
 //appelée dans login() du client :
 int sendLoginToServer(int, char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);

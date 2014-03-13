@@ -1,7 +1,7 @@
 #include "ticker.hpp"
 #include "mainGui.hpp"
-Ticker::Ticker(const int sockfd, MainGui *parent)
-    : sockfd_(sockfd), QWidget(parent), parent_(parent) {
+Ticker::Ticker(Client * client, MainGui *parent)
+    : QWidget(parent), parent_(parent), __client(client) {
     myTimerId = 0; // no timer started yet
     counter =nbPlayers=money=nbFans=actionPoints=0;
     move(0,50); // position in parent window
@@ -15,8 +15,8 @@ Ticker::Ticker(const int sockfd, MainGui *parent)
 }
 void Ticker::showInfo() {
     move(0,50-counter%5); //this is to show its activity
-    askForManagerInfos(sockfd_);
-    receiveManagerInfos(sockfd_,&nbPlayers,&money,&nbFans,&actionPoints);
+    __client->askForManagerInfos();
+    __client->receiveManagerInfos(&nbPlayers,&money,&nbFans,&actionPoints);
     parent_->setMoney(money);
     parent_->setNbPlayers(nbPlayers);
     parent_->setNbPlayers(nbPlayers);

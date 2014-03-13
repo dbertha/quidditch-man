@@ -10,11 +10,13 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QStringList>
+#include "Client.hpp"
 #include "ticker.hpp"
 #include "loginDialog.hpp"
 #include "clientMatchHandler.hpp"
 #include "playerMgr.hpp"
 #include "buildingsDialog.hpp"
+
 
 class Ticker;
 class BuildingsDialog;
@@ -40,6 +42,7 @@ private slots:
         void listMgrs();
         void listPlayers();
         void buildings();
+        void listAndChooseTournaments();
 private:
         int badConnection();
         void createActions();
@@ -68,8 +71,9 @@ private:
         Ticker *ticker;
         BuildingsDialog *buildingsDialog;
         LoginDialog *loginDialog;
-        int sockfd_, role, nbPlayers, money, nbFans, nbActionPoints;
+        int role, nbPlayers, money, nbFans, nbActionPoints;
         QMainWindow parent_;
+        Client * __client;
 };
 
 #endif // MAINGUI_H

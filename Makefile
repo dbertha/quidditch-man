@@ -76,7 +76,7 @@ clientGUI.out: client/clientMatchHandler.hpp \
            client/buildingsDialog.hpp \
            client/buildingsModel.hpp \
            client/playerMgr.hpp \
-           common/NetworkInterface.hpp \
+           client/Client.hpp \
            client/clientMatchHandler.cpp \
            client/loginDialog.cpp \
            client/GUImain.cpp \
@@ -86,7 +86,7 @@ clientGUI.out: client/clientMatchHandler.hpp \
            client/buildingsDialog.cpp \
            client/buildingsModel.cpp \
            client/playerMgr.cpp \
-           common/NetworkInterface.cpp 
+           client/Client.cpp 
 	make -f Makefile.GUI
 	
 clean:
