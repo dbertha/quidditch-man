@@ -1,11 +1,14 @@
 % Installation environnement de compilation et packages : 
 % sudo apt-get install texlive-base texlive-lang-french texlive-latex-extra
 % Compilation :
-% pdflatex SRD.tex 
+% depuis SRD/ :
+% pdflatex src/SRD.tex 
 % Si modification de l'index ou du glossaire, faire aussi :
 % makeindex -s SRD.ist -t SRD.glg -o SRD.gls SRD.glo
-% pdflatex SRD.tex 
-% pdflatex SRD.tex 
+% pdflatex src/SRD.tex 
+% pdflatex src/SRD.tex 
+% ou directement :
+% make
 
 \let\pagebreakORIG\pagebreak
 \let\clearpageORIG\clearpage
@@ -175,6 +178,8 @@
     2.1 & David & 11/03/14 & Précisions de l'architecture réseau \\
     2.2 & Manon & 06/03/14 & Titre + Section 2.1 \\
     2.3 & Manon & 12/03/14 & Amélioration diags de classes \\
+    2.4 & David & 12/03/14 & Diagramme de composants \\
+    2.5 & David & 12/03/14 & Précisions sur le déroulement d'un match \\
     \hline
   \end{tabular}
 
@@ -459,7 +464,7 @@
     \includegraphics[scale=0.5]{uml/useCaseView/TourMatch.png}
     \caption{Cas d'utilisation 6: Tour d'un match}
   \end{figure}  
-    Les matches se jouent au tour par tour. A chaque tour, les clients qui s'affrontent sont invités à indiquer les actions (déplacement ou action particulière) à faire pour chacun de leur joueur. Ils ont un temps limité pour indiquer ces actions. Une fois le temps écoulé, seules les indications déjà enregistrées seront prises en compte.
+    Les matches se jouent au tour par tour. A chaque tour, les clients qui s'affrontent sont invités à indiquer les actions (déplacement ou action particulière) à faire pour chacun de leur joueur. %Ils ont un temps limité pour indiquer ces actions. Une fois le temps écoulé, seules les indications déjà enregistrées seront prises en compte.
 
     \subsubsection{Choisir joueur}
       \begin{itemize}
@@ -496,10 +501,11 @@
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Spécialise Faire une action particulière.
         \item \textbf{Pré-conditions} : Le joueur qui va faire la passe doit tenir le \gls{souafle}\index{balle!souafle} et doit être un \gls{poursuiveur}s \index{joueur!poursuiveur} ou un \gls{gardien}s \index{joueur!gardien}.
         \item \textbf{Post-conditions} : Que la passe soit réussie ou ratée, le joueur ne possèdera plus le souafle.
-        \item \textbf{Cas général} : Le client choisit l’endroit de destination de la passe. Les endroits possibles dépendent des compétences du joueur qui a le souafle. Attraper le souafle suite à une passe ou l’intercepter (passe adverse) se fait de façon automatique par un poursuiveur se trouvant sur la trajectoire de la passe.
+        \item \textbf{Cas général} : Le client choisit l’endroit de destination de la passe. Les endroits possibles dépendent des compétences du joueur qui a le souafle. %Attraper le souafle suite à une passe ou l’intercepter (passe adverse) se fait de façon automatique par un poursuiveur se trouvant sur la trajectoire de la passe.
         \item \textbf{Cas exceptionnels} :
         \begin{itemize}
-            \item Le joueur est heurté par un \gls{cognard}\index{balle!cognard}. La passe échoue. 
+            %\item Le joueur est heurté par un \gls{cognard}\index{balle!cognard}. La passe échoue. 
+            \item La balle entre en collision avec une autre ball ou un joueur. Son déplacement s'arrête.
         \end{itemize}
       \end{itemize}
 
@@ -508,11 +514,12 @@
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Spécialise Faire une action particulière.
         \item \textbf{Pré-conditions} : Le poursuiveur qui veut tirer doit tenir le souafle et se trouver dans l’alignement d’un des buts. 
         \item \textbf{Post-conditions} : Qu’il y ait but ou non, le joueur ne tiendra plus le souafle.
-        \item \textbf{Cas général} : Le client essaie de marquer un but en indiquant au poursuiveur détenant le souafle vers quel but il doit tirer. Intercepter le souafle se fait automatiquement par le \gls{gardien}\index{joueur!gardien} ou les \gls{poursuiveur}s \index{joueur!poursuiveur} adverses s’ils se trouvent sur la trajectoire du souafle. Si le tir est réussi, l'équipe qui vient de marquer gagne 10 points.
-        \item \textbf{Cas exceptionnels} :
-          \begin{itemize}
-        \item Le poursuiveur qui s'apprête à tirer est heurté par un \gls{cognard}\index{balle!cognard}. Le tir au but échoue. 
-          \end{itemize}
+        \item \textbf{Cas général} : Le client essaie de marquer un but en indiquant au poursuiveur détenant le souafle vers quel but il doit tirer.  Si le tir est réussi, l'équipe qui vient de marquer gagne 10 points. %Intercepter le souafle se fait automatiquement par le \gls{gardien}\index{joueur!gardien} ou les \gls{poursuiveur}s \index{joueur!poursuiveur} adverses s’ils se trouvent sur la trajectoire du souafle.
+         \item \textbf{Cas exceptionnels} :
+           \begin{itemize}
+%         \item Le poursuiveur qui s'apprête à tirer est heurté par un \gls{cognard}\index{balle!cognard}. Le tir au but échoue. 
+            \item La balle entre en collision avec une autre balle ou un joueur. Son déplacement s'arrête.
+           \end{itemize}
       \end{itemize}
 
     \subsubsection{Frapper le cognard}
@@ -520,10 +527,10 @@
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Spécialise Faire une action particulière
         \item \textbf{Pré-conditions} : Le joueur qui va essayer de frapper un \gls{cognard}\index{balle!cognard} doit être un batteur\index{joueur!batteur} et doit se situer près du cognard.
         \item \textbf{Post-conditions} : Le cognard est projeté dans la direction voulue.
-        \item \textbf{Cas général} : Le client indique dans quelle direction le batteur doit frapper le cognard.
+        \item \textbf{Cas général} : Le code client indique dans quelle direction le batteur doit frapper le cognard.
         \item \textbf{Cas exceptionnels} :
           \begin{itemize}
-        \item Le batteur rate son coup. Le cognard heurte le joueur.
+        \item Le batteur rate son coup. Rien ne se passe%Le cognard heurte le joueur.
           \end{itemize}
       \end{itemize}
 
@@ -535,8 +542,9 @@
         \item \textbf{Cas général} : Un des attrapeurs est arrivé à proximité du vif d'or. Il essaiera alors de l’attraper (la réussite de l’action dépend des qualités de l’attrapeur et de sa distance par rapport au vif d’or). S’il réussit à l’attraper, son équipe gagne 150 points et le match est terminé.
         \item \textbf{Cas exceptionnels} :
          \begin{itemize}
-            \item L'attrapeur est heurté par un cognard. Le vif d'or reste libre.
-            \end{itemize}
+            %\item L'attrapeur est heurté par un cognard. Le vif d'or reste libre.
+            \item L'attrapeur échoue. Le vif d'or reste libre.    
+        \end{itemize}
       \end{itemize}
 
     \subsubsection{Déclarer forfait}
@@ -556,8 +564,11 @@
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Est étendu par Finir le match.
         \item \textbf{Pré-conditions} : L'action se déroule au cours d'un match.
         \item \textbf{Post-conditions} : Si l'adversaire accepte la proposition, le match sera terminé, sinon le match continue.
-        \item \textbf{Cas général} : Un des client souhaite mettre fin au match en proposant un match nul à l'adversaire. Un match nul a l'avantage que chacun des clients recevra une petite récompense.
-        \item \textbf{Cas exceptionnels} : Néant.
+        \item \textbf{Cas général} : Un des client souhaite mettre fin au match en proposant un match nul à l'adversaire. %Un match nul a l'avantage que chacun des clients recevra une petite récompense.
+        \item \textbf{Cas exceptionnels} :
+          \begin{itemize}
+            \item Il s'agit d'un match de tournoi. Celui ayant demandé la fin du match est considéré comme perdant.
+          \end{itemize}
       \end{itemize}
 
     \subsubsection{Finir le match}
@@ -568,8 +579,9 @@
         \item \textbf{Cas général} : Le match va se terminer, le score est figé et les résultats vont déterminer ce que va gagner ou perdre (argent, fans) chaque client.
         \item \textbf{Cas exceptionnels} :
           \begin{itemize}
-            \item Le match se finit parce que les deux clients qui s’affrontent se sont déconnectés et n’ont pas joué le match jusqu’au bout. Le match est considéré comme annulé.
-            \item Si les 7 joueurs d'une même équipe sont blessés et ne peuvent continuer à jouer, l'équipe adverse gagnera le match.
+%            \item Le match se finit parce que les deux clients qui s’affrontent se sont déconnectés et n’ont pas joué le match jusqu’au bout. Le match est considéré comme annulé.
+%            \item Si les 7 joueurs d'une même équipe sont blessés et ne peuvent continuer à jouer, l'équipe adverse gagnera le match.
+            \item Un des clubs a déclaré forfait. L'autre club est gagnant.
           \end{itemize}
       \end{itemize}
 
@@ -627,7 +639,10 @@
         \item \textbf{Pré-conditions} : Néant.
         \item \textbf{Post-conditions} : Néant.
         \item \textbf{Cas général} : L'administrateur choisit combien de participants, et donc combien de tours, comprendra le tournoi. Il ne peut bien entendu par choisir n'importe quel nombre.
-        \item \textbf{Cas exceptionnels} : Néant.
+        \item \textbf{Cas exceptionnels} : 
+          \begin{itemize}
+            \item L'administrateur entre un nombre qui n'est pas une puissance de deux. La création est annulée.
+          \end{itemize}
       \end{itemize}
 
     \subsubsection{Choisir l'échelle des gains}
@@ -758,14 +773,14 @@
       \begin{itemize}
         \item \textbf{Acteur}  : Serveur.
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
-        \item \textbf{Pré-conditions} : Au moins un des clients qui doivent s’affronter lors de ce match est connecté.
+        \item \textbf{Pré-conditions} : Les deux clients devant s'affronter sont connectés.
         \item \textbf{Post-conditions} : Néant.
         \item \textbf{Cas général} : Le serveur va maintenant gérer le match et l’aspect gestion ne sera plus accessible tant que le match ne sera pas terminé.
-        \item \textbf{Cas exceptionnels} : 
-          \begin{itemize}
-            \item Un des clients ne s’est pas connecté pour le match, le serveur prendra sa place pour déplacer ses joueurs et affronter le client connecté.
-			\item Aucun client ne s’est connecté pour le match, le match est considéré comme annulé.
-          \end{itemize}    	
+        \item \textbf{Cas exceptionnels} : Néant
+          %\begin{itemize}
+            %\item Un des clients ne s’est pas connecté pour le match, le serveur prendra sa place pour déplacer ses joueurs et affronter le client connecté.
+			%\item Aucun client ne s’est connecté pour le match, le match est considéré comme annulé.
+          %\end{itemize}    	
       \end{itemize}
     \subsubsection{Choisir action pour joueur}
       \begin{itemize}
