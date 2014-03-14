@@ -20,6 +20,7 @@
 #include "buildingsDialog.hpp"
 #include "buyAPDialog.hpp"
 #include "freeAPDialog.hpp"
+#include "MatchWindow.hpp"
 
 //TODO : exceptions notifier
 

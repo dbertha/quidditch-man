@@ -7,7 +7,7 @@
 
 MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QWidget(parent),
 	numMaTeam(numTeam), iHaveASelection(false),  scoreTeam1(0), scoreTeam2(0), winner(0), currentMove(0), 
-	__field(),_listeJoueur(),_listeBall(), __client(client), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd()))
+	__field(), __client(client), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd(),  QSocketNotifier::Read, this))
 {
 	//initialisation : 
 	for(int i = 0; i < 7; ++i){
@@ -16,7 +16,6 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QWidg
 	  moves[i][2] = 10000; //sentinelle : mouvement vide
 	  moves[i][3] = 10000;
 	}
-	__forfeitAndDrawNotifier->setEnabled(false);
 	connect(__forfeitAndDrawNotifier,SIGNAL(activated(int)),this,SLOT(pushesHandler()));
 
 	setFixedSize(800, 800);
@@ -94,12 +93,14 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QWidg
 	layout->addLayout(layoutConformi,2,2);
 	this->setLayout(layout);
 
-
+	__forfeitAndDrawNotifier->setEnabled(false);
 	__client->getAllPositions();
-	allPositions = __client->receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);*/
+	allPositions = __client->receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
+	
 
 	initListeHexa();
 	updateListeHexa();
+	__forfeitAndDrawNotifier->setEnabled(true);
 }
 
 void MatchWindow::initListeHexa(){
@@ -537,11 +538,13 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 				iHaveASelection = true;
 				caseJoueurSelect = ListeHexa[indexRow][indexCol];
 				caseJoueurSelect->select();
-
+				
 				//recup info sur le joueur et afficher
 				//communication réseaux pour avoir info
-				__client->selectPlayer(selectedPlayerID);
+				__forfeitAndDrawNotifier->setEnabled(false);
+				__client->selectPlayer(caseJoueurSelect->getType());
 				attributs = __client->receiveSelectedPlayerInfos();
+				__forfeitAndDrawNotifier->setEnabled(true);
 				//attributs = { {3,5,3,4,5}, AxialCoordinates(iAxial,jAxial) ,1 };
 //*!!!!!!!!!!!! playerRole qui vas de 0 à 6
 //*!!!!!!!!!!!! et selectedPlayerID = playerRole + 7 si numMaTeam = 2 (de 0 à 6 ou de 7 à 13)
@@ -720,6 +723,7 @@ void MatchWindow::handlerTour(){
 }
 
 void MatchWindow::nextTurn(){
+	__forfeitAndDrawNotifier->setEnabled(false);
 	//sendMoves
 	__client->sendMoves(moves);
 	//getConfirmation
@@ -739,16 +743,18 @@ void MatchWindow::nextTurn(){
 	//update affichage
 	resetListeHexa();
 	updateListeHexa();
+	__forfeitAndDrawNotifier->setEnabled(true);
 }
 
 void MatchWindow::pushesHandler(){
 	bool over = false;
-	__pushesNotifier->setEnabled(false);
-	SerializedObject received = receiveOnSocket(sockfd_);
+	__forfeitAndDrawNotifier->setEnabled(false);
+	SerializedObject received = receiveOnSocket(__client->getSockfd());
     switch(received.typeOfInfos){
 		case OPPONENTFORFEIT : {
 			QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("Opponent forfeited"),QMessageBox::Ok);
 			over = true;
+			break;
 		}
 		case OPPONENTASKFORDRAW : {
 			int ret, code;
@@ -767,16 +773,19 @@ void MatchWindow::pushesHandler(){
 				code = DRAWDENIED;
 			}
 			__client->sendAnswerToDrawProposition(code);
-			return input_ ? -1 : 0;
+			break;
         }
     }
-	__pushesNotifier->setEnabled(true);
+    if(over){
+		close();
+	}
+	else __forfeitAndDrawNotifier->setEnabled(true);
 }
 
 void MatchWindow::endHandler(){
 	bool over = false;
 	if(winner != 0){
-		QString str = QString("Winner is team %1").arg(QString::number(winner);
+		QString str = QString("Winner is team %1").arg(QString::number(winner));
 		QMessageBox::information(this,QMessageBox::tr("Match over !"),str,QMessageBox::Ok);
 		over = true;
 	}else{
@@ -793,24 +802,25 @@ void MatchWindow::endHandler(){
         ret = msgBox.exec();
         if(ret == QMessageBox::Abort){
 			//forfeit
-			__pushesNotifier->setEnabled(false);
+			__forfeitAndDrawNotifier->setEnabled(false);
 			__client->sendForfeit();
 			QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("You forfeited"),QMessageBox::Ok);
 			over = true;
 		}else if(ret == QMessageBox::Cancel){
 			//ask for a draw
-			__pushesNotifier->setEnabled(false);
+			__forfeitAndDrawNotifier->setEnabled(false);
 			QMessageBox::information(this,QMessageBox::tr("About draw"),QString("You are considered as the looser if you ask for a draw during a tournament and it's accepted"),QMessageBox::Ok); 
 			//TODO : chance de revenir en arrière
 			
 			__client->sendDrawRequest();
-			int result = getConfirmation();
+			int result = __client->getConfirmation();
 			if(result == DRAWACCEPTED){
 				QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("Draw accepted"),QMessageBox::Ok);
 				over = true;
             }else{
 				QMessageBox::information(this,QMessageBox::tr("Draw"),QString("Draw refused"),QMessageBox::Ok);
             }
+            __forfeitAndDrawNotifier->setEnabled(true);
 		}
 	}
 	if(over){

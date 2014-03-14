@@ -78,6 +78,11 @@ clientGUI.out: client/clientMatchHandler.hpp \
            client/tournaments.hpp \
            client/buyAPDialog.hpp \
            client/freeAPDialog.hpp \
+	   client/auctionMgr.hpp \
+           client/AuctionsDialog.hpp \
+           client/auctionWindow.hpp \
+           client/MatchWindow.hpp \
+           client/HexagonalCase.hpp \
            client/clientMatchHandler.cpp \
            client/loginDialog.cpp \
            client/GUImain.cpp \
@@ -93,7 +98,12 @@ clientGUI.out: client/clientMatchHandler.hpp \
            client/tournamentDialog.cpp \
            client/tournaments.cpp \
 	   client/buyAPDialog.cpp \
-           client/freeAPDialog.cpp
+           client/freeAPDialog.cpp \
+	   client/auctionMgr.cpp \
+           client/AuctionsDialog.cpp \
+           client/auctionWindow.cpp \
+           client/MatchWindow.cpp \
+           client/HexagonalCase.cpp
 	make -f Makefile.GUI
 	
 clean:
