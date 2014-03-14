@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_fenetre_t {
-    QByteArrayData data[6];
-    char stringdata[68];
+    QByteArrayData data[8];
+    char stringdata[90];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -30,14 +30,17 @@ struct qt_meta_stringdata_fenetre_t {
 static const qt_meta_stringdata_fenetre_t qt_meta_stringdata_fenetre = {
     {
 QT_MOC_LITERAL(0, 0, 7),
-QT_MOC_LITERAL(1, 8, 12),
-QT_MOC_LITERAL(2, 21, 0),
-QT_MOC_LITERAL(3, 22, 11),
-QT_MOC_LITERAL(4, 34, 18),
-QT_MOC_LITERAL(5, 53, 13)
+QT_MOC_LITERAL(1, 8, 9),
+QT_MOC_LITERAL(2, 18, 0),
+QT_MOC_LITERAL(3, 19, 12),
+QT_MOC_LITERAL(4, 32, 11),
+QT_MOC_LITERAL(5, 44, 18),
+QT_MOC_LITERAL(6, 63, 13),
+QT_MOC_LITERAL(7, 77, 11)
     },
-    "fenetre\0changerTexte\0\0handlerMove\0"
-    "handlerChoixAction\0handlerAction\0"
+    "fenetre\0checkTour\0\0changerTexte\0"
+    "handlerMove\0handlerChoixAction\0"
+    "handlerAction\0handlerTour\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -47,23 +50,31 @@ static const uint qt_meta_data_fenetre[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       4,   14, // methods
+       6,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       0,       // signalCount
+       1,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags
+       1,    0,   44,    2, 0x06,
 
  // slots: name, argc, parameters, tag, flags
-       1,    2,   34,    2, 0x0a,
-       3,    2,   39,    2, 0x0a,
-       4,    1,   44,    2, 0x0a,
-       5,    0,   47,    2, 0x0a,
+       3,    2,   45,    2, 0x0a,
+       4,    2,   50,    2, 0x0a,
+       5,    1,   55,    2, 0x0a,
+       6,    0,   58,    2, 0x0a,
+       7,    0,   59,    2, 0x0a,
+
+ // signals: parameters
+    QMetaType::Void,
 
  // slots: parameters
     QMetaType::Void, QMetaType::Int, QMetaType::Int,    2,    2,
     QMetaType::Void, QMetaType::Int, QMetaType::Int,    2,    2,
     QMetaType::Void, QMetaType::Bool,    2,
+    QMetaType::Void,
     QMetaType::Void,
 
        0        // eod
@@ -74,11 +85,22 @@ void fenetre::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
     if (_c == QMetaObject::InvokeMetaMethod) {
         fenetre *_t = static_cast<fenetre *>(_o);
         switch (_id) {
-        case 0: _t->changerTexte((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 1: _t->handlerMove((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 2: _t->handlerChoixAction((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 3: _t->handlerAction(); break;
+        case 0: _t->checkTour(); break;
+        case 1: _t->changerTexte((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 2: _t->handlerMove((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 3: _t->handlerChoixAction((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 4: _t->handlerAction(); break;
+        case 5: _t->handlerTour(); break;
         default: ;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        void **func = reinterpret_cast<void **>(_a[1]);
+        {
+            typedef void (fenetre::*_t)();
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&fenetre::checkTour)) {
+                *result = 0;
+            }
         }
     }
 }
@@ -108,14 +130,20 @@ int fenetre::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 4)
+        if (_id < 6)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 4;
+        _id -= 6;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 4)
+        if (_id < 6)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 4;
+        _id -= 6;
     }
     return _id;
+}
+
+// SIGNAL 0
+void fenetre::checkTour()
+{
+    QMetaObject::activate(this, &staticMetaObject, 0, 0);
 }
 QT_END_MOC_NAMESPACE

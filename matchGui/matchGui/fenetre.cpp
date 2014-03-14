@@ -254,7 +254,7 @@ fenetre::fenetre(int numTeam) : QWidget(),
 
 
 //###################################################################
-/*	std::vector<AxialCoordinates> allPositions;
+/*
 	getAllPositions();
 	allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);*/
 
@@ -328,6 +328,19 @@ void fenetre::initListeHexa(){
 	indexRow=AxialCoordinates(GOAL_SIDE2_DIAG,GOAL_SIDE2_LINE).getLineOnMatrix();
 	indexCol=AxialCoordinates(GOAL_SIDE2_DIAG,GOAL_SIDE2_LINE).getColOnMatrix();
 	ListeHexa[indexRow][indexCol]->isAGoal();
+}
+
+void fenetre::resetListeHexa(){
+	int indexRow;
+	int indexCol;
+	//crée les hexagone selon ce qu'il doivent contenir et les connectes a la fenetre (this)
+	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){ //index de la diag
+		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){ //index de la ligne
+			indexRow=AxialCoordinates(indexRowAxial,indexColAxial).getLineOnMatrix();
+			indexCol=AxialCoordinates(indexRowAxial,indexColAxial).getColOnMatrix();
+			ListeHexa[indexRow][indexCol]->setType(-1);
+		}
+	}
 }
 
 void fenetre::updateListeHexa(){
@@ -1033,21 +1046,98 @@ void fenetre::handlerAction(){
 	qDebug() <<"diagonale destination : "+ QString::number( moves[currentMove][2]);
 	qDebug() <<"ligne destination : " +QString::number( moves[currentMove][3]);
 	currentMove++;
+
+	//TODO: faire une belle fonction pour ça
+	caseJoueurSelect->unselect();
+	iHaveASelection=false;
+	demarquerToutesCase();
+	deplacer->setChecked(true);
+	deplacer->setEnabled(false);
+	lancer->setEnabled(false);
+	taper->setEnabled(false);
+	recupSouaffle->setEnabled(false);
+	recupVifDOr->setEnabled(false);
+	infoJoueur->setText("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
+	BoutonConfirm->setEnabled(false);
+
+	handlerTour();
+
 }
-/*
+
+void fenetre::handlerTour(){
+	//check si toutes action fait -> si oui, envoyer donner serveur, recup allPosition et mettre a jour
+	if(currentMove==7){//le joueur a fait tout c'est deplacement
+		qDebug()<<"toutes les actions sont entrées";
+//###################################################################
+//		sendMoves(moves);
+//###################################################################
+		nextTurn();
+	}
+
+	//check si joueur veut abandonner, proposer match null
+
+
+}
+
 void fenetre::nextTurn(){
 	//sendMoves
 	//getConfirmation
 
 	//reset :
-	nbActions = 0;
+	currentMove = 0;
 	for(int i = 0; i < 7; ++i){
-		__moves[i][0] = i;
-		__moves[i][1] = NO_SPECIAL_ACTION;
-		__moves[i][2] = 10000; //sentinelle : mouvement vide
-		__moves[i][3] = 10000;
+		moves[i][0] = i;
+		moves[i][1] = NO_SPECIAL_ACTION;
+		moves[i][2] = 10000; //sentinelle : mouvement vide
+		moves[i][3] = 10000;
 	}
+	resetListeHexa();
 	//récupérer les positions
+	//###################################################################
+	/*
+		getAllPositions();
+		allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);*/
+
+		/*		#define TEAM1_KEEPER 0
+				#define TEAM1_SEEKER 1
+				#define TEAM1_CHASER1 2
+				#define TEAM1_CHASER2 3
+				#define TEAM1_CHASER3 4
+				#define TEAM1_BEATER1 5
+				#define TEAM1_BEATER2 6
+				#define TEAM2_KEEPER 7
+				#define TEAM2_SEEKER 8
+				#define TEAM2_CHASER1 9
+				#define TEAM2_CHASER2 10
+				#define TEAM2_CHASER3 11
+				#define TEAM2_BEATER1 12
+				#define TEAM2_BEATER2 13
+				#define GOLDENSNITCH 14
+				#define BLUDGER1 15
+				#define BLUDGER2 16
+				#define QUAFFLE 17 */
+		allPositions.clear();
+		allPositions.push_back(AxialCoordinates(0,0));//TEAM1_KEEPER
+		allPositions.push_back(AxialCoordinates(0,1));//TEAM1_SEEKER
+		allPositions.push_back(AxialCoordinates(1,1));
+		allPositions.push_back(AxialCoordinates(-1,-1));
+		allPositions.push_back(AxialCoordinates(2,2));//TEAM1_CHASER3
+		allPositions.push_back(AxialCoordinates(3,3));//TEAM1_BEATER1
+		allPositions.push_back(AxialCoordinates(-2,2));//TEAM1_BEATER2
+		allPositions.push_back(AxialCoordinates(-2,-2));
+		allPositions.push_back(AxialCoordinates(4,4));//TEAM2_SEEKER
+		allPositions.push_back(AxialCoordinates(-4,4));
+		allPositions.push_back(AxialCoordinates(-4,-4));
+		allPositions.push_back(AxialCoordinates(4,-4));
+		allPositions.push_back(AxialCoordinates(5,5));
+		allPositions.push_back(AxialCoordinates(-5,5));
+		allPositions.push_back(AxialCoordinates(5,-5));//GOLDENSNITCH
+		allPositions.push_back(AxialCoordinates(-5,-5));//Bludger1
+		allPositions.push_back(AxialCoordinates(6,6));//Bludger2
+		allPositions.push_back(AxialCoordinates(6,-6));//Quaffle
+	//###################################################################
+	//update score et autre donné/ check si demande match nul ou forfait autre joueur
 	//update affichage
+	updateListeHexa();
 	//tester si fin de tour (recevoir d'éventuelles notifications de forfait ou match nul par le serveur)
-}*/
+}

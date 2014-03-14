@@ -44,9 +44,10 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		void handlerMove(int,int);
 		void handlerChoixAction(bool);
 		void handlerAction();
+		void handlerTour();
 
     signals:
-//    void agrandissementMax();
+		void checkTour();
 //    void agrandissementMaxV2(int);//test perso pour renvoyé des valeur
 
     private:
@@ -103,6 +104,7 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		void initHexagonalFieldWithDefine();
 
 		void initListeHexa();
+		void resetListeHexa();
 		void updateListeHexa();
 
 		void demarquerToutesCase();
@@ -117,7 +119,7 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 
 		bool ifNotOut(int iAxial, int jAxial);
 
-//		void nextTurn();
+		void nextTurn();
 //        AxialCoordinates coord;
 //    QPushButton *m_bouton;
 //    QLCDNumber *m_lcd;
