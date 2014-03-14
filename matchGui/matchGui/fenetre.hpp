@@ -23,10 +23,10 @@
 
 #include "hexagone.hpp"
 
-#include "Coordinates.hpp" //permet d'avoir MATRIX_SIZE et systeme de coord
-#include "HexagonalField.hpp"
-#include "PlayingPlayer.hpp"
-#include "Ball.hpp"
+#include "../common/Coordinates.hpp" //permet d'avoir MATRIX_SIZE et systeme de coord
+#include "../common/HexagonalField.hpp"
+
+#include "Client.hpp" //network
 
 
 class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
@@ -47,9 +47,11 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		void handlerMove(int,int);
 		void handlerChoixAction(bool);
 		void handlerAction();
+		void handlerTour();
+		void pushesHandler();
 
     signals:
-//    void agrandissementMax();
+		void checkTour();
 //    void agrandissementMaxV2(int);//test perso pour renvoyé des valeur
 
     private:
@@ -95,19 +97,14 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
         hexagone *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
 
 		HexagonalField __field;
-		//----------à supprimer
-		std::vector <PlayingPlayer> _listeJoueur;
-		std::vector <Ball> _listeBall;
 
-		std::vector <PlayingPlayer> __players;
-		std::vector <Ball> __balls;
-		//---------
 
 
 		void initFieldGuiWithHexagonalField();
 		void initHexagonalFieldWithDefine();
 
 		void initListeHexa();
+		void resetListeHexa();
 		void updateListeHexa();
 
 		void demarquerToutesCase();
@@ -121,15 +118,13 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		void marquerAttraperVifDOr(int iAxial,int jAxial);
 
 		bool ifNotOut(int iAxial, int jAxial);
+
+		void endHandler();
+		void nextTurn();
+		Client * __client;
+		QSocketNotifier * __forfeitAndDrawNotifier;
 		
-		//à activer quand on aura reçu le client en paramètre :
-		//void nextTurn();
-		//Client * __client;
-		//QSocketNotifier * __forfeitAndDrawNotifier;
-		
-		
-		
-		
+
 //        AxialCoordinates coord;
 //    QPushButton *m_bouton;
 //    QLCDNumber *m_lcd;

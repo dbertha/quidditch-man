@@ -2,180 +2,22 @@
 
 //note: code pas du tout optimise/"modualiser"/"umliser", grosse phase de refactoring necessaire
 
-fenetre::fenetre() : QWidget()//on dit qu'on appelle le constructeur de QWidget (on peut lui passer des paramettre si besoin)
+
+
+
+fenetre::fenetre(Client * client, int numTeam) : QWidget(),
+	numMaTeam(numTeam), iHaveASelection(false),  scoreTeam1(0), scoreTeam2(0), winner(0), currentMove(0), 
+	__field(),_listeJoueur(),_listeBall(), __client(client), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd()))
 {
-	//setFixedSize(500, 500);
-
-	texte = new QLabel("Zone txte \n blabla",this); //vas servir a afficher resultat
-
-    //création de la scene, zone principal où seront afficher les cases haxagonal
-    scene = new QGraphicsScene;
-    //def la taille de la scene
-    scene->setSceneRect(-200,-200,400,400); //(point x depart, point y depart, largeur,hauteur)
-    //ajout d'un point reperer au centre
-    //scene->addRect(QRect(-2, -2, 2, 2));
-
-    //création de la view qui vas contenir la scene
-    view = new QGraphicsView(scene);
-
-
-/*    //test ajout hexagone personnalisé unique
-    hexa = new hexagone(0,0,Qt::red);
-    scene->addItem(hexa);*/
-
-	ListeHexa[0][0] =new hexagone(0,0,-1);
-    scene->addItem(ListeHexa[0][0]);
-    QObject::connect(ListeHexa[0][0], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[0][1] = new hexagone(0,1,0);
-    scene->addItem(ListeHexa[0][1]);
-    QObject::connect(ListeHexa[0][1], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[1][0] = new hexagone(1,0,1);
-    scene->addItem(ListeHexa[1][0]);
-    QObject::connect(ListeHexa[1][0], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[1][1] = new hexagone(1,1,2);
-    scene->addItem(ListeHexa[1][1]);
-    QObject::connect(ListeHexa[1][1], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[0][2] = new hexagone(0,2,3);
-    scene->addItem(ListeHexa[0][2]);
-    QObject::connect(ListeHexa[0][2], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[1][2] = new hexagone(1,2,4);
-    scene->addItem(ListeHexa[1][2]);
-    QObject::connect(ListeHexa[1][2], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[2][2] = new hexagone(2,2,5);
-    scene->addItem(ListeHexa[2][2]);
-    QObject::connect(ListeHexa[2][2], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[2][0] = new hexagone(2,0,6);
-    scene->addItem(ListeHexa[2][0]);
-    QObject::connect(ListeHexa[2][0], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[2][1] = new hexagone(2,1,7);
-    scene->addItem(ListeHexa[2][1]);
-	scene->addRect(40,10,20,40);//test pour voir zone defini de boundingRect
-    QObject::connect(ListeHexa[2][1], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-
-}
-
-fenetre::fenetre(HexagonalField field,std::vector <PlayingPlayer> vPlaying,std::vector <Ball> vBall) : QWidget(),
-	__field(field),_listeJoueur(vPlaying),_listeBall(vBall)
-{
-	//init a rajouter dans le constructeur avec juste int idMaTeam
-	iHaveASelection=false;
-	numMaTeam=1;
-
-	setFixedSize(800, 800);
-
-	//*****************************************************************************************
-	texte = new QLabel("Zone texte",this); //vas servir a afficher resultat
-
-	infoJoueur = new QLabel("Info sur le joueur selection \n nom, prenom, vitesse, force,....",this);
-	infoJoueur->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-	//*****************************************************************************************
-	//création de la scene, zone principal où seront afficher les cases haxagonal
-	scene = new QGraphicsScene;
-	//def la taille de la scene
-	scene->setSceneRect(-200,-200,400,400); //(point x depart, point y depart, largeur,hauteur)
-	//ajout d'un point reperer au centre
-	//scene->addRect(QRect(-2, -2, 2, 2));
-
-	//création de la view qui vas contenir la scene
-	view = new QGraphicsView(scene);
-
-	//*****************************************************************************************
-	//création box de Radio bouton pour les choix action d'un joueur
-	groupbox = new QGroupBox("Action possible:");
-
-	deplacer = new QRadioButton("Deplacement");
-	lancer = new QRadioButton("Lancer souaffle");
-	taper = new QRadioButton("Frapper le cognard");
-	recupSouaffle =  new QRadioButton("Tenter de récupérer le souaffle");
-
-
-
-	deplacer->setChecked(true);
-	deplacer->setEnabled(false);
-	lancer->setEnabled(false);
-	taper->setEnabled(false);
-	recupSouaffle->setEnabled(false);
-//	taper->setVisible(false);
-
-	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(deplacer);
-	vbox->addWidget(lancer);
-	vbox->addWidget(taper);
-	vbox->addWidget(recupSouaffle);
-
-	groupbox->setLayout(vbox);
-
-	//*****************************************************************************************
-
-	//initialisation d'un layout pour organniser le Qlabel,la view, radio bouton,....
-	layout = new QGridLayout;
-	layout->addWidget(texte);
-	layout->addWidget(view, 1, 0,1,2);//peut occuper 1 ligne et 2 colonne
-	layout->addWidget(infoJoueur,2,0);
-	layout->addWidget(groupbox,2,1);
-
-	this->setLayout(layout);
-
-//###############
-/*	std::vector<AxialCoordinates> allPositions;
-	getAllPositions();
-	allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);*/
-//###############
-
-	initFieldGuiWithHexagonalField();
-}
-
-fenetre::fenetre(int idMaTean,std::vector <PlayingPlayer> vPlaying,std::vector <Ball> vBall) : QWidget(),
-	__field(),_listeJoueur(vPlaying),_listeBall(vBall)
-{
-	setFixedSize(700, 700);
-
-	texte = new QLabel("Zone texte",this); //vas servir a afficher resultat
-
-	//création de la scene, zone principal où seront afficher les cases haxagonal
-	scene = new QGraphicsScene;
-	//def la taille de la scene
-	scene->setSceneRect(-200,-200,400,400); //(point x depart, point y depart, largeur,hauteur)
-	//ajout d'un point reperer au centre
-	//scene->addRect(QRect(-2, -2, 2, 2));
-
-	//création de la view qui vas contenir la scene
-	view = new QGraphicsView(scene);
-
-	//initialisation d'un layout pour organniser le Qlabel et la view
-	layout = new QGridLayout;
-	layout->addWidget(texte);
-	layout->addWidget(view, 1, 0);
-	this->setLayout(layout);
-
-	initFieldGuiWithHexagonalField();
-}
-
-fenetre::fenetre(int numTeam) : QWidget(),
-	numMaTeam(numTeam),__field(),_listeJoueur(),_listeBall()
-{
-	//initialisation : __client(client), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd())
-	//*!!!!!!!! a deplacer dans constructeur dans liste initialisation
-	scoreTeam1 = 0;
-	scoreTeam2 = 0;
-	winner = 0;
-	iHaveASelection=false;
-	currentMove = 0;
+	//initialisation : 
 	for(int i = 0; i < 7; ++i){
 	  moves[i][0] = i;
 	  moves[i][1] = NO_SPECIAL_ACTION;
 	  moves[i][2] = 10000; //sentinelle : mouvement vide
 	  moves[i][3] = 10000;
 	}
+	__forfeitAndDrawNotifier->setEnabled(false);
+	connect(__forfeitAndDrawNotifier,SIGNAL(activated(int)),this,SLOT(pushesHandler()));
 
 	setFixedSize(800, 800);
 
@@ -191,8 +33,7 @@ fenetre::fenetre(int numTeam) : QWidget(),
 	scene = new QGraphicsScene;
 	//def la taille de la scene
 	scene->setSceneRect(-200,-200,400,400); //(point x depart, point y depart, largeur,hauteur)
-	//ajout d'un point reperer au centre
-	//scene->addRect(QRect(-2, -2, 2, 2));
+
 
 	//création de la view qui vas contenir la scene
 	view = new QGraphicsView(scene);
@@ -254,48 +95,8 @@ fenetre::fenetre(int numTeam) : QWidget(),
 	this->setLayout(layout);
 
 
-//###################################################################
-/*	std::vector<AxialCoordinates> allPositions;
-	getAllPositions();
-	allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);*/
-
-	/*		#define TEAM1_KEEPER 0
-			#define TEAM1_SEEKER 1
-			#define TEAM1_CHASER1 2
-			#define TEAM1_CHASER2 3
-			#define TEAM1_CHASER3 4
-			#define TEAM1_BEATER1 5
-			#define TEAM1_BEATER2 6
-			#define TEAM2_KEEPER 7
-			#define TEAM2_SEEKER 8
-			#define TEAM2_CHASER1 9
-			#define TEAM2_CHASER2 10
-			#define TEAM2_CHASER3 11
-			#define TEAM2_BEATER1 12
-			#define TEAM2_BEATER2 13
-			#define GOLDENSNITCH 14
-			#define BLUDGER1 15
-			#define BLUDGER2 16
-			#define QUAFFLE 17 */
-	allPositions.push_back(AxialCoordinates(-8,0));//TEAM1_KEEPER
-	allPositions.push_back(AxialCoordinates(0,1));//TEAM1_SEEKER deplacer a coté vif d'or
-	allPositions.push_back(AxialCoordinates(0,-6));
-	allPositions.push_back(AxialCoordinates(3,0));
-	allPositions.push_back(AxialCoordinates(1,-3));//TEAM1_CHASER3 deplacer a coté d'un souafle
-	allPositions.push_back(AxialCoordinates(1,-5));//TEAM1_BEATER1
-	allPositions.push_back(AxialCoordinates(-11,11));//TEAM1_BEATER2
-	allPositions.push_back(AxialCoordinates(8,0));
-	allPositions.push_back(AxialCoordinates(9,-9));//TEAM2_SEEKER
-	allPositions.push_back(AxialCoordinates(6,-6));
-	allPositions.push_back(AxialCoordinates(3,0));
-	allPositions.push_back(AxialCoordinates(0,6));
-	allPositions.push_back(AxialCoordinates(4,-5));
-	allPositions.push_back(AxialCoordinates(-1,5));
-	allPositions.push_back(AxialCoordinates(0,0));//GOLDENSNITCH
-	allPositions.push_back(AxialCoordinates(1,-6));//Bludger1 //mis a coté TEAM1_BEATER1
-	allPositions.push_back(AxialCoordinates(0,-4));//Bludger2
-	allPositions.push_back(AxialCoordinates(2,-3));//Quaffle
-//###################################################################
+	__client->getAllPositions();
+	allPositions = __client->receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);*/
 
 	initListeHexa();
 	updateListeHexa();
@@ -331,6 +132,19 @@ void fenetre::initListeHexa(){
 	ListeHexa[indexRow][indexCol]->isAGoal();
 }
 
+void fenetre::resetListeHexa(){
+	int indexRow;
+	int indexCol;
+	//crée les hexagone selon ce qu'il doivent contenir et les connectes a la fenetre (this)
+	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){ //index de la diag
+		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){ //index de la ligne
+			indexRow=AxialCoordinates(indexRowAxial,indexColAxial).getLineOnMatrix();
+			indexCol=AxialCoordinates(indexRowAxial,indexColAxial).getColOnMatrix();
+			ListeHexa[indexRow][indexCol]->setType(-1);
+		}
+	}
+}
+
 void fenetre::updateListeHexa(){
 	//mets a jout les case hexagones selon un vecteur allPositions
 	// allPosition[0]  contient les coord axial du joueur 0 de l'equipe 1 (TEAM1_KEEPER)
@@ -349,158 +163,7 @@ void fenetre::updateListeHexa(){
 	update();
 }
 
-void fenetre::initFieldGuiWithHexagonalField(){
-	//vas pourcourir tout le HexagonalField _fieldMatrice pour crée des hexagone correspondant
-	// on part du principe que le point (0,0) de hexagonalFiel _fieldMatrice est au centre de la matrice
-	// on parcours donc de -tailleMax/2 a tailleMax/2 +1 sur les lignes et colonnes
-	// on se sert de AxialCoordinates() pour traduire ces coord dans un system "classique"
-//	qDebug()<< "affiche test for axialCoord";
-	int idOccupant;
-	int indexRow;
-	int indexCol;
-	//crée les hexagone selon ce qu'il doivent contenir et les connectes a la fenetre (this)
-	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){ //index de la diag
-		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){ //index de la ligne
-//			qDebug()<<"--- row puis Col puis val a cette posi";
-//			qDebug()<< indexRowAxial;
-//			qDebug()<< indexColAxial;
-//			qDebug()<< _fieldMatrice.getOccupant(AxialCoordinates(indexRowAxial,indexColAxial));
-//			qDebug()<< AxialCoordinates(indexRowAxial,indexColAxial).getLineOnMatrix();
-//			qDebug()<< AxialCoordinates(indexRowAxial,indexColAxial).getColOnMatrix();
-			idOccupant=__field.getOccupant(AxialCoordinates(indexRowAxial,indexColAxial));
-//			if(idOccupant != NOT_ON_HEX_GRID){
-				indexRow=AxialCoordinates(indexRowAxial,indexColAxial).getLineOnMatrix();
-				indexCol=AxialCoordinates(indexRowAxial,indexColAxial).getColOnMatrix();
-				ListeHexa[indexRow][indexCol] =new hexagone(indexRowAxial,indexColAxial,idOccupant);
-				scene->addItem(ListeHexa[indexRow][indexCol]);
-				QObject::connect(ListeHexa[indexRow][indexCol], SIGNAL(hexagoneSelect(int,int))
-						, this, SLOT(changerTexte(int,int)));
-				QObject::connect(ListeHexa[indexRow][indexCol], SIGNAL(hexagoneSelect(int,int))
-						, this, SLOT(handlerMove(int,int)));
 
-//			}
-		//QObject::connect(ListeHexa[indexRow][indexCol], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-		}
-	}
-
-	//defini les case qui sont des goal
-	indexRow=AxialCoordinates(GOAL_SIDE1_DIAG,GOAL_SIDE1_LINE).getLineOnMatrix();
-	indexCol=AxialCoordinates(GOAL_SIDE1_DIAG,GOAL_SIDE1_LINE).getColOnMatrix();
-	ListeHexa[indexRow][indexCol]->isAGoal();
-
-	indexRow=AxialCoordinates(GOAL_SIDE2_DIAG,GOAL_SIDE2_LINE).getLineOnMatrix();
-	indexCol=AxialCoordinates(GOAL_SIDE2_DIAG,GOAL_SIDE2_LINE).getColOnMatrix();
-	ListeHexa[indexRow][indexCol]->isAGoal();
-}
-
-//testing only :
-void fenetre::initHexagonalFieldWithDefine(){
-	//vas crée un hexagonalField qui pourra etre utiliser par initFieldGuiWithHexagonalField()
-
-
-	//COPIER-COLLER de match.cpp -> constructeur match(...)
-	//les positions des joueurs sont defini a partir des position stocker dans DEFINE.hpp
-
-	ManagedPlayer temp;
-	std::vector<ManagedPlayer> team1, team2;
-	temp.setCapacity(0,5);
-	temp.setCapacity(1,5);
-	temp.setCapacity(2,5);
-	temp.setCapacity(3,5);
-	temp.setCapacity(4,5);
-	temp.setFirstName("Power");
-	temp.setLastName("Prout");
-	team1.push_back(temp); //TEAM1_KEEPER
-	team1.push_back(temp); //TEAM1_SEEKER
-	team1.push_back(temp); //TEAM1_CHASER1
-	team1.push_back(temp);//TEAM1_CHASER2
-	team1.push_back(temp); //TEAM1_CHASER3
-	team1.push_back(temp); //TEAM1_BEATER1
-	team1.push_back(temp); //TEAM1_BEATER2
-
-	team2.push_back(temp); //TEAM2_KEEPER
-	team2.push_back(temp); //TEAM2_SEEKER
-	team2.push_back(temp); //TEAM2_CHASER1
-	team2.push_back(temp);//TEAM2_CHASER2
-	team2.push_back(temp); //TEAM2_CHASER3
-	team2.push_back(temp); //TEAM2_BEATER1
-	team2.push_back(temp); //TEAM2_BEATER2	*/
-
-	for(int i = 0; i < 7; ++i){
-		int role = i % TEAM2_KEEPER; //les 2 premiers roles correspondent déjà
-		if((role < TEAM1_BEATER1) and (role > TEAM1_SEEKER)) {role = ROLE_CHASER;}
-		else if((role < TEAM2_KEEPER) and (role > TEAM1_CHASER3)) {role = ROLE_BEATER;}
-		AxialCoordinates position;
-		switch(i){
-			case TEAM1_KEEPER :
-				position = AxialCoordinates(STARTINGDIAG_TEAM1_KEEPER, STARTINGLINE_TEAM1_KEEPER);
-				break;
-			case TEAM1_SEEKER :
-				position = AxialCoordinates(STARTINGDIAG_TEAM1_SEEKER, STARTINGLINE_TEAM1_SEEKER);
-				break;
-			case TEAM1_CHASER1 :
-				position = AxialCoordinates(STARTINGDIAG_TEAM1_CHASER1, STARTINGLINE_TEAM1_CHASER1);
-				break;
-			case TEAM1_CHASER2 :
-				position = AxialCoordinates(STARTINGDIAG_TEAM1_CHASER2, STARTINGLINE_TEAM1_CHASER2);
-				break;
-			case TEAM1_CHASER3 :
-				position = AxialCoordinates(STARTINGDIAG_TEAM1_CHASER3, STARTINGLINE_TEAM1_CHASER3);
-				break;
-			case TEAM1_BEATER1 :
-				position = AxialCoordinates(STARTINGDIAG_TEAM1_BEATER1, STARTINGLINE_TEAM1_BEATER1);
-				break;
-			case TEAM1_BEATER2 :
-				position = AxialCoordinates(STARTINGDIAG_TEAM1_BEATER2, STARTINGLINE_TEAM1_BEATER2);
-				break;
-		}
-		__players.push_back(PlayingPlayer(team1[i], role, position));
-		__field.setOccupant(position, i);
-	}
-
-	for(int i = 0; i < 7; ++i){ //création et positionnement de l'équipe 2
-		int role = i % TEAM2_KEEPER; //les 2 premiers roles correspondent déjà
-		if((role < TEAM1_BEATER1) and (role > TEAM1_SEEKER)) {role = ROLE_CHASER;}
-		else if((role < TEAM2_KEEPER) and (role > TEAM1_CHASER3)) {role = ROLE_BEATER;}
-		AxialCoordinates position;
-		switch(i+TEAM2_KEEPER){
-			case TEAM2_KEEPER :
-				position = AxialCoordinates(STARTINGDIAG_TEAM2_KEEPER, STARTINGLINE_TEAM2_KEEPER);
-				break;
-			case TEAM2_SEEKER :
-				position = AxialCoordinates(STARTINGDIAG_TEAM2_SEEKER, STARTINGLINE_TEAM2_SEEKER);
-				break;
-			case TEAM2_CHASER1 :
-				position = AxialCoordinates(STARTINGDIAG_TEAM2_CHASER1, STARTINGLINE_TEAM2_CHASER1);
-				break;
-			case TEAM2_CHASER2 :
-				position = AxialCoordinates(STARTINGDIAG_TEAM2_CHASER2, STARTINGLINE_TEAM2_CHASER2);
-				break;
-			case TEAM2_CHASER3 :
-				position = AxialCoordinates(STARTINGDIAG_TEAM2_CHASER3, STARTINGLINE_TEAM2_CHASER3);
-				break;
-			case TEAM2_BEATER1 :
-				position = AxialCoordinates(STARTINGDIAG_TEAM2_BEATER1, STARTINGLINE_TEAM2_BEATER1);
-				break;
-			case TEAM2_BEATER2 :
-				position = AxialCoordinates(STARTINGDIAG_TEAM2_BEATER2, STARTINGLINE_TEAM2_BEATER2);
-				break;
-		}
-		__players.push_back(PlayingPlayer(team2[i], role, position));
-		__field.setOccupant(position, i+TEAM2_KEEPER);
-	}
-	//les 4 balles :
-	__balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_GOLDENSNITCH, STARTINGLINE_GOLDENSNITCH)));
-	__field.setOccupant(AxialCoordinates(STARTINGDIAG_GOLDENSNITCH, STARTINGLINE_GOLDENSNITCH), GOLDENSNITCH);
-	__balls.push_back(Ball(BLUDGER1, AxialCoordinates(STARTINGDIAG_BLUDGER1, STARTINGLINE_BLUDGER1)));
-	__field.setOccupant(AxialCoordinates(STARTINGDIAG_BLUDGER1, STARTINGLINE_BLUDGER1), BLUDGER1);
-	__balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2)));
-	__field.setOccupant(AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2), BLUDGER2);
-	__balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE)));
-	__field.setOccupant(AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE), QUAFFLE);
-
-	initFieldGuiWithHexagonalField();
-}
 
 void fenetre::changerTexte(int i,int j){
 	int indexRow=AxialCoordinates(i,j).getLineOnMatrix();
@@ -876,20 +539,13 @@ void fenetre::handlerMove(int iAxial,int jAxial){
 				caseJoueurSelect->select();
 
 				//recup info sur le joueur et afficher
-//#################################################################
-/*				//communication réseaux pour avoir info
-				selectPlayer(selectedPlayerID);
-				attributs = receiveSelectedPlayerInfos(); */
-				attributs = { {3,5,3,4,5}, AxialCoordinates(iAxial,jAxial) ,1 };
-//*!!!!!!!!!!!! david travail avec position dans Client::askAndSendMoves(...,...,std::vector<AxialCoordinates> &positions)
-//*!!!!!!!!!!!! je travail avec allPositions
-//*!!!!!!!!!!!! david travail playerRole qui vas de 0 à 6
+				//communication réseaux pour avoir info
+				__client->selectPlayer(selectedPlayerID);
+				attributs = __client->receiveSelectedPlayerInfos();
+				//attributs = { {3,5,3,4,5}, AxialCoordinates(iAxial,jAxial) ,1 };
+//*!!!!!!!!!!!! playerRole qui vas de 0 à 6
 //*!!!!!!!!!!!! et selectedPlayerID = playerRole + 7 si numMaTeam = 2 (de 0 à 6 ou de 7 à 13)
-//*!!!!!!!!!!!!
-//*!!!!!!!!!!!!
-//*!!!!!!!!!!!!
 
-//#################################################################
 				playerRole = caseJoueurSelect->getType() %7; //playerRole est un attribut de la fenetre pour pas se perdre
 				qDebug() << "id du joueur";
 				qDebug() << caseJoueurSelect->getType();
@@ -1033,29 +689,62 @@ void fenetre::handlerAction(){
 	qDebug() <<"action spéciale : "+ QString::number( moves[currentMove][1]); //pas d'action spéciale
 	qDebug() <<"diagonale destination : "+ QString::number( moves[currentMove][2]);
 	qDebug() <<"ligne destination : " +QString::number( moves[currentMove][3]);
-	currentMove++;
+	++currentMove;
+
+	//TODO: faire une belle fonction pour ça
+	caseJoueurSelect->unselect();
+	iHaveASelection=false;
+	demarquerToutesCase();
+	deplacer->setChecked(true);
+	deplacer->setEnabled(false);
+	lancer->setEnabled(false);
+	taper->setEnabled(false);
+	recupSouaffle->setEnabled(false);
+	recupVifDOr->setEnabled(false);
+	infoJoueur->setText("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
+	BoutonConfirm->setEnabled(false);
+
+	handlerTour();
+
+}
+
+
+void fenetre::handlerTour(){
+	//check si toutes action fait -> si oui, envoyer donner serveur, recup allPosition et mettre a jour
+	if(currentMove==7){//le joueur a fait tout c'est deplacement
+		qDebug()<<"toutes les actions sont entrées";
+		nextTurn();
+		endHandler();
+	}
+
 }
 
 void fenetre::nextTurn(){
-	
 	//sendMoves
 	__client->sendMoves(moves);
 	//getConfirmation
 	__client->getConfirmation(); //Attention, bloquant si adversaire n'a pas encore répondu
 
 	//reset :
-	nbActions = 0;
+	currentMove = 0;
 	for(int i = 0; i < 7; ++i){
-		__moves[i][0] = i;
-		__moves[i][1] = NO_SPECIAL_ACTION;
-		__moves[i][2] = 10000; //sentinelle : mouvement vide
-		__moves[i][3] = 10000;
+		moves[i][0] = i;
+		moves[i][1] = NO_SPECIAL_ACTION;
+		moves[i][2] = 10000; //sentinelle : mouvement vide
+		moves[i][3] = 10000;
 	}
 	//récupérer les positions
 	__client->getAllPositions();
-    allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
+    allPositions = __client->receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
 	//update affichage
 	resetListeHexa();
 	updateListeHexa();
-	//tester si fin de tour (recevoir d'éventuelles notifications de forfait ou match nul par le serveur)
-}*/
+}
+
+void fenetre::pushesHandler(){}
+
+void fenetre::endHandler(){
+	if(winner != 0){
+		
+	}
+}
