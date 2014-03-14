@@ -73,24 +73,30 @@ class hexagone : public QGraphicsObject
 
 		int getIAxial();
 		int getJAxial();
+		int getTypeMarkBall();
 
         void select();
+		void selectForAction();
         void unselect();
 
 		void isAGoal();
 
 		void isAccessible();
 
+
 		void isLine();
 		void isDiagonalGoBasDroite();
 		void isDiagonalGohautDroite();
 		void isForCatch();
 
-		void isMarkForBludger();
+		void isMarkForBludger(int);
 		void isMarkForQuaffle();
 		void isMarkForGoldenSnitch();
 
 		void isNonAccessible();
+
+		bool ifMark();
+
 
         //boudingRect => defnie la region frontiere de l'objet
         QRectF boundingRect() const;
@@ -110,8 +116,12 @@ class hexagone : public QGraphicsObject
         int _typeCase;//indique le type de case (vide, contient un joueur,balle,...)
         int _indiceI;
         int _indiceJ;
+
+		int _markTypeBalle;// BLUDGER1 15, BLUDGER2 16, QUAFFLE 17
+
 		bool _ifGoal;
         bool _ifSelect;
+		bool _ifSelectForAction;
 
 		bool _ifAccesible;
 		bool _ifLine;

@@ -4,20 +4,6 @@
 #include <cstring>
 #include <iomanip> //setw
 
-void HexagonalField::reset(){
-    for (int indexRow = 0; indexRow < MATRIX_SIZE; ++indexRow){
-        for(int indexCol = 0; indexCol < std::max(0,((MATRIX_SIZE/2) - indexRow)); ++indexCol){
-            matrix[indexRow][indexCol] = NOT_ON_HEX_GRID;
-        }
-        for(int indexCol = std::max(0,((MATRIX_SIZE/2) - indexRow)); indexCol < (MATRIX_SIZE - std::max(0, indexRow - (MATRIX_SIZE /2))); ++indexCol){
-            matrix[indexRow][indexCol] = FREE_SPACE;
-        }
-        for(int indexCol = (MATRIX_SIZE - std::max(0, indexRow - (MATRIX_SIZE /2))); indexCol < MATRIX_SIZE; ++indexCol){
-            matrix[indexRow][indexCol] = NOT_ON_HEX_GRID;
-        }
-    }
-}
-
 HexagonalField::HexagonalField(){
     //-2 : hors de la grille hexagonale
     //-1 : place vide

@@ -1,9 +1,11 @@
 #ifndef FENETRE_HPP
 #define FENETRE_HPP
 
+//note: code pas du tout optimise/"modualiser"/"umliser", grosse phase de refactoring necessaire
+
 #include <QApplication>
 #include <QWidget>
-//#include <QPushButton>
+#include <QPushButton>
 //#include <QLCDNumber>
 //#include <QSlider>
 //#include <QPainter>
@@ -17,10 +19,8 @@
 #include <QRadioButton>
 
 #include <QDebug> //permet de dispose d'un affichage dans console debug
-#include <vector>
 
 #include "hexagone.hpp"
-#include <iostream>
 
 #include "Coordinates.hpp" //permet d'avoir MATRIX_SIZE et systeme de coord
 #include "HexagonalField.hpp"
@@ -43,22 +43,22 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		void changerTexte(int,int);
 		void handlerMove(int,int);
 		void handlerChoixAction(bool);
+		void handlerAction();
 
     signals:
 //    void agrandissementMax();
 //    void agrandissementMaxV2(int);//test perso pour renvoyé des valeur
 
     private:
-		int numMaTeam, nbActions;
+		int numMaTeam;
 		bool iHaveASelection;
-		//TODO : ne pas initialiser ici
+
 		int scoreTeam1;
 		int scoreTeam2;
 		int winner;
-		
-		
+		int moves[7][4];
+		int currentMove;
 		std::vector<AxialCoordinates> allPositions, __allPositions;
-		int __moves[4][7];
 
 		typedef struct { //pas besoin de la classe complète
 			int attributes[5];
@@ -70,6 +70,7 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		int playerRole;
 
 		QLabel *infoJoueur;
+		QLabel *scoreEquipe;
 		QLabel *texte;
         QGridLayout *layout;
         QGraphicsScene *scene;
@@ -82,11 +83,15 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		QRadioButton *recupSouaffle;
 		QRadioButton *recupVifDOr;
 
+		QGridLayout *layoutConformi;
+		QLabel *textConfirm;
+		QPushButton *BoutonConfirm;
+
 		hexagone *caseJoueurSelect;
+		hexagone *caseSelect;
         hexagone *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
 
 		HexagonalField __field;
-		//TODO : n'a pas à connaître PlayingPlayer et Ball
 		std::vector <PlayingPlayer> _listeJoueur;
 		std::vector <Ball> _listeBall;
 
@@ -100,19 +105,19 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		void initListeHexa();
 		void updateListeHexa();
 
-		void marquerToutesCaseNonAccessible();
+		void demarquerToutesCase();
 
 		void marquerCaseAccessibleDepuis(int iAxial,int jAxial,int maxDistance);
 
-		void marquerFrappe(int iAxial,int jAxial,int maxDistance);
+		void marquerFrappe(int iAxial,int jAxial,int maxDistance, int idBludger);
 		void marquerLancer(int iAxial,int jAxial,int maxDistance);
 
 		void marquerAttraperSouaffle(int iAxial,int jAxial);
 		void marquerAttraperVifDOr(int iAxial,int jAxial);
 
 		bool ifNotOut(int iAxial, int jAxial);
-		
-		void nextTurn();
+
+//		void nextTurn();
 //        AxialCoordinates coord;
 //    QPushButton *m_bouton;
 //    QLCDNumber *m_lcd;

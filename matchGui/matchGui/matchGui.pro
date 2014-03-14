@@ -1,5 +1,3 @@
-
-
 QMAKE_CXXFLAGS += -Wextra -std=c++11
 
 SOURCES += \

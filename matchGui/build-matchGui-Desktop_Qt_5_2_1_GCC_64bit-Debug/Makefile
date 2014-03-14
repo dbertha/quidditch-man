@@ -14,7 +14,7 @@ CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
-CXXFLAGS      = -pipe -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
+CXXFLAGS      = -pipe -Wextra -std=c++11 -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 INCPATH       = -I../../../../Qt5.2.1/5.2.1/gcc_64/mkspecs/linux-g++ -I../matchGui -I../../../../Qt5.2.1/5.2.1/gcc_64/include -I../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets -I../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui -I../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore -I. -I.
 LINK          = g++
 LFLAGS        = -Wl,-rpath,/home/pidy/Qt5.2.1/5.2.1/gcc_64 -Wl,-rpath,/home/pidy/Qt5.2.1/5.2.1/gcc_64/lib
@@ -568,6 +568,10 @@ moc_fenetre.cpp: ../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QApplication
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qguiapplication.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qinputmethod.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QWidget \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QPushButton \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qpushbutton.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qicon.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QLabel \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qlabel.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qframe.h \
@@ -591,8 +595,6 @@ moc_fenetre.cpp: ../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QApplication
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qgroupbox.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QRadioButton \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qradiobutton.h \
-		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qabstractbutton.h \
-		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qicon.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/QDebug \
 		../matchGui/hexagone.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QGraphicsItem \
@@ -601,6 +603,7 @@ moc_fenetre.cpp: ../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QApplication
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QColor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QCursor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/qmath.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QBrush \
 		../matchGui/Defines.hpp \
 		../matchGui/Coordinates.hpp \
 		../matchGui/HexagonalField.hpp \
@@ -719,6 +722,7 @@ moc_hexagone.cpp: ../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QGraphicsIt
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QCursor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qcursor.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/qmath.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QBrush \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/QDebug \
 		../matchGui/Defines.hpp \
 		../matchGui/hexagone.hpp
@@ -891,6 +895,7 @@ main.o: ../matchGui/main.cpp ../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QColor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QCursor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/qmath.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QBrush \
 		../matchGui/Defines.hpp \
 		../matchGui/Coordinates.hpp \
 		../matchGui/HexagonalField.hpp \
@@ -1019,6 +1024,10 @@ fenetre.o: ../matchGui/fenetre.cpp ../matchGui/fenetre.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qguiapplication.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qinputmethod.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QWidget \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QPushButton \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qpushbutton.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qicon.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QLabel \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qlabel.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qframe.h \
@@ -1042,8 +1051,6 @@ fenetre.o: ../matchGui/fenetre.cpp ../matchGui/fenetre.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qgroupbox.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QRadioButton \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qradiobutton.h \
-		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/qabstractbutton.h \
-		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qicon.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/QDebug \
 		../matchGui/hexagone.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtWidgets/QGraphicsItem \
@@ -1052,6 +1059,7 @@ fenetre.o: ../matchGui/fenetre.cpp ../matchGui/fenetre.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QColor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QCursor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/qmath.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QBrush \
 		../matchGui/Defines.hpp \
 		../matchGui/Coordinates.hpp \
 		../matchGui/HexagonalField.hpp \
@@ -1170,6 +1178,7 @@ hexagone.o: ../matchGui/hexagone.cpp ../matchGui/hexagone.hpp \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QCursor \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/qcursor.h \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/qmath.h \
+		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtGui/QBrush \
 		../../../../Qt5.2.1/5.2.1/gcc_64/include/QtCore/QDebug \
 		../matchGui/Defines.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o hexagone.o ../matchGui/hexagone.cpp

@@ -5,23 +5,23 @@ hexagone::hexagone(int i, int j,int type, QGraphicsItem *parent) : QGraphicsObje
 	_typeCase(type),_indiceI(i),_indiceJ(j),_ifGoal(false),_ifSelect(false),_ifAccesible(false),
 	_ifLine(false),_ifDiagonalBasDroite(false),_ifDiagonalhautDroite(false),_ifForCatch(false),
 	_ifMarkForBludger(false), _ifMarkForQuaffle(false), _ifMarkForGoldenSnitch(false){
-
+	_ifSelectForAction=false;
 	//this->setCursor(QCursor(Qt::OpenHandCursor));//test pour changer le cursor
 	//setBoundingRegionGranularity(1);
 	//QObject::connect(this, SIGNAL(clicked()), qApp, SLOT(quit()));
+	if(_typeCase == NOT_ON_HEX_GRID){
+		setActive(false);
+		setEnabled(false);
+		setVisible(false);
+	}
 }
 
 //fonction appeler par QT pour dessiner l'objet (ou le redessiner/update)
 void hexagone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget)
 {
-	if(_typeCase != NOT_ON_HEX_GRID){//on dessine seulement les "vrais" case
-		painter->setRenderHint(QPainter::Antialiasing, true);
-		dessinerHexagone(painter);
-		dessinerType(painter);
-	}else{
-		setActive(false);
-		setEnabled(false);
-	}
+	painter->setRenderHint(QPainter::Antialiasing, true);
+	dessinerHexagone(painter);
+	dessinerType(painter);
 }
 
 //----------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ void hexagone::dessinerHexagone(QPainter *painter){
 			brush.setStyle(Qt::BDiagPattern);
 		}
 		if(_ifForCatch){
-			brush.setStyle(Qt::CrossPattern);
+			brush.setStyle(Qt::SolidPattern);
 		}
 
 		if(_ifMarkForBludger){
@@ -65,8 +65,14 @@ void hexagone::dessinerHexagone(QPainter *painter){
 		}
 	}
 
+	QColor couleurBord=Qt::black;
+	if(_ifSelectForAction){
+		couleurBord = Qt::green;
+
+	}
+
 	painter->setBrush(brush );
-	painter->setPen(QPen(Qt::black,2,Qt::SolidLine)); //defini le pinceaux qui dessine les contours
+	painter->setPen(QPen(couleurBord,2,Qt::SolidLine)); //defini le pinceaux qui dessine les contours
 
 	//2. dessiner l'hexagone
 	painter->drawPolygon(hexagoneBuilt());
@@ -232,7 +238,9 @@ int hexagone::getIAxial(){
 int hexagone::getJAxial(){
 	return _indiceJ;
 }
-
+int hexagone::getTypeMarkBall(){
+	return _markTypeBalle;
+}
 //----------------------------------------------------------------------------------------------
 //Changement d'etat d'une case (selection ou pas, si c'est un goal, si case accessible,...)
 
@@ -241,10 +249,17 @@ void hexagone::select(){
 	update();
 }
 
+void hexagone::selectForAction(){
+	_ifSelectForAction = true;
+	update();
+}
+
+
 void hexagone::unselect(){
 	_ifSelect = false;
 	update();
 }
+
 //TODO : changer les noms, cela ressemble à des getters plutot qu'à des setter
 void hexagone::isAGoal(){
 	_ifGoal = true;
@@ -276,13 +291,15 @@ void hexagone::isForCatch(){
 	update();
 }
 
-void hexagone::isMarkForBludger(){
+void hexagone::isMarkForBludger(int idBludger){
 	_ifMarkForBludger=true;
+	_markTypeBalle=idBludger;
 	update();
 }
 
 void hexagone::isMarkForQuaffle(){
 	_ifMarkForQuaffle=true;
+	_markTypeBalle=QUAFFLE;
 	update();
 }
 
@@ -293,6 +310,7 @@ void hexagone::isMarkForGoldenSnitch(){
 
 void hexagone::isNonAccessible(){
 	_ifAccesible = false;
+	_ifSelectForAction = false;
 
 	_ifLine = false;
 	_ifDiagonalBasDroite = false;
@@ -303,7 +321,30 @@ void hexagone::isNonAccessible(){
 	_ifMarkForBludger=false;
 	_ifMarkForQuaffle=false;
 	_ifMarkForGoldenSnitch=false;
+
+	_markTypeBalle=-7;
+
+	setZValue(0);
 	update();
+}
+
+bool hexagone::ifMark(){
+	qDebug()<<"check si marquer, i,j";
+	qDebug()<< _indiceI;
+	qDebug()<< _indiceJ;
+	qDebug()<< _ifAccesible;
+	qDebug()<< _ifLine ;
+	qDebug()<< _ifDiagonalBasDroite ;
+	qDebug()<< _ifDiagonalhautDroite ;
+
+	qDebug()<< _ifForCatch;
+
+	qDebug()<< _ifMarkForBludger;
+	qDebug()<< _ifMarkForQuaffle;
+	qDebug()<< _ifMarkForGoldenSnitch;
+
+	return ( _ifAccesible||_ifLine || _ifDiagonalBasDroite || _ifDiagonalhautDroite ||
+			_ifForCatch || _ifMarkForBludger || _ifMarkForQuaffle ||_ifMarkForGoldenSnitch );
 }
 
 //----------------------------------------------------------------------------------------------
