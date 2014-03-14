@@ -264,7 +264,7 @@ void displayAuctionsList(vector<string> auctionsList) {
     else {
         for (unsigned int i=0;i<auctionsList.size();i+=4) {
             cout<<" ["<<atoi(auctionsList[i].c_str())+1<<"] "<<auctionsList[i+1]<<" | Starting price : "<<auctionsList[i+3];
-            cout<<" | Time left to participate : "<<auctionsList[2]<<endl;
+            cout<<" | Time left to participate : "<<auctionsList[i+2]<<endl;
         }
         cout<<"Indicate which auction you wish to inspect [or 0 to abort] : ";
     }
@@ -1771,4 +1771,17 @@ void Client::askInput() {
             break;
         }
     }
+}
+
+
+string Client::intToString(int value) { //TODO : dans une classe générique ?
+    char buffer[800];
+    sprintf(buffer,"%d",value);
+    string tmp = "";
+    int i = 0;
+    while (buffer[i] != '\0') {
+        tmp+=buffer[i];
+        ++i;
+    }
+    return tmp;
 }

@@ -19,7 +19,8 @@ private:
     QPushButton *playersButton;
     QPushButton *auctionButton;
     QPushButton *buildingsButton;
-    QPushButton *APButton;
+    QPushButton *buyAPButton;
+    QPushButton *freeAPButton;
     QVBoxLayout *menuLayout;
     QGroupBox *groupBox;
     MainGui *parent_;

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'mainGui.hpp'
 **
-** Created: Fri Mar 14 09:04:18 2014
+** Created: Fri Mar 14 12:30:05 2014
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_MainGui[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       8,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -36,9 +36,12 @@ static const uint qt_meta_data_MainGui[] = {
       34,    8,    8,    8, 0x0a,
       46,    8,    8,    8, 0x0a,
       60,    8,    8,    8, 0x0a,
-      76,    8,    8,    8, 0x08,
-      84,    8,    8,    8, 0x08,
-      92,    8,    8,    8, 0x08,
+      76,    8,    8,    8, 0x0a,
+      88,    8,    8,    8, 0x0a,
+     101,    8,    8,    8, 0x0a,
+     116,    8,    8,    8, 0x08,
+     124,    8,    8,    8, 0x08,
+     132,    8,    8,    8, 0x08,
 
        0        // eod
 };
@@ -46,6 +49,7 @@ static const uint qt_meta_data_MainGui[] = {
 static const char qt_meta_stringdata_MainGui[] = {
     "MainGui\0\0listMgrs()\0listPlayers()\0"
     "buildings()\0tournaments()\0pushesHandler()\0"
+    "buyAPMenu()\0freeAPMenu()\0auctionsMenu()\0"
     "about()\0login()\0logout()\0"
 };
 
@@ -60,9 +64,12 @@ void MainGui::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
         case 2: _t->buildings(); break;
         case 3: _t->tournaments(); break;
         case 4: _t->pushesHandler(); break;
-        case 5: _t->about(); break;
-        case 6: _t->login(); break;
-        case 7: _t->logout(); break;
+        case 5: _t->buyAPMenu(); break;
+        case 6: _t->freeAPMenu(); break;
+        case 7: _t->auctionsMenu(); break;
+        case 8: _t->about(); break;
+        case 9: _t->login(); break;
+        case 10: _t->logout(); break;
         default: ;
         }
     }
@@ -101,9 +108,9 @@ int MainGui::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 8)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 8;
+        _id -= 11;
     }
     return _id;
 }

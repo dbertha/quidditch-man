@@ -1,6 +1,7 @@
 #include "mainGui.hpp"
 #include "clientMatchHandler.hpp"
 #include "playerMgr.hpp"
+#include "auctionMgr.hpp"
 
 MainGui::MainGui(int sockfd,QMainWindow *parent) : 
 parent_(parent), __client(new Client(sockfd, true)), __pushesNotifier(new QSocketNotifier(sockfd, QSocketNotifier::Read, this)) {
@@ -156,6 +157,21 @@ void MainGui::listMgrs() {
     }
     ticker->show();
 }
+
+void MainGui::buyAPMenu() {
+    buyAPDialog = new BuyAPDialog(__client,this);
+    buyAPDialog->exec();
+}
+
+void MainGui::freeAPMenu() {
+    freeAPDialog = new FreeAPDialog(__client,this);
+    freeAPDialog->exec();
+}
+
+void MainGui::auctionsMenu(){
+    if (chooseAuction(__client,this)==BAD_CONNECTION) badConnection();
+
+}
     
 
 //~ void MainGui::listAndChooseTournaments(){
@@ -239,7 +255,9 @@ void MainGui::createMenu() {
         connect(listTournamentsAction,SIGNAL(triggered()),this,SLOT(tournaments()));
         actionPointsMenu=menuBar()->addMenu(tr("Action Points"));
         actionPointsMenu->addAction(newPromotionAction);
+        connect(newPromotionAction,SIGNAL(triggered()),this,SLOT(freeAPMenu()));
         actionPointsMenu->addAction(buyAPAction);
+        connect(buyAPAction,SIGNAL(triggered()),this,SLOT(buyAPMenu()));
         ticker = new Ticker(__client, __pushesNotifier, this);
         ticker->show();
         mainMenu = new MainMenu(this);

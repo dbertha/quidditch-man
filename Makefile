@@ -76,6 +76,8 @@ clientGUI.out: client/clientMatchHandler.hpp \
            client/playersDialog.hpp \
            client/tournamentDialog.hpp \
            client/tournaments.hpp \
+           client/buyAPDialog.hpp \
+           client/freeAPDialog.hpp \
            client/clientMatchHandler.cpp \
            client/loginDialog.cpp \
            client/GUImain.cpp \
@@ -89,7 +91,9 @@ clientGUI.out: client/clientMatchHandler.hpp \
            client/mainMenu.cpp \
            client/playersDialog.cpp \
            client/tournamentDialog.cpp \
-           client/tournaments.cpp 
+           client/tournaments.cpp \
+	   client/buyAPDialog.cpp \
+           client/freeAPDialog.cpp
 	make -f Makefile.GUI
 	
 clean:

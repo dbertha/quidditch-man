@@ -186,6 +186,8 @@ public :
     std::vector<int> getTournamentList();
     int askToJoinTournament(int tournamentID = 0);
     int receiveNumOfTeam();
+
+    std::string intToString(int);
 };
 
 

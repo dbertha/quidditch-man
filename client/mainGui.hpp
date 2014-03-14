@@ -18,6 +18,8 @@
 #include "loginDialog.hpp"
 #include "mainMenu.hpp"
 #include "buildingsDialog.hpp"
+#include "buyAPDialog.hpp"
+#include "freeAPDialog.hpp"
 
 //TODO : exceptions notifier
 
@@ -25,6 +27,7 @@
 class MainMenu;
 class Ticker;
 class BuildingsDialog;
+class BuyAPDialog;
 
 class MainGui : public QMainWindow {
     Q_OBJECT
@@ -45,6 +48,9 @@ public slots:
         void buildings();
         void tournaments();
         void pushesHandler();
+        void buyAPMenu();
+        void freeAPMenu();
+        void auctionsMenu();
 private slots:
         void about();
         void login();
@@ -78,6 +84,8 @@ private:
         Ticker *ticker;
         MainMenu *mainMenu;
         BuildingsDialog *buildingsDialog;
+        BuyAPDialog *buyAPDialog;
+        FreeAPDialog *freeAPDialog;
         LoginDialog *loginDialog;
         int role, nbPlayers, money, nbFans, nbActionPoints;
         QMainWindow parent_;

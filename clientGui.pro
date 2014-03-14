@@ -18,6 +18,9 @@ HEADERS += client/clientMatchHandler.hpp \
            client/playersDialog.hpp \
            client/tournamentDialog.hpp \
            client/tournaments.hpp \
+    client/buyAPDialog.hpp \
+    client/freeAPDialog.hpp \
+    client/auctionMgr.hpp
 
 SOURCES += client/clientMatchHandler.cpp \
            client/loginDialog.cpp \
@@ -33,4 +36,7 @@ SOURCES += client/clientMatchHandler.cpp \
            client/playersDialog.cpp \
            client/tournamentDialog.cpp \
            client/tournaments.cpp \
+    client/buyAPDialog.cpp \
+    client/freeAPDialog.cpp \
+    client/auctionMgr.cpp
 
