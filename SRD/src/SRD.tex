@@ -1080,6 +1080,16 @@ Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvo
           à ce niveau-là aussi.
 
       \subsubsection{Interface graphique}
+      \begin{figure}[H]
+          \center
+          \includegraphics[scale=0.4]{uml/class/GUIClasses.png}
+         \caption{Diagramme des classes impliquées dans la GUI}
+         \end{figure}
+         
+         Une fenêtre principale fait appel à différentes sous-fenêtres pour des interactions particulières.
+         Si une fenêtre a besoin de communiquer avec le serveur, elle le fera à travers un pointeur de la classe Client,
+         la fenêtre principale instanciant une classe client à sa construction.
+
   
 \subsection{Le réseau}
   L'interface réseau doit permettre une communication bidirectionnelle :
@@ -1236,6 +1246,14 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
     \center
     \includegraphics[scale=0.4]{uml/Diagrammededeploiement.png}
     \caption{Diagramme de composants}
+    \end{figure}
+    Pour la phase suivante, nous veillerons à extraire le code client tout ce qui concerne la gestion "terminal-only",
+    responsabilité que nous attribuerons à une classe dédiée.
+    
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/GUIComponents.png}
+    \caption{Diagramme de composants pour la partie graphique uniquement}
     \end{figure}
 %\chapter{Index des termes utilisés}
 %  Contiendra, au moins, toutes les entrées du glossaire (avec les numéros des pages correspondantes).
