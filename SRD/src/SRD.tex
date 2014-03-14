@@ -183,6 +183,7 @@
     2.5 & David & 12/03/14 & Précisions sur le déroulement d'un match \\
     2.6 & David & 13/03/14 & Diagrammes pour la GUI \\
     2.7 & Hélène & 14/03/14 & Terminal graphique avec diagrammes détaillés\\
+    3.0 & Manon & 14/03/14 & Relecture partielle \\
     \hline
   \end{tabular}
 
@@ -218,7 +219,7 @@
     L'utilisateur démarre le jeu. Soit il a déjà commencé une \gls{partie}\index{partie}; dans ce cas, l'utilisateur s'identifie et reprend sa partie là où il l'avait laissée. \\
     Soit il ne possède pas encore de partie; le programme lui demande alors quelques informations d'identification. 
     Il se voit ensuite attribuer une équipe de 7 \gls{joueur}s médiocres et une \gls{parcelle}\index{parcelle}. 
-    Au commencement, ce dernier est presque désert, composé uniquement d'un 
+    Au commencement, cette dernière est presque déserte, composée uniquement d'un 
     \gls{stade}\index{bâtiment!Stade} de \gls{Quidditch}\index{Quidditch} et d'emplacements vides prévus pour accueillir les bâtiments.
 
     \subsubsection{Créer nouvelle partie}
@@ -236,7 +237,7 @@
     \subsubsection{Charger partie existante}
       \begin{itemize}
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Néant.
-        \item \textbf{Pré-conditions} : Il faut qu’il existe déjà une partie à laquelle créée par ce client.
+        \item \textbf{Pré-conditions} : Il faut qu’il existe déjà une partie créée par ce client.
         \item \textbf{Post-conditions} : Le client a accès à sa partie.
         \item \textbf{Cas général} : Le client souhaite continuer une partie déjà entamée et rentre le nom de la partie ainsi que le mot de passe pour récupérer les informations concernant cette partie.
         \item \textbf{Cas exceptionnels} :
@@ -251,13 +252,13 @@
     \includegraphics[scale=0.5]{uml/useCaseView/GestionEquipe.png}
     \caption{Cas d'utilisation 2: Gestion de l'équipe}
   \end{figure}  
-    Une fois que l'utilisateur a rejoint sa \gls{partie}\index{partie} ou en a créé une nouvelle, il peut gérer son équipe. Le manager peut alors au choix se renseigner sur ses joueurs, et donc voir les capacitiés de ce dernier, l'avancement de ses entraînements, etc. Il peut également envoyer un joueur au centre d'entraînement ou à l'hôpital.
+    Une fois que l'utilisateur a rejoint sa \gls{partie}\index{partie} ou en a créé une nouvelle, il peut gérer son équipe. Le manager peut alors au choix se renseigner sur ses joueurs, et donc voir les capacitiés de ces derniers, l'avancement de leurs entraînements, etc. Il peut également envoyer un joueur au centre d'entraînement ou à l'hôpital.
 
     \subsubsection{Inspecter un joueur}
       \begin{itemize}
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Inclut Sélectionner joueur.
         \item \textbf{Pré-conditions} : Néant.
-        \item \textbf{Post-conditions} : Une \"fiche d'identité\" du joueur est affichée.
+        \item \textbf{Post-conditions} : Une fiche d'identité du joueur est affichée.
         \item \textbf{Cas général} : Le client/manager souhaite se renseigner sur un de ses joueurs. Il sélectionne le joueur concerné pour avoir les informations sur ce dernier. Ces informations sont : les capacités, l'avancement des entraînements par capacité, une indication quant au blocage (entraînement/hôpital/enchères) éventuel du joueur, les informations sur le balai du joueur et une estimation de la valeur du joueur.
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
@@ -304,14 +305,14 @@
     \includegraphics[scale=0.5]{uml/useCaseView/GestionDomaine.png}
     \caption{Cas d'utilisation 3: Gestion du domaine}
   \end{figure}  
-    Une fois que l'utilisateur a rejoint sa \gls{partie}\index{partie} ou en a créé une nouvelle, il peut gérer son domaine. Au commencement du jeu, ce domaine comprend un stade de petite taille, des infrastructures médiocres pour les entraînements et les soins à procurer aux joueurs, qui deviendront un beau centre d'entraînement et un hôpital à la pointe de la technologie, et également d'emplacements pour un fan shop et un centre de promotion (pour gagner des points d'action). Le client peut donc entamer des projets de construction et d'améliorer de bâtiments pour que ces derniers soient plus performants ou plus lucratifs.
+    Une fois que l'utilisateur a rejoint sa \gls{partie}\index{partie} ou en a créé une nouvelle, il peut gérer son domaine. Au commencement du jeu, ce domaine comprend un stade de petite taille, des infrastructures médiocres pour les entraînements et les soins à procurer aux joueurs, qui deviendront un beau centre d'entraînement et un hôpital à la pointe de la technologie, et également des emplacements pour un fan shop et un centre de promotion (pour gagner des points d'action). Le client peut donc entamer des projets de construction et d'amélioration de bâtiments pour que ces derniers soient plus performants ou plus lucratifs.
 
     \subsubsection{Entrer dans le bâtiment}
       \begin{itemize}
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Inclut Voir les propriétés du bâtiment et Construire/Améliorer le bâtiment.
         \item \textbf{Pré-conditions} : Néant.
         \item \textbf{Post-conditions} : Le client est dans le bâtiment.
-        \item \textbf{Cas général} : Le client \"rentre\" dans le bâtiment et a la possibilité de lancer un projet de construction ou d'obtenir les informations concernant ce bâtiment.
+        \item \textbf{Cas général} : Le client rentre dans le bâtiment et a la possibilité de lancer un projet de construction ou d'obtenir les informations concernant ce bâtiment.
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
 
@@ -340,7 +341,7 @@
     \includegraphics[scale=0.5]{uml/useCaseView/Encheres.png}
     \caption{Cas d'utilisation 4: Gestion de l'équipe}
   \end{figure}  
-    L'utilisateur n'étant pas obligé de se coltiner à vie son équipe de bras cassés, il peut acheter des joueurs mis en enchères par d'autres utilisateurs, ou même se débarasser des siens en les mettant en vente. Pour participer à une enchère, l'utilisateur doit faire une première offre, il est alors inscrit au tour suivant. A chaque enchère faite par un participant, le prix d'achat augmente de 10\% du prix de départ. La vente se déroule par tour. A chacun de ces tours, les participants peuvent choisir d'enchérir ou non. S'ils enchérissent, ils sont inscrits pour le tour suivant, sinon, ils quittent la vente. Lorsqu'il n'y a qu'un seul participant qui enchérit au cours d'un tour, c'est lui qui remporte l'enchère. Si par contre aucun participant n'a enchéri avant la fin du tour actuel, c'est celui qui a enchéri en dernier au tour précédent qui remporte l'enchère. La transaction peut alors se faire. 
+    L'utilisateur n'étant pas obligé de se coltiner à vie son équipe de bras cassés, il peut acheter des joueurs mis aux enchères par d'autres utilisateurs, ou même se débarasser des siens en les mettant en vente. Pour participer à une enchère, l'utilisateur doit faire une première offre, il est alors inscrit au tour suivant. A chaque enchère faite par un participant, le prix d'achat augmente de 10\% du prix de départ. La vente se déroule par tour. A chacun de ces tours, les participants peuvent choisir d'enchérir ou non. S'ils enchérissent, ils sont inscrits pour le tour suivant, sinon, ils quittent la vente. Lorsqu'il n'y a qu'un seul participant qui enchérit au cours d'un tour, c'est lui qui remporte l'enchère. Si par contre aucun participant n'a enchéri avant la fin du tour actuel, c'est celui qui a enchéri en dernier au tour précédent qui remporte l'enchère. La transaction peut alors se faire. 
 
     \subsubsection{Vendre un joueur aux enchères}
       \begin{itemize}
@@ -642,7 +643,7 @@
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Est inclus dans Créer un tournoi.
         \item \textbf{Pré-conditions} : Néant.
         \item \textbf{Post-conditions} : Néant.
-        \item \textbf{Cas général} : L'administrateur choisit combien de participants, et donc combien de tours, comprendra le tournoi. Il ne peut bien entendu par choisir n'importe quel nombre.
+        \item \textbf{Cas général} : L'administrateur choisit combien de participants, et donc combien de tours, comprendra le tournoi. Il ne peut bien entendu pas choisir n'importe quel nombre.
         \item \textbf{Cas exceptionnels} : 
           \begin{itemize}
             \item L'administrateur entre un nombre qui n'est pas une puissance de deux. La création est annulée.
@@ -660,7 +661,7 @@
   
 \section{Exigences non fonctionnelles}
   Pour le confort de l'utilisateur, il faudra  une interface graphique très intuitive, 
-  les menus étant attachés à des  bâtiments, leur sélection par la souris ouvrira ces menus.
+  les menus étant attachés à des  bâtiments, leur sélection par la souris ouvrira ces menus. Cette interface était l'idée de départ mais n'a pu être réalisée pour des raisons pratiques (contraintes temporelles).
   De même, la gestion d'un match devra être aisée, malgré le nombre d'actions à choisir 
   sur un tour. Le plaisir de l'utilisateur apporté par le jeu dépendra du rythme de la succession de ces tours.
 \section{Exigences de domaine}
@@ -904,7 +905,7 @@ Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvo
          \caption{Diagramme des classes impliquées dans la gestion générale}
          \end{figure}
 
-        Un manager est le \"personnage virtuel\" qu'incarne un client. Il est le propriétaire d'un domaine et d'une équipe de quidditch. Au départ du jeu, il possède quelques bâtiments sur son domaine, et sept joueurs de qualité moyenne, si pas médiocre. Pour améliorer ses bâtiments, ou les capacités de ses joueurs, le manager doit dépenser des points d'action, de l'argent, et attendre. L'attente en temps réel est gérée par la classe Calendrier.
+        Un manager est le personnage virtuel qu'incarne un client. Il est le propriétaire d'un domaine et d'une équipe de quidditch. Au départ du jeu, il possède quelques bâtiments sur son domaine, et sept joueurs de qualité moyenne, si pas médiocre. Pour améliorer ses bâtiments, ou les capacités de ses joueurs, le manager doit dépenser des points d'action, de l'argent, et attendre. L'attente en temps réel est gérée par la classe Calendrier.
 
 
       \subsubsection{Bâtiments}
@@ -1051,7 +1052,7 @@ Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvo
          \caption{Diagramme de classes pour les matches}
          \end{figure}
 
-            Le match relie deux clients différents dans un affrontement sur un \gls{terrain}\index{terrain} où se déplacent à la fois des joueurs et des \index{balle}balles, les joueurs pouvant faire se déplacer les balles. Le terrain est représenté par un hexagone allongé et respecte le format \"case hexagonale\", c'est-à-dire qu'il y a 6 cases de destination adjacentes à une case donnée (si elle n'est pas sur les bords). Un client peut participer à deux \"types\" de match, soit un match amical, en invitant un autre joueur ou en étant invité, soit un match de tournoi, qui offre des récompenses plus importantes. Au début de chaque match, le client choisit quels joueurs seront sur le terrain, et à quel poste ils joueront. Le déroulement des matches consiste en du tour par tour.
+            Le match relie deux clients différents dans un affrontement sur un \gls{terrain}\index{terrain} où se déplacent à la fois des joueurs et des \index{balle}balles, les joueurs pouvant faire se déplacer les balles. Le terrain est représenté par un hexagone allongé et respecte le format case hexagonale, c'est-à-dire qu'il y a 6 cases de destination adjacentes à une case donnée (si elle n'est pas sur les bords). Un client peut participer à deux types de match, soit un match amical, en invitant un autre joueur ou en étant invité, soit un match de tournoi, qui offre des récompenses plus importantes. Au début de chaque match, le client choisit quels joueurs seront sur le terrain, et à quel poste ils joueront. Le déroulement des matches consiste en du tour par tour.
 
       \subsubsection{Tournois}
           \begin{figure}[H]
@@ -1227,7 +1228,7 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
     \includegraphics[scale=0.4]{uml/Sequence_matchStarting.png}
     \caption{Diagramme de séquence : démarrage d'un match amical}
     \end{figure}
-  À la connexion d'un client, le serveur instancie un User, classe chargé d'interpréter
+  À la connexion d'un client, le serveur instancie un User, classe chargée d'interpréter
   les messages reçus sur le socket de communication correspondant.
   Si cette requête concerne la gestion d'un match, alors le User\index{User} transmet l'information
   au matchesHandler, qui a lui-même été instancié par le serveur à son initialisation et dont chaque
@@ -1243,7 +1244,7 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
   
   Une fois le match démarré, le code client se charge de remplir une matrice d'entiers caractérisant
   une liste de déplacements ou d'actions, qu'il envoie au serveur. Le premier client à répondre
-  est bloqué le temps que le deuxième client ne réponde. 
+  est bloqué le temps que le deuxième client réponde. 
   Une gestion de time-out pourra être intégrée plus tard.
 
 \subsection{Diagramme de composants}
