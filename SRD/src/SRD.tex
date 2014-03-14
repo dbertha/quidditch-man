@@ -182,6 +182,7 @@
     2.4 & David & 12/03/14 & Diagramme de composants \\
     2.5 & David & 12/03/14 & Précisions sur le déroulement d'un match \\
     2.6 & David & 13/03/14 & Diagrammes pour la GUI \\
+    2.7 & Hélène & 14/03/14 & Terminal graphique avec diagrammes détaillés\\
     \hline
   \end{tabular}
 
@@ -1089,9 +1090,10 @@ Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvo
          
          Une fenêtre principale fait appel à différentes sous-fenêtres pour des interactions particulières.
          Si une fenêtre a besoin de communiquer avec le serveur, elle le fera à travers un pointeur de la classe Client,
-         la fenêtre principale instanciant une classe client à sa construction.
-
-  
+         la fenêtre principale instanciant une classe client à sa construction.\\
+         
+    Pour une description plus élaborée de la partie graphique, le lecteur se reportera utilement au § \ref{diag-client-graphique}.
+    
 \subsection{Le réseau}
   L'interface réseau doit permettre une communication bidirectionnelle :
 \begin{itemize}
@@ -1248,14 +1250,107 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
     \includegraphics[scale=0.4]{uml/Diagrammededeploiement.png}
     \caption{Diagramme de composants}
     \end{figure}
-    Pour la phase suivante, nous veillerons à extraire le code client tout ce qui concerne la gestion "terminal-only",
-    responsabilité que nous attribuerons à une classe dédiée.
-    
     \begin{figure}[H]
     \center
     \includegraphics[scale=0.4]{uml/GUIComponents.png}
-    \caption{Diagramme de composants pour la partie graphique uniquement}
+    \caption{Diagramme simplifié de composants pour la partie graphique uniquement}
     \end{figure}
+\newpage
+\section{Le client graphique} \label{diag-client-graphique}
+\subsection{Le login}
+Le client graphique s'ouvre sur un dialogue de login permettant à l'utilisateur de se connecter au serveur,
+soit avec un nom d'utilisateur existant, soit en se créant une nouvelle identité \emph{(checkbox "New User")}\footnote{Les détails techniques de mise en \oe uvre sont mis entre parenthèses.
+Un mode d'emploi s'obtiendra en supprimant ces parties.}.
+A ce moment, la fenêtre du jeu n'est pas encore visible.\\
+Si l'utilisateur ne souhaite pas se connecter ("Quit"), il se voit proposer une fenêtre avec
+des menus réduits : "File" lui permettant de tenter à nouveau de se connecter ou, au contraire,
+d'arrêter le programme, ainsi qu'un menu "Help".
+
+\subsection{Les menus et les boutons}
+En cas de réussite du login ou de l'enregistrement, le serveur fournit au client le rôle
+de l'utilisateur : manager ou administrateur; ce dernier est réservé à l'utilisateur
+"admin" (mode de passe "admin") prédéfini dans le fichier central d'identification.\\
+En fonction de ce rôle, la fenêtre centrale de gestion \emph{(classe "MainGui" héritant de QMainWindow
+: figure \ref{mainGUI})},
+présente une barre de menus différente.\\
+Le manager dispose également de boutons
+\emph{(classe "MainMenu")} activant les fonctions associées aux points principaux de la barre de menus.
+Ce rôle déterminera également de façon dynamique l'affichage de certains boutons dans le dialogue
+de gestion des tournois.
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/class/mainGUI.png}
+    \caption{Diagramme de classes autour de "MainGui"} \label{mainGUI}
+    \end{figure}
+\subsection{La bannière}
+Enfin, le manager voit s'afficher une bannière qui reprend les informations concernant ses avoirs;
+ces informations sont rafraîchies périodiquement
+\emph{(classe "ticker", qui, lorsqu'elle est affichée, lance un timer\cite{Blanchette2006})}.
+L'utilisateur attentif remarquera que cette bannière se déplace : ce n'est pas un gadget;
+à chaque déplacement, les données sont mises à jour!
+\emph{(le but est, pour les développeurs, de pouvoir vérifier ainsi aisément que le timer fonctionne).}\\
+Dans certaines parties du jeu, la bannière, moins utile, est cachée à dessein.
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/class/generalGUI.png}
+    \caption{Diagramme de classes GUI} \label{generalGUI}
+    \end{figure}
+\emph{Comme le montre la figure \ref{generalGUI}, la majorité des classes graphiques héritent de "QDialog",
+qui elle-même hérite de "QWidget", tout comme "QMainWindow".}
+
+\subsection{La gestion des bâtiments}
+Sous la forme d'un tableau de bord rafraîchi périodiquement \emph{(classe "BuildingsDialog")},
+chaque ligne reprend l'état d'un bâtiment \emph{(une construction model-viewer
+où le modèle "BuildingsModel", héritant de la classe abstraite "QAbstractTableModel", a été en partie réimplémenté;
+un "reset()" avertit le viewer standard "QTableView" lorsque les données sont rafraîchies;
+le modèle a été conçu pour être réutilisé, ce qui est le cas dans la gestion des joueurs : figure \ref{tableView})}.
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.4]{uml/class/tableView.png}
+    \caption{Diagramme des classes utilisant le modèle "BuildingsModel" associé au viewer "QTableView"}\label{tableView}
+    \end{figure}
+Le manager a la possibilité de demander un upgrade du bâtiment sur la ligne duquel
+il a placé le curseur, si, bien entendu, il possède assez d'argent et de points d'action,
+et que le bâtiment n'est pas déjà en cours d'upgrade.
+Le manager peut entreprendre, à ces conditions, l'upgrade de plusieurs bâtiments.
+S'il a la patience d'attendre la fin de ceux-ci, il verra,
+sans devoir intervenir, les données du tableau de bord s'actualiser.
+\subsection{La gestion des joueurs}
+Cette fonction \emph{("playerMgr()")} commence par la présentation d'une liste
+\emph{(une construction model-viewer autour d'une liste, placée dans une classe générique "SelectionDialog",
+qui est réutilisée dans plusieurs autres fonctions)}
+dans laquelle le manager peut sélectionner un joueur.
+Cette présentation est un standard de l'application, repris dans toutes les fonctions;
+elle permet de limiter au maximum le nombre d'entrées dans les menus,
+car une fois le joueur sélectionné,
+le programme lui présente les informations détaillées concernant ce dernier
+et propose diverses actions sous forme de boutons,
+en fonction des caractéristiques du joueur sélectionné.
+Nous appellerons par la suite ce dispositif un modèle liste-détails-actions.\\
+Les informations détaillées concernant le joueur sont ici à nouveau présentées sous la forme
+d'un tableau de bord et d'une bannière \emph{(QLabel)}, en légende cette fois.
+Si le joueur n'est pas bloqué car en cours d'entraînement, de soins ou de vente,
+et que le manager dispose d'action points,
+ce dernier voit apparaître des boutons lui permettant de lancer un entraînement, une vente
+ou d'envoyer le joueur se faire soigner.
+Bien entendu, ces boutons ne sont affichés que s'ils sont pertinents
+par rapport à la situation présente du joueur.\\
+Comme le manager ne peut entreprendre qu'une action à la fois,
+le joueur étant alors bloqué pour un certain temps, la fonction s'arrête ensuite
+\emph{(Ce dialogue est géré par la classe "playersDialog", qui, pour le tableau de bord,
+met à nouveau en \oe uvre une construction model-viewer autour de la classe "BuildingsModel")}.
+Notons que l'achat d'un broomstick est prévu mais pas encore programmé.
+\subsection{Les tournois}
+Cette fonction \emph{("tournaments()")} commence par un avertissement;
+ensuite, comme pour la gestion des joueurs, vient la présentation d'une liste 
+\emph{(une construction model-viewer gérée par la classe "SelectionDialog")}
+dans laquelle le manager peut sélectionner un tournoi pour y participer,
+si la liste n'est pas vide; sinon, il ne peut que quitter le dialogue.\\
+Par contre, si l'utilisateur est un administrateur, il peut créer un nouveau tournoi
+\emph{(Comme le nombre de données à introduire est limité,
+nous avons eu recours ici, comme pour la vente d'un joueur, à une suite de questions,
+plutôt qu'à la construction d'une classe adhoc héritant de "QDialog")}.
+
 %\chapter{Index des termes utilisés}
 %  Contiendra, au moins, toutes les entrées du glossaire (avec les numéros des pages correspondantes).
 \addcontentsline{toc}{chapter}{4 Index}
