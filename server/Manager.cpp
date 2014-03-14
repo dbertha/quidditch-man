@@ -150,6 +150,17 @@ bool Manager::trainPlayer(int playerID, int capacityNumber) {
 	_actionPoints-=AP_TRAINING;
 	return true;
 }
+
+void Manager::lockPlayer(string name) {
+	string tmp;
+	for (unsigned i=0;i<_players.size();++i){
+		tmp = _players[i].getFirstName() + " " + _players[i].getLastName();
+		if (tmp==name) {
+			_players[i].lockPlayer();
+		}
+	}
+}
+
 void Manager::unlockPlayer(string name) {
 	string tmp;
 	for (unsigned i=0;i<_players.size();++i){

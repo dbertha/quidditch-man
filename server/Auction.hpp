@@ -16,16 +16,19 @@ class Auction {
 	User* auctionCreator_;
 	vector<User*> usersInAuction_;
 	vector<User*> bidders_;
+	User* lastBidder_;
 	ManagedPlayer player_;
 	struct tm instant_;
 	int startingPrice_;
 	int currentPrice_;
 	int currentTurn_;
 	int auctionID_;
+	int nbOfEndOfTurn_;
 
  public:
 
  	Auction(User* creator, ManagedPlayer player, int startingPrice, int ID);
+ 	void endAuction();
 
  	User* getAuctionCreator();
  	Manager* getManager();
@@ -38,10 +41,12 @@ class Auction {
  	int getCurrentPrice();
  	int getCurrentTurn();
  	int getAuctionID();
+ 	int getNumberOfBidders();
  	int isAuctionFinished();
  	string getPlayerName();
  	void bid(User* bidder);
-
+ 	void endOfTurnAsked();
+ 	int getNbOfEndOfTurn();
 };
 
 #endif

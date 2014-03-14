@@ -26,4 +26,6 @@
 *.out
 *.o
 moc*
+Makefile.*
 *.synctex.gz
+moc*

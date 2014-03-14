@@ -58,7 +58,7 @@
 
 #define ABORT 0
 
-#define TIMESCALE 1
+
 
 typedef struct { //pas besoin de la classe complète
     int attributes[5];
@@ -73,6 +73,8 @@ public:
     //for the thread :
     int getConfirmation();
     int bid();
+    int getCurrentPrice();
+    int askCurrentPrice();
 
 private:
     bool GUI_;
@@ -82,6 +84,7 @@ private:
     int input_;
     char opponent_[10];
     fd_set FDSet_;
+    int currentAuctionPrice_;
 
     enum Status {INIT,ADMIN,FREE, AVAILABLE, MANAGERS_MENU, AUCTION_MENU, PLAYERS_MENU, BUILDINGS_MENU, \
     TOURNAMENTS_MENU, PLAYERSLIST_MENU, TRAINING_MENU, HEALING_MENU, \
@@ -127,6 +130,9 @@ private:
     void askAndSendMoves(int numTeam, HexagonalField &field, std::vector<AxialCoordinates> &positions);
     void commMgr();
     //network :
+public :
+    int getSockfd() const {return sockfd_;}
+
     int sendLoginToServer(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
     int sendNewManagerToServer(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
     
@@ -163,10 +169,13 @@ private:
     std::vector<std::string> receiveAuctionsList();
     int joinAuction(int auctionID);
     int askForAuctionInfos(int auctionID);
-    int getCurrentPrice();
-    
+
+
     int checkAuction();
     int receiveAuctionResult();
+
+    int askAuctionTimeLeft();
+    int getAuctionTimeLeft();
 
     int buyActionPoints(int amount);
     int getPriceForAP();
@@ -180,6 +189,8 @@ private:
     std::vector<int> getTournamentList();
     int askToJoinTournament(int tournamentID = 0);
     int receiveNumOfTeam();
+
+    std::string intToString(int);
 };
 
 

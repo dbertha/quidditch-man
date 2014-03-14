@@ -1,6 +1,6 @@
 #include "Client.hpp"
-#include "../common/commAPI.hpp"
 
+//TODO : utiliser buildConnexion de NetworkBase
 int main(int argc, char* argv[]) {
 	int sockfd_;
 	struct sockaddr_in serverAddr;

@@ -7,8 +7,13 @@
 #define INPUTSIZE 100 //taille du message envoyé du client vers le serveur
 #define __DEBUG
 
+#define TIMESCALE 1
+
 #define USERNAME_LENGTH 30
 #define PASSWORD_LENGTH 30
+
+#define BAD_CONNECTION -1
+#define NO_CHOICE -2
 
 #define LOGIN_FAILED 0 
 #define NORMAL_LOGIN 1
@@ -21,13 +26,14 @@
 #define ALREADYINCONSTRUCTION 2
 #define NOTENOUGHMONEY 3
 #define NOTENOUGHAP 4
- 
+
 #define AP_TRAINING 5
 #define AP_HOSPITAL 5
 #define AP_UPGRADE 10
 #define AP_FRIENDLY_MATCH 15
 #define AP_AUCTION 3
 #define AP_ENTER_AUCTION 5
+
 #define GOLD_FOR_ONE_AP 10000 
 #define TIMESCALEACTIONPOINTS 3
 
@@ -76,6 +82,11 @@
 #define END_AUCTION_TURN 41
 #define AUCTION_RESULT 42
 #define GETAUCTIONINFO 43
+#define GET_AUCTION_PRICE 64
+#define AUCTION_PRICE 65
+#define GET_AUCTION_TIME_LEFT 66
+#define AUCTION_TIME_LEFT 67
+
 #define MATCH_INVITATION 44
 #define FORFEIT 45
 #define OPPONENTFORFEIT 46
@@ -233,6 +244,8 @@
 
 #define STARTINGDIAG_TEAM2_BEATER2 -1
 #define STARTINGLINE_TEAM2_BEATER2 5
+
+
 
 //codes de confirmation : 
 #define MATCH_STARTING 0
