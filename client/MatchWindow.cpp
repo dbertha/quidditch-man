@@ -18,10 +18,10 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	}
 	connect(__forfeitAndDrawNotifier,SIGNAL(activated(int)),this,SLOT(pushesHandler()));
 
-	setFixedSize(800, 800);
+	setFixedSize(680, 680);
 
 	//*****************************************************************************************
-	texte = new QLabel("Zone texte \n Zone texte",this); //vas servir a afficher resultat
+//	texte = new QLabel("Zone texte \n Zone texte",this); //vas servir a afficher resultat
 
 	infoJoueur = new QLabel("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
 	infoJoueur->setFrameStyle(QFrame::Panel | QFrame::Sunken);
@@ -90,7 +90,7 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 
 	//initialisation d'un layout pour organniser le Qlabel,la view, radio bouton,....
 	layout = new QGridLayout;
-	layout->addWidget(texte,3,0);
+//	layout->addWidget(texte,3,0);
 	layout->addWidget(scoreEquipe,0,0);
 	layout->addWidget(view, 1, 0,1,3);//peut occuper 1 ligne et 3 colonne
 	layout->addWidget(infoJoueur,2,0);
@@ -121,8 +121,8 @@ void MatchWindow::initListeHexa(){
 			indexCol=AxialCoordinates(indexRowAxial,indexColAxial).getColOnMatrix();
 			ListeHexa[indexRow][indexCol] =new HexagonalCase(indexRowAxial,indexColAxial,idOccupant);
 			scene->addItem(ListeHexa[indexRow][indexCol]);
-			QObject::connect(ListeHexa[indexRow][indexCol], SIGNAL(caseSelect(int,int))
-					, this, SLOT(changerTexte(int,int)));
+//			QObject::connect(ListeHexa[indexRow][indexCol], SIGNAL(caseSelect(int,int))
+//					, this, SLOT(changerTexte(int,int)));
 			QObject::connect(ListeHexa[indexRow][indexCol], SIGNAL(caseSelect(int,int))
 					, this, SLOT(handlerMove(int,int)));
 		}
@@ -166,6 +166,12 @@ void MatchWindow::updateListeHexa(){
 		indexCol=allPositions[i].getColOnMatrix();
 		if(ListeHexa[indexRow][indexCol]->getType()==FREE_SPACE){//1 balle et un joueur peuvent se supperposer
 			ListeHexa[indexRow][indexCol]->setType(i);
+		}else{//on rajoute une balle sur la casse du joueur
+			if(i==QUAFFLE){
+				ListeHexa[indexRow][indexCol]->rajouterBalle(2);//TODO impplique qu'il connait num pour mettre Quaflla,pas bon
+			}else{
+				ListeHexa[indexRow][indexCol]->rajouterBalle(1);
+			}
 		}
 
 
@@ -176,7 +182,7 @@ void MatchWindow::updateListeHexa(){
 
 
 void MatchWindow::changerTexte(int i,int j){
-	int indexRow=AxialCoordinates(i,j).getLineOnMatrix();
+/*	int indexRow=AxialCoordinates(i,j).getLineOnMatrix();
 	int indexCol=AxialCoordinates(i,j).getColOnMatrix();
 
 	texte->setText("coord Axial: i= "+QString::number(i)+", j ="+QString::number(j) +"\n"
@@ -186,7 +192,7 @@ void MatchWindow::changerTexte(int i,int j){
 //		qDebug()<<"rentre dans if acces";
 //		marquerToutesCaseNonAccessible();
 //	}
-	update();
+	update();*/
 
 }
 

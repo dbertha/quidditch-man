@@ -25,12 +25,12 @@
 
 //construit un HexagonalCase grace a 6 point, l'HexagonalCase peut etre vu comme un triangle (partie superieur) + un rectangle + triangle retourné
 static const QPointF baseCoord[6] =
-	{QPointF(  0.0, -15.0), //0. pointe haute
-	 QPointF( 10.0, -7.0), //1. haut-droite
-	 QPointF( 10.0,  7.0), //2. bas-droite
-	 QPointF(  0.0,  15.0), //3. pointe bas
-	 QPointF(-10.0,  7.0), //4. bas-gauche
-	 QPointF(-10.0, -7.0)};//5. haut-gauche
+	{QPointF(  0.0, -12.0), //0. pointe haute
+	 QPointF( 10.0, -6.0), //1. haut-droite
+	 QPointF( 10.0,  6.0), //2. bas-droite
+	 QPointF(  0.0,  12.0), //3. pointe bas
+	 QPointF(-10.0,  6.0), //4. bas-gauche
+	 QPointF(-10.0, -6.0)};//5. haut-gauche
 
 static const qreal hauteur = pBas.y() - pHaut.y() ;
 static const qreal largeur = pHautDroite.x() - pHautGauche.x() ;
@@ -74,6 +74,8 @@ class HexagonalCase : public QGraphicsObject
 		int getIAxial();
 		int getJAxial();
 		int getTypeMarkBall();
+
+		void rajouterBalle(int);
 
         void select();
 		void selectForAction();
@@ -136,6 +138,8 @@ class HexagonalCase : public QGraphicsObject
 		bool _ifMarkForBludger;
 		bool _ifMarkForQuaffle;
 		bool _ifMarkForGoldenSnitch;
+
+		int _contientBalleEnPlus;
 
         void dessinerHexagone(QPainter *painter);//dessine le coutour de la case
         void dessinerType(QPainter *painter);//dessine le type de la case (balle,joueur,...)
