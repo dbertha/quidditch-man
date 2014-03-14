@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 	//les 4 balles :
 	__balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_GOLDENSNITCH, STARTINGLINE_GOLDENSNITCH)));
 	__field.setOccupant(AxialCoordinates(STARTINGDIAG_GOLDENSNITCH, STARTINGLINE_GOLDENSNITCH), GOLDENSNITCH);
-	__balls.push_back(Ball(BLUDGER1, AxialCoordinates(STARTINGDIAG_BLUDGER1, STARTINGLINE_BLUDGER1)));
+	__balls.push_back(Ball(BLUDGER1, AxialCoordinates(-3,4  )));//STARTINGDIAG_BLUDGER1, STARTINGLINE_BLUDGER1)));
 	__field.setOccupant(AxialCoordinates(STARTINGDIAG_BLUDGER1, STARTINGLINE_BLUDGER1), BLUDGER1);
 	__balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2)));
 	__field.setOccupant(AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2), BLUDGER2);
@@ -152,14 +152,16 @@ int main(int argc, char *argv[])
 //	fenetre test; //pour des test
 //	test.show();
 
-	fenetre test2(__field,__players,__balls);
-	test2.show();
+	__players[0].carryQuaffle();
+
+//	fenetre test2(__field,__players,__balls);
+//	test2.show();
 
 //	fenetre test3(1,__players,__balls);
 //	test3.show();
 
-//	fenetre test4(0);
-//	test4.show();
+	fenetre test4(1);
+	test4.show();
 
     return app.exec();
 }
