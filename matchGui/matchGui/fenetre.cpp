@@ -741,7 +741,37 @@ void fenetre::nextTurn(){
 	updateListeHexa();
 }
 
-void fenetre::pushesHandler(){}
+void fenetre::pushesHandler(){
+	bool over = false;
+	__pushesNotifier->setEnabled(false);
+	SerializedObject received = receiveOnSocket(sockfd_);
+    switch(received.typeOfInfos){
+		case OPPONENTFORFEIT : {
+			QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("Opponent forfeited"),QMessageBox::Ok);
+			over = true;
+		}
+		case OPPONENTASKFORDRAW : {
+			int ret, code;
+			QMessageBox msgBox;
+			QString texte("The opponent ask for a draw, do you accept ? ?");
+			msgBox.setWindowTitle("Draw proposal !");
+			msgBox.setText(texte);
+			
+			msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+			msgBox.setDefaultButton(QMessageBox::No);
+			ret = msgBox.exec();
+			if(ret == QMessageBox::Yes){
+				code = DRAWACCEPTED;
+				over = true;
+			}else{
+				code = DRAWDENIED;
+			}
+			__client->sendAnswerToDrawProposition(code);
+			return input_ ? -1 : 0;
+        }
+    }
+	__pushesNotifier->setEnabled(true);
+}
 
 void fenetre::endHandler(){
 	bool over = false;
@@ -750,11 +780,12 @@ void fenetre::endHandler(){
 		QMessageBox::information(this,QMessageBox::tr("Match over !"),str,QMessageBox::Ok);
 		over = true;
 	}else{
-		int ret:
+		int ret;
 		QMessageBox msgBox;
+		QString texte("Do you want to continue the match ?");
         msgBox.setWindowTitle("Next turn starts !");
         msgBox.setText(texte);
-        msgBox.setInformativeText("Do you want to continue the match (abort to forfeit, cancel to ask for a draw) ?");
+        msgBox.setInformativeText("abort to forfeit, cancel to ask for a draw ");
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Abort | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Yes);
         //QPushButton *connectButton = msgBox.addButton(tr("Forfeit"), QMessageBox::ActionRole);
@@ -778,7 +809,7 @@ void fenetre::endHandler(){
 				QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("Draw accepted"),QMessageBox::Ok);
 				over = true;
             }else{
-				QMessageBox::information(this,QMessageBox::tr("Draw"),QString("Draw denied"),QMessageBox::Ok);
+				QMessageBox::information(this,QMessageBox::tr("Draw"),QString("Draw refused"),QMessageBox::Ok);
             }
 		}
 	}
