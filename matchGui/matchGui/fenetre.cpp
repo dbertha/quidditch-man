@@ -1,5 +1,8 @@
 #include "fenetre.hpp"
 
+
+#include "QMainWindow"
+#include "QDialog"
 //note: code pas du tout optimise/"modualiser"/"umliser", grosse phase de refactoring necessaire
 
 fenetre::fenetre() : QWidget()//on dit qu'on appelle le constructeur de QWidget (on peut lui passer des paramettre si besoin)
@@ -164,6 +167,7 @@ fenetre::fenetre(int numTeam) : QWidget(),
 	numMaTeam(numTeam),__field(),_listeJoueur(),_listeBall()
 {
 	//*!!!!!!!! a deplacer dans constructeur dans liste initialisation
+
 	scoreTeam1 = 0;
 	scoreTeam2 = 0;
 	winner = 0;
@@ -236,9 +240,13 @@ fenetre::fenetre(int numTeam) : QWidget(),
 	BoutonConfirm = new QPushButton("OK");
 	BoutonConfirm->setMaximumSize ( 80, 30);
 	BoutonConfirm->setEnabled(false);
+	BoutonFinirTour = new QPushButton("terminer le tour");
+	BoutonFinirTour->setMaximumSize ( 110, 30);
+
 	textConfirm = new QLabel("Confirmer action:");
-	layoutConformi->addWidget(textConfirm,0,0);
-	layoutConformi->addWidget(BoutonConfirm,1,0);
+	layoutConformi->addWidget(textConfirm,0,0,Qt::AlignBottom);
+	layoutConformi->addWidget(BoutonConfirm,1,0,Qt::AlignTop);
+	layoutConformi->addWidget(BoutonFinirTour,2,0);
 	QObject::connect(BoutonConfirm,SIGNAL(clicked()),this,SLOT(handlerAction()));
 	//*****************************************************************************************
 
@@ -279,12 +287,12 @@ fenetre::fenetre(int numTeam) : QWidget(),
 	allPositions.push_back(AxialCoordinates(-8,0));//TEAM1_KEEPER
 	allPositions.push_back(AxialCoordinates(0,1));//TEAM1_SEEKER deplacer a coté vif d'or
 	allPositions.push_back(AxialCoordinates(0,-6));
-	allPositions.push_back(AxialCoordinates(3,0));
+	allPositions.push_back(AxialCoordinates(-3,0));
 	allPositions.push_back(AxialCoordinates(1,-3));//TEAM1_CHASER3 deplacer a coté d'un souafle
 	allPositions.push_back(AxialCoordinates(1,-5));//TEAM1_BEATER1
 	allPositions.push_back(AxialCoordinates(-11,11));//TEAM1_BEATER2
-	allPositions.push_back(AxialCoordinates(8,0));
-	allPositions.push_back(AxialCoordinates(9,-9));//TEAM2_SEEKER
+	allPositions.push_back(AxialCoordinates(8,0));//TEAM2_SEEKER1
+	allPositions.push_back(AxialCoordinates(9,-9));//TEAM2_SEEKER2
 	allPositions.push_back(AxialCoordinates(6,-6));
 	allPositions.push_back(AxialCoordinates(3,0));
 	allPositions.push_back(AxialCoordinates(0,6));
@@ -881,7 +889,8 @@ void fenetre::handlerMove(int iAxial,int jAxial){
 		//verifier si je peux selectionner l'objet
 		if( ListeHexa[indexRow][indexCol]->getType() != -1){//si pas une case vide (j'ai un joueur)
 			qDebug() << "j'ai une nouvelle selection de qlq chose";
-			if( ((ListeHexa[indexRow][indexCol]->getType() / 7) +1) == numMaTeam){//je verif qu'il est a mon equipe
+			if( (((ListeHexa[indexRow][indexCol]->getType() / 7) +1) == numMaTeam)
+					&& !(ListeHexa[indexRow][indexCol]->ifBlocked()) ){//je verif qu'il est a mon equipe
 				qDebug() << "joueur de ma team trouver";
 				iHaveASelection = true;
 				caseJoueurSelect = ListeHexa[indexRow][indexCol];
@@ -1010,6 +1019,7 @@ void fenetre::handlerAction(){
 		moves[currentMove][1] = NO_SPECIAL_ACTION; //pas d'action spéciale
 		moves[currentMove][2] = caseSelect->getIAxial();
 		moves[currentMove][3] = caseSelect->getJAxial();
+		caseJoueurSelect->bloquerLeJoueur();
 	}
 	//--------------------------------------------------------------------------
 	if(lancer->isChecked()){
@@ -1018,6 +1028,7 @@ void fenetre::handlerAction(){
 		moves[currentMove][1] = NO_SPECIAL_ACTION;
 		moves[currentMove][2] = caseSelect->getIAxial();
 		moves[currentMove][3] = caseSelect->getJAxial();
+		caseJoueurSelect->bloquerLeJoueur();
 	}
 	//--------------------------------------------------------------------------
 	if(taper->isChecked()){
@@ -1026,18 +1037,21 @@ void fenetre::handlerAction(){
 		moves[currentMove][1] = NO_SPECIAL_ACTION;
 		moves[currentMove][2] = caseSelect->getIAxial();
 		moves[currentMove][3] = caseSelect->getJAxial();
+		caseJoueurSelect->bloquerLeJoueur();
 	}
 	//--------------------------------------------------------------------------
 	if( recupSouaffle->isChecked() ){
 		qDebug() << "    recupSouaffle choisi";
 		moves[currentMove][0] = caseJoueurSelect->getType();
 		moves[currentMove][1] = INTERCEPT_QUAFFLE;
+		caseJoueurSelect->bloquerLeJoueur();
 	}
 	//--------------------------------------------------------------------------
 	if( recupVifDOr->isChecked() ){
 		qDebug() << "    recupVifDOr choisi";
 		moves[currentMove][0] = caseJoueurSelect->getType();
 		moves[currentMove][1] = CATCH_GOLDENSNITCH;
+		caseJoueurSelect->bloquerLeJoueur();
 	}
 	qDebug() <<"Affichage Info dans Move: ";
 	qDebug() <<"currentMove : " + QString::number(currentMove);
@@ -1075,8 +1089,6 @@ void fenetre::handlerTour(){
 	}
 
 	//check si joueur veut abandonner, proposer match null
-
-
 }
 
 void fenetre::nextTurn(){

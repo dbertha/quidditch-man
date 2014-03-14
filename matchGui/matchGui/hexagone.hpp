@@ -78,6 +78,7 @@ class hexagone : public QGraphicsObject
         void select();
 		void selectForAction();
         void unselect();
+		void bloquerLeJoueur();
 
 		void isAGoal();
 
@@ -96,6 +97,7 @@ class hexagone : public QGraphicsObject
 		void isNonAccessible();
 
 		bool ifMark();
+		bool ifBlocked();
 
 
         //boudingRect => defnie la region frontiere de l'objet
@@ -120,6 +122,8 @@ class hexagone : public QGraphicsObject
 		int _markTypeBalle;// BLUDGER1 15, BLUDGER2 16, QUAFFLE 17
 
 		bool _ifGoal;
+
+		bool _blocked;
         bool _ifSelect;
 		bool _ifSelectForAction;
 

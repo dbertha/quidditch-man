@@ -6,6 +6,7 @@ hexagone::hexagone(int i, int j,int type, QGraphicsItem *parent) : QGraphicsObje
 	_ifLine(false),_ifDiagonalBasDroite(false),_ifDiagonalhautDroite(false),_ifForCatch(false),
 	_ifMarkForBludger(false), _ifMarkForQuaffle(false), _ifMarkForGoldenSnitch(false){
 	_ifSelectForAction=false;
+	_blocked=false;//note: un joueur bloquer ne peut etre debloquer que quand on redefini la case (setType)
 	//this->setCursor(QCursor(Qt::OpenHandCursor));//test pour changer le cursor
 	//setBoundingRegionGranularity(1);
 	//QObject::connect(this, SIGNAL(clicked()), qApp, SLOT(quit()));
@@ -63,6 +64,11 @@ void hexagone::dessinerHexagone(QPainter *painter){
 		if(_ifGoal){//si la case est un but
 			brush.setColor(_couleurFondGoal);
 		}
+	}
+
+	if(_blocked){
+		brush.setStyle(Qt::SolidPattern);
+		brush.setColor(Qt::gray);
 	}
 
 	QColor couleurBord=Qt::black;
@@ -226,6 +232,7 @@ QPointF hexagone::centreHexagon() const{
 //----------------------------------------------------------------------------------------------
 void hexagone::setType(int typeCase){
 	_typeCase = typeCase;
+	_blocked = false;
 	update();
 }
 int hexagone::getType(){
@@ -257,6 +264,11 @@ void hexagone::selectForAction(){
 
 void hexagone::unselect(){
 	_ifSelect = false;
+	update();
+}
+
+void hexagone::bloquerLeJoueur(){
+	_blocked = true;
 	update();
 }
 
@@ -345,6 +357,10 @@ bool hexagone::ifMark(){
 
 	return ( _ifAccesible||_ifLine || _ifDiagonalBasDroite || _ifDiagonalhautDroite ||
 			_ifForCatch || _ifMarkForBludger || _ifMarkForQuaffle ||_ifMarkForGoldenSnitch );
+}
+
+bool hexagone::ifBlocked(){
+	return _blocked;
 }
 
 //----------------------------------------------------------------------------------------------

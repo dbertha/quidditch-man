@@ -87,6 +87,12 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		QGridLayout *layoutConformi;
 		QLabel *textConfirm;
 		QPushButton *BoutonConfirm;
+		QPushButton *BoutonFinirTour;
+
+		QGridLayout *layoutChoixMatch;
+		QPushButton *BoutonAbandon;
+		QPushButton *BoutonMatchNul;
+
 
 		hexagone *caseJoueurSelect;
 		hexagone *caseSelect;
