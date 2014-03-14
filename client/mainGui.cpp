@@ -252,6 +252,7 @@ void MainGui::createMenu() {
         connect(listMgrsAction,SIGNAL(triggered()),this,SLOT(listMgrs()));
         auctionMenu=menuBar()->addMenu(tr("Auctions"));
         auctionMenu->addAction(listAuctionsAction);
+        connect(listAuctionsAction,SIGNAL(triggered()),this,SLOT(auctionsMenu()));
         playersMenu=menuBar()->addMenu(tr("Players"));
         playersMenu->addAction(listPlayersAction);
         connect(listPlayersAction,SIGNAL(triggered()),this,SLOT(listPlayers()));

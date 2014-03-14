@@ -778,17 +778,19 @@ void User::cmdHandler(SerializedObject *received) {
 				if (this==auction_->getAuctionCreator()) {
 					manager_->unlockPlayer(auction_->getPlayerName());
 				}
-				if (auction_->getLastBidder()==this) {
+				else if (auction_->getLastBidder()==this) {
 					resultOfAuction = -1;
 					if (manager_->getMoney()<auctionPrice) resultOfAuction = -2;
 					auctionWin(auction_->getManager(),auction_->getPlayer());
+				}
+				else {
+					calendar_->update();
+					DataBase::save(*manager_);
 				}
 			}
 			else {
 				resultOfAuction=1;
 			}
-			calendar_->update();
-			DataBase::save(*manager_);
 
 			if (auction_->getNbOfEndOfTurn()==auction_->getNumberOfBidders()) {
 				auction_->resetBidders();
