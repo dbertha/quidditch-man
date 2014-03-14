@@ -46,7 +46,7 @@ void User::cmdHandler(SerializedObject *received) {
 	int auctionPrice;
 	int elapsedTime;
 	int APGained;
-	int amount, price, currentPrice;
+	int amount, price, currentPrice,auctionTimeLeft;
 	ManagedPlayer tmpPlayer;
 	vector<int> infos;
 	vector<string> playersList;
@@ -565,15 +565,18 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 			//handle demand:
 			calendar_->update();
-			manager_->setActionPoints(manager_->getActionPoints()-AP_AUCTION);
-			DataBase::save(*manager_);
-			tmpPlayer = manager_->getPlayer(targetedPlayer);
-			if (tmpPlayer.isBlocked()) confirmation=false;
-			else {
-				manager_->lockPlayer(tmpPlayer.getFirstName()+" "+tmpPlayer.getLastName());
-				server_->createAuction(this,tmpPlayer,startingPrice);
-				confirmation=true;
+			if (manager_->getActionPoints()>=AP_AUCTION) {
+				manager_->setActionPoints(manager_->getActionPoints()-AP_AUCTION);
+				DataBase::save(*manager_);
+				tmpPlayer = manager_->getPlayer(targetedPlayer);
+				if (tmpPlayer.isBlocked()) confirmation=false;
+				else {
+					manager_->lockPlayer(tmpPlayer.getFirstName()+" "+tmpPlayer.getLastName());
+					server_->createAuction(this,tmpPlayer,startingPrice);
+					confirmation=true;
+				}
 			}
+			else confirmation=false;
 			answer.typeOfInfos = AUCTIONCREATION_CONFIRM;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
             sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
@@ -589,15 +592,17 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 			//handle demand:
 			calendar_->update();
-			manager_->setActionPoints(manager_->getActionPoints()-AP_ENTER_AUCTION);
-			DataBase::save(*manager_);
-			for (unsigned int i=0;i<server_->auctionsList_.size();++i) {
-				if (targetedAuction==server_->getAuctionID(i)) auction_ = server_->auctionsList_[i];
+			if (manager_->getActionPoints()>=AP_ENTER_AUCTION) {
+				manager_->setActionPoints(manager_->getActionPoints()-AP_ENTER_AUCTION);
+				DataBase::save(*manager_);
+				for (unsigned int i=0;i<server_->auctionsList_.size();++i) {
+					if (targetedAuction==server_->getAuctionID(i)) auction_ = server_->auctionsList_[i];
+				}
+				if (auction_==NULL) confirmation = false;
+				else confirmation = true;
+				//construct answer:
 			}
-			if (auction_==NULL) confirmation = false;
-			else confirmation = true;
-			//construct answer:
-
+			else confirmation=false;
 			answer.typeOfInfos = AUCTIONJOIN_CONFIRM;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
             sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
@@ -805,6 +810,20 @@ void User::cmdHandler(SerializedObject *received) {
 
 			answer.typeOfInfos = AUCTION_PRICE;
 			memcpy(answerPosition, &currentPrice, sizeof(currentPrice));
+            sendOnSocket(sockfd_, answer); 
+			break;	
+		}
+		case GET_AUCTION_TIME_LEFT : {
+			//no details to read : possible improvement : participation to several auctions at a same time. No.
+#ifdef __DEBUG
+			//std::cout<<"Montant de l'enchère demandé sur le socket "<<getSockfd()<<std::endl;
+#endif
+			//calendar_->update();
+			//DataBase::save(*manager_);
+			auctionTimeLeft = auction_->getTimeBeforeFirstTurn();
+
+			answer.typeOfInfos = AUCTION_TIME_LEFT;
+			memcpy(answerPosition, &auctionTimeLeft, sizeof(auctionTimeLeft));
             sendOnSocket(sockfd_, answer); 
 			break;	
 		}
