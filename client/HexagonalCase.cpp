@@ -74,8 +74,8 @@ void HexagonalCase::dessinerHexagone(QPainter *painter){
 	QColor couleurBord=Qt::black;
 	if(_ifSelectForAction){
 		couleurBord = Qt::green;
-
 	}
+
 
 	painter->setBrush(brush );
 	painter->setPen(QPen(couleurBord,2,Qt::SolidLine)); //defini le pinceaux qui dessine les contours

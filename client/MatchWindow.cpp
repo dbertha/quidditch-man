@@ -85,6 +85,7 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	layoutConformi->addWidget(BoutonConfirm,1,0,Qt::AlignTop);
 	layoutConformi->addWidget(BoutonFinirTour,2,0);
 	QObject::connect(BoutonConfirm,SIGNAL(clicked()),this,SLOT(handlerAction()));
+	QObject::connect(BoutonFinirTour,SIGNAL(clicked()),this,SLOT(handlerTourEnd()));
 	//*****************************************************************************************
 
 	//initialisation d'un layout pour organniser le Qlabel,la view, radio bouton,....
@@ -163,7 +164,11 @@ void MatchWindow::updateListeHexa(){
 //		coord = allPositions[i];
 		indexRow=allPositions[i].getLineOnMatrix();
 		indexCol=allPositions[i].getColOnMatrix();
-		ListeHexa[indexRow][indexCol]->setType(i);
+		if(ListeHexa[indexRow][indexCol]->getType()==FREE_SPACE){//1 balle et un joueur peuvent se supperposer
+			ListeHexa[indexRow][indexCol]->setType(i);
+		}
+
+
 	}
 	update();
 }
@@ -562,7 +567,7 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 				infoJoueur->setText("Atribut du joueur:\n Vitesse  : "
 									+ QString::number( attributs.attributes[SPEED]) +
 				"  Force:"+ QString::number( attributs.attributes[STRENGTH]) +
-				"\n Précision:"+ QString::number( attributs.attributes[PRECISION]) +
+				"\n Precision:"+ QString::number( attributs.attributes[PRECISION]) +
 				"  Reflexe:"+QString::number( attributs.attributes[REFLEX]) +
 				"\n Resistance:"+QString::number( attributs.attributes[RESISTANCE]) );
 
@@ -724,12 +729,18 @@ void MatchWindow::handlerAction(){
 
 void MatchWindow::handlerTour(){
 	//check si toutes action fait -> si oui, envoyer donner serveur, recup allPosition et mettre a jour
-	if(currentMove==7){//le joueur a fait tout c'est deplacement
+	if(currentMove==7 || BoutonFinirTour->isChecked()){//le joueur a fait tout c'est deplacement
 		qDebug()<<"toutes les actions sont entrées";
 		nextTurn();
 		endHandler();
 	}
+}
 
+void MatchWindow::handlerTourEnd(){//correction derniere minute pour gerer bouton fin tour
+	//check si toutes action fait -> si oui, envoyer donner serveur, recup allPosition et mettre a jour
+	qDebug()<<"FIN du tour provoquer par le joueur";
+	nextTurn();
+	endHandler();
 }
 
 void MatchWindow::nextTurn(){
@@ -750,6 +761,9 @@ void MatchWindow::nextTurn(){
 	//récupérer les positions
 	__client->getAllPositions();
     allPositions = __client->receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
+	//TODO: mieux gerer affichage
+	scoreEquipe->setText("\t score equipe 1 = "+QString::number(scoreTeam1) +"\n\t score equipe 2 = "+QString::number(scoreTeam2) );
+
 	//update affichage
 	resetListeHexa();
 	updateListeHexa();

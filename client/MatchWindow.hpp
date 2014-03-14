@@ -47,6 +47,7 @@ class MatchWindow : public QDialog // On hérite de QWidget //TODO : changer pou
 		void handlerChoixAction(bool);
 		void handlerAction();
 		void handlerTour();
+		void handlerTourEnd();//TODO:ameliorer - correction derniere minute pour gerer bouton fin tour
 		void pushesHandler();
 
     signals:
