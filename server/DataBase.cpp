@@ -23,10 +23,9 @@ using namespace std;
 void DataBase::save(Manager manager) {
 	string login = manager.getLogin();
 	string file;
-
+	cout<<"Saving "<<login<<endl;
 	file = "server/Saves/"+login+"/"+login+".txt";
 	saveManager(file,manager);
-	cout<<"saveManager done"<<endl;
 
 	string directory = "server/Saves/"+login+"/Players";
 	mkdir(directory.c_str(),0777);
@@ -47,17 +46,14 @@ void DataBase::save(Manager manager) {
 	for (int i=0;i<manager.getNumberOfPlayers();++i) {
 		try {
 			ManagedPlayer player = manager.getPlayer(i);
-			cout<<player.getFirstName()<<endl;
 			file = "server/Saves/"+login+"/Players/"+player.getFirstName()+player.getLastName()+".txt";
 			savePlayer(file,player);
 		} catch (const char err[]) {cout<<err<<endl;}
 	}
 
-	cout<<"savePlayers done"<<endl;
 	file = "server/Saves/"+login+"/Players/players.txt";
 	savePlayersList(file,manager.getPlayers());
 
-	cout<<"savePlayersList done"<<endl;
 	file = "server/Saves/"+login+"/buildings.txt";
 	saveBuildings(file,manager.getStadium(),manager.getTrainingCenter(),manager.getHospital(),manager.getFanShop(),manager.getPromotionCenter());
 
@@ -151,7 +147,6 @@ void DataBase::savePlayer(string file, ManagedPlayer player) {
 		cerr<<"Error while opening file\n";
 	}
 
-	cout<<"savePlayer"<<endl;
 	string toWrite;
 
 	toWrite = player.getFirstName();

@@ -42,7 +42,7 @@ int sendOnSocket(int socketfd, SerializedObject toSend){
         printf("%s\n", "SendOnSocket : Erreur dans l'envoi des données"); //TODO : sur le flux err
     }else{
 #ifdef __DEBUG
-    printf("%s\n", "SendOnSocket : Paquet envoyé");
+    //printf("%s\n", "SendOnSocket : Paquet envoyé");
 #endif
     }
     return result;

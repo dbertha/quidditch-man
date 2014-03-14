@@ -7,6 +7,7 @@ using namespace std; //TODO : rajouter tous les spécificateurs de namespace
 //TODO : solution sans thread ou bien passage du pointeur this au thread
 bool hasChosen;
 bool isBidder;
+int currentPrice;
 
 Client::Client(int sockfd, bool GUI): GUI_(GUI), sockfd_(sockfd), state_(INIT) {}
 
@@ -1260,8 +1261,17 @@ int Client::askForAuctionInfos(int auctionID){
 }
 
 int Client::getCurrentPrice(){
+    int result;
+    SerializedObject received = receiveOnSocket(sockfd_);
+    char * position = received.stringData;
+    //TODO : vérifier qu'il s'agit bien d'un message de confirmation
+    memcpy(&result,position, sizeof(result));
+    return result;
+}
+
+int Client::askCurrentPrice(){
     SerializedObject serialized;
-    serialized.typeOfInfos = GETCURRENTPRICE;
+    serialized.typeOfInfos = GET_AUCTION_PRICE;
     return sendOnSocket(sockfd_, serialized);
 }
 
@@ -1284,6 +1294,12 @@ int Client::receiveAuctionResult() {
     //TODO : vérifier qu'il s'agit bien d'un message de confirmation
     memcpy(&result,position, sizeof(result));
     return result;
+}
+
+int Client::startAuctionTurn(){
+    SerializedObject serialized;
+    serialized.typeOfInfos = START_AUCTION_TURN;
+    return sendOnSocket(sockfd_, serialized);
 }
 
 int Client::startPromotionCampaign(){
@@ -1345,13 +1361,12 @@ void *auctionTurn(void* data) {
 
 
   int choice;
-  cout<<"-----> ";
   cin>>choice;
 
   if (choice==1) {
     client->bid();
     int result = client->getConfirmation();
-    cout << "Bid done, waiting for the end of the turn. " << endl;
+    //cout << "Bid done, waiting for the end of the turn. " << endl;
     isBidder=true;
     hasChosen=true;
   }
@@ -1362,59 +1377,97 @@ void *auctionTurn(void* data) {
 
 }
 
+int timeTurn;
+void *auctionPrice(void* data) {
+
+  //int* sockfd = (int *)data;
+  Client *client = (Client *) data;
+    //TODO : si solution conservée, mutexes
+
+  for (int tic=0;tic<timeTurn-1;++tic){
+  //while (true) { //Bug de recv/send
+    client->askCurrentPrice();
+    int result = client->getCurrentPrice();
+    if (result>currentPrice) {
+        cout<<"BID DONE. Price is now "<<result<<" gold"<<endl;
+        currentPrice=result;
+    }
+    sleep(1);
+  }
+}
+
+
 void Client::mainAuction(int auctionID, int timeLeft) {
     //TODO : deux appels à receiveAuctionResult : bizarre
   hasChosen=false;
   isBidder=false;
+  timeTurn=timeLeft;
   int turn = 0;
-
-  pthread_t thread;
+  currentPrice=0;
+  this->askCurrentPrice();
+  currentPrice = this->getCurrentPrice();
+  pthread_t thread,thread2;
   int res = pthread_create(&thread, NULL, auctionTurn, (void*) this);
+  int res2 = pthread_create(&thread2, NULL, auctionPrice, (void*) this);
   sleep(timeLeft);
+  pthread_cancel(thread2);
   pthread_cancel(thread);
+  sleep(2);
   checkAuction();
   int result = receiveAuctionResult();
-  int price = receiveAuctionResult();
-  cout << "result : " << result << " price " << price << endl;
+  cout << "result : " << result << " price " << currentPrice << endl;
   if (result<0) {
     cout<<" -Congrats! You have won this auction"<<endl;
-    if (result==-1) cout<<" --- "<<price<<" gold will be transferred in exchange of the player"<<endl;
+    if (result==-1) cout<<" --- "<<currentPrice<<" gold will be transferred in exchange of the player"<<endl;
     else if (result==-2) {
-      cout<<" --- You don't have enough money to pay the "<<price<<" required";
+      cout<<" --- You don't have enough money to pay the "<<currentPrice<<" required";
       cout<<", so 3 percent of your money will be given to the owner of the player"<<endl;
     }
   }
   else if (result==0) {
-    cout<<" -Goodbye! You have left this auction"<<endl;
+    cout<<" -Auction is now over. You have not won. Goodbye !"<<endl;
   }
   else {
-    cout<<" -Next turn will start soon... The current price is "<<price<<endl;
-    sleep(10);
+    cout<<" -Next turn will start soon... The current price is "<<currentPrice<<endl;
+    sleep(8);
     turn+=1;
-
+    timeTurn=30;
     while ((result>0)&&(hasChosen)&&(isBidder)) {
+        //startAuctionTurn();
+        //getConfirmation();
         hasChosen=false;
         res = pthread_create(&thread, NULL, auctionTurn, (void*) this);
+        res2 = pthread_create(&thread2, NULL, auctionPrice, (void*) this);
         sleep(30);
+        pthread_cancel(thread2);
         pthread_cancel(thread);
+        sleep(2);
         cout<<" --- END OF TURN"<<endl;
         checkAuction();
         result = receiveAuctionResult();
-        price = receiveAuctionResult();
-        if ((!hasChosen)||(!isBidder)) {
-          cout<<" -Goodbye! You have left this auction"<<endl;
-        }
-        else if (result<0) {
+        cout << "result : " << result << " price " << currentPrice << endl;
+        //if ((!hasChosen)||(!isBidder)) {
+        //  cout<<" -Goodbye! You have left this auction"<<endl;
+        //}
+        if (result<0) {
           cout<<" -Congrats! You have won this auction"<<endl;
-          if (result==-1) cout<<" --- "<<price<<" gold will be transfered in exchange of the player"<<endl;
+          if (result==-1) cout<<" --- "<<currentPrice<<" gold will be transfered in exchange of the player"<<endl;
           else if (result==-2) {
-            cout<<" --- You don't have enough money to pay the "<<price<<" required";
+            cout<<" --- You don't have enough money to pay the "<<currentPrice<<" required";
             cout<<", so 3 percent of your money will be given to the owner of the player"<<endl;
           }
         }
+        else if (result==0) {
+            cout<<"Sorry, you've lost this auction"<<endl;
+        }
         else {
-          cout<<" -Next turn will start soon... The current price is "<<price<<endl;
-          sleep(10);
+            if ((!hasChosen)||(!isBidder)) {
+                cout<<" -Goodbye! You have left this auction"<<endl;
+            }
+            else {
+              cout<<" -Next turn will start soon... The current price is "<<currentPrice<<endl;
+              sleep(10);
+            }
         }
         turn+=1;
       } 
@@ -1439,7 +1492,6 @@ void Client::handleAuctions(){
                 cout<<" ---- Entering an auction costs "<<AP_ENTER_AUCTION<<" action points ----"<<endl;
                 cout<<"Do you want to join this auction ? [1 to enter, 0 to quit] \n -----> ";
                 int enterAuction;
-                cout<<" -----> ";
                 cin>>enterAuction;
                 if (enterAuction==1) {
                     joinAuction(auctionToInspect-1);

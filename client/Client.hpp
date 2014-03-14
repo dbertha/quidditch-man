@@ -73,6 +73,8 @@ public:
     //for the thread :
     int getConfirmation();
     int bid();
+    int getCurrentPrice();
+    int askCurrentPrice();
 
 private:
     bool GUI_;
@@ -82,6 +84,7 @@ private:
     int input_;
     char opponent_[10];
     fd_set FDSet_;
+    int currentAuctionPrice_;
 
     enum Status {INIT,ADMIN,FREE, AVAILABLE, MANAGERS_MENU, AUCTION_MENU, PLAYERS_MENU, BUILDINGS_MENU, \
     TOURNAMENTS_MENU, PLAYERSLIST_MENU, TRAINING_MENU, HEALING_MENU, \
@@ -163,10 +166,11 @@ private:
     std::vector<std::string> receiveAuctionsList();
     int joinAuction(int auctionID);
     int askForAuctionInfos(int auctionID);
-    int getCurrentPrice();
-    
+
+
     int checkAuction();
     int receiveAuctionResult();
+    int startAuctionTurn();
 
     int buyActionPoints(int amount);
     int getPriceForAP();
