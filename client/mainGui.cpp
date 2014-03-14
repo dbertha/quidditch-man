@@ -58,6 +58,8 @@ void MainGui::pushesHandler(){
             __client->answerMatchProposal(confirmation, playersInTeam);
             //~ answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
             if(__client->receiveMatchConfirmation() == MATCH_STARTING){
+                MatchWindow * matchWindow  = new MatchWindow(__client, 2, this);
+                matchWindow->show();
                 //~ //startMatch( 2); //invité a l'équipe 2
             }
             break;
@@ -90,6 +92,8 @@ void MainGui::pushesHandler(){
             //bloquant, l'adversaire doit avoir répondu aussi :
             numTeam = __client->receiveNumOfTeam();
             if(numTeam > 0){ //first to answer is the team 1
+                MatchWindow * matchWindow = new MatchWindow(__client, numTeam, this);
+                matchWindow->show();
                 //~ startMatch(numTeam);
             }
             break;
@@ -126,6 +130,7 @@ void MainGui::tournaments() {
 
 void MainGui::listMgrs() {
     ticker->hide();
+    __pushesNotifier->setEnabled(false);
     int res = choosePartner(__client,this);
     if (res==BAD_CONNECTION) badConnection();
     else if(res != NO_CHOICE){
@@ -148,6 +153,8 @@ void MainGui::listMgrs() {
         int confirmation = __client->receiveMatchConfirmation();
         //~ progress->setValue(1);
         if(confirmation == MATCH_STARTING){
+            MatchWindow * matchWindow = new MatchWindow(__client, 1, this);
+            matchWindow->show();
             //startMatch(1); //inviteur a l'équipe 1
         }else{
             QMessageBox msgBox;
@@ -156,6 +163,7 @@ void MainGui::listMgrs() {
         }
     }
     ticker->show();
+    __pushesNotifier->setEnabled(true);
 }
 
 void MainGui::buyAPMenu() {

@@ -18,6 +18,7 @@
 #include <QGroupBox>
 #include <QRadioButton>
 #include <QSocketNotifier>
+#include <QMessageBox>
 
 #include <QDebug> //permet de dispose d'un affichage dans console debug
 
@@ -34,9 +35,6 @@ class MatchWindow : public QWidget // On hérite de QWidget //TODO : changer pou
 	Q_OBJECT //vas permettre de def ces propres slot (public slots:) et signaux (signals:)
 
     public:
-		MatchWindow();//constructeur pour test
-		MatchWindow(HexagonalField,std::vector <PlayingPlayer>,std::vector <Ball>);
-		MatchWindow(int idMaTeam,std::vector <PlayingPlayer>,std::vector <Ball>);//constructeur de la MatchWindow
 		
 		//MatchWindow(int idMaTeam);
 		//final :
@@ -64,12 +62,6 @@ class MatchWindow : public QWidget // On hérite de QWidget //TODO : changer pou
 		int moves[7][4];
 		int currentMove;
 		std::vector<AxialCoordinates> allPositions;
-
-		typedef struct { //pas besoin de la classe complète
-			int attributes[5];
-			AxialCoordinates position;
-			int hasQuaffle;
-		} playerAttr;
 		playerAttr attributs;
 
 		int playerRole;
