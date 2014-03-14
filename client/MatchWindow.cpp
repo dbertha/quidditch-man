@@ -1,5 +1,8 @@
 #include "MatchWindow.hpp"
 
+
+#include "QMainWindow"
+#include "QDialog"
 //note: code pas du tout optimise/"modualiser"/"umliser", grosse phase de refactoring necessaire
 
 
@@ -9,7 +12,9 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QWidg
 	numMaTeam(numTeam), iHaveASelection(false),  scoreTeam1(0), scoreTeam2(0), winner(0), currentMove(0), 
 	__field(), __client(client), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd(),  QSocketNotifier::Read, this))
 {
+
 	//initialisation : 
+
 	for(int i = 0; i < 7; ++i){
 	  moves[i][0] = i;
 	  moves[i][1] = NO_SPECIAL_ACTION;
@@ -77,9 +82,13 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QWidg
 	BoutonConfirm = new QPushButton("OK");
 	BoutonConfirm->setMaximumSize ( 80, 30);
 	BoutonConfirm->setEnabled(false);
+	BoutonFinirTour = new QPushButton("terminer le tour");
+	BoutonFinirTour->setMaximumSize ( 110, 30);
+
 	textConfirm = new QLabel("Confirmer action:");
-	layoutConformi->addWidget(textConfirm,0,0);
-	layoutConformi->addWidget(BoutonConfirm,1,0);
+	layoutConformi->addWidget(textConfirm,0,0,Qt::AlignBottom);
+	layoutConformi->addWidget(BoutonConfirm,1,0,Qt::AlignTop);
+	layoutConformi->addWidget(BoutonFinirTour,2,0);
 	QObject::connect(BoutonConfirm,SIGNAL(clicked()),this,SLOT(handlerAction()));
 	//*****************************************************************************************
 
@@ -533,7 +542,8 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 		//verifier si je peux selectionner l'objet
 		if( ListeHexa[indexRow][indexCol]->getType() != -1){//si pas une case vide (j'ai un joueur)
 			qDebug() << "j'ai une nouvelle selection de qlq chose";
-			if( ((ListeHexa[indexRow][indexCol]->getType() / 7) +1) == numMaTeam){//je verif qu'il est a mon equipe
+			if( (((ListeHexa[indexRow][indexCol]->getType() / 7) +1) == numMaTeam)
+					&& !(ListeHexa[indexRow][indexCol]->ifBlocked()) ){//je verif qu'il est a mon equipe
 				qDebug() << "joueur de ma team trouver";
 				iHaveASelection = true;
 				caseJoueurSelect = ListeHexa[indexRow][indexCol];
@@ -657,6 +667,7 @@ void MatchWindow::handlerAction(){
 		moves[currentMove][1] = NO_SPECIAL_ACTION; //pas d'action spéciale
 		moves[currentMove][2] = caseSelect->getIAxial();
 		moves[currentMove][3] = caseSelect->getJAxial();
+		caseJoueurSelect->bloquerLeJoueur();
 	}
 	//--------------------------------------------------------------------------
 	if(lancer->isChecked()){
@@ -665,6 +676,7 @@ void MatchWindow::handlerAction(){
 		moves[currentMove][1] = NO_SPECIAL_ACTION;
 		moves[currentMove][2] = caseSelect->getIAxial();
 		moves[currentMove][3] = caseSelect->getJAxial();
+		caseJoueurSelect->bloquerLeJoueur();
 	}
 	//--------------------------------------------------------------------------
 	if(taper->isChecked()){
@@ -673,18 +685,21 @@ void MatchWindow::handlerAction(){
 		moves[currentMove][1] = NO_SPECIAL_ACTION;
 		moves[currentMove][2] = caseSelect->getIAxial();
 		moves[currentMove][3] = caseSelect->getJAxial();
+		caseJoueurSelect->bloquerLeJoueur();
 	}
 	//--------------------------------------------------------------------------
 	if( recupSouaffle->isChecked() ){
 		qDebug() << "    recupSouaffle choisi";
 		moves[currentMove][0] = caseJoueurSelect->getType();
 		moves[currentMove][1] = INTERCEPT_QUAFFLE;
+		caseJoueurSelect->bloquerLeJoueur();
 	}
 	//--------------------------------------------------------------------------
 	if( recupVifDOr->isChecked() ){
 		qDebug() << "    recupVifDOr choisi";
 		moves[currentMove][0] = caseJoueurSelect->getType();
 		moves[currentMove][1] = CATCH_GOLDENSNITCH;
+		caseJoueurSelect->bloquerLeJoueur();
 	}
 	qDebug() <<"Affichage Info dans Move: ";
 	qDebug() <<"currentMove : " + QString::number(currentMove);

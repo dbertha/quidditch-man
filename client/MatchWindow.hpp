@@ -83,6 +83,12 @@ class MatchWindow : public QWidget // On hérite de QWidget //TODO : changer pou
 		QGridLayout *layoutConformi;
 		QLabel *textConfirm;
 		QPushButton *BoutonConfirm;
+		QPushButton *BoutonFinirTour;
+
+		QGridLayout *layoutChoixMatch;
+		QPushButton *BoutonAbandon;
+		QPushButton *BoutonMatchNul;
+
 
 		HexagonalCase *caseJoueurSelect;
 		HexagonalCase *caseSelect;
