@@ -110,7 +110,7 @@ void AuctionWindow::changeLabel(){
     QString myText=QString("The current price is %1 gold").arg(currentPrice_);
     price->setText(myText);
 
-    nbOfBidders_=(currentPrice_-turnPrice_)/10;
+    nbOfBidders_=(currentPrice_-turnPrice_)/(startingPrice_/10);
     myText = QString("Bidders : %1").arg(nbOfBidders_);
     bidders->setText(myText);
     update();
