@@ -7,6 +7,7 @@ HexagonalCase::HexagonalCase(int i, int j,int type, QGraphicsItem *parent) : QGr
 	_ifMarkForBludger(false), _ifMarkForQuaffle(false), _ifMarkForGoldenSnitch(false){
 	_ifSelectForAction=false;
 	_blocked=false;//note: un joueur bloquer ne peut etre debloquer que quand on redefini la case (setType)
+	_contientBalleEnPlus=0;
 	//this->setCursor(QCursor(Qt::OpenHandCursor));//test pour changer le cursor
 	//setBoundingRegionGranularity(1);
 	//QObject::connect(this, SIGNAL(clicked()), qApp, SLOT(quit()));
@@ -66,6 +67,7 @@ void HexagonalCase::dessinerHexagone(QPainter *painter){
 		}
 	}
 
+
 	if(_blocked){
 		brush.setStyle(Qt::SolidPattern);
 		brush.setColor(Qt::gray);
@@ -79,6 +81,14 @@ void HexagonalCase::dessinerHexagone(QPainter *painter){
 
 	painter->setBrush(brush );
 	painter->setPen(QPen(couleurBord,2,Qt::SolidLine)); //defini le pinceaux qui dessine les contours
+
+	if(_contientBalleEnPlus==1){//bludger en plus sur case
+		dessinerBludger(painter);
+	}
+	if(_contientBalleEnPlus==2){//bludger en plus sur case
+		dessinerQuaffle(painter);
+	}
+
 
 	//2. dessiner l'HexagonalCase
 	painter->drawPolygon(caseBuilt());
@@ -233,6 +243,7 @@ QPointF HexagonalCase::centreHexagon() const{
 void HexagonalCase::setType(int typeCase){
 	_typeCase = typeCase;
 	_blocked = false;
+	_contientBalleEnPlus=0;
 	update();
 }
 int HexagonalCase::getType(){
@@ -248,6 +259,10 @@ int HexagonalCase::getJAxial(){
 int HexagonalCase::getTypeMarkBall(){
 	return _markTypeBalle;
 }
+void HexagonalCase::rajouterBalle(int nbr){
+	_contientBalleEnPlus=nbr;
+}
+
 //----------------------------------------------------------------------------------------------
 //Changement d'etat d'une case (selection ou pas, si c'est un goal, si case accessible,...)
 
