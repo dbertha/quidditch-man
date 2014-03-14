@@ -1,7 +1,8 @@
 # calls client and server Makefile
 all: client.out server.out clientGUI.out
 
-client.out: client/Client.cpp \
+client.out: Makefile.client \
+			client/Client.cpp \
 			client/Client.hpp \
 			client/ClientMain.cpp \
 			common/Coordinates.hpp \
@@ -13,7 +14,8 @@ client.out: client/Client.cpp \
 			common/NetworkBase.cpp
 	make -f Makefile.client
 	
-server.out: server/Auction.hpp \
+server.out: Makefile.server \
+			server/Auction.hpp \
 			server/Ball.hpp \
 			server/Broomstick.hpp \
 			server/Building.hpp \
@@ -63,7 +65,8 @@ server.out: server/Auction.hpp \
 			common/NetworkBase.cpp
 	make -f Makefile.server
 	
-clientGUI.out: client/clientMatchHandler.hpp \
+clientGUI.out: Makefile.GUI \
+	client/clientMatchHandler.hpp \
            client/loginDialog.hpp \
            client/mainGui.hpp \
            client/selectionDialog.hpp \
@@ -105,6 +108,15 @@ clientGUI.out: client/clientMatchHandler.hpp \
            client/MatchWindow.cpp \
            client/HexagonalCase.cpp
 	make -f Makefile.GUI
+	
+Makefile.client :
+	qmake client.pro -o Makefile.client
+	
+Makefile.server :
+	qmake server.pro -o Makefile.server
+	
+Makefile.GUI :
+	qmake clientGui.pro -o Makefile.GUI
 	
 clean:
 	make clean -f Makefile.server
