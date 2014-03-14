@@ -5,7 +5,7 @@
 
 
 
-fenetre::fenetre(Client * client, int numTeam) : QWidget(),
+fenetre::fenetre(Client * client, int numTeam, QWidget * parent) : QWidget(parent),
 	numMaTeam(numTeam), iHaveASelection(false),  scoreTeam1(0), scoreTeam2(0), winner(0), currentMove(0), 
 	__field(),_listeJoueur(),_listeBall(), __client(client), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd()))
 {
@@ -744,7 +744,45 @@ void fenetre::nextTurn(){
 void fenetre::pushesHandler(){}
 
 void fenetre::endHandler(){
+	bool over = false;
 	if(winner != 0){
-		
+		QString str = QString("Winner is team %1").arg(QString::number(winner);
+		QMessageBox::information(this,QMessageBox::tr("Match over !"),str,QMessageBox::Ok);
+		over = true;
+	}else{
+		int ret:
+		QMessageBox msgBox;
+        msgBox.setWindowTitle("Next turn starts !");
+        msgBox.setText(texte);
+        msgBox.setInformativeText("Do you want to continue the match (abort to forfeit, cancel to ask for a draw) ?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Abort | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        //QPushButton *connectButton = msgBox.addButton(tr("Forfeit"), QMessageBox::ActionRole);
+        //QPushButton *connectButton = msgBox.addButton(tr("AskForDraw"), QMessageBox::ActionRole);
+        ret = msgBox.exec();
+        if(ret == QMessageBox::Abort){
+			//forfeit
+			__pushesNotifier->setEnabled(false);
+			__client->sendForfeit();
+			QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("You forfeited"),QMessageBox::Ok);
+			over = true;
+		}else if(ret == QMessageBox::Cancel){
+			//ask for a draw
+			__pushesNotifier->setEnabled(false);
+			QMessageBox::information(this,QMessageBox::tr("About draw"),QString("You are considered as the looser if you ask for a draw during a tournament and it's accepted"),QMessageBox::Ok); 
+			//TODO : chance de revenir en arrière
+			
+			__client->sendDrawRequest();
+			int result = getConfirmation();
+			if(result == DRAWACCEPTED){
+				QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("Draw accepted"),QMessageBox::Ok);
+				over = true;
+            }else{
+				QMessageBox::information(this,QMessageBox::tr("Draw"),QString("Draw denied"),QMessageBox::Ok);
+            }
+		}
+	}
+	if(over){
+		close();
 	}
 }

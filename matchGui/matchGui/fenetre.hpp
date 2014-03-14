@@ -38,9 +38,9 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		fenetre(HexagonalField,std::vector <PlayingPlayer>,std::vector <Ball>);
 		fenetre(int idMaTeam,std::vector <PlayingPlayer>,std::vector <Ball>);//constructeur de la fenetre
 		
-		fenetre(int idMaTeam);
+		//fenetre(int idMaTeam);
 		//final :
-		//fenetre(Client * client, int idTeam);
+		fenetre(Client * client, int idTeam, QWidget * parent = 0);
 
     public slots:
 		void changerTexte(int,int);
