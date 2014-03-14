@@ -1,7 +1,0 @@
-HenryBarnes.txt
-NathanEdwards.txt
-NathanJames.txt
-NolanWood.txt
-BentleyReed.txt
-OwenBrooks.txt
-OwenSanders.txt
