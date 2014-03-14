@@ -1,3 +1,7 @@
+
+
+QMAKE_CXXFLAGS += -Wextra -std=c++11
+
 SOURCES += \
     main.cpp \
     fenetre.cpp \

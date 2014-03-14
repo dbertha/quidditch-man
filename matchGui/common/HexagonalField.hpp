@@ -52,8 +52,7 @@
 
 
 //TODO : affichage du vif d'or seulement si l'attrapeur de l'équipe est dans les environs
-//TODO : corriger defaut affichage avec unicodes
-//TODO : afficher les buts
+
 
 typedef int objectIndex_t;
 
@@ -68,6 +67,7 @@ public :
     void display();
     void display(AxialCoordinates selected, int distance);
     bool isFree(AxialCoordinates toTest);
+    void reset();
 };
 
 #endif

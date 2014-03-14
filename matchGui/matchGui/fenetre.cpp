@@ -1,172 +1,186 @@
 #include "fenetre.hpp"
 
-fenetre::fenetre() : QWidget()//on dit qu'on appelle le constructeur de QWidget (on peut lui passer des paramettre si besoin)
-{
-	//setFixedSize(500, 500);
-
-	texte = new QLabel("Zone txte \n blabla",this); //vas servir a afficher resultat
-
-    //création de la scene, zone principal où seront afficher les cases haxagonal
-    scene = new QGraphicsScene;
-    //def la taille de la scene
-    scene->setSceneRect(-200,-200,400,400); //(point x depart, point y depart, largeur,hauteur)
-    //ajout d'un point reperer au centre
-    //scene->addRect(QRect(-2, -2, 2, 2));
-
-    //création de la view qui vas contenir la scene
-    view = new QGraphicsView(scene);
-
-
-/*    //test ajout hexagone personnalisé unique
-    hexa = new hexagone(0,0,Qt::red);
-    scene->addItem(hexa);*/
-
-	ListeHexa[0][0] =new hexagone(0,0,-1);
-    scene->addItem(ListeHexa[0][0]);
-    QObject::connect(ListeHexa[0][0], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[0][1] = new hexagone(0,1,0);
-    scene->addItem(ListeHexa[0][1]);
-    QObject::connect(ListeHexa[0][1], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[1][0] = new hexagone(1,0,1);
-    scene->addItem(ListeHexa[1][0]);
-    QObject::connect(ListeHexa[1][0], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[1][1] = new hexagone(1,1,2);
-    scene->addItem(ListeHexa[1][1]);
-    QObject::connect(ListeHexa[1][1], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[0][2] = new hexagone(0,2,3);
-    scene->addItem(ListeHexa[0][2]);
-    QObject::connect(ListeHexa[0][2], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[1][2] = new hexagone(1,2,4);
-    scene->addItem(ListeHexa[1][2]);
-    QObject::connect(ListeHexa[1][2], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[2][2] = new hexagone(2,2,5);
-    scene->addItem(ListeHexa[2][2]);
-    QObject::connect(ListeHexa[2][2], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[2][0] = new hexagone(2,0,6);
-    scene->addItem(ListeHexa[2][0]);
-    QObject::connect(ListeHexa[2][0], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-	ListeHexa[2][1] = new hexagone(2,1,7);
-    scene->addItem(ListeHexa[2][1]);
-	scene->addRect(40,10,20,40);//test pour voir zone defini de boundingRect
-    QObject::connect(ListeHexa[2][1], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
-
-
-}
-
-fenetre::fenetre(HexagonalField field,std::vector <PlayingPlayer> vPlaying,std::vector <Ball> vBall) : QWidget(),
-	__field(field),_listeJoueur(vPlaying),_listeBall(vBall)
-{
-	//init a rajouter dans le constructeur avec juste int idMaTeam
-	iHaveASelection=false;
-	numMaTeam=1;
-
-	setFixedSize(800, 800);
-
-	//*****************************************************************************************
-	texte = new QLabel("Zone texte",this); //vas servir a afficher resultat
-
-	infoJoueur = new QLabel("Info sur le joueur selection \n nom, prenom, vitesse, force,....",this);
-	infoJoueur->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-	//*****************************************************************************************
-	//création de la scene, zone principal où seront afficher les cases haxagonal
-	scene = new QGraphicsScene;
-	//def la taille de la scene
-	scene->setSceneRect(-200,-200,400,400); //(point x depart, point y depart, largeur,hauteur)
-	//ajout d'un point reperer au centre
-	//scene->addRect(QRect(-2, -2, 2, 2));
-
-	//création de la view qui vas contenir la scene
-	view = new QGraphicsView(scene);
-
-	//*****************************************************************************************
-	//création box de Radio bouton pour les choix action d'un joueur
-	groupbox = new QGroupBox("Action possible:");
-
-	deplacer = new QRadioButton("Deplacement");
-	lancer = new QRadioButton("Lancer souaffle");
-	taper = new QRadioButton("Frapper le cognard");
-	recupSouaffle =  new QRadioButton("Tenter de récupérer le souaffle");
-
-
-
-	deplacer->setChecked(true);
-	deplacer->setEnabled(false);
-	lancer->setEnabled(false);
-	taper->setEnabled(false);
-	recupSouaffle->setEnabled(false);
-//	taper->setVisible(false);
-
-	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(deplacer);
-	vbox->addWidget(lancer);
-	vbox->addWidget(taper);
-	vbox->addWidget(recupSouaffle);
-
-	groupbox->setLayout(vbox);
-
-	//*****************************************************************************************
-
-	//initialisation d'un layout pour organniser le Qlabel,la view, radio bouton,....
-	layout = new QGridLayout;
-	layout->addWidget(texte);
-	layout->addWidget(view, 1, 0,1,2);//peut occuper 1 ligne et 2 colonne
-	layout->addWidget(infoJoueur,2,0);
-	layout->addWidget(groupbox,2,1);
-
-	this->setLayout(layout);
-
-//###############
-/*	std::vector<AxialCoordinates> allPositions;
-	getAllPositions();
-	allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);*/
-//###############
-
-	initFieldGuiWithHexagonalField();
-}
-
-fenetre::fenetre(int idMaTean,std::vector <PlayingPlayer> vPlaying,std::vector <Ball> vBall) : QWidget(),
-	__field(),_listeJoueur(vPlaying),_listeBall(vBall)
-{
-	setFixedSize(700, 700);
-
-	texte = new QLabel("Zone texte",this); //vas servir a afficher resultat
-
-	//création de la scene, zone principal où seront afficher les cases haxagonal
-	scene = new QGraphicsScene;
-	//def la taille de la scene
-	scene->setSceneRect(-200,-200,400,400); //(point x depart, point y depart, largeur,hauteur)
-	//ajout d'un point reperer au centre
-	//scene->addRect(QRect(-2, -2, 2, 2));
-
-	//création de la view qui vas contenir la scene
-	view = new QGraphicsView(scene);
-
-	//initialisation d'un layout pour organniser le Qlabel et la view
-	layout = new QGridLayout;
-	layout->addWidget(texte);
-	layout->addWidget(view, 1, 0);
-	this->setLayout(layout);
-
-	initFieldGuiWithHexagonalField();
-}
+//~ fenetre::fenetre() : QWidget()//on dit qu'on appelle le constructeur de QWidget (on peut lui passer des paramettre si besoin)
+//~ {
+	//~ //setFixedSize(500, 500);
+//~ 
+	//~ texte = new QLabel("Zone txte \n blabla",this); //vas servir a afficher resultat
+//~ 
+    //~ //création de la scene, zone principal où seront afficher les cases haxagonal
+    //~ scene = new QGraphicsScene;
+    //~ //def la taille de la scene
+    //~ scene->setSceneRect(-200,-200,400,400); //(point x depart, point y depart, largeur,hauteur)
+    //~ //ajout d'un point reperer au centre
+    //~ //scene->addRect(QRect(-2, -2, 2, 2));
+//~ 
+    //~ //création de la view qui vas contenir la scene
+    //~ view = new QGraphicsView(scene);
+//~ 
+//~ 
+//~ /*    //test ajout hexagone personnalisé unique
+    //~ hexa = new hexagone(0,0,Qt::red);
+    //~ scene->addItem(hexa);*/
+//~ 
+	//~ ListeHexa[0][0] =new hexagone(0,0,-1);
+    //~ scene->addItem(ListeHexa[0][0]);
+    //~ QObject::connect(ListeHexa[0][0], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
+//~ 
+	//~ ListeHexa[0][1] = new hexagone(0,1,0);
+    //~ scene->addItem(ListeHexa[0][1]);
+    //~ QObject::connect(ListeHexa[0][1], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
+//~ 
+	//~ ListeHexa[1][0] = new hexagone(1,0,1);
+    //~ scene->addItem(ListeHexa[1][0]);
+    //~ QObject::connect(ListeHexa[1][0], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
+//~ 
+	//~ ListeHexa[1][1] = new hexagone(1,1,2);
+    //~ scene->addItem(ListeHexa[1][1]);
+    //~ QObject::connect(ListeHexa[1][1], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
+//~ 
+	//~ ListeHexa[0][2] = new hexagone(0,2,3);
+    //~ scene->addItem(ListeHexa[0][2]);
+    //~ QObject::connect(ListeHexa[0][2], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
+//~ 
+	//~ ListeHexa[1][2] = new hexagone(1,2,4);
+    //~ scene->addItem(ListeHexa[1][2]);
+    //~ QObject::connect(ListeHexa[1][2], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
+//~ 
+	//~ ListeHexa[2][2] = new hexagone(2,2,5);
+    //~ scene->addItem(ListeHexa[2][2]);
+    //~ QObject::connect(ListeHexa[2][2], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
+//~ 
+	//~ ListeHexa[2][0] = new hexagone(2,0,6);
+    //~ scene->addItem(ListeHexa[2][0]);
+    //~ QObject::connect(ListeHexa[2][0], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
+//~ 
+	//~ ListeHexa[2][1] = new hexagone(2,1,7);
+    //~ scene->addItem(ListeHexa[2][1]);
+	//~ scene->addRect(40,10,20,40);//test pour voir zone defini de boundingRect
+    //~ QObject::connect(ListeHexa[2][1], SIGNAL(hexagoneSelect(int,int)), this, SLOT(changerTexte(int,int)));
+//~ 
+//~ 
+//~ }
+//~ 
+//~ fenetre::fenetre(HexagonalField field,std::vector <PlayingPlayer> vPlaying,std::vector <Ball> vBall) : QWidget(),
+	//~ __field(field),_listeJoueur(vPlaying),_listeBall(vBall)
+//~ {
+	//~ //init a rajouter dans le constructeur avec juste int idMaTeam
+	//~ iHaveASelection=false;
+	//~ numMaTeam=1;
+//~ 
+	//~ setFixedSize(800, 800);
+//~ 
+	//~ //*****************************************************************************************
+	//~ texte = new QLabel("Zone texte",this); //vas servir a afficher resultat
+//~ 
+	//~ infoJoueur = new QLabel("Info sur le joueur selection \n nom, prenom, vitesse, force,....",this);
+	//~ infoJoueur->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+	//~ //*****************************************************************************************
+	//~ //création de la scene, zone principal où seront afficher les cases haxagonal
+	//~ scene = new QGraphicsScene;
+	//~ //def la taille de la scene
+	//~ scene->setSceneRect(-200,-200,400,400); //(point x depart, point y depart, largeur,hauteur)
+	//~ //ajout d'un point reperer au centre
+	//~ //scene->addRect(QRect(-2, -2, 2, 2));
+//~ 
+	//~ //création de la view qui vas contenir la scene
+	//~ view = new QGraphicsView(scene);
+//~ 
+	//~ //*****************************************************************************************
+	//~ //création box de Radio bouton pour les choix action d'un joueur
+	//~ groupbox = new QGroupBox("Action possible:");
+//~ 
+	//~ deplacer = new QRadioButton("Deplacement");
+	//~ lancer = new QRadioButton("Lancer souaffle");
+	//~ taper = new QRadioButton("Frapper le cognard");
+	//~ recupSouaffle =  new QRadioButton("Tenter de récupérer le souaffle");
+//~ 
+//~ 
+//~ 
+	//~ deplacer->setChecked(true);
+	//~ deplacer->setEnabled(false);
+	//~ lancer->setEnabled(false);
+	//~ taper->setEnabled(false);
+	//~ recupSouaffle->setEnabled(false);
+//~ //	taper->setVisible(false);
+//~ 
+	//~ QVBoxLayout *vbox = new QVBoxLayout;
+	//~ vbox->addWidget(deplacer);
+	//~ vbox->addWidget(lancer);
+	//~ vbox->addWidget(taper);
+	//~ vbox->addWidget(recupSouaffle);
+//~ 
+	//~ groupbox->setLayout(vbox);
+//~ 
+	//~ //*****************************************************************************************
+//~ 
+	//~ //initialisation d'un layout pour organniser le Qlabel,la view, radio bouton,....
+	//~ layout = new QGridLayout;
+	//~ layout->addWidget(texte);
+	//~ layout->addWidget(view, 1, 0,1,2);//peut occuper 1 ligne et 2 colonne
+	//~ layout->addWidget(infoJoueur,2,0);
+	//~ layout->addWidget(groupbox,2,1);
+//~ 
+	//~ this->setLayout(layout);
+//~ 
+//~ //###############
+//~ /*	std::vector<AxialCoordinates> allPositions;
+	//~ getAllPositions();
+	//~ allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);*/
+//~ //###############
+//~ 
+	//~ initFieldGuiWithHexagonalField();
+//~ }
+//~ 
+//~ fenetre::fenetre(int idMaTean,std::vector <PlayingPlayer> vPlaying,std::vector <Ball> vBall) : QWidget(),
+	//~ __field(),_listeJoueur(vPlaying),_listeBall(vBall)
+//~ {
+	//~ setFixedSize(700, 700);
+//~ 
+	//~ texte = new QLabel("Zone texte",this); //vas servir a afficher resultat
+//~ 
+	//~ //création de la scene, zone principal où seront afficher les cases haxagonal
+	//~ scene = new QGraphicsScene;
+	//~ //def la taille de la scene
+	//~ scene->setSceneRect(-200,-200,400,400); //(point x depart, point y depart, largeur,hauteur)
+	//~ //ajout d'un point reperer au centre
+	//~ //scene->addRect(QRect(-2, -2, 2, 2));
+//~ 
+	//~ //création de la view qui vas contenir la scene
+	//~ view = new QGraphicsView(scene);
+//~ 
+	//~ //initialisation d'un layout pour organniser le Qlabel et la view
+	//~ layout = new QGridLayout;
+	//~ layout->addWidget(texte);
+	//~ layout->addWidget(view, 1, 0);
+	//~ this->setLayout(layout);
+//~ 
+	//~ initFieldGuiWithHexagonalField();
+//~ }
 
 fenetre::fenetre(int numTeam) : QWidget(),
-	numMaTeam(numTeam),__field(),_listeJoueur(),_listeBall()
+	numMaTeam(numTeam), nbActions(0), __allPositions(), iHaveASelection(false), 
+	scoreTeam1(0), scoreTeam2(0), winner(0), __field(),_listeJoueur(),_listeBall()
 {
+	std::cout << "taille allPositions : " << __allPositions.size() << std::endl;
 	//*!!!!!!!! a deplacer dans constructeur dans liste initialisation
-	scoreTeam1 = 0;
-	scoreTeam2 = 0;
-	winner = 0;
-	iHaveASelection=false;
-
+	//~ scoreTeam1 = 0;
+	//~ scoreTeam2 = 0;
+	//~ winner = 0;
+	//~ iHaveASelection=false;
+	//initialisation de la matrice des mouvements : liste de mouvements vides
+	std::cout << "taille allPositions : " << __allPositions.size() << std::endl;
+	std::cout << "Initialisation moves " << std::endl;
+	for(int i = 0; i < 7; ++i){
+		__moves[i][0] = i;
+		__moves[i][1] = NO_SPECIAL_ACTION;
+		__moves[i][2] = 10000; //sentinelle : mouvement vide
+		__moves[i][3] = 10000;
+	}
+	std::cout << "Initialisation moves terminée " << std::endl;
+	std::cout << "taille allPositions : " << __allPositions.size() << std::endl;
+	std::cout << "taille listJoueur : " << _listeJoueur.size() << std::endl;
+	
 	setFixedSize(800, 800);
 
 	//*****************************************************************************************
@@ -195,7 +209,7 @@ fenetre::fenetre(int numTeam) : QWidget(),
 	recupSouaffle =  new QRadioButton("Tenter de récupérer le souaffle");
 	recupVifDOr = new QRadioButton("Tenter d'attraper le vif d'or");
 
-
+	std::cout << "Activation boutons" << std::endl;
 	deplacer->setChecked(true);
 	deplacer->setEnabled(false);
 	lancer->setEnabled(false);
@@ -222,6 +236,7 @@ fenetre::fenetre(int numTeam) : QWidget(),
 	//*****************************************************************************************
 
 	//initialisation d'un layout pour organniser le Qlabel,la view, radio bouton,....
+	std::cout << "Activation layout" << std::endl;
 	layout = new QGridLayout;
 	layout->addWidget(texte);
 	layout->addWidget(view, 1, 0,1,2);//peut occuper 1 ligne et 2 colonne
@@ -254,7 +269,9 @@ fenetre::fenetre(int numTeam) : QWidget(),
 			#define BLUDGER1 15
 			#define BLUDGER2 16
 			#define QUAFFLE 17 */
+	std::cout << "Construction positions" << std::endl;
 	allPositions.push_back(AxialCoordinates(-8,0));//TEAM1_KEEPER
+	std::cout << "Première position" << std::endl;
 	allPositions.push_back(AxialCoordinates(0,1));//TEAM1_SEEKER deplacer a coté vif d'or
 	allPositions.push_back(AxialCoordinates(0,-6));
 	allPositions.push_back(AxialCoordinates(3,0));
@@ -273,9 +290,23 @@ fenetre::fenetre(int numTeam) : QWidget(),
 	allPositions.push_back(AxialCoordinates(0,-4));//Bludger2
 	allPositions.push_back(AxialCoordinates(2,-3));//Quaffle
 //###################################################################
-
-	initListeHexa();
-	updateListeHexa();
+	//-------David : à faire à chaque mise à jour de allPositions si besoin de field
+	std::cout << "On fait le reset" << std::endl;
+	__field.reset();
+	std::cout << "Fin reset" << std::endl;
+	//TODO : méthode de field :
+    for(unsigned int i = 0; i < allPositions.size(); ++i){
+		if(__field.getOccupant(allPositions[i]) == FREE_SPACE){
+			__field.setOccupant(allPositions[i], i);
+        }else{
+			//TODO : gérer superpositions
+		}
+    }
+    std::cout << "On met à jour l'affichage" << std::endl;
+    //------
+    //TODO : soit se passer complétement de field, soit l'utiliser aussi dans update
+	initListeHexa(); //besoin de field
+	updateListeHexa(); //pas besoin de field
 }
 
 void fenetre::initListeHexa(){
@@ -284,8 +315,8 @@ void fenetre::initListeHexa(){
 	int indexRow;
 	int indexCol;
 	//crée les hexagone selon ce qu'il doivent contenir et les connectes a la fenetre (this)
-	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){
-		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){
+	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){ //index de la diag
+		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){ //index de la ligne
 			idOccupant=__field.getOccupant(AxialCoordinates(indexRowAxial,indexColAxial));
 			indexRow=AxialCoordinates(indexRowAxial,indexColAxial).getLineOnMatrix();
 			indexCol=AxialCoordinates(indexRowAxial,indexColAxial).getColOnMatrix();
@@ -299,7 +330,6 @@ void fenetre::initListeHexa(){
 	}
 
 	//defini les case qui sont des goal
-	//bizarre de devoir inverser DIAG et LINE
 	indexRow=AxialCoordinates(GOAL_SIDE1_DIAG,GOAL_SIDE1_LINE).getLineOnMatrix();
 	indexCol=AxialCoordinates(GOAL_SIDE1_DIAG,GOAL_SIDE1_LINE).getColOnMatrix();
 	ListeHexa[indexRow][indexCol]->isAGoal();
@@ -327,18 +357,20 @@ void fenetre::updateListeHexa(){
 	update();
 }
 
+//redondant avec initListHexa : laquelle garder ?
 void fenetre::initFieldGuiWithHexagonalField(){
 	//vas pourcourir tout le HexagonalField _fieldMatrice pour crée des hexagone correspondant
 	// on part du principe que le point (0,0) de hexagonalFiel _fieldMatrice est au centre de la matrice
 	// on parcours donc de -tailleMax/2 a tailleMax/2 +1 sur les lignes et colonnes
 	// on se sert de AxialCoordinates() pour traduire ces coord dans un system "classique"
+	//TODO : mettre à jour __field à la réception des positions
 //	qDebug()<< "affiche test for axialCoord";
 	int idOccupant;
 	int indexRow;
 	int indexCol;
 	//crée les hexagone selon ce qu'il doivent contenir et les connectes a la fenetre (this)
-	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){
-		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){
+	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){ //index de la diag
+		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){ //index de la ligne
 //			qDebug()<<"--- row puis Col puis val a cette posi";
 //			qDebug()<< indexRowAxial;
 //			qDebug()<< indexColAxial;
@@ -362,7 +394,6 @@ void fenetre::initFieldGuiWithHexagonalField(){
 	}
 
 	//defini les case qui sont des goal
-	//bizarre de devoir inverser DIAG et LINE
 	indexRow=AxialCoordinates(GOAL_SIDE1_DIAG,GOAL_SIDE1_LINE).getLineOnMatrix();
 	indexCol=AxialCoordinates(GOAL_SIDE1_DIAG,GOAL_SIDE1_LINE).getColOnMatrix();
 	ListeHexa[indexRow][indexCol]->isAGoal();
@@ -372,6 +403,7 @@ void fenetre::initFieldGuiWithHexagonalField(){
 	ListeHexa[indexRow][indexCol]->isAGoal();
 }
 
+//testing only :
 void fenetre::initHexagonalFieldWithDefine(){
 	//vas crée un hexagonalField qui pourra etre utiliser par initFieldGuiWithHexagonalField()
 
@@ -505,7 +537,7 @@ void fenetre::marquerCaseAccessibleDepuis(int rowAxial, int colAxial, int maxDis
 	//on vas comparer la distance entre le pointDepart et toutes les occases et marquer celle qui sont accesible
 	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){
 		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){
-			if( pointDepart.getDistanceTo(AxialCoordinates(indexRowAxial,indexColAxial)) <= maxDistance){
+			if( pointDepart.getDistanceTo(AxialCoordinates(indexRowAxial,indexColAxial)) <= maxDistance){ //TODO : optimiser
 				//marquage
 				indexRow=AxialCoordinates(indexRowAxial,indexColAxial).getLineOnMatrix();
 				indexCol=AxialCoordinates(indexRowAxial,indexColAxial).getColOnMatrix();
@@ -810,6 +842,9 @@ void fenetre::handlerMove(int iAxial,int jAxial){
 //	if(iHaveASelection){//object deja selectionné
 	if(false){
 		//verif si peut deplacer, faire action, ...
+		//TODO : construire moves[4][7], compter le nombre d'actions déjà réalisées
+		//TODO bouton pour finir le tour
+		//nextTurn()
 	}else{//aucune selection
 		//verifier si je peux selectionner l'objet
 		if( ListeHexa[indexRow][indexCol]->getType() != -1){//si pas une case vide (j'ai un joueur)
@@ -909,7 +944,7 @@ void fenetre::handlerChoixAction(bool){
 		qDebug() <<attributs.attributes[STRENGTH];
 		if(allPositions[BLUDGER1].getDistanceTo(AxialCoordinates(caseJoueurSelect->getIAxial(),caseJoueurSelect->getJAxial())) < 2)
 			marquerFrappe(allPositions[BLUDGER1].getDiagAxis(),allPositions[BLUDGER1].getLineAxis(),attributs.attributes[STRENGTH]);
-		if(allPositions[BLUDGER2].getDistanceTo(AxialCoordinates(caseJoueurSelect->getIAxial(),caseJoueurSelect->getJAxial())) < 2)
+		else if(allPositions[BLUDGER2].getDistanceTo(AxialCoordinates(caseJoueurSelect->getIAxial(),caseJoueurSelect->getJAxial())) < 2)
 			marquerFrappe(allPositions[BLUDGER2].getDiagAxis(),allPositions[BLUDGER2].getLineAxis(),attributs.attributes[STRENGTH]);
 	}
 
@@ -928,4 +963,22 @@ void fenetre::handlerChoixAction(bool){
 
 
 
+}
+
+
+void fenetre::nextTurn(){
+	//sendMoves
+	//getConfirmation
+	
+	//reset :
+	nbActions = 0;
+	for(int i = 0; i < 7; ++i){
+		__moves[i][0] = i;
+		__moves[i][1] = NO_SPECIAL_ACTION;
+		__moves[i][2] = 10000; //sentinelle : mouvement vide
+		__moves[i][3] = 10000;
+	}
+	//récupérer les positions
+	//update affichage
+	//tester si fin de tour (recevoir d'éventuelles notifications de forfait ou match nul par le serveur)
 }
