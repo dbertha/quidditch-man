@@ -20,7 +20,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-int User::endOfAuctionTurn_=0;
 
 
 User::User(Server * server, MatchesHandler *matchesHandler, int sockfd, int userID): state_(INIT), server_(server), __matchesHandler(matchesHandler), sockfd_(sockfd), userId_(userID), manager_(NULL), calendar_(NULL), auction_(NULL) {
@@ -655,6 +654,9 @@ void User::cmdHandler(SerializedObject *received) {
 					auctionsList.push_back(intToString(server_->getAuctionTimeLeft(i)));
 					auctionsList.push_back(intToString(server_->getAuctionStartingPrice(i)));
 				}
+				else {
+					server_->auctionsList_[i]->endAuction();
+				}
 			}
 			//construct answer 
 			answer.typeOfInfos = AUCTIONSLIST;
@@ -761,10 +763,7 @@ void User::cmdHandler(SerializedObject *received) {
 #ifdef __DEBUG
 			std::cout<<"Tour d'enchère fini sur le socket "<<getSockfd()<<std::endl;
 #endif
-			//++endOfAuctionTurn_;
 			auction_->endOfTurnAsked();
-			std::cout<<endOfAuctionTurn_<<endl;
-			std::cout<<"Bidders : "<<auction_->getNumberOfBidders();
 			calendar_->update();
 			DataBase::save(*manager_);
 			isFinished = auction_->isAuctionFinished();

@@ -81,7 +81,6 @@ private:
 	Calendar* calendar_;
 	Auction* auction_;
     int **__moves;
-    static int endOfAuctionTurn_;
     struct tm timeOfStart_;
 };
 

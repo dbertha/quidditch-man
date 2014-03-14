@@ -1289,12 +1289,6 @@ int Client::receiveAuctionResult() {
     return result;
 }
 
-int Client::startAuctionTurn(){
-    SerializedObject serialized;
-    serialized.typeOfInfos = START_AUCTION_TURN;
-    return sendOnSocket(sockfd_, serialized);
-}
-
 int Client::startPromotionCampaign(){
     SerializedObject serialized;
     char * position = serialized.stringData;

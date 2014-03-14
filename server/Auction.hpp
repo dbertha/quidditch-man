@@ -28,6 +28,7 @@ class Auction {
  public:
 
  	Auction(User* creator, ManagedPlayer player, int startingPrice, int ID);
+ 	void endAuction();
 
  	User* getAuctionCreator();
  	Manager* getManager();

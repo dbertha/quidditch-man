@@ -14,6 +14,12 @@ startingPrice_(startingPrice), currentPrice_(startingPrice), currentTurn_(0), au
     instant_=*localtime(&secondes);
 }
 
+void Auction::endAuction() {
+	try {
+		getManager()->unlockPlayer(getPlayerName());
+	} catch (const char err[]) {}
+}
+
 User* Auction::getAuctionCreator() {return auctionCreator_;}
 Manager* Auction::getManager() {return auctionCreator_->getManager();}
 User* Auction::getLastBidder() {return lastBidder_;}

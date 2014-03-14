@@ -173,7 +173,6 @@ public :
 
     int checkAuction();
     int receiveAuctionResult();
-    int startAuctionTurn();
 
     int buyActionPoints(int amount);
     int getPriceForAP();
