@@ -3,7 +3,7 @@
 #include "../common/Defines.hpp"
 #include "selectionDialog.hpp"
 #include "Client.hpp"
-//#include "auctionsDialog.hpp"
+#include "AuctionsDialog.hpp"
 //#include "common/NetworkInterface.hpp"
 
 

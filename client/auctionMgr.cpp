@@ -20,12 +20,10 @@ int chooseAuction(Client * client, QWidget *parent) {
     if (selectionDialog->exec()==selectionDialog->Accepted) {
         pos = selectionDialog->getPosition();
         std::cout<<pos+1<<"eme enchere selectionne"<<std::endl;
-        //PlayersDialog *playersDialog = new PlayersDialog(client,pos,parent);
-        //strncpy(username,playersList[2*pos].c_str(),USERNAME_LENGTH);
-        //strcat(username," ");
-        //strncat(username,playersList[2*pos+1].c_str(),USERNAME_LENGTH);
-        //playersDialog->setWindowTitle(username);
-        //playersDialog->exec();
+        AuctionsDialog *auctionsDialog = new AuctionsDialog(client,pos,atoi(auctionsList[pos*4+3].c_str()),parent);
+        line=auctionsList[pos*4+1]+" - Starting price : "+auctionsList[pos*4+3];
+        auctionsDialog->setWindowTitle(line.c_str());
+        auctionsDialog->exec();
     }
     return pos;
 }

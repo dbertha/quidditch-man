@@ -20,7 +20,9 @@ HEADERS += client/clientMatchHandler.hpp \
            client/tournaments.hpp \
     client/buyAPDialog.hpp \
     client/freeAPDialog.hpp \
-    client/auctionMgr.hpp
+    client/auctionMgr.hpp \
+    client/AuctionsDialog.hpp \
+    client/auctionWindow.hpp
 
 SOURCES += client/clientMatchHandler.cpp \
            client/loginDialog.cpp \
@@ -38,5 +40,7 @@ SOURCES += client/clientMatchHandler.cpp \
            client/tournaments.cpp \
     client/buyAPDialog.cpp \
     client/freeAPDialog.cpp \
-    client/auctionMgr.cpp
+    client/auctionMgr.cpp \
+    client/AuctionsDialog.cpp \
+    client/auctionWindow.cpp
 
