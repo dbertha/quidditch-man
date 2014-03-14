@@ -17,6 +17,7 @@
 #include <QGraphicsPolygonItem>
 #include <QGroupBox>
 #include <QRadioButton>
+#include <QSocketNotifier>
 
 #include <QDebug> //permet de dispose d'un affichage dans console debug
 
@@ -36,8 +37,10 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		fenetre();//constructeur pour test
 		fenetre(HexagonalField,std::vector <PlayingPlayer>,std::vector <Ball>);
 		fenetre(int idMaTeam,std::vector <PlayingPlayer>,std::vector <Ball>);//constructeur de la fenetre
-
+		
 		fenetre(int idMaTeam);
+		//final :
+		//fenetre(Client * client, int idTeam);
 
     public slots:
 		void changerTexte(int,int);
@@ -58,7 +61,7 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		int winner;
 		int moves[7][4];
 		int currentMove;
-		std::vector<AxialCoordinates> allPositions, __allPositions;
+		std::vector<AxialCoordinates> allPositions;
 
 		typedef struct { //pas besoin de la classe complète
 			int attributes[5];
@@ -92,11 +95,13 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
         hexagone *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
 
 		HexagonalField __field;
+		//----------à supprimer
 		std::vector <PlayingPlayer> _listeJoueur;
 		std::vector <Ball> _listeBall;
 
 		std::vector <PlayingPlayer> __players;
 		std::vector <Ball> __balls;
+		//---------
 
 
 		void initFieldGuiWithHexagonalField();
@@ -116,8 +121,15 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		void marquerAttraperVifDOr(int iAxial,int jAxial);
 
 		bool ifNotOut(int iAxial, int jAxial);
-
-//		void nextTurn();
+		
+		//à activer quand on aura reçu le client en paramètre :
+		//void nextTurn();
+		//Client * __client;
+		//QSocketNotifier * __forfeitAndDrawNotifier;
+		
+		
+		
+		
 //        AxialCoordinates coord;
 //    QPushButton *m_bouton;
 //    QLCDNumber *m_lcd;

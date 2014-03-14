@@ -163,6 +163,7 @@ fenetre::fenetre(int idMaTean,std::vector <PlayingPlayer> vPlaying,std::vector <
 fenetre::fenetre(int numTeam) : QWidget(),
 	numMaTeam(numTeam),__field(),_listeJoueur(),_listeBall()
 {
+	//initialisation : __client(client), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd())
 	//*!!!!!!!! a deplacer dans constructeur dans liste initialisation
 	scoreTeam1 = 0;
 	scoreTeam2 = 0;
@@ -1034,10 +1035,13 @@ void fenetre::handlerAction(){
 	qDebug() <<"ligne destination : " +QString::number( moves[currentMove][3]);
 	currentMove++;
 }
-/*
+
 void fenetre::nextTurn(){
+	
 	//sendMoves
+	__client->sendMoves(moves);
 	//getConfirmation
+	__client->getConfirmation(); //Attention, bloquant si adversaire n'a pas encore répondu
 
 	//reset :
 	nbActions = 0;
@@ -1048,6 +1052,10 @@ void fenetre::nextTurn(){
 		__moves[i][3] = 10000;
 	}
 	//récupérer les positions
+	__client->getAllPositions();
+    allPositions = receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
 	//update affichage
+	resetListeHexa();
+	updateListeHexa();
 	//tester si fin de tour (recevoir d'éventuelles notifications de forfait ou match nul par le serveur)
 }*/
