@@ -1250,12 +1250,14 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
     \includegraphics[scale=0.4]{uml/Diagrammededeploiement.png}
     \caption{Diagramme de composants}
     \end{figure}
+    Lors de la phase suivante, nous veillerons à dissocier le client (réseau) de la gestion des affichages et entrées clavier du jeu en terminal.
     \begin{figure}[H]
     \center
     \includegraphics[scale=0.4]{uml/GUIComponents.png}
     \caption{Diagramme simplifié de composants pour la partie graphique uniquement}
     \end{figure}
 \newpage
+
 \section{Le client graphique} \label{diag-client-graphique}
 \subsection{Le login}
 Le client graphique s'ouvre sur un dialogue de login permettant à l'utilisateur de se connecter au serveur,
@@ -1350,6 +1352,29 @@ Par contre, si l'utilisateur est un administrateur, il peut créer un nouveau to
 \emph{(Comme le nombre de données à introduire est limité,
 nous avons eu recours ici, comme pour la vente d'un joueur, à une suite de questions,
 plutôt qu'à la construction d'une classe adhoc héritant de "QDialog")}.
+
+\section{Fonctionnalités futures envisagées}
+  \subsection{Log des actions au cours d'un match}
+    Lors de la gestion des déplacements au cours d'un match, le serveur enregistrerait 
+    toutes les actions intervenues (collisions, tentative d'attraper le vif d'or,...).
+    Il enverrait ce détail au client qui l'afficherait. Ainsi l'utilisateur aurait une
+    meilleure compréhension de ce qui se déroule entre deux tours.
+  \subsection{Ajouter des possibilités à l'administrateur}
+    L'administrateur disposerait d'un plus large panel d'options, dont par exemple :
+    \begin{itemize}
+      \item Bannir, bloquer, ou supprimer un compte utilisateur.
+      \item La création d'un compte utilisateur avec des caractéristiques de départ choisies.
+      \item La possibilité de créer un joueur avec des caractéristiques choisies 
+        et de l'attribuer à un utilisateur ou de le mettre aux enchères.
+      \item La possibilité de récupérer les données du serveur afin d'en faire une sauvegarde locale.
+    \end{itemize}
+  \subsection{Des matchs d’entraînement}
+    À l'aide d'une intelligence artificielle basique, permettre à l'utilisateur
+    de jouer un match d'entraînement, ne rapportant pas d'argent mais
+    augmentant les capacités des joueurs en fonction de leurs succès.
+    
+  
+
 
 %\chapter{Index des termes utilisés}
 %  Contiendra, au moins, toutes les entrées du glossaire (avec les numéros des pages correspondantes).
