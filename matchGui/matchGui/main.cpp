@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
 
 //	fenetre test3(1,__players,__balls);
 //	test3.show();
-
+	
 	fenetre test4(1);
 	test4.show();
 

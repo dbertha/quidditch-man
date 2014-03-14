@@ -245,7 +245,7 @@ void hexagone::unselect(){
 	_ifSelect = false;
 	update();
 }
-
+//TODO : changer les noms, cela ressemble à des getters plutot qu'à des setter
 void hexagone::isAGoal(){
 	_ifGoal = true;
 	update();

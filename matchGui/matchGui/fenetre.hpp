@@ -17,8 +17,10 @@
 #include <QRadioButton>
 
 #include <QDebug> //permet de dispose d'un affichage dans console debug
+#include <vector>
 
 #include "hexagone.hpp"
+#include <iostream>
 
 #include "Coordinates.hpp" //permet d'avoir MATRIX_SIZE et systeme de coord
 #include "HexagonalField.hpp"
@@ -47,13 +49,16 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 //    void agrandissementMaxV2(int);//test perso pour renvoyé des valeur
 
     private:
-		int numMaTeam;
+		int numMaTeam, nbActions;
 		bool iHaveASelection;
-
-		int scoreTeam1 = 0;
-		int scoreTeam2 = 0;
-		int winner = 0;
-		std::vector<AxialCoordinates> allPositions;
+		//TODO : ne pas initialiser ici
+		int scoreTeam1;
+		int scoreTeam2;
+		int winner;
+		
+		
+		std::vector<AxialCoordinates> allPositions, __allPositions;
+		int __moves[4][7];
 
 		typedef struct { //pas besoin de la classe complète
 			int attributes[5];
@@ -81,6 +86,7 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
         hexagone *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
 
 		HexagonalField __field;
+		//TODO : n'a pas à connaître PlayingPlayer et Ball
 		std::vector <PlayingPlayer> _listeJoueur;
 		std::vector <Ball> _listeBall;
 
@@ -105,6 +111,8 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		void marquerAttraperVifDOr(int iAxial,int jAxial);
 
 		bool ifNotOut(int iAxial, int jAxial);
+		
+		void nextTurn();
 //        AxialCoordinates coord;
 //    QPushButton *m_bouton;
 //    QLCDNumber *m_lcd;
