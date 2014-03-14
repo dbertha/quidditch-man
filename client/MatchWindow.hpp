@@ -21,7 +21,7 @@
 
 #include <QDebug> //permet de dispose d'un affichage dans console debug
 
-#include "hexagone.hpp"
+#include "HexagonalCase.hpp"
 
 #include "../common/Coordinates.hpp" //permet d'avoir MATRIX_SIZE et systeme de coord
 #include "../common/HexagonalField.hpp"
@@ -29,18 +29,18 @@
 #include "Client.hpp" //network
 
 
-class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
+class MatchWindow : public QWidget // On hérite de QWidget //TODO : changer pour QDialog
 {
 	Q_OBJECT //vas permettre de def ces propres slot (public slots:) et signaux (signals:)
 
     public:
-		fenetre();//constructeur pour test
-		fenetre(HexagonalField,std::vector <PlayingPlayer>,std::vector <Ball>);
-		fenetre(int idMaTeam,std::vector <PlayingPlayer>,std::vector <Ball>);//constructeur de la fenetre
+		MatchWindow();//constructeur pour test
+		MatchWindow(HexagonalField,std::vector <PlayingPlayer>,std::vector <Ball>);
+		MatchWindow(int idMaTeam,std::vector <PlayingPlayer>,std::vector <Ball>);//constructeur de la MatchWindow
 		
-		//fenetre(int idMaTeam);
+		//MatchWindow(int idMaTeam);
 		//final :
-		fenetre(Client * client, int idTeam, QWidget * parent = 0);
+		MatchWindow(Client * client, int idTeam, QWidget * parent = 0);
 
     public slots:
 		void changerTexte(int,int);
@@ -92,9 +92,9 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		QLabel *textConfirm;
 		QPushButton *BoutonConfirm;
 
-		hexagone *caseJoueurSelect;
-		hexagone *caseSelect;
-        hexagone *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
+		HexagonalCase *caseJoueurSelect;
+		HexagonalCase *caseSelect;
+        HexagonalCase *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
 
 		HexagonalField __field;
 

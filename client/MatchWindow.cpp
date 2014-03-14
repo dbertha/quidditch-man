@@ -1,11 +1,11 @@
-#include "fenetre.hpp"
+#include "MatchWindow.hpp"
 
 //note: code pas du tout optimise/"modualiser"/"umliser", grosse phase de refactoring necessaire
 
 
 
 
-fenetre::fenetre(Client * client, int numTeam, QWidget * parent) : QWidget(parent),
+MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QWidget(parent),
 	numMaTeam(numTeam), iHaveASelection(false),  scoreTeam1(0), scoreTeam2(0), winner(0), currentMove(0), 
 	__field(),_listeJoueur(),_listeBall(), __client(client), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd()))
 {
@@ -102,22 +102,22 @@ fenetre::fenetre(Client * client, int numTeam, QWidget * parent) : QWidget(paren
 	updateListeHexa();
 }
 
-void fenetre::initListeHexa(){
+void MatchWindow::initListeHexa(){
 	//initialise un terrain vide avec juste des goal
 	int idOccupant;
 	int indexRow;
 	int indexCol;
-	//crée les hexagone selon ce qu'il doivent contenir et les connectes a la fenetre (this)
+	//crée les HexagonalCase selon ce qu'il doivent contenir et les connectes a la MatchWindow (this)
 	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){ //index de la diag
 		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){ //index de la ligne
 			idOccupant=__field.getOccupant(AxialCoordinates(indexRowAxial,indexColAxial));
 			indexRow=AxialCoordinates(indexRowAxial,indexColAxial).getLineOnMatrix();
 			indexCol=AxialCoordinates(indexRowAxial,indexColAxial).getColOnMatrix();
-			ListeHexa[indexRow][indexCol] =new hexagone(indexRowAxial,indexColAxial,idOccupant);
+			ListeHexa[indexRow][indexCol] =new HexagonalCase(indexRowAxial,indexColAxial,idOccupant);
 			scene->addItem(ListeHexa[indexRow][indexCol]);
-			QObject::connect(ListeHexa[indexRow][indexCol], SIGNAL(hexagoneSelect(int,int))
+			QObject::connect(ListeHexa[indexRow][indexCol], SIGNAL(caseSelect(int,int))
 					, this, SLOT(changerTexte(int,int)));
-			QObject::connect(ListeHexa[indexRow][indexCol], SIGNAL(hexagoneSelect(int,int))
+			QObject::connect(ListeHexa[indexRow][indexCol], SIGNAL(caseSelect(int,int))
 					, this, SLOT(handlerMove(int,int)));
 		}
 	}
@@ -132,10 +132,10 @@ void fenetre::initListeHexa(){
 	ListeHexa[indexRow][indexCol]->isAGoal();
 }
 
-void fenetre::resetListeHexa(){
+void MatchWindow::resetListeHexa(){
 	int indexRow;
 	int indexCol;
-	//crée les hexagone selon ce qu'il doivent contenir et les connectes a la fenetre (this)
+	//crée les HexagonalCase selon ce qu'il doivent contenir et les connectes a la MatchWindow (this)
 	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){ //index de la diag
 		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){ //index de la ligne
 			indexRow=AxialCoordinates(indexRowAxial,indexColAxial).getLineOnMatrix();
@@ -145,8 +145,8 @@ void fenetre::resetListeHexa(){
 	}
 }
 
-void fenetre::updateListeHexa(){
-	//mets a jout les case hexagones selon un vecteur allPositions
+void MatchWindow::updateListeHexa(){
+	//mets a jout les case HexagonalCases selon un vecteur allPositions
 	// allPosition[0]  contient les coord axial du joueur 0 de l'equipe 1 (TEAM1_KEEPER)
 	// les autre allPosition[x] vont dans le meme ordre qu'il sont decrit dans le fichier definie.hpp
 //	AxialCoordinates coord;
@@ -165,7 +165,7 @@ void fenetre::updateListeHexa(){
 
 
 
-void fenetre::changerTexte(int i,int j){
+void MatchWindow::changerTexte(int i,int j){
 	int indexRow=AxialCoordinates(i,j).getLineOnMatrix();
 	int indexCol=AxialCoordinates(i,j).getColOnMatrix();
 
@@ -180,7 +180,7 @@ void fenetre::changerTexte(int i,int j){
 
 }
 
-void fenetre::marquerCaseAccessibleDepuis(int rowAxial, int colAxial, int maxDistance){
+void MatchWindow::marquerCaseAccessibleDepuis(int rowAxial, int colAxial, int maxDistance){
 	//crée le point de depart, celui par rapport au quel ont vas estimer la distance
 	AxialCoordinates pointDepart(rowAxial,colAxial);
 
@@ -205,7 +205,7 @@ void fenetre::marquerCaseAccessibleDepuis(int rowAxial, int colAxial, int maxDis
 	update();
 }
 
-void fenetre::demarquerToutesCase(){
+void MatchWindow::demarquerToutesCase(){
 	//vas marquer toutes les casses non Accesible
 	//NOTE: pas optimal, faut s'arranger pour sauvergarder une liste de case qui ont
 	//  été marquer accesible pour les dermarquer facilement
@@ -232,7 +232,7 @@ void fenetre::demarquerToutesCase(){
 }
 
 //TODO *!!!!!!!!!!!!!!!!!!! A refactorer, marquerFrappe + marquerLancer
-void fenetre::marquerFrappe(int iAxialDepart,int jAxialDepart,int maxDistance,int idBudlger){
+void MatchWindow::marquerFrappe(int iAxialDepart,int jAxialDepart,int maxDistance,int idBudlger){
 	qDebug()<<"Debut du marquage pour frappe, i,j,max";
 	qDebug()<<iAxialDepart;
 	qDebug()<<jAxialDepart;
@@ -343,7 +343,7 @@ void fenetre::marquerFrappe(int iAxialDepart,int jAxialDepart,int maxDistance,in
 
 }
 
-void fenetre::marquerLancer(int iAxialDepart,int jAxialDepart,int maxDistance){
+void MatchWindow::marquerLancer(int iAxialDepart,int jAxialDepart,int maxDistance){
 	qDebug()<<"Debut du marquage pour Lancer, i,j,max";
 	qDebug()<<iAxialDepart;
 	qDebug()<<jAxialDepart;
@@ -454,14 +454,14 @@ void fenetre::marquerLancer(int iAxialDepart,int jAxialDepart,int maxDistance){
 
 }
 
-void fenetre::marquerAttraperSouaffle(int iAxial,int jAxial){
+void MatchWindow::marquerAttraperSouaffle(int iAxial,int jAxial){
 	int indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
 	int indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
 	ListeHexa[indexRow][indexCol]->isMarkForQuaffle();
 	ListeHexa[indexRow][indexCol]->isForCatch();
 
 }
-void fenetre::marquerAttraperVifDOr(int iAxial,int jAxial){
+void MatchWindow::marquerAttraperVifDOr(int iAxial,int jAxial){
 	int indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
 	int indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
 	ListeHexa[indexRow][indexCol]->isMarkForGoldenSnitch();
@@ -471,7 +471,7 @@ void fenetre::marquerAttraperVifDOr(int iAxial,int jAxial){
 
 
 
-bool fenetre::ifNotOut(int iAxial,int jAxial){
+bool MatchWindow::ifNotOut(int iAxial,int jAxial){
 	int indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
 	int indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
 
@@ -488,7 +488,7 @@ bool fenetre::ifNotOut(int iAxial,int jAxial){
 
 //------------------------------------------------------------------------------------------------------------
 //gestion des events
-void fenetre::handlerMove(int iAxial,int jAxial){
+void MatchWindow::handlerMove(int iAxial,int jAxial){
 	int indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
 	int indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
 	caseSelect = ListeHexa[indexRow][indexCol];
@@ -546,7 +546,7 @@ void fenetre::handlerMove(int iAxial,int jAxial){
 //*!!!!!!!!!!!! playerRole qui vas de 0 à 6
 //*!!!!!!!!!!!! et selectedPlayerID = playerRole + 7 si numMaTeam = 2 (de 0 à 6 ou de 7 à 13)
 
-				playerRole = caseJoueurSelect->getType() %7; //playerRole est un attribut de la fenetre pour pas se perdre
+				playerRole = caseJoueurSelect->getType() %7; //playerRole est un attribut de la MatchWindow pour pas se perdre
 				qDebug() << "id du joueur";
 				qDebug() << caseJoueurSelect->getType();
 				qDebug() << "role du joueur";
@@ -599,7 +599,7 @@ void fenetre::handlerMove(int iAxial,int jAxial){
 	}
 }
 
-void fenetre::handlerChoixAction(bool){
+void MatchWindow::handlerChoixAction(bool){
 	qDebug() << "--Bouton ratio clicker";
 	demarquerToutesCase();
 	//--------------------------------------------------------------------------
@@ -638,7 +638,7 @@ void fenetre::handlerChoixAction(bool){
 	}
 }
 
-void fenetre::handlerAction(){
+void MatchWindow::handlerAction(){
 	qDebug() <<"action confirmer => création du mouve et check si joueur tous bouger ou si veux arreter";
 	//RAPPEL :
 	//moves[][0] : indice de l'objet concerné
@@ -709,7 +709,7 @@ void fenetre::handlerAction(){
 }
 
 
-void fenetre::handlerTour(){
+void MatchWindow::handlerTour(){
 	//check si toutes action fait -> si oui, envoyer donner serveur, recup allPosition et mettre a jour
 	if(currentMove==7){//le joueur a fait tout c'est deplacement
 		qDebug()<<"toutes les actions sont entrées";
@@ -719,7 +719,7 @@ void fenetre::handlerTour(){
 
 }
 
-void fenetre::nextTurn(){
+void MatchWindow::nextTurn(){
 	//sendMoves
 	__client->sendMoves(moves);
 	//getConfirmation
@@ -741,7 +741,7 @@ void fenetre::nextTurn(){
 	updateListeHexa();
 }
 
-void fenetre::pushesHandler(){
+void MatchWindow::pushesHandler(){
 	bool over = false;
 	__pushesNotifier->setEnabled(false);
 	SerializedObject received = receiveOnSocket(sockfd_);
@@ -773,7 +773,7 @@ void fenetre::pushesHandler(){
 	__pushesNotifier->setEnabled(true);
 }
 
-void fenetre::endHandler(){
+void MatchWindow::endHandler(){
 	bool over = false;
 	if(winner != 0){
 		QString str = QString("Winner is team %1").arg(QString::number(winner);

@@ -20,10 +20,10 @@
 #define pBasGauche baseCoord[4]
 #define pHautGauche baseCoord[5]
 
-//const static car commune a toutes les hexagone
+//const static car commune a toutes les HexagonalCase
 //attention: l'axe y est inversé (augmente en allant vers la bas)
 
-//construit un hexagone grace a 6 point, l'hexagone peut etre vu comme un triangle (partie superieur) + un rectangle + triangle retourné
+//construit un HexagonalCase grace a 6 point, l'HexagonalCase peut etre vu comme un triangle (partie superieur) + un rectangle + triangle retourné
 static const QPointF baseCoord[6] =
 	{QPointF(  0.0, -15.0), //0. pointe haute
 	 QPointF( 10.0, -7.0), //1. haut-droite
@@ -34,10 +34,10 @@ static const QPointF baseCoord[6] =
 
 static const qreal hauteur = pBas.y() - pHaut.y() ;
 static const qreal largeur = pHautDroite.x() - pHautGauche.x() ;
-//hauteurTiers: utilise pour le decalage des hexagones par rapport a l'axe vertical
+//hauteurTiers: utilise pour le decalage des HexagonalCases par rapport a l'axe vertical
 //  on prend pas en conte la hauteur d'un des "triangle"
 static const qreal hauteurTiers = pBas.y() - pHautDroite.y() ;
-//hauteurCentral: hauteur du rectangle central inscrit dans l'hexagone
+//hauteurCentral: hauteur du rectangle central inscrit dans l'HexagonalCase
 static const qreal hauteurCentral = pBasDroite.y() - pHautDroite.y() ;
 
 //permet de quantifier le decalage subit par un haxagone le long de l'axe horizontal
@@ -58,12 +58,12 @@ static const QColor _couleurGoldenSnitch=Qt::yellow;
 static const QColor _couleurBludger=Qt::darkRed;
 
 
-class hexagone : public QGraphicsObject
+class HexagonalCase : public QGraphicsObject
 {
     Q_OBJECT //vas permettre de def ces propres slot et signaux
 
     public:
-        hexagone(int i = 0, int j = 0,int type=FREE_SPACE, QGraphicsItem *parent = 0);
+        HexagonalCase(int i = 0, int j = 0,int type=FREE_SPACE, QGraphicsItem *parent = 0);
 
         //paint => comment dessiner l'objet
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
@@ -107,7 +107,7 @@ class hexagone : public QGraphicsObject
         void changerCouleur();
 
     signals:
-		void hexagoneSelect(int,int);
+		void caseSelect(int,int);
 
     protected:
         void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -145,7 +145,7 @@ class hexagone : public QGraphicsObject
 		void dessinerGoldenSnitch(QPainter *painter);
 		void dessinerBludger(QPainter *painter);
 
-        QPolygonF hexagoneBuilt() const;//hexagone pre-fabriquer
+        QPolygonF caseBuilt() const;//HexagonalCase pre-fabriquer
         QRectF rectangleInterne() const;
         QPointF centreHexagon() const;
 
