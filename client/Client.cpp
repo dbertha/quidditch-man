@@ -1289,6 +1289,21 @@ int Client::receiveAuctionResult() {
     return result;
 }
 
+int Client::askAuctionTimeLeft(){
+    SerializedObject serialized;
+    serialized.typeOfInfos = GET_AUCTION_TIME_LEFT;
+    return sendOnSocket(sockfd_, serialized);
+}
+int Client::getAuctionTimeLeft(){
+    int result;
+    SerializedObject received = receiveOnSocket(sockfd_);
+    char * position = received.stringData;
+    //TODO : vérifier qu'il s'agit bien d'un message de confirmation
+    memcpy(&result,position, sizeof(result));
+    return result;
+}
+
+
 int Client::startPromotionCampaign(){
     SerializedObject serialized;
     char * position = serialized.stringData;
@@ -1483,7 +1498,12 @@ void Client::handleAuctions(){
                 if (enterAuction==1) {
                     joinAuction(auctionToInspect-1);
                     int joinResult = getConfirmation();
-                    mainAuction(auctionToInspect-1,atoi(timeLeft.c_str()));
+                    if (joinResult==1) {
+                        askAuctionTimeLeft();
+                        int auctionTimeLeft=getAuctionTimeLeft();
+                        mainAuction(auctionToInspect-1,auctionTimeLeft);
+                    }
+                    else cout<<" ---- You don't have enough action points to join this auction"<<endl;
                 }
             }
         }
@@ -1504,7 +1524,7 @@ void Client::handleAuctions(){
                 if (startingPrice>0) {
                     sellPlayer(sellPlayerChoice-1,startingPrice);
                     bool sellingResult = getConfirmation(); //always true
-                    if (!sellingResult) cout<<" ----- The player is blocked and cannot be selled right now"<<endl;
+                    if (!sellingResult) cout<<" ----- The player is blocked or you don't have enough action points"<<endl;
                     else cout<<" ----- Auction started !"<<endl;
                     sellPlayerChoice=ABORT;
                 }

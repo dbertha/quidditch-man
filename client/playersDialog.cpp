@@ -8,13 +8,13 @@ PlayersDialog::PlayersDialog(Client * client, const int player, QWidget *parent)
     vAxe<<"Speed"<<"Strength"<<"Precision"<<"Reflex"<<"Resistance";
     buildingsModel->setAxes(hAxe,vAxe);
     loadedData.resize(vAxe.length());
-
+    //uses a model-view pattern with a custom BuildingsModel model
     tableView = new QTableView(this);
     tableView->setModel(buildingsModel);
     tableView->setAlternatingRowColors(true);
     selectionModel = tableView->selectionModel();
     nbPlayers=money=nbFans=actionPoints=0;
-    getInfo();
+    getInfo();// gets all infos about the player
     QString str=QString("Life = %1 (max = %2) - Estimated value = %3 gold").arg(playerInfos[13]).arg(playerInfos[4]).arg(playerInfos[14]);
     lifeValueLabel = new QLabel(str);
     mainLayout = new QVBoxLayout;
@@ -37,9 +37,10 @@ PlayersDialog::PlayersDialog(Client * client, const int player, QWidget *parent)
             cancelButton= new QPushButton(tr("Cancel"));
             bottomLayout = new QHBoxLayout;
             bottomLayout->addWidget(trainButton);
-            bottomLayout->addWidget(healButton);
+            if (playerInfos[13]<playerInfos[4]) bottomLayout->addWidget(healButton);
+            //this button is only needed if life is lesser than maximum
             bottomLayout->addWidget(sellButton);
-            bottomLayout->addWidget(broomstickButton);
+//            bottomLayout->addWidget(broomstickButton);
             bottomLayout->addWidget(cancelButton);
             connect(trainButton, SIGNAL(clicked()), this, SLOT(train()));
             connect(healButton, SIGNAL(clicked()), this, SLOT(heal()));
@@ -99,7 +100,8 @@ void PlayersDialog::select(const int action) {
             if (actionPoints<AP_AUCTION) break;
             bool ok;
             int price = QInputDialog::getInt(this,tr("New auction"),
-                    tr("starting price"),0,0,999999999,1,&ok);
+                    tr("starting price"),0,0,playerInfos[14],1,&ok);
+                    //starting price is limited by estimated value
             if (ok) {
                 if(__client->sellPlayer(player_,price)==0) return badConnection();
                 if (__client->getConfirmation()) {

@@ -174,6 +174,9 @@ public :
     int checkAuction();
     int receiveAuctionResult();
 
+    int askAuctionTimeLeft();
+    int getAuctionTimeLeft();
+
     int buyActionPoints(int amount);
     int getPriceForAP();
 

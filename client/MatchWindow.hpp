@@ -17,27 +17,30 @@
 #include <QGraphicsPolygonItem>
 #include <QGroupBox>
 #include <QRadioButton>
+#include <QSocketNotifier>
 
 #include <QDebug> //permet de dispose d'un affichage dans console debug
 
-#include "hexagone.hpp"
+#include "HexagonalCase.hpp"
 
-#include "Coordinates.hpp" //permet d'avoir MATRIX_SIZE et systeme de coord
-#include "HexagonalField.hpp"
-#include "PlayingPlayer.hpp"
-#include "Ball.hpp"
+#include "../common/Coordinates.hpp" //permet d'avoir MATRIX_SIZE et systeme de coord
+#include "../common/HexagonalField.hpp"
+
+#include "Client.hpp" //network
 
 
-class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
+class MatchWindow : public QWidget // On hérite de QWidget //TODO : changer pour QDialog
 {
 	Q_OBJECT //vas permettre de def ces propres slot (public slots:) et signaux (signals:)
 
     public:
-		fenetre();//constructeur pour test
-		fenetre(HexagonalField,std::vector <PlayingPlayer>,std::vector <Ball>);
-		fenetre(int idMaTeam,std::vector <PlayingPlayer>,std::vector <Ball>);//constructeur de la fenetre
-
-		fenetre(int idMaTeam);
+		MatchWindow();//constructeur pour test
+		MatchWindow(HexagonalField,std::vector <PlayingPlayer>,std::vector <Ball>);
+		MatchWindow(int idMaTeam,std::vector <PlayingPlayer>,std::vector <Ball>);//constructeur de la MatchWindow
+		
+		//MatchWindow(int idMaTeam);
+		//final :
+		MatchWindow(Client * client, int idTeam, QWidget * parent = 0);
 
     public slots:
 		void changerTexte(int,int);
@@ -45,6 +48,7 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		void handlerChoixAction(bool);
 		void handlerAction();
 		void handlerTour();
+		void pushesHandler();
 
     signals:
 		void checkTour();
@@ -59,7 +63,7 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		int winner;
 		int moves[7][4];
 		int currentMove;
-		std::vector<AxialCoordinates> allPositions, __allPositions;
+		std::vector<AxialCoordinates> allPositions;
 
 		typedef struct { //pas besoin de la classe complète
 			int attributes[5];
@@ -94,16 +98,12 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 		QPushButton *BoutonMatchNul;
 
 
-		hexagone *caseJoueurSelect;
-		hexagone *caseSelect;
-        hexagone *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
+		HexagonalCase *caseJoueurSelect;
+		HexagonalCase *caseSelect;
+        HexagonalCase *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
 
 		HexagonalField __field;
-		std::vector <PlayingPlayer> _listeJoueur;
-		std::vector <Ball> _listeBall;
 
-		std::vector <PlayingPlayer> __players;
-		std::vector <Ball> __balls;
 
 
 		void initFieldGuiWithHexagonalField();
@@ -125,7 +125,12 @@ class fenetre : public QWidget // On hérite de QWidget (IMPORTANT)
 
 		bool ifNotOut(int iAxial, int jAxial);
 
+		void endHandler();
 		void nextTurn();
+		Client * __client;
+		QSocketNotifier * __forfeitAndDrawNotifier;
+		
+
 //        AxialCoordinates coord;
 //    QPushButton *m_bouton;
 //    QLCDNumber *m_lcd;
