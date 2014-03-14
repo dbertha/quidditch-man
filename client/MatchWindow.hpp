@@ -5,6 +5,7 @@
 
 #include <QApplication>
 #include <QWidget>
+#include <QDialog>
 #include <QPushButton>
 //#include <QLCDNumber>
 //#include <QSlider>
@@ -30,7 +31,7 @@
 #include "Client.hpp" //network
 
 
-class MatchWindow : public QWidget // On hérite de QWidget //TODO : changer pour QDialog
+class MatchWindow : public QDialog // On hérite de QWidget //TODO : changer pour QDialog
 {
 	Q_OBJECT //vas permettre de def ces propres slot (public slots:) et signaux (signals:)
 

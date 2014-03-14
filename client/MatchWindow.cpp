@@ -1,14 +1,9 @@
 #include "MatchWindow.hpp"
 
 
-#include "QMainWindow"
-#include "QDialog"
 //note: code pas du tout optimise/"modualiser"/"umliser", grosse phase de refactoring necessaire
 
-
-
-
-MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QWidget(parent),
+MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDialog(parent),
 	numMaTeam(numTeam), iHaveASelection(false),  scoreTeam1(0), scoreTeam2(0), winner(0), currentMove(0), 
 	__field(), __client(client), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd(),  QSocketNotifier::Read, this))
 {

@@ -2,7 +2,8 @@ include (common.pri)
 TEMPLATE = app
 TARGET = clientGui.out
 DEPENDPATH += . client common
-
+QT += widgets
+DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 
 # Input
 HEADERS += client/clientMatchHandler.hpp \

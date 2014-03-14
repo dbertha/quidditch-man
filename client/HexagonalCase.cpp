@@ -267,7 +267,7 @@ void HexagonalCase::unselect(){
 	update();
 }
 
-void hexagone::bloquerLeJoueur(){
+void HexagonalCase::bloquerLeJoueur(){
 	_blocked = true;
 	update();
 }
@@ -359,7 +359,7 @@ bool HexagonalCase::ifMark(){
 			_ifForCatch || _ifMarkForBludger || _ifMarkForQuaffle ||_ifMarkForGoldenSnitch );
 }
 
-bool hexagone::ifBlocked(){
+bool HexagonalCase::ifBlocked(){
 	return _blocked;
 }
 
