@@ -1,6 +1,6 @@
 #include "loginDialog.hpp"
 
-LoginDialog::LoginDialog(int sockfd, QWidget *parent): sockfd_(sockfd), QDialog(parent)
+LoginDialog::LoginDialog(Client * client, QWidget *parent): QDialog(parent), __client(client)
 {
     label = new QLabel(tr("User Name"));
     lineEdit = new QLineEdit;
@@ -81,8 +81,8 @@ void LoginDialog::loginClicked()
                     else {//on tente le login
                         strncpy(username,userName.toAscii().data(),USERNAME_LENGTH);
                         strncpy(password,password1.toAscii().data(),PASSWORD_LENGTH);
-                        if(sendLoginToServer(sockfd_,username,password)!=0) {
-                            role=getConfirmation(sockfd_);
+                        if(__client->sendLoginToServer(username,password)!=0) {
+                            role=__client->getConfirmation();
                              if (role) accept();
                              else {
                                  errorMessageDialog->showMessage(
@@ -96,13 +96,15 @@ void LoginDialog::loginClicked()
                 if (password1==text) {//on tente l'enregistrement
                     strncpy(username,userName.toAscii().data(),USERNAME_LENGTH);
                     strncpy(password,password1.toAscii().data(),PASSWORD_LENGTH);
-                    if(sendNewManagerToServer(sockfd_,username,password)!=0)
-                        if (getConfirmation(sockfd_)) accept();
+                    if(__client->sendNewManagerToServer(username,password)!=0){
+                        role=__client->getConfirmation();
+                        if (role == NORMAL_LOGIN) accept();
                         else {
                             errorMessageDialog->showMessage(
                                 tr("User name already registred."));
                             init();
                         }
+                    }
                 }
                 else {
                     std::cout<<"pswd "<<text.toStdString()<<std::endl;

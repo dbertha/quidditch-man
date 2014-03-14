@@ -2,7 +2,9 @@
 
 //constructeur:
 hexagone::hexagone(int i, int j,int type, QGraphicsItem *parent) : QGraphicsObject(parent),
-	_typeCase(type),_indiceI(i),_indiceJ(j),_ifGoal(false),_ifSelect(false){
+	_typeCase(type),_indiceI(i),_indiceJ(j),_ifGoal(false),_ifSelect(false),_ifAccesible(false),
+	_ifLine(false),_ifDiagonalBasDroite(false),_ifDiagonalhautDroite(false),_ifForCatch(false),
+	_ifMarkForBludger(false), _ifMarkForQuaffle(false), _ifMarkForGoldenSnitch(false){
 
 	//this->setCursor(QCursor(Qt::OpenHandCursor));//test pour changer le cursor
 	//setBoundingRegionGranularity(1);
@@ -12,35 +14,64 @@ hexagone::hexagone(int i, int j,int type, QGraphicsItem *parent) : QGraphicsObje
 //fonction appeler par QT pour dessiner l'objet (ou le redessiner/update)
 void hexagone::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget)
 {
-	painter->setRenderHint(QPainter::Antialiasing, true);
-	dessinerHexagone(painter);
-	dessinerType(painter);
+	if(_typeCase != NOT_ON_HEX_GRID){//on dessine seulement les "vrais" case
+		painter->setRenderHint(QPainter::Antialiasing, true);
+		dessinerHexagone(painter);
+		dessinerType(painter);
+	}else{
+		setActive(false);
+		setEnabled(false);
+	}
 }
 
 //----------------------------------------------------------------------------------------------
 //FONCTION POUR DESSINER LES DIFFERENTS ELEMENT D'UNE CASE
 void hexagone::dessinerHexagone(QPainter *painter){
-	//1. definir les options de coloriage
-	painter->setPen(QPen(Qt::black,2,Qt::SolidLine)); //defini le pinceaux qui dessine les contours
 
-	if(_ifSelect){ //defini la couleur de remplissage
-		painter->setBrush( _couleurFondSelect );
-	}else{
-		if(_ifGoal){
-			painter->setBrush( _couleurFondGoal );
-		}else{
-		painter->setBrush( _couleurFondNoSelect);
+	//1. definir les options de coloriage = definir contour et fond utiliser
+	QBrush brush(_couleurFondNoSelect,Qt::SolidPattern);//vas servir a definir le fond
+
+	if(_ifSelect){ //si la case est selectionner par le manager
+		brush.setColor(_couleurFondSelect);
+	}else{//une case selectionner ne peut pas etre dessiner accesible
+		if(_ifAccesible){//si la case a été marquer accesible
+			brush.setColor(Qt::green);
+			brush.setStyle(Qt::DiagCrossPattern);
+		}
+		if(_ifLine){
+			brush.setStyle(Qt::HorPattern);
+		}
+		if(_ifDiagonalBasDroite){
+			brush.setStyle(Qt::FDiagPattern);
+		}
+		if(_ifDiagonalhautDroite){
+			brush.setStyle(Qt::BDiagPattern);
+		}
+		if(_ifForCatch){
+			brush.setStyle(Qt::CrossPattern);
+		}
+
+		if(_ifMarkForBludger){
+			brush.setColor(_couleurBludger);
+		}
+		if(_ifMarkForQuaffle){
+			brush.setColor(_couleurQuaffle);
+		}
+		if(_ifMarkForGoldenSnitch){
+			brush.setColor(_couleurGoldenSnitch);
+		}
+		if(_ifGoal){//si la case est un but
+			brush.setColor(_couleurFondGoal);
 		}
 	}
 
-	//2. dessiner l'hexagone
+	painter->setBrush(brush );
+	painter->setPen(QPen(Qt::black,2,Qt::SolidLine)); //defini le pinceaux qui dessine les contours
 
+	//2. dessiner l'hexagone
 	painter->drawPolygon(hexagoneBuilt());
 
 }
-
-
-
 
 void hexagone::dessinerType(QPainter *painter){
 	//pas mal de joueur son dessiner de la meme maniere pour l'instant, certain case son donc inutile
@@ -187,18 +218,96 @@ QPointF hexagone::centreHexagon() const{
 
 }
 //----------------------------------------------------------------------------------------------
+void hexagone::setType(int typeCase){
+	_typeCase = typeCase;
+	update();
+}
+int hexagone::getType(){
+	return _typeCase ;
+}
+//----------------------------------------------------------------------------------------------
+int hexagone::getIAxial(){
+	return _indiceI;
+}
+int hexagone::getJAxial(){
+	return _indiceJ;
+}
 
+//----------------------------------------------------------------------------------------------
+//Changement d'etat d'une case (selection ou pas, si c'est un goal, si case accessible,...)
 
 void hexagone::select(){
 	_ifSelect = true;
-
+	update();
 }
 
 void hexagone::unselect(){
 	_ifSelect = false;
-
+	update();
 }
 
+void hexagone::isAGoal(){
+	_ifGoal = true;
+	update();
+}
+
+void hexagone::isAccessible(){
+	_ifAccesible = true;
+	update();
+}
+
+void hexagone::isLine(){
+	_ifLine = true;
+	update();
+}
+
+void hexagone::isDiagonalGoBasDroite(){
+	_ifDiagonalBasDroite = true;
+	update();
+}
+
+void hexagone::isDiagonalGohautDroite(){
+	_ifDiagonalhautDroite = true;
+	update();
+}
+
+void hexagone::isForCatch(){
+	_ifForCatch = true;
+	update();
+}
+
+void hexagone::isMarkForBludger(){
+	_ifMarkForBludger=true;
+	update();
+}
+
+void hexagone::isMarkForQuaffle(){
+	_ifMarkForQuaffle=true;
+	update();
+}
+
+void hexagone::isMarkForGoldenSnitch(){
+	_ifMarkForGoldenSnitch=true;
+	update();
+}
+
+void hexagone::isNonAccessible(){
+	_ifAccesible = false;
+
+	_ifLine = false;
+	_ifDiagonalBasDroite = false;
+	_ifDiagonalhautDroite = false;
+
+	_ifForCatch=false;
+
+	_ifMarkForBludger=false;
+	_ifMarkForQuaffle=false;
+	_ifMarkForGoldenSnitch=false;
+	update();
+}
+
+//----------------------------------------------------------------------------------------------
+//fonction test pour voir la reaction a un signal
 void hexagone::changerCouleur(){//slots de reaction a un signal
 
 	if(_ifSelect){
@@ -216,7 +325,7 @@ void hexagone::changerCouleur(){//slots de reaction a un signal
 void hexagone::mousePressEvent(QGraphicsSceneMouseEvent *)
  {//test pour voir les reaction possible a un clickage
 	 //setCursor(Qt::ClosedHandCursor);
-	 changerCouleur();
+	 //changerCouleur();
 	 emit hexagoneSelect(_indiceI,_indiceJ);
 
  }

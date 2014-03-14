@@ -24,6 +24,7 @@ int User::endOfAuctionTurn_=0;
 
 
 User::User(Server * server, MatchesHandler *matchesHandler, int sockfd, int userID): state_(INIT), server_(server), __matchesHandler(matchesHandler), sockfd_(sockfd), userId_(userID), manager_(NULL), calendar_(NULL), auction_(NULL) {
+    //username vide
     __moves = new int*[7]; //7 lignes
     for(int i =0; i < 7; ++i){
         __moves[i] = new int[4]; //4 colonnes
@@ -74,21 +75,33 @@ void User::cmdHandler(SerializedObject *received) {
 #endif
 			//handle demand:
 			if (checkLoginAndPassword(username,password) == 1) {
-				std::cout<<"LOGIN OK"<<std::endl;
-				manager_ = new Manager(username);
-				userName_=username;
-				//userId_=server_->usersList_.size();
-
-				if(!strcmp(username, "admin")){ //return 0 if equal
-					state_= ADMIN;
-					confirmation = ADMIN_LOGIN;
+				std::string strName = username;
+				bool alreadyConnected = false;
+				for(unsigned int i = 0; i < server_->usersList_.size(); ++i){
+					alreadyConnected = alreadyConnected or (not strName.compare(server_->usersList_[i]->getUserName())); 
+					//compare : 0 if equal, so need to negate that value for bool equivalence
+				}
+				if(alreadyConnected){
+					std::cout<<"ALREADY CONNECTED"<<std::endl;
+					confirmation = LOGIN_FAILED;
 				}else{
-					calendar_ = new Calendar(manager_);
-					calendar_->update();
-					DataBase::save(*manager_);
-				
-					state_=FREE;
-					confirmation = NORMAL_LOGIN;
+					
+					std::cout<<"LOGIN OK"<<std::endl;
+					manager_ = new Manager(username);
+					userName_=username;
+					//userId_=server_->usersList_.size();
+
+					if(!strcmp(username, "admin")){ //return 0 if equal
+						state_= ADMIN;
+						confirmation = ADMIN_LOGIN;
+					}else{
+						calendar_ = new Calendar(manager_);
+						calendar_->update();
+						DataBase::save(*manager_);
+					
+						state_=FREE;
+						confirmation = NORMAL_LOGIN;
+					}
 				}
 			}
 			else {
@@ -602,7 +615,7 @@ void User::cmdHandler(SerializedObject *received) {
             int counter;
             counter = 0;
             for (unsigned int i=0;i<server_->usersList_.size();++i){
-                if(server_->usersList_[i]->state_==FREE) { //TODO : ne pas reprendre l'user qui fait la demande dans la liste
+                if((server_->usersList_[i]->state_==FREE) and (server_->usersList_[i] != this)) { //on ne reprend pas celui qui fait la demande
                     ++counter;
                     IDList.push_back(server_->usersList_[i]->getUserID());
                     std::cout << "userId " << server_->usersList_[i]->getUserID() << std::endl;

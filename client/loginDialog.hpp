@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "common/NetworkInterface.hpp"
+#include "Client.hpp"
 
 class QCheckBox;
 class QLabel;
@@ -32,7 +32,7 @@ class LoginDialog : public QDialog
     Q_OBJECT
 
 public:
-    LoginDialog(int, QWidget *parent = 0);
+    LoginDialog(Client * client, QWidget *parent = 0);
     void init();
     QString getName();
     int getRole();
@@ -46,7 +46,8 @@ private slots:
     void enableloginButton(const QString &text);
 
 private:
-    int sockfd_, role;
+    int role;
+    Client * __client;
     char username[USERNAME_LENGTH];
     char password[PASSWORD_LENGTH];
     QLabel *label;

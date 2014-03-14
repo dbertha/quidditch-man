@@ -7,6 +7,7 @@
 #include <QColor>
 #include <QCursor>
 #include <QtCore/qmath.h> //pour qFabs
+#include <QBrush>
 
 #include <QDebug> //permet de dispose d'un affichage dans console debug
 
@@ -46,7 +47,7 @@ static const QPointF pasIndiceJ(largeur/2,hauteurTiers);
 
 //defini les couleurs utilise pour le coloriage selon le type de case (vide,joueur,but,balle)
 static const QColor _couleurFondSelect=Qt::cyan;
-static const QColor _couleurFondNoSelect=Qt::white;
+static const QColor _couleurFondNoSelect=Qt::white;//Qt::NoBrush si on met image de fond
 static const QColor _couleurFondGoal=Qt::darkCyan;
 
 static const QColor _couleurEquipe1=Qt::blue;
@@ -67,8 +68,29 @@ class hexagone : public QGraphicsObject
         //paint => comment dessiner l'objet
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
+		void setType(int);
+		int getType();
+
+		int getIAxial();
+		int getJAxial();
+
         void select();
         void unselect();
+
+		void isAGoal();
+
+		void isAccessible();
+
+		void isLine();
+		void isDiagonalGoBasDroite();
+		void isDiagonalGohautDroite();
+		void isForCatch();
+
+		void isMarkForBludger();
+		void isMarkForQuaffle();
+		void isMarkForGoldenSnitch();
+
+		void isNonAccessible();
 
         //boudingRect => defnie la region frontiere de l'objet
         QRectF boundingRect() const;
@@ -91,6 +113,15 @@ class hexagone : public QGraphicsObject
 		bool _ifGoal;
         bool _ifSelect;
 
+		bool _ifAccesible;
+		bool _ifLine;
+		bool _ifDiagonalBasDroite; //diagonal qui vas d'en haut a gauche vers le bas a droite = suis la vertical "Axial"
+		bool _ifDiagonalhautDroite; //diagonal qui vas d'en bas a gauche vers le haut a droite = vas du 3ieme cadran trigonometrique vers 1ers cadran
+		bool _ifForCatch;
+
+		bool _ifMarkForBludger;
+		bool _ifMarkForQuaffle;
+		bool _ifMarkForGoldenSnitch;
 
         void dessinerHexagone(QPainter *painter);//dessine le coutour de la case
         void dessinerType(QPainter *painter);//dessine le type de la case (balle,joueur,...)

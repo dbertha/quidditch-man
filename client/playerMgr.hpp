@@ -2,10 +2,13 @@
 #define PLAYERMGR_HPP
 #include "Defines.hpp"
 #include "selectionDialog.hpp"
-#include "common/NetworkInterface.hpp"
+#include "Client.hpp"
+#include "playersDialog.hpp"
+//#include "common/NetworkInterface.hpp"
+
 
 #define BAD_CONNECTION -1
-#define NO_CHOISE 0
+#define NO_CHOICE -2
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,8 +19,7 @@
 #include <QStringList>
 #include <QWidget>
 
-int choosePlayer(const int, QWidget *parent);
+int choosePlayer(Client * client, QWidget *parent);
 
-std::vector<int> chooseTeamForMatch(const int sockfd_, QWidget *parent);
 
 #endif

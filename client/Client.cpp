@@ -1,5 +1,4 @@
 #include "Client.hpp"
-#include "commAPI.hpp"
 // Documentation : voir Readme.txt
 
 using namespace std; //TODO : rajouter tous les spécificateurs de namespace
@@ -15,7 +14,7 @@ void Client::run() {
     if(GUI_){
     }else{
         mainLoop();
-        close(sockfd_);
+        close(sockfd_); //TODO : destructeur
     }
 }
 
@@ -391,11 +390,9 @@ std::vector<int> Client::getTournamentList(){
     std::vector<int> tournamentsList;
     SerializedObject received = receiveOnSocket(sockfd_);
     char * position = received.stringData;
-    std::cout << "header : " << received.typeOfInfos << std::endl;
-
     memcpy(&nbOfTournaments, position, sizeof(nbOfTournaments));
     position += sizeof(nbOfTournaments);
-    std::cout << "Nb of tournaments : " << nbOfTournaments << std::endl;
+    //std::cout << "Nb of tournaments : " << nbOfTournaments << std::endl;
     for(int i = 0; i < nbOfTournaments; ++i){
         memcpy(&startingNbOfPlayers, position, sizeof(startingNbOfPlayers));
         position += sizeof(startingNbOfPlayers);
@@ -403,9 +400,6 @@ std::vector<int> Client::getTournamentList(){
         position += sizeof(currentNbOfPlayers);
         memcpy(&startingPrice, position, sizeof(startingPrice));
         position += sizeof(startingPrice);
-        std::cout << "Nb of players to start : " << startingNbOfPlayers << std::endl;
-        std::cout << "Nb of players susbcibe : " << currentNbOfPlayers << std::endl;
-        std::cout << "price : " << startingPrice << std::endl;
         tournamentsList.push_back(startingNbOfPlayers);
         tournamentsList.push_back(currentNbOfPlayers);
         tournamentsList.push_back(startingPrice);
@@ -794,7 +788,6 @@ void Client::askAndSendMoves(int numTeam, HexagonalField &field, std::vector<Axi
 void Client::commMgr() {
 //gère les messages non sollicités (exemple : invitation à un match amical)
 	SerializedObject received = receiveOnSocket(sockfd_);
-    //TODO : tester retour recv
 	switch(received.typeOfInfos){
 		case MATCH_INVITATION : {
             int IDInvitor;
@@ -833,7 +826,7 @@ void Client::commMgr() {
             position += sizeof(IDOpponent);
             memcpy(&name, position, sizeof(name));
             position += sizeof(name);
-            //memcpy(&numTeam, position, sizeof(numTeam));
+            
             cout << "Opponent ID : " << IDOpponent << " name : " << name << endl;
             //forced to accept
             std::vector<int> playersInTeam;

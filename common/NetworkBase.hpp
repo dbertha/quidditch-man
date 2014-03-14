@@ -1,8 +1,9 @@
 /* Module réseau en C, gère la communication basique entre serveur et clients */
 #ifndef NETWORKBASE_H
 #define NETWORKBASE_H
-/* TODO : vérifier si modules inutiles */
-#include <stdlib.h> 
+//TODO : vérifier si modules inutiles 
+#include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
@@ -10,6 +11,10 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
 
 #include "Defines.hpp"
 
@@ -29,6 +34,8 @@ typedef struct {
 int sendOnSocket(int socketfd, SerializedObject toSend);
 
 SerializedObject receiveOnSocket(int socketfd);
+
+int buildConnection (const int);
         
     
 

@@ -13,7 +13,11 @@ HEADERS += client/clientMatchHandler.hpp \
            client/buildingsDialog.hpp \
            client/buildingsModel.hpp \
            client/playerMgr.hpp \
-           common/NetworkInterface.hpp \
+           client/Client.hpp \
+           client/mainMenu.hpp \
+           client/playersDialog.hpp \
+           client/tournamentDialog.hpp \
+           client/tournaments.hpp \
 
 SOURCES += client/clientMatchHandler.cpp \
            client/loginDialog.cpp \
@@ -24,5 +28,9 @@ SOURCES += client/clientMatchHandler.cpp \
            client/buildingsDialog.cpp \
            client/buildingsModel.cpp \
            client/playerMgr.cpp \
-           common/NetworkInterface.cpp \
+           client/Client.cpp \
+           client/mainMenu.cpp \
+           client/playersDialog.cpp \
+           client/tournamentDialog.cpp \
+           client/tournaments.cpp \
 

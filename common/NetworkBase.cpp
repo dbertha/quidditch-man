@@ -1,19 +1,6 @@
-/* Module réseau en C, gère la communication basique entre serveur et clients */
+// Module réseau en C (compilation C++), gère la communication basique entre serveur et clients
 
-/* TODO : vérifier si modules inutiles 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
-#include <netdb.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>*/
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include "Defines.hpp"
+
 #include "NetworkBase.hpp"
 
 /* recv(socket, *message, sizeToWrite, 0) return sizeWriten if ok
@@ -48,6 +35,35 @@ int sendOnSocket(int socketfd, SerializedObject toSend){
     return result;
 }
 
+int buildConnection (const int port_) {
+
+	struct sockaddr_in sockAddress_;
+
+	int sockfd_=socket(PF_INET,SOCK_STREAM,0);
+	if (sockfd_ == ERROR) {
+		std::cerr<<"Socket descriptor initialization error"<<std::endl;
+		return ERROR;
+	}
+	int yes=1; //autorise deux binds successifs
+	if (setsockopt(sockfd_, SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int))==ERROR) {
+		std::cerr<<"Socket descriptor options initialization error"<<std::endl;
+		return ERROR;
+	}
+	int n;
+	unsigned int m = sizeof(n);
+	getsockopt(sockfd_,SOL_SOCKET,SO_RCVBUF,(void *)&n, &m);
+	std::cout<<"TCP buffer size : "<<n<<std::endl;
+	sockAddress_.sin_family=AF_INET;
+	sockAddress_.sin_port=htons(port_);
+	sockAddress_.sin_addr.s_addr=INADDR_ANY;
+	memset(&sockAddress_.sin_zero,'\0',8);
+
+	if (bind(sockfd_,(struct sockaddr*)&sockAddress_,sizeof(struct sockaddr))==ERROR) {
+		std::cerr<<"Socket bind error"<<std::endl;
+		return ERROR;
+	}
+	else return sockfd_;
+}
 
 
 

@@ -1,58 +1,182 @@
 #include "mainGui.hpp"
+#include "clientMatchHandler.hpp"
+#include "playerMgr.hpp"
 
-MainGui::MainGui(int sockfd,QMainWindow *parent) : sockfd_(sockfd), parent_(parent) {
-    setFixedSize(800,480);
+MainGui::MainGui(int sockfd,QMainWindow *parent) : 
+parent_(parent), __client(new Client(sockfd, true)), __pushesNotifier(new QSocketNotifier(sockfd, QSocketNotifier::Read, this)) {
+    __pushesNotifier->setEnabled(false); //genère le signal
+    connect(__pushesNotifier,SIGNAL(activated(int)),this,SLOT(pushesHandler()));
+    setFixedSize(800,640);
     createActions();
     firstMenu();
     setWindowTitle(tr("Quidditch Manager 2014"));
-    loginDialog = new LoginDialog(sockfd_,this);
+    loginDialog = new LoginDialog(__client,this);
     nbPlayers=money=nbFans=nbActionPoints=0;
     login();
 }
 
-MainGui::~ MainGui() {}
-
-void MainGui::run() {
-   this->show();
+MainGui::~ MainGui() {
+    delete __client;
+    __client = NULL;
 }
-void MainGui::quit() {
-    std::cout<<"quit"<<std::endl;
+void MainGui::pushesHandler(){
+    ticker->hide();
+    __pushesNotifier->setEnabled(false);
+    //receive
+    SerializedObject received = receiveOnSocket(__client->getSockfd());
+    
+    //handle
+    switch(received.typeOfInfos){
+		case MATCH_INVITATION : {
+            int IDInvitor;
+            char name[USERNAME_LENGTH];
+            char * position = received.stringData;
+            bool confirmation;
+            QString texte;
+            std::vector<int> playersInTeam;
+            memcpy(&IDInvitor, position, sizeof(IDInvitor));
+            position += sizeof(IDInvitor);
+            memcpy(&name, position, sizeof(name));
+            //texte << "Do you want to fight against " << name << "with ID : " << QString::number(IDInvitor) << " ?";
+            texte = QString("%1, with ID %2 wants to play a match against you !").arg(name, QString::number(IDInvitor));
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("You've got a match proposal !");
+            msgBox.setText(texte);
+            msgBox.setInformativeText("Do you accept the match ?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msgBox.setDefaultButton(QMessageBox::Yes);
+            if(msgBox.exec() == QMessageBox::Yes){
+                confirmation = true;
+            }else {
+                confirmation = false;
+            }
+            
+            if(confirmation){
+                playersInTeam = chooseTeamForMatch(__client, this);
+            }
+            __client->answerMatchProposal(confirmation, playersInTeam);
+            //~ answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
+            if(__client->receiveMatchConfirmation() == MATCH_STARTING){
+                //~ //startMatch( 2); //invité a l'équipe 2
+            }
+            break;
+        }
+        case SERVER_DOWN : {
+            badConnection();
+            break;
+        }
+        case MATCH_TOURNAMENT_START : {
+            int IDOpponent, numTeam;
+            char name[USERNAME_LENGTH];
+            char * position = received.stringData;
+            QString texte;
+            //~ cout << "A tournament turn starts now !" << endl;
+            memcpy(&IDOpponent, position, sizeof(IDOpponent));
+            position += sizeof(IDOpponent);
+            memcpy(&name, position, sizeof(name));
+            position += sizeof(name);
+            texte = QString("%1, with ID %2 is your opponent !").arg(name, QString::number(IDOpponent));
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("A tournament match starts now !");
+            msgBox.setText(texte);
+            msgBox.setInformativeText("You have to accept.");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            msgBox.exec();
+            //forced to accept
+            std::vector<int> playersInTeam = chooseTeamForMatch(__client, this);
+            __client->sendTeamForMatchTournament(playersInTeam);
+            //bloquant, l'adversaire doit avoir répondu aussi :
+            numTeam = __client->receiveNumOfTeam();
+            if(numTeam > 0){ //first to answer is the team 1
+                //~ startMatch(numTeam);
+            }
+            break;
+        }
+	}
+    __pushesNotifier->setEnabled(true);
+    ticker->show();
 }
 int MainGui::badConnection() {
+    ticker->hide();
     QErrorMessage *errorMessageDialog = new QErrorMessage(this);
     errorMessageDialog->showMessage(tr("No connection with the server."));
     return (0);
 }
 void MainGui::buildings() {
-    buildingsDialog = new BuildingsDialog(sockfd_,this);
+    buildingsDialog = new BuildingsDialog(__client,this);
     buildingsDialog->exec();
 }
 void MainGui::listPlayers() {
-    ticker->hide();
-    int res = choosePlayer(sockfd_,this);
-    if (res==BAD_CONNECTION) badConnection();
-    else {
-// .............
+    if (choosePlayer(__client,this)==BAD_CONNECTION) badConnection();
+}
+void MainGui::tournaments() {
+    if (role==NORMAL_LOGIN) {
+        ticker->hide();
     }
-    ticker->show();
+    //this slots acts for both manager and administrator as well :
+    //if manager, the user may choose to participate to a tournament
+    //if administrator, the user can create a new tournament
+    chooseTournament(__client,role,this);
+    if(role == NORMAL_LOGIN){
+        ticker->show();
+    }    
 }
 
 void MainGui::listMgrs() {
     ticker->hide();
-    int res = choosePartner(sockfd_,this);
+    int res = choosePartner(__client,this);
     if (res==BAD_CONNECTION) badConnection();
-    else {
+    else if(res != NO_CHOICE){
         std::vector<int> chosenPlayers;
-        chosenPlayers = chooseTeamForMatch(sockfd_, this); //tous les rôles sont nécessairement remplis 
+        chosenPlayers = chooseTeamForMatch(__client, this); //tous les rôles sont nécessairement remplis 
         //(on suppose suffisament de joueurs)
+#ifdef __DEBUG
         std::cout << "index choisi : " << std::endl;
         for(unsigned int i = 0; i < chosenPlayers.size() ; ++i){
             std::cout << chosenPlayers[i] << std::endl;
+        }      
+#endif
+        //send invitation
+        __client->proposeMatchTo(res,  chosenPlayers);
+        //~ QProgressDialog *progress = new QProgressDialog("Waiting answer from opponent...", QString(), 0, 3, this);
+        //~ progress->setWindowModality(Qt::WindowModal);
+        //~ progress->show();
+        //~ progress->setValue(0);
+        //TODO : afficher un message d'attente (le programme se bloque)
+        int confirmation = __client->receiveMatchConfirmation();
+        //~ progress->setValue(1);
+        if(confirmation == MATCH_STARTING){
+            //startMatch(1); //inviteur a l'équipe 1
+        }else{
+            QMessageBox msgBox;
+            msgBox.setText("Invitation denied !");
+            msgBox.exec();
         }
-// .............
     }
     ticker->show();
 }
+    
+
+//~ void MainGui::listAndChooseTournaments(){
+    //~ ticker->hide();
+    //~ int res = chooseTournament(__client,this);
+    //~ if (res==BAD_CONNECTION) badConnection();
+    //~ else if(res != NO_CHOICE){
+        //~ __client->askToJoinTournament(); //pour le moment, un seul tournoi à la fois
+        //~ int confirmation = __client->getConfirmation();
+        //~ QMessageBox msgBox;
+ //~ 
+ //~ 
+        //~ if(confirmation == 0){
+            //~ msgBox.setText("Impossible to join this tournament !");
+        //~ }else{
+            //~ msgBox.setText("You are recorded as a participant of this tournament. Be ready for when it will start !");
+//~ 
+        //~ }
+        //~ msgBox.exec();
+    //~ }
+
 void MainGui::login() {
     loginDialog->init();
     if (loginDialog->exec()==loginDialog->Accepted) {//connecte; on cree le menu
@@ -74,9 +198,8 @@ void MainGui::createActions() {
     listMgrsAction=new QAction(tr("List available managers"),this);
     listAuctionsAction=new QAction(tr("List auctions"),this);
     listPlayersAction=new QAction(tr("List my players"),this);
-    buildingsAction=new QAction(tr("Open board"),this);
+    buildingsAction=new QAction(tr("List my buildings"),this);
     listTournamentsAction=new QAction(tr("List tournaments"),this);
-    newTournamentAction=new QAction(tr("New tournament"),this);
     newPromotionAction=new QAction(tr("Start a new promotion campaign"),this);
     buyAPAction=new QAction(tr("Buy action points"),this);
 }
@@ -113,16 +236,20 @@ void MainGui::createMenu() {
         connect(buildingsAction,SIGNAL(triggered()),this,SLOT(buildings()));
         tournamentsMenu=menuBar()->addMenu(tr("Tournaments"));
         tournamentsMenu->addAction(listTournamentsAction);
+        connect(listTournamentsAction,SIGNAL(triggered()),this,SLOT(tournaments()));
         actionPointsMenu=menuBar()->addMenu(tr("Action Points"));
         actionPointsMenu->addAction(newPromotionAction);
         actionPointsMenu->addAction(buyAPAction);
-        ticker = new Ticker(sockfd_, this);
+        ticker = new Ticker(__client, __pushesNotifier, this);
         ticker->show();
+        mainMenu = new MainMenu(this);
+        setCentralWidget(mainMenu);
+        mainMenu->show();
     }
     else if (role==ADMIN_LOGIN) {
         tournamentsMenu=menuBar()->addMenu(tr("Tournaments"));
-        tournamentsMenu->addAction(newTournamentAction);
         tournamentsMenu->addAction(listTournamentsAction);
+        connect(listTournamentsAction,SIGNAL(triggered()),this,SLOT(tournaments()));
     }
 }
 void MainGui::about() {

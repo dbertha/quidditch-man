@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_fenetre_t {
-    QByteArrayData data[3];
-    char stringdata[23];
+    QByteArrayData data[5];
+    char stringdata[54];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -31,9 +31,12 @@ static const qt_meta_stringdata_fenetre_t qt_meta_stringdata_fenetre = {
     {
 QT_MOC_LITERAL(0, 0, 7),
 QT_MOC_LITERAL(1, 8, 12),
-QT_MOC_LITERAL(2, 21, 0)
+QT_MOC_LITERAL(2, 21, 0),
+QT_MOC_LITERAL(3, 22, 11),
+QT_MOC_LITERAL(4, 34, 18)
     },
-    "fenetre\0changerTexte\0\0"
+    "fenetre\0changerTexte\0\0handlerMove\0"
+    "handlerChoixAction\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -43,7 +46,7 @@ static const uint qt_meta_data_fenetre[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       1,   14, // methods
+       3,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -51,10 +54,14 @@ static const uint qt_meta_data_fenetre[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    2,   19,    2, 0x0a,
+       1,    2,   29,    2, 0x0a,
+       3,    2,   34,    2, 0x0a,
+       4,    1,   39,    2, 0x0a,
 
  // slots: parameters
     QMetaType::Void, QMetaType::Int, QMetaType::Int,    2,    2,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int,    2,    2,
+    QMetaType::Void, QMetaType::Bool,    2,
 
        0        // eod
 };
@@ -65,6 +72,8 @@ void fenetre::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
         fenetre *_t = static_cast<fenetre *>(_o);
         switch (_id) {
         case 0: _t->changerTexte((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 1: _t->handlerMove((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 2: _t->handlerChoixAction((*reinterpret_cast< bool(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -95,13 +104,13 @@ int fenetre::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 1)
+        if (_id < 3)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 1;
+        _id -= 3;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 1)
+        if (_id < 3)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 1;
+        _id -= 3;
     }
     return _id;
 }
