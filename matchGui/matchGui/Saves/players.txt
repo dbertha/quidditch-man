@@ -1,7 +1,0 @@
-defaultKeeper.txt
-defaultSeeker.txt
-defaultChaser.txt
-defaultChaser.txt
-defaultChaser.txt
-defaultBeater.txt
-defaultBeater.txt
