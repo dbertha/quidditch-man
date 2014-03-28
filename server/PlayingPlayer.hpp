@@ -35,6 +35,7 @@ public:
     AxialCoordinates getPosition() {return __currentPosition;}
     int getRole(){return __role;}
     char * serializeAttributes(char * bufferPosition); //renvoie l'extrémité du buffer, où l'on peut continuer à écrire
+    
     //5 int : attribut
     //1 int : hasQuaffle
     

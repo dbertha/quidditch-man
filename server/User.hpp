@@ -64,7 +64,7 @@ public:
 	void auctionWin(Manager* manager, ManagedPlayer player);
 	void handleEndOfMatch(int numTeam, int numWinningTeam);
 	
-	void handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice); //normal price + tournamentPrice
+	void handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice, std::vector<int> lifes); //normal price + tournamentPrice
 
 	std::string intToString(int value);
 
@@ -77,6 +77,7 @@ private:
 	std::string userName_;
 	std::string answer_; //TODO : inutilisé
 	std::string dataRequest_;
+	std::vector<ManagedPlayer *> _teamInMatch;
 	Manager* manager_;
 	Calendar* calendar_;
 	Auction* auction_;

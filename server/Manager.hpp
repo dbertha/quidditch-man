@@ -60,7 +60,7 @@ class Manager {
  	void removePlayer(ManagedPlayer& player);
  	vector<string> getPlayersList();
  	vector<ManagedPlayer> getPlayers();
- 	ManagedPlayer getPlayer(int index);
+ 	ManagedPlayer& getPlayer(int index);
  	vector<int> getPlayerInformations(int playerID);
 
  	Stadium& getStadium();

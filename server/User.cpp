@@ -437,6 +437,7 @@ void User::cmdHandler(SerializedObject *received) {
             for(int i = 0; i < 7; ++i){
                 //TODO : éviter des copies ?
 				team1.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
+				_teamInMatch.push_back(&manager_->getPlayer(playersInTeam[i]));
 			}
             User *invited = NULL;
             for(unsigned int i = 0; i < server_->usersList_.size(); ++i){
@@ -472,6 +473,7 @@ void User::cmdHandler(SerializedObject *received) {
             for(unsigned int i = 0; i < playersInTeam.size(); ++i){
                 //TODO : éviter des copies ?
 				team2.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
+				_teamInMatch.push_back(&manager_->getPlayer(playersInTeam[i]));
 			}
 			__matchesHandler->respondToMatchProposal(this, team2, __moves);
 
@@ -842,6 +844,7 @@ void User::cmdHandler(SerializedObject *received) {
             for(unsigned int i = 0; i < playersInTeam.size(); ++i){
                 //TODO : éviter des copies ?
 				team.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
+				_teamInMatch.push_back(&manager_->getPlayer(playersInTeam[i]));
 			}
 #ifdef __DEBUG
 			std::cout<<"On passe le relais à matchesHandler"<<std::endl;
@@ -962,7 +965,11 @@ void User::handleEndOfMatch(int numTeam, int numWinningTeam){
 	manager_->addMoney(money);
 }
 
-void User::handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice){
+void User::handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice, std::vector<int> lifes){ //tournamentPrice = 0 if not in a tournament
 	int money = manager_->getIncomeFromMatch(numTeam == numWinningTeam, numTeam == 1); //host if team 1
 	manager_->addMoney(numTeam == numWinningTeam ? money + tournamentPrice : money);
+	for(unsigned int i = 0; i < _teamInMatch.size(); ++i){
+		_teamInMatch[i]->setLife(lifes[i]);
+	}
+	_teamInMatch.clear();
 }

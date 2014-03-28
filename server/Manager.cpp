@@ -113,7 +113,7 @@ vector<string> Manager::getPlayersList() {
 	return tmp;
 }
 vector<ManagedPlayer> Manager::getPlayers() {return _players;}
-ManagedPlayer Manager::getPlayer(int index) {
+ManagedPlayer& Manager::getPlayer(int index) {
 	if (index>=_numberOfPlayers) throw "Index out of range";
 	return _players[index];
 }

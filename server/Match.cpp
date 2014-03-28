@@ -479,3 +479,15 @@ void Match::serializePlayerAttr(int playerID, char * bufferPosition){
     //on suppose l'ID valide
     __players[playerID].serializeAttributes(bufferPosition);
 }
+
+std::vector<int> Match::getLifesOfTeam(int nbTeam){
+    std::vector<int> result;
+    int indexStart = TEAM1_KEEPER;
+    if(nbTeam == 2){
+        indexStart = TEAM2_KEEPER;
+    }
+    for(int i = indexStart; i < indexStart + 7; ++i){
+        result.push_back(__players[i].getLife());
+    }
+    return result;
+}

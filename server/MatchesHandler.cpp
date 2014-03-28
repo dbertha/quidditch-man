@@ -219,8 +219,8 @@ void MatchesHandler::handleEndOfMatch(User * winningUser, int winnerTeam, int ma
     if(matchesVector[matchIndex]->isInTournament()){
         tournamentPrice = __tournament->getReward();
     }
-    inviteds[matchIndex]->handleEndOfMatch(2, winnerTeam, tournamentPrice); //numteam, winningTeam
-    invitors[matchIndex]->handleEndOfMatch(1, winnerTeam, tournamentPrice); //numteam, winningTeam
+    inviteds[matchIndex]->handleEndOfMatch(2, winnerTeam, tournamentPrice, matchesVector[matchIndex]->getLifesOfTeam(2)); //numteam, winningTeam
+    invitors[matchIndex]->handleEndOfMatch(1, winnerTeam, tournamentPrice, matchesVector[matchIndex]->getLifesOfTeam(1)); //numteam, winningTeam
     
     if(matchesVector[matchIndex]->isInTournament()){
         deleteMatch(matchIndex);

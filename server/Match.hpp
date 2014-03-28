@@ -54,6 +54,7 @@ public :
     int serializeScoreAndPositions(char * bufferPosition); //retourne aussi le gagnant
     void serializePlayerAttr(int playerID, char * bufferPosition);
     bool isInTournament(){return __isInTournament;}
+    std::vector<int> getLifesOfTeam(int nbTeam);
 };
 
 #endif
