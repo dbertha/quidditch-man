@@ -47,7 +47,7 @@ void PlayingPlayer::handleBludger(){
 }
 
 bool PlayingPlayer::interceptQuaffle(int distance){
-    return (getCapacity(PRECISION) * getCapacity(REFLEX)) > (distance * 10);
+    return (getCapacity(PRECISION) * getCapacity(REFLEX) * 1.5) > (distance * 10);
 }
 
 bool PlayingPlayer::catchGoldenSnitch(int distance){
@@ -85,6 +85,10 @@ char * PlayingPlayer::serializeAttributes(char * bufferPosition){
 }
 
 
-    
+std::vector<Move> PlayingPlayer::getMovesTo(AxialCoordinates destination){
+    return __currentPosition.getMovesTo(destination);
+}
 
-
+int PlayingPlayer::getDistanceTo(AxialCoordinates destination){
+    return __currentPosition.getDistanceTo(destination);
+}

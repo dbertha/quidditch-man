@@ -29,6 +29,8 @@ public:
     void moveTo(AxialCoordinates destination); //setter
     void loseQuaffle();
     void carryQuaffle();
+    int getDistanceTo(AxialCoordinates destination);
+    std::vector<Move> getMovesTo(AxialCoordinates destination);
     bool hasQuaffle(){return __hasQuaffle;}
     AxialCoordinates getPosition() {return __currentPosition;}
     int getRole(){return __role;}

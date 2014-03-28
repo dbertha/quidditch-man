@@ -24,7 +24,8 @@ public :
         if((__role == BLUDGER1) or (__role == BLUDGER1)) {return BLUDGER_AUTOSPEED;} 
         return 0;
     }
-        //TODO : vitesse du cognard influencé quand frappé par le joueur qui frappe ou influence seulement la distance où l'envoyer ?
+    std::vector<Move> getMovesTo(AxialCoordinates destination){return __currentPosition.getMovesTo(destination);}
+    int getDistanceTo(AxialCoordinates destination){return __currentPosition.getDistanceTo(destination);}
 private :
     int __role;
     AxialCoordinates __currentPosition;
