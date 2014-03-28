@@ -27,5 +27,7 @@
 *.o
 moc*
 Makefile.*
+*.GUI
+Makefile.GUI
 *.synctex.gz
 moc*
