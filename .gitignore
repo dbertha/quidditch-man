@@ -25,4 +25,7 @@
 *.mtc1
 *.out
 *.o
+moc*
+Makefile.*
 *.synctex.gz
+moc*

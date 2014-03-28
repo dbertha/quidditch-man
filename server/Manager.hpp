@@ -70,6 +70,7 @@ class Manager {
  	TrainingCenter& getTrainingCenter();
  	vector<int> getTrainingCenterInformations();
  	bool trainPlayer(int playerID, int capacityNumber);
+ 	void lockPlayer(string name);
  	void unlockPlayer(string name);
  	bool isPlayerBlocked(int playerID);
  	bool isPlayerBlocked(string name);

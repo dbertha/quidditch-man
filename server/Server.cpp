@@ -1,4 +1,5 @@
 #include "Server.hpp"
+
 //#include "CommonMgr.hpp"
 //~ #include "User.hpp"
 //~ #include <netinet/in.h> //htons()  ntohs()
@@ -139,6 +140,7 @@ int Server::receive(User * aUser, SerializedObject * received) {
 	}
 	return length;
 }
+
 
 int Server::sendToClient(User * aUser, SerializedObject * toSend) {
 	toSend->typeOfInfos = htons(toSend->typeOfInfos);

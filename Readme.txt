@@ -1,35 +1,7 @@
-Considérations préliminaires et choix :
-- Comme tout middleware, la communication réseau ne doit pas connaître les formats internes des messages échangés;
-- Au démarrage,  le serveur crée une instance de la classe CommonMgr, destinée à gérer initialisation et clôture des activités fonctionnelles sur le serveur;
-- Lors d'une nouvelle connexion, le serveur crée une instance de la classe User;
-- Tout nouveau message reçu par le serveur est confié à la méthode cmdHandler de l'objet User;
-- Cela permet un contrôle global de ses activités (et de l'arrêt) et, dans le futur (interface graphique), de lui permettre d'entreprendre plusieurs activités en parallèle;
-- Aucune des méthodes de celui-ci n'étant bloquante pendant plus d'une fraction de seconde (pas ou peu d'I/O) et compte tenu des délais très courts pour la mise en oeuvre, nous avons opté à ce stade pour une solution mono-thread;
-- Travailler avec un seul thread supprime la nécessité de devoir gérer l'accès concurrent aux données (en mémoire ou sur disque) et la communication entre threads (arrêt du serveur par exemple);
-- On utilise donc la fonction select() : c'est un peu plus compliqué côté communication mais nettement plus simple côté fonctionnel;
-- On peut gérer le terminal du serveur avec cette même fonction (pour commander l'arrêt du serveur par exemple ou obtenir la liste des utilisateurs connectés...);
-- Une solution multi-threads rendrait la gestion de ressources communes par les fonctions applicatives plus complexe (sérialisation de sections critiques), tout en étant beaucoup plus gourmande en ressources CPU et présentant des risques de deadlocks (tests plus délicats à réaliser!);
-- Si nécessaire, une solution multi-threads sera adoptée par la suite;
-- Seul le déroulement d'une vente aux enchères devra être accompagné par un thread de cadencement (un par vente) (thread pooling ?).
+How to compile :
+make
 
-En pratique :
-- Séparation du code :
-- Serveur-fonctionnel : CommonMgr.cpp, User.cpp, ...
-- Serveur-communication : ServerMain.cpp et Server.cpp;
-- Client-communication : sendToServer.c;
-- En principe, Server.c ne doit pas être modifié : tout doit se passer dans User.cpp (une instance par client) et CommonMgr.cpp (une seule instance), avec l'aide éventuelle des méthodes publiques de Server.c;
-- User.cpp reçoit le message dans sa signature et répond au client à l'aide de sendToClient().
-- Pour la facilité des tests (voir plus loin), il est préférable de ne transmettre dans les messages que de l'ASCII.
-- La taille des messages envoyés des clients au serveur ne peut dépasser INPUTSIZE, défini dans defines.h et Defines.hpp : c'est la taille du buffer msg (défini dans Server.h);
-- Si le message de réponse est de longueur fixe prévisible, msg peut alors être utilisé de part et d'autre;
-- Sinon (par exemple pour une liste), deux solutions sont possibles :
-- Un message par ligne de la liste;
-- Utiliser de part et d'autre des zones de mémoire allouées dynamiquement et envoyer tout en un seul message, après un premier message indiquant au client la taille du buffer.
-- Le port de communication (3495) est défini dans Defines.hpp et defines.h.
-- Le code utilise la variable __DEBUG, défine dans defines.h et Defines.hpp, pour générer une trace.
-- Un programme de test client.c permet de tester la communication et les méthodes de User.cpp (à condition que les messages soient en ASCII);
-- On peut aussi utiliser telnet; exemple : telnet 127.0.1.1 3495 (à la même condition).
-- Pour l'instant, le code n'est pas portable vers Windows (mais une version multi-compatible est réalisable...).
-- compilation du serveur : g++ -g -Wall Defines.hpp Server.hpp User.hpp ServerMain.cpp Server.cpp User.cpp CommonMgr.cpp CommonMgr.hpp -o Server
-- compilation du client : make
-- améliorations prévues dans le futur : gestion du terminal du serveur, détection des sockets morts (clients qui n'ont pas fait disconnect suite à un crash par ex.), ...
+Availables accounts :
+admin admin
+player1 pass1
+player2 pass2
