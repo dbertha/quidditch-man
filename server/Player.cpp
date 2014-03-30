@@ -33,7 +33,9 @@ int Player::getCapacity(int capacityNumber) const {return _capacities[capacityNu
 void Player::setCapacity(int capacityNumber, int value) {_capacities[capacityNumber] = value;}
 
 int Player::getLife() const {return _life;}
-void Player::setLife(int value) {_life = value;}
+void Player::setLife(int value) {
+	_life = value;
+}
 void Player::heal() {_life = _capacities[4];}
 
 void Player::setFirstName(string firstName) {_firstName = firstName;}

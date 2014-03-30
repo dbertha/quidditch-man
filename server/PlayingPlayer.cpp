@@ -29,6 +29,7 @@ PlayingPlayer::PlayingPlayer(ManagedPlayer& player, int role, AxialCoordinates s
 		if (i == broomstick.getCapacityBoosted()) tmp += broomstick.getBonus();
 		this->setCapacity(i,tmp);
 	}
+	setLife(player.getLife());
 }
 
 int PlayingPlayer::getMaxDistance(){
