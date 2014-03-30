@@ -44,6 +44,7 @@ class MatchesHandler;
 class User {
 public:
 	User(Server *, MatchesHandler *, int, int);
+	~User();
 	void cmdHandler(SerializedObject *);
 	void setDisconnection();
 	bool isDisconnecting();

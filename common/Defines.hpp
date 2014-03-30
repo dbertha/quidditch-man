@@ -169,10 +169,18 @@
 #define FREE_SPACE_UNICODE "\u2B1C"
 #define GOAL_UNICODE "\u2A02"
 
-#define GOAL_SIDE1_DIAG -9
-#define GOAL_SIDE1_LINE 0
-#define GOAL_SIDE2_DIAG 9
-#define GOAL_SIDE2_LINE 0
+#define GOAL1_SIDE1_DIAG -9
+#define GOAL1_SIDE1_LINE -2
+#define GOAL2_SIDE1_DIAG -9
+#define GOAL2_SIDE1_LINE 0
+#define GOAL3_SIDE1_DIAG -11
+#define GOAL3_SIDE1_LINE 2
+#define GOAL1_SIDE2_DIAG 11
+#define GOAL1_SIDE2_LINE -2
+#define GOAL2_SIDE2_DIAG 9
+#define GOAL2_SIDE2_LINE 0
+#define GOAL3_SIDE2_DIAG 9
+#define GOAL3_SIDE2_LINE 2
 
 #define ROLE_KEEPER 0
 #define ROLE_SEEKER 1
@@ -184,8 +192,6 @@
 #define CATCH_GOLDENSNITCH 1
 
 //TODO : définir les positions de départ en fonction de la taille du terrain
-//TODO : plusieurs buts quand grand terrain
-//TODO : position de départ du vif d'or et des bugler aléatoire
 
 
 

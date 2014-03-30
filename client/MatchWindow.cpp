@@ -129,12 +129,24 @@ void MatchWindow::initListeHexa(){
 	}
 
 	//defini les case qui sont des goal
-	indexRow=AxialCoordinates(GOAL_SIDE1_DIAG,GOAL_SIDE1_LINE).getLineOnMatrix();
-	indexCol=AxialCoordinates(GOAL_SIDE1_DIAG,GOAL_SIDE1_LINE).getColOnMatrix();
+	indexRow=AxialCoordinates(GOAL1_SIDE1_DIAG,GOAL1_SIDE1_LINE).getLineOnMatrix();
+	indexCol=AxialCoordinates(GOAL1_SIDE1_DIAG,GOAL1_SIDE1_LINE).getColOnMatrix();
+	ListeHexa[indexRow][indexCol]->isAGoal();
+	indexRow=AxialCoordinates(GOAL2_SIDE1_DIAG,GOAL2_SIDE1_LINE).getLineOnMatrix();
+	indexCol=AxialCoordinates(GOAL2_SIDE1_DIAG,GOAL2_SIDE1_LINE).getColOnMatrix();
+	ListeHexa[indexRow][indexCol]->isAGoal();
+	indexRow=AxialCoordinates(GOAL3_SIDE1_DIAG,GOAL3_SIDE1_LINE).getLineOnMatrix();
+	indexCol=AxialCoordinates(GOAL3_SIDE1_DIAG,GOAL3_SIDE1_LINE).getColOnMatrix();
 	ListeHexa[indexRow][indexCol]->isAGoal();
 
-	indexRow=AxialCoordinates(GOAL_SIDE2_DIAG,GOAL_SIDE2_LINE).getLineOnMatrix();
-	indexCol=AxialCoordinates(GOAL_SIDE2_DIAG,GOAL_SIDE2_LINE).getColOnMatrix();
+	indexRow=AxialCoordinates(GOAL1_SIDE2_DIAG,GOAL1_SIDE2_LINE).getLineOnMatrix();
+	indexCol=AxialCoordinates(GOAL1_SIDE2_DIAG,GOAL1_SIDE2_LINE).getColOnMatrix();
+	ListeHexa[indexRow][indexCol]->isAGoal();
+	indexRow=AxialCoordinates(GOAL2_SIDE2_DIAG,GOAL2_SIDE2_LINE).getLineOnMatrix();
+	indexCol=AxialCoordinates(GOAL2_SIDE2_DIAG,GOAL2_SIDE2_LINE).getColOnMatrix();
+	ListeHexa[indexRow][indexCol]->isAGoal();
+	indexRow=AxialCoordinates(GOAL3_SIDE2_DIAG,GOAL3_SIDE2_LINE).getLineOnMatrix();
+	indexCol=AxialCoordinates(GOAL3_SIDE2_DIAG,GOAL3_SIDE2_LINE).getColOnMatrix();
 	ListeHexa[indexRow][indexCol]->isAGoal();
 }
 

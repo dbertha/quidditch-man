@@ -28,7 +28,19 @@ User::User(Server * server, MatchesHandler *matchesHandler, int sockfd, int user
     for(int i =0; i < 7; ++i){
         __moves[i] = new int[4]; //4 colonnes
     }
-    //TODO : delete correspondant dans le destructeur
+}
+
+User::~User(){
+    for(int i =0; i < 7; ++i){
+		delete[] __moves[i];
+    }
+    delete[] __moves;
+    if(manager_ != NULL){
+		delete manager_;
+	}
+	if(calendar_ != NULL){
+		delete calendar_;
+	}
 }
 
 void User::cmdHandler(SerializedObject *received) {

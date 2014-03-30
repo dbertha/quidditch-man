@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define MATRIX_SIZE 21 // nombre impair pour obtenir un centre unique en [MATRIX_SIZE/2][MATRIX_SIZE/2], qui correspondra à [0][0] en coordonnées axiales
+#define MATRIX_SIZE 27 // nombre impair pour obtenir un centre unique en [MATRIX_SIZE/2][MATRIX_SIZE/2], qui correspondra à [0][0] en coordonnées axiales
 
 //Q : classe parente pour utiliser le polymorphisme ?
 

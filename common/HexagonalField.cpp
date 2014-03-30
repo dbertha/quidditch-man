@@ -56,16 +56,18 @@ bool HexagonalField::setOccupant(AxialCoordinates coord, objectIndex_t object){
 }
 
 void HexagonalField::display() {
-    AxialCoordinates goal1Position(GOAL_SIDE1_DIAG, GOAL_SIDE1_LINE), goal2Position(GOAL_SIDE2_DIAG, GOAL_SIDE2_LINE);
+    //AxialCoordinates goal1Position(GOAL_SIDE1_DIAG, GOAL_SIDE1_LINE), goal2Position(GOAL_SIDE2_DIAG, GOAL_SIDE2_LINE);
     char space = ' ';
     std::string emptyUnicode = FREE_SPACE_UNICODE;
     for (int indexRow = 0; indexRow < MATRIX_SIZE; ++indexRow){
-        std::string decalage(abs(indexRow - (MATRIX_SIZE/2)) * 3, space);
+		std::string decalage;
+		if(indexRow != (MATRIX_SIZE/2)) {
+			decalage = std::string((abs(indexRow - (MATRIX_SIZE/2)) * 2.75), space);
+		}
         std::cout << decalage;
         for(int indexCol = std::max(0,((MATRIX_SIZE/2) - indexRow)); indexCol < (MATRIX_SIZE - std::max(0, indexRow - (MATRIX_SIZE /2))); ++indexCol){
             if(matrix[indexRow][indexCol] < 0){
-                if(((indexRow == goal1Position.getLineOnMatrix()) and (indexCol == goal1Position.getColOnMatrix()))
-                or((indexRow == goal2Position.getLineOnMatrix()) and (indexCol == goal2Position.getColOnMatrix()))){ //affichage du goal
+                if(isGoal(indexRow, indexCol)){ //affichage du goal
                     std::string goalUnicode = GOAL_UNICODE;
                     std::cout /*<< std::setw(2)*/ << goalUnicode << std::string(4, space);
                 }
@@ -82,14 +84,17 @@ void HexagonalField::display() {
 }
     
 void HexagonalField::display(AxialCoordinates selected, int distance){
-    AxialCoordinates goal1Position(GOAL_SIDE1_DIAG, GOAL_SIDE1_LINE), goal2Position(GOAL_SIDE2_DIAG, GOAL_SIDE2_LINE);
+    //AxialCoordinates goal1Position(GOAL_SIDE1_DIAG, GOAL_SIDE1_LINE), goal2Position(GOAL_SIDE2_DIAG, GOAL_SIDE2_LINE);
     std::string startColoring = "\033[31m"; //31 : rouge
     std::string stopColoring = "\033[0m"; // 0 : reset 
     std::string colorCenter = "\033[1;32m"; // 1 : gras, 32 : vert
     std::string emptyUnicode = FREE_SPACE_UNICODE;
     char space = ' ';
     for (int indexRow = 0; indexRow < MATRIX_SIZE; ++indexRow){
-        std::string decalage(abs(indexRow - (MATRIX_SIZE/2)) * 3, space);
+		std::string decalage;
+        if(indexRow != (MATRIX_SIZE/2)) {
+			decalage = std::string((abs(indexRow - (MATRIX_SIZE/2)) * 3) - 1, space);
+		}
         std::cout << decalage;
         if((indexRow >= (selected.getLineOnMatrix() - distance)) and (indexRow <= (selected.getLineOnMatrix() + distance))){
             //lignes dont une partie doit être coloriée
@@ -105,8 +110,7 @@ void HexagonalField::display(AxialCoordinates selected, int distance){
                     std::cout << colorCenter; //coloration particulière pour le centre
                 }
                 if(matrix[indexRow][indexCol] < 0){
-                    if(((indexRow == goal1Position.getLineOnMatrix()) and (indexCol == goal1Position.getColOnMatrix()))
-                    or((indexRow == goal2Position.getLineOnMatrix()) and (indexCol == goal2Position.getColOnMatrix()))){ //affichage du goal
+                    if(isGoal(indexRow, indexCol)){ //affichage des buts
                         std::string goalUnicode = GOAL_UNICODE;
                         std::cout << /*std::setw(2) <<*/  goalUnicode << std::string(4, space);
                     }
@@ -131,8 +135,7 @@ void HexagonalField::display(AxialCoordinates selected, int distance){
         }else{
             for(int indexCol = std::max(0,((MATRIX_SIZE/2) - indexRow)); indexCol < (MATRIX_SIZE - std::max(0, indexRow - (MATRIX_SIZE /2))); ++indexCol){
                 if(matrix[indexRow][indexCol] < 0){
-                    if(((indexRow == goal1Position.getLineOnMatrix()) and (indexCol == goal1Position.getColOnMatrix()))
-                    or((indexRow == goal2Position.getLineOnMatrix()) and (indexCol == goal2Position.getColOnMatrix()))){ //affichage du goal
+                    if(isGoal(indexRow,indexCol)){ //affichage des buts
                         std::string goalUnicode = GOAL_UNICODE;
                         std::cout << /*std::setw(2) <<*/  goalUnicode << std::string(4, space);
                     }
@@ -152,4 +155,28 @@ void HexagonalField::display(AxialCoordinates selected, int distance){
 
 bool HexagonalField::isFree(AxialCoordinates toTest){
     return matrix[toTest.getLineOnMatrix()][toTest.getColOnMatrix()] == FREE_SPACE;
+}
+
+bool HexagonalField::isGoal(int rowOnMatrix, int colOnMatrix){
+	return isGoal(AxialCoordinates(colOnMatrix - MATRIX_SIZE/2, rowOnMatrix - MATRIX_SIZE / 2));
+}
+
+bool HexagonalField::isGoal(AxialCoordinates toTest){
+	return isTeam1Goal(toTest) or isTeam2Goal(toTest);
+}
+
+bool HexagonalField::isTeam1Goal(AxialCoordinates toTest){
+	int diag = toTest.getDiagAxis();
+	int line = toTest.getLineAxis();
+	return (diag == GOAL1_SIDE1_DIAG and line == GOAL1_SIDE1_LINE) or 
+		(diag == GOAL2_SIDE1_DIAG and line == GOAL2_SIDE1_LINE) or 
+		(diag == GOAL3_SIDE1_DIAG and line == GOAL3_SIDE1_LINE);
+}
+
+bool HexagonalField::isTeam2Goal(AxialCoordinates toTest){
+	int diag = toTest.getDiagAxis();
+	int line = toTest.getLineAxis();
+	return (diag == GOAL1_SIDE2_DIAG and line == GOAL1_SIDE2_LINE) or 
+		(diag == GOAL2_SIDE2_DIAG and line == GOAL2_SIDE2_LINE) or 
+		(diag == GOAL3_SIDE2_DIAG and line == GOAL3_SIDE2_LINE);
 }

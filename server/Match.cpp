@@ -210,7 +210,6 @@ void Match::makeMoves(){
     //moves[][3] : ligne destination
     //1ère étape : gestion des interceptions de balle
     
-    //TODO : vérifier que deux batteurs n'essaient pas de frapper le même cognard
     for(int i = 0; i < 7; ++i){
         if(__movesTeam1[i][1] >= 0){ //tentative de capture d'une balle
             if((__players[__movesTeam1[i][0]].getRole() == ROLE_CHASER) and (__movesTeam1[i][1] == INTERCEPT_QUAFFLE)){ //normalement c'est test est fait aussi niveau client
@@ -395,11 +394,11 @@ void Match::makeMoves(){
                         __field.setOccupant(destination, movesOrder[objectToMove]);
                         
                         if(movesOrder[objectToMove] == QUAFFLE){ //test si traverse le but
-                            //TODO : test trajectoire rectiligne
+                            //TODO : test trajectoire rectiligne : niveau client
                             //TODO : si collision avec le gardien, une chance de passer à travers
-                            if((destination.getDiagAxis() == GOAL_SIDE1_DIAG) and (destination.getLineAxis() == GOAL_SIDE1_LINE)){
+                            if(__field.isTeam1Goal(destination)){
                                 __scoreTeam2 += 10;
-                            }else if((destination.getDiagAxis() == GOAL_SIDE2_DIAG) and (destination.getLineAxis() == GOAL_SIDE2_LINE)){
+                            }else if(__field.isTeam2Goal(destination)){
                                 __scoreTeam1 += 10;
                             }
                         }
@@ -486,7 +485,7 @@ std::vector<int> Match::getLifesOfTeam(int nbTeam){
     if(nbTeam == 2){
         indexStart = TEAM2_KEEPER;
     }
-    for(int i = indexStart; i < indexStart + 7; ++i){
+    for(int i = indexStart; i < (indexStart + 7); ++i){
         result.push_back(__players[i].getLife());
     }
     return result;

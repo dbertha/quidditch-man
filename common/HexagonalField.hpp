@@ -9,9 +9,7 @@
 
 
 
-//TODO : affichage du vif d'or seulement si l'attrapeur de l'équipe est dans les environs
-//TODO : corriger defaut affichage avec unicodes
-
+//évolution éventuelle : affichage du vif d'or seulement si l'attrapeur de l'équipe est dans les environs
 
 typedef int objectIndex_t;
 
@@ -26,6 +24,10 @@ public :
     void display();
     void display(AxialCoordinates selected, int distance);
     bool isFree(AxialCoordinates toTest);
+    bool isGoal(int rowOnMatrix, int colOnMatrix);
+    bool isGoal(AxialCoordinates toTest);
+    bool isTeam2Goal(AxialCoordinates toTest);
+    bool isTeam1Goal(AxialCoordinates toTest);
     void reset();
 };
 
