@@ -9,7 +9,7 @@
 #include <vector>
 #include <iostream>
 #include <cstring> //memcpy
-
+#include "DataBase.hpp"
 
 
 //TODO : logger ce qu'il se passe pour le renvoyer au client
@@ -35,6 +35,7 @@ public :
     //~ Match();
     //~ void addTeam(std::vector<ManagedPlayer> &team, int ** movesTeam, int numTeam);
     void launch(std::vector<ManagedPlayer> &team2, int ** movesTeam2);
+    void launchTrainingMatch();
     Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team2, int ** movesTeam1, int **movesTeam2);
     //Listes ordonnées de 7 joueurs telles que 
     //~ KEEPER en position 0
@@ -55,6 +56,8 @@ public :
     void serializePlayerAttr(int playerID, char * bufferPosition);
     bool isInTournament(){return __isInTournament;}
     std::vector<int> getLifesOfTeam(int nbTeam);
+    void deleteIATeam();
+    void generateIAActions();
 };
 
 #endif

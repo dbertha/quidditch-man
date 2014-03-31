@@ -403,6 +403,86 @@ ManagedPlayer* DataBase::loadPlayer(string file){
 	return player;
 }
 
+void DataBase::loadPlayerFrom(string file, ManagedPlayer * toLoad){
+	/*
+	The format of a player save file is :
+		First Name
+		Last Name
+		Speed 
+		Strength 
+		Precision
+		Reflex 
+		Resistance
+		Life
+		Training left to do to up speed
+		Training left to do to up strength 
+		Training left to do to up precision 
+		Training left to do to up reflex 
+		Training left to do to up resistance 
+		1 if player is blocked (by the training center or the hospital) or 0 if not
+		Number of the capacity boosted by the broomstick
+		Bonus granted by the broomstick 
+
+	*/
+#ifdef __DEBUG
+	cout<<"loadPlayer"<<endl;
+	cout<<file<<endl;
+#endif
+
+	int fd = open(file.c_str(),O_RDONLY);
+	if (fd==-1) {
+		cerr<<"Error while opening file\n";
+	}
+
+	int size = lseek(fd,0,SEEK_END);
+	lseek(fd,0,SEEK_SET);
+	
+	char buffer[size+1];
+	int bytes;
+	bytes = read(fd,buffer,sizeof(buffer));
+	buffer[bytes]='\0';
+
+	string firstName,lastName;
+	firstName = strtok(buffer,"\n");
+	lastName = strtok(NULL,"\n");
+	
+	string tmp;
+	for (int i=0;i<5;++i){
+		tmp = strtok(NULL,"\n");
+		toLoad->setCapacity(i,atoi(tmp.c_str()));
+	}
+
+	tmp = strtok(NULL,"\n");
+	toLoad->setLife(atoi(tmp.c_str()));
+
+	for (int i=0;i<5;++i){
+		tmp = strtok(NULL,"\n");
+		toLoad->setTrainingLeft(i,atoi(tmp.c_str()));
+	}
+
+	tmp = strtok(NULL,"\n");
+	int blocked = atoi(tmp.c_str());
+	if (blocked) toLoad->lockPlayer();
+	else toLoad->unlockPlayer();
+
+	tmp = strtok(NULL,"\n");
+	int broomstickCapacity = atoi(tmp.c_str());
+
+	tmp = strtok(NULL,"\n");
+	int broomstickBonus = atoi(tmp.c_str());
+
+	toLoad->setBroomstick(Broomstick(broomstickCapacity,broomstickBonus));
+
+	close(fd);
+
+	//default name is John Doe. If it's the player name, it's a new player, and he needs a real name.
+	if ((firstName=="John")&&(lastName=="Doe")) verifyName(firstName,lastName); 
+
+	toLoad->setFirstName(firstName);
+	toLoad->setLastName(lastName);
+	//return player;
+}
+
 void DataBase::loadBuildings(string file, Stadium& stadium, TrainingCenter& trainingCenter, Hospital& hospital, FanShop& fanShop,\
  							 PromotionCenter& promotionCenter){
 	/*

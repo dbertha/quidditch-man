@@ -565,6 +565,30 @@ void User::cmdHandler(SerializedObject *received) {
 			__matchesHandler->confirmDraw(this,confirmation);
 			break;
 		}
+		
+		case PLAYTRAININGMATCH : {
+			//reading details
+			position = received->stringData;
+			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
+			for(int i = 0; i < 7; ++i){
+				int value;
+				memcpy(&value,position, sizeof(value));
+				position += sizeof(value);
+				playersInTeam.push_back(value); //ajout à la liste
+			}
+#ifdef __DEBUG
+			std::cout<<"Demande de début de match d'entrainement reçue sur socket "<<getSockfd()<<std::endl;
+#endif
+            std::vector<ManagedPlayer> team1;
+            for(int i = 0; i < 7; ++i){
+                //TODO : éviter des copies ?
+				team1.push_back(manager_->getPlayer(playersInTeam[i])); //ajout à la liste
+				_teamInMatch.push_back(&manager_->getPlayer(playersInTeam[i]));
+			}
+               
+            __matchesHandler->playTrainingMatch(this, team1, __moves); //matchesHandler handle the answer
+			break;
+		}
 		case CREATEAUCTION : {
 			//reading details
 			int startingPrice;
@@ -1038,6 +1062,19 @@ void User::handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice
 	int money = manager_->getIncomeFromMatch(numTeam == numWinningTeam, numTeam == 1); //host if team 1
 	manager_->addMoney(numTeam == numWinningTeam ? money + tournamentPrice : money);
 	for(unsigned int i = 0; i < _teamInMatch.size(); ++i){
+		_teamInMatch[i]->setLife(lifes[i]);
+	}
+	_teamInMatch.clear();
+}
+
+void User::handleEndOfTrainingMatch(int numTeam, int numWinningTeam, std::vector<int> lifes){
+	srand (time(NULL));
+	int boostedCapacity;
+	for(unsigned int i = 0; i < _teamInMatch.size(); ++i){
+		if(numTeam == numWinningTeam){ //caract boostées seulement si est gagnant
+			boostedCapacity = rand() % 5; //1 caract alétoire recoit + 1
+			_teamInMatch[i]->setCapacity(boostedCapacity, _teamInMatch[i]->getCapacity(boostedCapacity) + 1);
+		}
 		_teamInMatch[i]->setLife(lifes[i]);
 	}
 	_teamInMatch.clear();

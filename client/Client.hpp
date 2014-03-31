@@ -35,6 +35,8 @@
 #define MANAGE_BUILDINGS 4
 #define ACTION_POINTS 5
 #define SEE_TOURNAMENTS 6
+#define START_TRAINING_MATCH 7
+
 //auctions menu
 #define SEE_AUCTIONS 1
 #define SELL_PLAYER 2
@@ -156,6 +158,7 @@ public :
     int answerMatchProposal(bool confirmation, std::vector<int> playersInTeam);
     int sendTeamForMatchTournament(std::vector<int> playersInTeam);
     int receiveMatchConfirmation();
+    int sendTrainingMatchRequest(std::vector<int> playersInTeam);
     int getAllPositions();
     std::vector<AxialCoordinates> receiveScoresAndPositions(int * winner, int * scoreTeam1, int * scoreTeam2);
     int selectPlayer(int playerID);

@@ -95,6 +95,86 @@ void Match::launch(std::vector<ManagedPlayer> &team2, int ** movesTeam2){ //suit
 #endif
 }
 
+void Match::launchTrainingMatch(){
+#ifdef __DEBUG
+        std::cout << "Match d'entrainement initialisé" << std::endl;
+#endif
+    //creation de l'équipe de l'IA :
+    
+    AxialCoordinates position;
+    ManagedPlayer player;
+    
+    position = AxialCoordinates(STARTINGDIAG_TEAM2_KEEPER, STARTINGLINE_TEAM2_KEEPER);
+    DataBase::loadPlayerFrom("server/Saves/IAKeeper.txt", &player);
+    __players.push_back(PlayingPlayer(player, ROLE_KEEPER, position));
+    __field.setOccupant(position, TEAM2_KEEPER);
+    
+    position = AxialCoordinates(STARTINGDIAG_TEAM2_SEEKER, STARTINGLINE_TEAM2_SEEKER);
+    DataBase::loadPlayerFrom("server/Saves/IASeeker.txt", &player);
+    __players.push_back(PlayingPlayer(player, ROLE_SEEKER, position));
+    __field.setOccupant(position, TEAM2_SEEKER);
+    
+    position = AxialCoordinates(STARTINGDIAG_TEAM2_CHASER1, STARTINGLINE_TEAM2_CHASER1);
+    DataBase::loadPlayerFrom("server/Saves/IAChaser.txt", &player);
+    __players.push_back(PlayingPlayer(player, ROLE_CHASER, position));
+    __field.setOccupant(position, TEAM2_CHASER1);
+    position = AxialCoordinates(STARTINGDIAG_TEAM2_CHASER2, STARTINGLINE_TEAM2_CHASER2);
+    DataBase::loadPlayerFrom("server/Saves/IAChaser.txt", &player);
+    __players.push_back(PlayingPlayer(player, ROLE_CHASER, position));
+    __field.setOccupant(position, TEAM2_CHASER2);
+    position = AxialCoordinates(STARTINGDIAG_TEAM2_CHASER3, STARTINGLINE_TEAM2_CHASER3);
+    DataBase::loadPlayerFrom("server/Saves/IAChaser.txt", &player);
+    __players.push_back(PlayingPlayer(player, ROLE_CHASER, position));
+    __field.setOccupant(position, TEAM2_CHASER3);
+    
+    position = AxialCoordinates(STARTINGDIAG_TEAM2_BEATER1, STARTINGLINE_TEAM2_BEATER1);
+    DataBase::loadPlayerFrom("server/Saves/IABeater.txt", &player);
+    __players.push_back(PlayingPlayer(player, ROLE_BEATER, position));
+    __field.setOccupant(position, TEAM2_BEATER1);
+    position = AxialCoordinates(STARTINGDIAG_TEAM2_BEATER2, STARTINGLINE_TEAM2_BEATER2);
+    DataBase::loadPlayerFrom("server/Saves/IABeater.txt", &player);
+    __players.push_back(PlayingPlayer(player, ROLE_BEATER, position));
+    __field.setOccupant(position, TEAM2_BEATER2);
+    
+    __movesTeam2 = new int*[7];
+    for(int i = 0; i < 7; ++i){
+        __movesTeam2[i] = new int[4];
+        __movesTeam2[i][0] = i + TEAM2_KEEPER;
+        __movesTeam2[i][1] = NO_SPECIAL_ACTION;
+        __movesTeam2[i][2] = 10000;
+        __movesTeam2[i][3] = 10000;
+    }
+    //action systématique : essayer d'attraper le vif d'or
+    __movesTeam2[1][0] = TEAM2_SEEKER;
+    __movesTeam2[1][1] = CATCH_GOLDENSNITCH;
+    
+    //les 4 balles :
+    __balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_GOLDENSNITCH, STARTINGLINE_GOLDENSNITCH))); 
+    __field.setOccupant(AxialCoordinates(STARTINGDIAG_GOLDENSNITCH, STARTINGLINE_GOLDENSNITCH), GOLDENSNITCH);
+    __balls.push_back(Ball(BLUDGER1, AxialCoordinates(STARTINGDIAG_BLUDGER1, STARTINGLINE_BLUDGER1))); 
+    __field.setOccupant(AxialCoordinates(STARTINGDIAG_BLUDGER1, STARTINGLINE_BLUDGER1), BLUDGER1);
+    __balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2))); 
+    __field.setOccupant(AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2), BLUDGER2);
+    __balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE))); 
+    __field.setOccupant(AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE), QUAFFLE);
+#ifdef __DEBUG
+    __field.display();
+    std::cout << "On passe aux priorités." << std::endl;
+#endif
+    
+    sortBySpeed();
+#ifdef __DEBUG
+    std::cout << "Fin priorités." << std::endl;
+#endif
+}
+
+void Match::deleteIATeam(){
+    for(int i =0; i < 7; ++i){
+		delete[] __movesTeam2[i];
+    }
+    delete[] __movesTeam2;
+}
+
 void Match::sortBySpeed(){
     //on enregistre les priorités de déplacements :
     //TODO : à optimiser
@@ -489,4 +569,16 @@ std::vector<int> Match::getLifesOfTeam(int nbTeam){
         result.push_back(__players[i].getLife());
     }
     return result;
+}
+
+void Match::generateIAActions(){
+    AxialCoordinates currentPosition, destination;
+    for(int i = 0; i < 7; ++i){
+        if(i != 1){ //SEEKER reçoit tjs la même action
+            currentPosition = __players[i+TEAM2_KEEPER].getPosition();
+            destination = currentPosition.getRandomDestination(__players[i+TEAM2_KEEPER].getCapacity(SPEED));
+            __movesTeam2[i][2] = destination.getDiagAxis();
+            __movesTeam2[i][3] = destination.getLineAxis();
+        }
+    }
 }

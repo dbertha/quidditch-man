@@ -50,6 +50,7 @@
 #define OVER 6
 #define WAITINGTWOPLAYERS 7
 #define WAITINGSECONDPLAYER 8
+#define TRAININGMATCH 9
 
 class User;
 class MatchesHandler{
@@ -66,6 +67,7 @@ public :
     void proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1, int **movesTeam1);
     void respondToMatchProposal(User * invited, std::vector<ManagedPlayer> &team2, int **movesTeam2);
     void respondToTournamentMatch(User * responder, std::vector<ManagedPlayer> &team, int **movesTeam);
+    void playTrainingMatch(User * invitor, std::vector<ManagedPlayer> &team1, int **movesTeam1);
     bool isInvited(User * user);
     int sendConfirmationTo(User * client, int answerCode);
     //~ int sendConfirmationTo(User * client, int answerCode, int numTeam);

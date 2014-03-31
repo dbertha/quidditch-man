@@ -53,6 +53,7 @@ void Client::displayMainMenu(){
     cout<<" [4] Manage buildings"<<endl;
     cout<<" [5] Get action points"<<endl;
     cout<<" [6] See open tournaments"<<endl;
+    cout<<" [7] Play a training match"<<endl;
     cout<<" [0] Quit game"<<endl;
     cout<<"-----> " << flush;
 }
@@ -368,6 +369,15 @@ void Client::handleMainMenu(){
             state_ = TOURNAMENTS_MENU;
             break;
         }
+        case START_TRAINING_MATCH : {
+            std::vector<int> team = displayAndAskPlayersForMatch();
+            sendTrainingMatchRequest(team);
+            if(getConfirmation() == 1){
+                startMatch(1);
+            }
+            state_ = FREE;
+            break;
+        }
         default : {
 			state_ = DISCONNECTING;
             break;
@@ -537,6 +547,7 @@ int Client::testifContinue(int numTeam){
                     cout << "Draw accepted by the opponent ! " << endl;
                     return -1;
                 }else{
+                    cout << "Draw refused ! " << endl;
                     return winner;
                 }
             }
@@ -1087,6 +1098,20 @@ int Client::sendTeamForMatchTournament(std::vector<int> playersInTeam){
     SerializedObject serialized;
     char * position = serialized.stringData;
     serialized.typeOfInfos = STARTTOURNAMENTMATCH;
+    int value;
+    //TODO : éviter redondance du code
+    for(unsigned int i = 0; i < playersInTeam.size();++i){ //joueurs choisis pour jouer le match
+        value = playersInTeam[i];
+        memcpy(position, &value, sizeof(value));
+        position += sizeof(value);
+    }
+    return sendOnSocket(sockfd_, serialized);
+}
+
+int Client::sendTrainingMatchRequest(std::vector<int> playersInTeam){
+    SerializedObject serialized;
+    char * position = serialized.stringData;
+    serialized.typeOfInfos = PLAYTRAININGMATCH;
     int value;
     //TODO : éviter redondance du code
     for(unsigned int i = 0; i < playersInTeam.size();++i){ //joueurs choisis pour jouer le match

@@ -1,6 +1,5 @@
 #include "MatchesHandler.hpp"
 
-//TODO : gérer un match terminé : actuellement un client qui rejoue un match sera tjs attaché au match précédent
 
 void MatchesHandler::proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1, int **movesTeam1){
     //TODO : tester si invited non null
@@ -62,9 +61,13 @@ void MatchesHandler::forfeit(User * demander){
             //sendEndOfMatch(invitors[matchIndex], FORFEIT);
         }
     }
-    sendEndOfMatch(winner, FORFEIT);
+    if(statesOfMatches[matchIndex] != TRAININGMATCH){
+        sendEndOfMatch(winner, FORFEIT);
+#ifdef __DEBUG
+    std::cout << "Forfait, le gagnant est prévenu" << std::endl;
+#endif
+    }
     handleEndOfMatch(winner, winningTeam, matchIndex);
-    
 }
 
 void MatchesHandler::transmitDrawRequest(User * demander){
@@ -90,7 +93,11 @@ void MatchesHandler::transmitDrawRequest(User * demander){
             //sendEndOfMatch(invitors[matchIndex], ASKFORDRAW);
         }
     }
-    sendEndOfMatch(receiver, ASKFORDRAW);
+    if(statesOfMatches[matchIndex] != TRAININGMATCH){
+        sendEndOfMatch(receiver, ASKFORDRAW);
+    }else{
+        sendEndOfMatch(demander, DRAWDENIED); //IA refuse toujours match nul
+    }
 }
 
 void MatchesHandler::confirmDraw(User * responder, int confirmation){
@@ -197,7 +204,7 @@ void MatchesHandler::getScoresAndPositions(User * demander){
     winner = matchesVector[matchIndex]->serializeScoreAndPositions(answer.stringData);
     sendOnSocket(demander->getSockfd(), answer);
     if(winner != 0){ //si match terminé
-        if(statesOfMatches[matchIndex] == OVER){ //si autre équipe a déjà vérifié
+        if((statesOfMatches[matchIndex] == OVER) or (statesOfMatches[matchIndex] == TRAININGMATCH)){ //si autre équipe a déjà vérifié ou un seul joueur
             handleEndOfMatch(winner, matchIndex);
         }else{
             statesOfMatches[matchIndex] = OVER;
@@ -213,14 +220,21 @@ void MatchesHandler::handleEndOfMatch(int winner, int matchIndex){
 
 void MatchesHandler::handleEndOfMatch(User * winningUser, int winnerTeam, int matchIndex){
 #ifdef __DEBUG
-    std::cout << "Nom du gagnant : " << winningUser->getUserName() << std::endl;
+    if(statesOfMatches[matchIndex] != TRAININGMATCH){
+        std::cout << "Nom du gagnant : " << winningUser->getUserName() << std::endl;
+    }
 #endif
     int tournamentPrice = 0;
     if(matchesVector[matchIndex]->isInTournament()){
         tournamentPrice = __tournament->getReward();
     }
-    inviteds[matchIndex]->handleEndOfMatch(2, winnerTeam, tournamentPrice, matchesVector[matchIndex]->getLifesOfTeam(2)); //numteam, winningTeam
-    invitors[matchIndex]->handleEndOfMatch(1, winnerTeam, tournamentPrice, matchesVector[matchIndex]->getLifesOfTeam(1)); //numteam, winningTeam
+    if(statesOfMatches[matchIndex] != TRAININGMATCH){
+        inviteds[matchIndex]->handleEndOfMatch(2, winnerTeam, tournamentPrice, matchesVector[matchIndex]->getLifesOfTeam(2)); //numteam, winningTeam
+        invitors[matchIndex]->handleEndOfMatch(1, winnerTeam, tournamentPrice, matchesVector[matchIndex]->getLifesOfTeam(1)); //numteam, winningTeam
+    }
+    else{
+        invitors[matchIndex]->handleEndOfTrainingMatch(1, winnerTeam, matchesVector[matchIndex]->getLifesOfTeam(1));
+    }
     
     if(matchesVector[matchIndex]->isInTournament()){
         deleteMatch(matchIndex);
@@ -274,6 +288,10 @@ void MatchesHandler::recordMoves(User * demander){
             matchesVector[matchIndex]->makeMoves();
             sendConfirmationTo(inviteds[matchIndex], MOVES_CONFIRM);
             sendConfirmationTo(invitors[matchIndex], MOVES_CONFIRM);
+        }else if(statesOfMatches[matchIndex] == TRAININGMATCH){
+            matchesVector[matchIndex]->generateIAActions();
+            matchesVector[matchIndex]->makeMoves();
+            sendConfirmationTo(invitors[matchIndex], MOVES_CONFIRM);
         }else{
             statesOfMatches[matchIndex] = WAITINGSECONDMOVE;
         }
@@ -293,12 +311,17 @@ void MatchesHandler::deleteMatch(int index){
 #ifdef __DEBUG
     std::cout << "Suppression du match à l'index " << index << std::endl;
 #endif
+    if(statesOfMatches[index] == TRAININGMATCH){
+        matchesVector[index]->deleteIATeam();
+    }
     delete matchesVector[index];
     matchesVector[index] = NULL;
     matchesVector.erase(matchesVector.begin() + index);
     invitors[index]->state_ = FREE;
     invitors.erase(invitors.begin() + index);
-    inviteds[index]->state_ = FREE;
+    if(statesOfMatches[index] != TRAININGMATCH){
+        inviteds[index]->state_ = FREE;
+    }
     inviteds.erase(inviteds.begin() + index);
     statesOfMatches.erase(statesOfMatches.begin() + index);
 #ifdef __DEBUG
@@ -417,4 +440,19 @@ int MatchesHandler::inviteForTournamentMatch(User * firstPlayer, User * secondPl
     result = sendOnSocket(firstPlayer->getSockfd(), msgForFirstPlayer);
     result = result and sendOnSocket(secondPlayer->getSockfd(), msgForSecondPlayer);
     return result;
+}
+
+void MatchesHandler::playTrainingMatch(User * invitor, std::vector<ManagedPlayer> &team1, int **movesTeam1){
+    if(invitor->state_ == FREE){
+        invitors.push_back(invitor);
+        inviteds.push_back(NULL);
+        statesOfMatches.push_back(TRAININGMATCH);
+        matchesVector.push_back(new Match(team1, movesTeam1));
+        matchesVector[matchesVector.size() - 1]->launchTrainingMatch();
+        
+        invitor->state_ = MATCH_INGAME;
+        sendConfirmationTo(invitor, 1);
+    }else{
+        sendConfirmationTo(invitor, -1);
+    }
 }

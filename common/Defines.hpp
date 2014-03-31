@@ -110,6 +110,9 @@
 #define MATCH_TOURNAMENT_START 62 //server to client
 #define STARTTOURNAMENTMATCH 63 //client to server
 
+#define PLAYTRAININGMATCH 68
+#define TRAITINGMATCHSTART 69
+
 
 
 #define STADIUM 1

@@ -23,6 +23,7 @@ class DataBase {
 
  	static void loadManager(string file, Manager& manager);
  	static ManagedPlayer* loadPlayer(string file);
+ 	static void loadPlayerFrom(string file, ManagedPlayer* toLoad);
  	static void loadBuildings(string file, Stadium& stadium, TrainingCenter& trainingCenter, Hospital& hospital, FanShop& fanShop,\
  							 PromotionCenter& promotionCenter);
 

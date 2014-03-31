@@ -66,6 +66,7 @@ public:
 	void handleEndOfMatch(int numTeam, int numWinningTeam);
 	
 	void handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice, std::vector<int> lifes); //normal price + tournamentPrice
+	void handleEndOfTrainingMatch(int numTeam, int numWinningTeam, std::vector<int> lifes);
 
 	std::string intToString(int value);
 
