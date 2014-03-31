@@ -587,7 +587,8 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 				"  Force:"+ QString::number( attributs.attributes[STRENGTH]) +
 				"\n Precision:"+ QString::number( attributs.attributes[PRECISION]) +
 				"  Reflexe:"+QString::number( attributs.attributes[REFLEX]) +
-				"\n Resistance:"+QString::number( attributs.attributes[RESISTANCE]) );
+				"\n Resistance:"+QString::number( attributs.attributes[RESISTANCE]) + 
+				"  Vie restante :"+QString::number( attributs.life) );
 
 				//debloque action de deplacement et affiche casse accesible
 				deplacer->setChecked(true);

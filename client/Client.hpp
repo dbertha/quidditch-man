@@ -64,6 +64,7 @@ typedef struct { //pas besoin de la classe complète
     int attributes[5];
     AxialCoordinates position;
     int hasQuaffle;
+    int life;
 } playerAttr;
 
 class Client {

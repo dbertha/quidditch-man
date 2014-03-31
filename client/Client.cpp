@@ -671,6 +671,7 @@ void Client::askAndSendMoves(int numTeam, HexagonalField &field, std::vector<Axi
       std::cout << "Précision  : " << attributs.attributes[PRECISION] << std::endl;
       std::cout << "Réflexe  : " << attributs.attributes[REFLEX] << std::endl;
       std::cout << "Résistance  : " << attributs.attributes[RESISTANCE] << std::endl;
+      std::cout << "Vie restante  : " << attributs.life << std::endl;
       if(attributs.hasQuaffle){
         std::cout << "Ce joueur porte le souaffle " << std::endl;
       }
@@ -1158,6 +1159,9 @@ playerAttr Client::receiveSelectedPlayerInfos(){
     memcpy(&attribute, position, sizeof(attribute)); //hasQuaffle
     position += sizeof(attribute);
     thePlayer.hasQuaffle = attribute;
+    memcpy(&attribute, position, sizeof(attribute)); //hasQuaffle
+    position += sizeof(attribute);
+    thePlayer.life = attribute;
     return thePlayer;
 }
 

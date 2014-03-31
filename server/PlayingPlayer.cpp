@@ -82,6 +82,9 @@ char * PlayingPlayer::serializeAttributes(char * bufferPosition){
     attribute = __hasQuaffle; //conversion to int
     memcpy(bufferPosition, &attribute, sizeof(attribute));
     bufferPosition += sizeof(attribute);
+    attribute = getLife();
+    memcpy(bufferPosition, &attribute, sizeof(attribute));
+    bufferPosition += sizeof(attribute);
     return bufferPosition;
 }
 
