@@ -180,6 +180,25 @@ void MainGui::auctionsMenu(){
     if (chooseAuction(__client,this)==BAD_CONNECTION) badConnection();
 
 }
+
+void MainGui::trainingMatchHandler(){
+    ticker->hide();
+    __pushesNotifier->setEnabled(false);
+    std::vector<int> chosenPlayers;
+    chosenPlayers = chooseTeamForMatch(__client, this); //tous les rôles sont nécessairement remplis 
+    __client->sendTrainingMatchRequest(chosenPlayers);
+    int confirmation = __client->receiveMatchConfirmation();
+    if(confirmation == 1){
+        MatchWindow * matchWindow = new MatchWindow(__client, 1, this);
+        matchWindow->show();
+    }else{
+        QMessageBox msgBox;
+        msgBox.setText("Training match not possible !");
+        msgBox.exec();
+    }
+    ticker->show();
+    __pushesNotifier->setEnabled(true);
+}
     
 
 //~ void MainGui::listAndChooseTournaments(){

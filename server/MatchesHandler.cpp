@@ -204,7 +204,13 @@ void MatchesHandler::getScoresAndPositions(User * demander){
     winner = matchesVector[matchIndex]->serializeScoreAndPositions(answer.stringData);
     sendOnSocket(demander->getSockfd(), answer);
     if(winner != 0){ //si match terminé
+#ifdef __DEBUG
+    std::cout << "Match terminé ! " << std::endl;
+#endif
         if((statesOfMatches[matchIndex] == OVER) or (statesOfMatches[matchIndex] == TRAININGMATCH)){ //si autre équipe a déjà vérifié ou un seul joueur
+#ifdef __DEBUG
+    std::cout << "Tous les joueurs concernés ont reçu le résultat, on peut supprimer le match" << std::endl;
+#endif
             handleEndOfMatch(winner, matchIndex);
         }else{
             statesOfMatches[matchIndex] = OVER;

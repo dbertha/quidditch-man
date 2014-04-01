@@ -7,6 +7,9 @@ MainMenu::MainMenu(MainGui *parent) : QWidget(parent), parent_(parent) {
     tournamentButton = new QPushButton(tr("Tournaments"));
     tournamentButton->setMinimumHeight(MINHEIGHT);
     tournamentButton->setMaximumWidth(MAXWIDTH);
+    trainingMatchButton = new QPushButton(tr("Play training match"));
+    trainingMatchButton->setMinimumHeight(MINHEIGHT);
+    trainingMatchButton->setMaximumWidth(MAXWIDTH);
     playersButton = new QPushButton(tr("Your players"));
     playersButton->setMinimumHeight(MINHEIGHT);
     playersButton->setMaximumWidth(MAXWIDTH);
@@ -25,6 +28,7 @@ MainMenu::MainMenu(MainGui *parent) : QWidget(parent), parent_(parent) {
     menuLayout = new QGridLayout;
     menuLayout->addWidget(matchButton,0,0);
     menuLayout->addWidget(tournamentButton,1,0);
+    menuLayout->addWidget(trainingMatchButton,2,0);
     menuLayout->addWidget(playersButton,0,1);
     menuLayout->addWidget(auctionButton, 0, 2);
     menuLayout->addWidget(buildingsButton,1,1);
@@ -32,10 +36,12 @@ MainMenu::MainMenu(MainGui *parent) : QWidget(parent), parent_(parent) {
     menuLayout->addWidget(freeAPButton, 2, 2);
     setLayout(menuLayout);
     connect(matchButton,SIGNAL(clicked()),parent_,SLOT(listMgrs()));
+    connect(trainingMatchButton,SIGNAL(clicked()),parent_,SLOT(trainingMatchHandler()));
     connect(playersButton,SIGNAL(clicked()),parent_,SLOT(listPlayers()));
     connect(buildingsButton,SIGNAL(clicked()),parent_,SLOT(buildings()));
     connect(tournamentButton,SIGNAL(clicked()),parent_,SLOT(tournaments()));
     connect(buyAPButton,SIGNAL(clicked()),parent_,SLOT(buyAPMenu()));
     connect(freeAPButton,SIGNAL(clicked()),parent_,SLOT(freeAPMenu()));
     connect(auctionButton,SIGNAL(clicked()),parent_,SLOT(auctionsMenu()));
+    
 }

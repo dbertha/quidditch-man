@@ -17,6 +17,7 @@ public:
 private:
     QPushButton *matchButton;
     QPushButton *tournamentButton;
+    QPushButton *trainingMatchButton;
     QPushButton *playersButton;
     QPushButton *auctionButton;
     QPushButton *buildingsButton;

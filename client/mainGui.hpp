@@ -52,6 +52,7 @@ public slots:
         void buyAPMenu();
         void freeAPMenu();
         void auctionsMenu();
+        void trainingMatchHandler();
 private slots:
         void about();
         void login();
