@@ -497,11 +497,21 @@ void Client::startMatch(int numTeam){
             cout << "Score team1 (inviter) = " << scoreTeam1 << endl;
             cout << "Score team2 (invited) = " << scoreTeam2 << endl;
             field.reset();
-            //TODO : méthode de field :
             for(unsigned int i = 0; i < allPositions.size(); ++i){
-              if(field.getOccupant(allPositions[i]) == FREE_SPACE){
-                field.setOccupant(allPositions[i], i);
-              }
+                
+                if((allPositions[i].getDiagAxis() != 10000) and (field.getOccupant(allPositions[i]) == FREE_SPACE)){
+                
+                    field.setOccupant(allPositions[i], i);
+                
+                }else if(allPositions[i].getDiagAxis() == 10000){
+                    int playerRole = i;
+                    int playerTeam = 1;
+                    if(i > TEAM2_KEEPER){
+                        playerTeam = 2;
+                        playerRole = i - TEAM2_KEEPER;
+                    }
+                    std::cout << "Le joueur " << playerRole << "de l'équipe " << playerTeam << " a été abattu par les cognards." << std::endl;
+                }
             }
             field.display();
             //TODO : tester si balle superposée à un joueur, et indiquer le joueur le cas échéant

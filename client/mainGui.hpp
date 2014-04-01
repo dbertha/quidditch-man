@@ -22,7 +22,6 @@
 #include "freeAPDialog.hpp"
 #include "MatchWindow.hpp"
 
-//TODO : exceptions notifier
 
 
 class MainMenu;

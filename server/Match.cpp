@@ -80,9 +80,9 @@ void Match::launch(std::vector<ManagedPlayer> &team2, int ** movesTeam2){ //suit
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_GOLDENSNITCH, STARTINGLINE_GOLDENSNITCH), GOLDENSNITCH);
     __balls.push_back(Ball(BLUDGER1, AxialCoordinates(STARTINGDIAG_BLUDGER1, STARTINGLINE_BLUDGER1))); 
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_BLUDGER1, STARTINGLINE_BLUDGER1), BLUDGER1);
-    __balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2))); 
+    __balls.push_back(Ball(BLUDGER2, AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2))); 
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2), BLUDGER2);
-    __balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE))); 
+    __balls.push_back(Ball(QUAFFLE, AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE))); 
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE), QUAFFLE);
 #ifdef __DEBUG
     __field.display();
@@ -153,9 +153,9 @@ void Match::launchTrainingMatch(){
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_GOLDENSNITCH, STARTINGLINE_GOLDENSNITCH), GOLDENSNITCH);
     __balls.push_back(Ball(BLUDGER1, AxialCoordinates(STARTINGDIAG_BLUDGER1, STARTINGLINE_BLUDGER1))); 
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_BLUDGER1, STARTINGLINE_BLUDGER1), BLUDGER1);
-    __balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2))); 
+    __balls.push_back(Ball(BLUDGER2, AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2))); 
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2), BLUDGER2);
-    __balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE))); 
+    __balls.push_back(Ball(QUAFFLE, AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE))); 
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE), QUAFFLE);
 #ifdef __DEBUG
     __field.display();
@@ -181,7 +181,7 @@ void Match::sortBySpeed(){
     int maxIndex, maxSpeedValue;
     for(int i = 0; i < 18; ++i){
         maxIndex = -1;
-        maxSpeedValue = 0;
+        maxSpeedValue = -1;
         for(unsigned int player = 0; player < __players.size(); ++player){
             if(not isInVector(__indexesSortedBySpeed, player)){
                 if(__players[player].getCapacity(SPEED) > maxSpeedValue){
@@ -273,9 +273,9 @@ Match::Match(std::vector<ManagedPlayer> &team1, std::vector<ManagedPlayer> &team
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_GOLDENSNITCH, STARTINGLINE_GOLDENSNITCH), GOLDENSNITCH);
     __balls.push_back(Ball(BLUDGER1, AxialCoordinates(STARTINGDIAG_BLUDGER1, STARTINGLINE_BLUDGER1))); 
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_BLUDGER1, STARTINGLINE_BLUDGER1), BLUDGER1);
-    __balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2))); 
+    __balls.push_back(Ball(BLUDGER2, AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2))); 
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_BLUDGER2, STARTINGLINE_BLUDGER2), BLUDGER2);
-    __balls.push_back(Ball(GOLDENSNITCH, AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE))); 
+    __balls.push_back(Ball(QUAFFLE, AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE))); 
     __field.setOccupant(AxialCoordinates(STARTINGDIAG_QUAFFLE, STARTINGLINE_QUAFFLE), QUAFFLE);
     __field.display();
     
@@ -372,8 +372,6 @@ void Match::makeMoves(){
     std::vector< int > movesOrder;
 
     //TODO : test si on n'essaie pas de frapper 2 fois sur le même cognard : priorité au plus rapide
-    //std::vector<int> movesOrder;
-    
     //génération des déplacements
     for(unsigned int i = 0; i < __indexesSortedBySpeed.size(); ++i){
         int * currentMove = NULL;
@@ -389,8 +387,6 @@ void Match::makeMoves(){
             if(currentMove[0] < GOLDENSNITCH){ //si pas une balle
                 std::vector<Move> orderedMoves = __players[currentMove[0]].getMovesTo(AxialCoordinates(currentMove[2], currentMove[3]));
                 allMoves.push_back(orderedMoves);
-                
-                
             }else{
                 std::vector<Move> orderedMoves = __balls[currentMove[0] - GOLDENSNITCH].getMovesTo(AxialCoordinates(currentMove[2], currentMove[3]));
                 allMoves.push_back(orderedMoves);
@@ -399,12 +395,20 @@ void Match::makeMoves(){
         else if(__indexesSortedBySpeed[i] == GOLDENSNITCH){
             // déplacement autonome du vif d'or
             std::vector<Move> orderedMoves = __balls[0].getMovesTo(__balls[0].getPosition().getRandomDestination(GOLDENSNITCH_SPEED));
+
             allMoves.push_back(orderedMoves);
             movesOrder.push_back(__indexesSortedBySpeed[i]);
         }
-        else if(__indexesSortedBySpeed[i] == BLUDGER1 or __indexesSortedBySpeed[i] == BLUDGER2){
+        else if((__indexesSortedBySpeed[i] == BLUDGER1) or (__indexesSortedBySpeed[i] == BLUDGER2)){
             // si pas cogné, cognards se déplacent de façon autonome
             std::vector<Move> orderedMoves = __balls[__indexesSortedBySpeed[i] - GOLDENSNITCH].getMovesTo(__balls[__indexesSortedBySpeed[i] - GOLDENSNITCH].getPosition().getRandomDestination(BLUDGER_AUTOSPEED));
+
+            allMoves.push_back(orderedMoves);
+            movesOrder.push_back(__indexesSortedBySpeed[i]);
+        }
+        else if(__indexesSortedBySpeed[i] == QUAFFLE){
+            std::vector<Move> orderedMoves;
+
             allMoves.push_back(orderedMoves);
             movesOrder.push_back(__indexesSortedBySpeed[i]);
         }
@@ -420,44 +424,55 @@ void Match::makeMoves(){
     while(stillMoves){
         stillMoves = false;
         for(unsigned int objectToMove = 0; objectToMove < movesOrder.size(); ++objectToMove){
+
             if(allMoves[objectToMove].size() > moveIndex){ //si encore des déplacements unitaires pour cet objet
+
                 stillMoves = true;
                 if(movesOrder[objectToMove] < GOLDENSNITCH){ //si PlayingPlayer
+                    
                     AxialCoordinates currentPosition = __players[movesOrder[objectToMove]].getPosition();
-                    AxialCoordinates destination(currentPosition.getDiagAxis() + allMoves[objectToMove][moveIndex].getDiagDiff(), currentPosition.getLineAxis() + allMoves[objectToMove][moveIndex].getLineDiff());
-                    if(__field.getOccupant(destination) == FREE_SPACE){ //destination libre
-                        __players[movesOrder[objectToMove]].moveTo(destination);
-                        if(__players[movesOrder[objectToMove]].hasQuaffle()){
-                            __balls[3].moveTo(destination); 
-                            //souaffle se déplace avec joueur qui le porte, ce joueur ne peut se déplacer avec la balle et la lancer sur un même tour
-                        }
-                        //TODO : méthodes + claires
-                        __field.setOccupant(destination, movesOrder[objectToMove]);
-                        __field.setOccupant(currentPosition, FREE_SPACE);
-                    }
-                    else if(__field.getOccupant(destination) < GOLDENSNITCH){ //collision avec un joueur : le mouvement s'arrête
+                    if(currentPosition.getDiagAxis() == 1000){ //un joueur peut être abbatu par un déplacement de balle alors qu'il a encore des déplacements
                         allMoves[objectToMove].clear();
-                    }else{//collision avec une balle
-                        if((__field.getOccupant(destination) == BLUDGER1) or (__field.getOccupant(destination) == BLUDGER2)){
-                            __players[movesOrder[objectToMove]].handleBludger();
-                            if(__players[movesOrder[objectToMove]].hasQuaffle()){ 
-                                __players[movesOrder[objectToMove]].loseQuaffle(); //lache le souaffle
-                                AxialCoordinates quafflePosition = __players[movesOrder[objectToMove]].getPosition();
-                                //souaffle libéré dans une case adjacente
-                                quafflePosition = AxialCoordinates(quafflePosition.getDiagAxis(), quafflePosition.getLineAxis() + 1); //case devant
-                                if((not quafflePosition.isOnField()) or (__field.getOccupant(quafflePosition) != FREE_SPACE)){
-                                    quafflePosition = AxialCoordinates(quafflePosition.getDiagAxis(), quafflePosition.getLineAxis() - 1); //case derrière
-                                }
-                                __field.setOccupant(quafflePosition, QUAFFLE);
-                                __balls[3].moveTo(quafflePosition);
+                    }
+                    else{
+                        AxialCoordinates destination(currentPosition.getDiagAxis() + allMoves[objectToMove][moveIndex].getDiagDiff(), currentPosition.getLineAxis() + allMoves[objectToMove][moveIndex].getLineDiff());
+                        if(__field.getOccupant(destination) == FREE_SPACE){ //destination libre
+                            __players[movesOrder[objectToMove]].moveTo(destination);
+                            if(__players[movesOrder[objectToMove]].hasQuaffle()){
+                                __balls[3].moveTo(destination); 
+                                //souaffle se déplace avec joueur qui le porte, ce joueur ne peut se déplacer avec la balle et la lancer sur un même tour
                             }
-                            if(__players[movesOrder[objectToMove]].getLife() == 0){ //abbatu par le cognard : sort du terrain
-                                __players[movesOrder[objectToMove]].moveTo(AxialCoordinates(10000,10000)); //hors du jeu
-                                __field.setOccupant(currentPosition, FREE_SPACE);
-                            }
-                            
+                            //TODO : méthodes + claires
+                            __field.setOccupant(destination, movesOrder[objectToMove]);
+                            __field.setOccupant(currentPosition, FREE_SPACE);
                         }
-                        allMoves[objectToMove].clear(); //de toute façon interrompu
+                        else if((__field.getOccupant(destination) < GOLDENSNITCH) and (__field.getOccupant(destination) > NOT_ON_HEX_GRID)){ //collision avec un joueur : le mouvement s'arrête
+                            allMoves[objectToMove].clear();
+                        }else{//collision avec une balle
+                            if((__field.getOccupant(destination) == BLUDGER1) or (__field.getOccupant(destination) == BLUDGER2)){
+                                __players[movesOrder[objectToMove]].handleBludger();
+                                if(__players[movesOrder[objectToMove]].hasQuaffle()){ 
+                                    __players[movesOrder[objectToMove]].loseQuaffle(); //lache le souaffle
+                                    AxialCoordinates quafflePosition = __players[movesOrder[objectToMove]].getPosition();
+                                    //souaffle libéré dans une case adjacente
+                                    quafflePosition = AxialCoordinates(quafflePosition.getDiagAxis(), quafflePosition.getLineAxis() + 1); //case devant
+                                    if((not quafflePosition.isOnField()) or (__field.getOccupant(quafflePosition) != FREE_SPACE)){
+                                        quafflePosition = AxialCoordinates(quafflePosition.getDiagAxis(), quafflePosition.getLineAxis() - 1); //case derrière
+                                    }
+                                    __field.setOccupant(quafflePosition, QUAFFLE);
+                                    __balls[3].moveTo(quafflePosition);
+                                }
+                                if(__players[movesOrder[objectToMove]].getLife() == 0){ //abbatu par le cognard : sort du terrain
+    #ifdef __DEBUG
+                        std::cout << "Joueur abbatu : " << movesOrder[objectToMove] << std::endl;
+    #endif
+                                    __players[movesOrder[objectToMove]].moveTo(AxialCoordinates(10000,10000)); //hors du jeu
+                                    __field.setOccupant(currentPosition, FREE_SPACE);
+                                }
+                                
+                            }
+                            allMoves[objectToMove].clear(); //de toute façon interrompu
+                        }
                     }
                 }else{ //si balle
                     AxialCoordinates currentPosition = __balls[movesOrder[objectToMove] - GOLDENSNITCH].getPosition();
@@ -483,7 +498,7 @@ void Match::makeMoves(){
                             }
                         }
                     }
-                    else if(__field.getOccupant(destination) < GOLDENSNITCH){ //collision avec un joueur : le mouvement s'arrête
+                    else if((__field.getOccupant(destination) < GOLDENSNITCH) and (__field.getOccupant(destination) > NOT_ON_HEX_GRID)){ //collision avec un joueur : le mouvement s'arrête
                         if((movesOrder[objectToMove] == BLUDGER1) or (movesOrder[objectToMove] == BLUDGER2)){
                             int occupantIndex = __field.getOccupant(destination);
                             __players[occupantIndex].handleBludger();
@@ -500,6 +515,9 @@ void Match::makeMoves(){
                             
                             }
                             if(__players[__field.getOccupant(destination)].getLife() == 0){ //abbatu par le cognard : sort du terrain
+#ifdef __DEBUG
+                    std::cout << "Joueur abbatu : " << __field.getOccupant(destination) << std::endl;
+#endif
                                 __players[__field.getOccupant(destination)].moveTo(AxialCoordinates(10000,10000)); //hors du jeu
                                 __field.setOccupant(destination, FREE_SPACE);
                             }
@@ -515,7 +533,10 @@ void Match::makeMoves(){
         ++moveIndex;
 
     }
-    
+    for(unsigned int objectToMove = 0; objectToMove < movesOrder.size(); ++objectToMove){
+        //on détruit tous les objets internes
+        allMoves[objectToMove].clear();
+    }
 }
 
 bool Match::isInVector(std::vector<int> toTest, int value){

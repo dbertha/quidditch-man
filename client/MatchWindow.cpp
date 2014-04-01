@@ -176,7 +176,21 @@ void MatchWindow::updateListeHexa(){
 //		coord = allPositions[i];
 		indexRow=allPositions[i].getLineOnMatrix();
 		indexCol=allPositions[i].getColOnMatrix();
-		if(ListeHexa[indexRow][indexCol]->getType()==FREE_SPACE){//1 balle et un joueur peuvent se supperposer
+		if(indexRow == 10000){
+			int playerRole = i;
+            int playerTeam = 1;
+            if(i > TEAM2_KEEPER){
+				playerTeam = 2;
+                playerRole = i - TEAM2_KEEPER;
+			}
+			QStringList orderedRoles;
+			QString boxTxt("Le joueur ");
+			orderedRoles << "KEEPER" << "SEEKER" << "CHASER1" << "CHASER2" << "CHASER3" << "BEATER1" << "BEATER2";
+			boxTxt += orderedRoles[i] + "de l'équipe " + QString::number(playerTeam) + " a été abattu par les cognards.";
+			QMessageBox msgBox;
+			msgBox.setText(boxTxt);
+			msgBox.exec();
+		}else if(ListeHexa[indexRow][indexCol]->getType()==FREE_SPACE){//1 balle et un joueur peuvent se supperposer
 			ListeHexa[indexRow][indexCol]->setType(i);
 		}else{//on rajoute une balle sur la casse du joueur
 			if(i==QUAFFLE){

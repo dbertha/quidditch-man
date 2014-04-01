@@ -21,7 +21,7 @@ public :
     void moveTo(AxialCoordinates destination) {__currentPosition = destination;}
     int getSpeed(){ 
         if(__role == GOLDENSNITCH) {return GOLDENSNITCH_SPEED;}
-        if((__role == BLUDGER1) or (__role == BLUDGER1)) {return BLUDGER_AUTOSPEED;} 
+        if((__role == BLUDGER1) or (__role == BLUDGER2)) {return BLUDGER_AUTOSPEED;} 
         return 0;
     }
     std::vector<Move> getMovesTo(AxialCoordinates destination){return __currentPosition.getMovesTo(destination);}

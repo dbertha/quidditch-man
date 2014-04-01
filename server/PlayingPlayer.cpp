@@ -21,7 +21,7 @@
 #include <time.h>       /* time */
 
 
-PlayingPlayer::PlayingPlayer(ManagedPlayer& player, int role, AxialCoordinates startingPosition) : __role(role), __currentPosition(startingPosition), __hasQuaffle(0){
+PlayingPlayer::PlayingPlayer(ManagedPlayer& player, int role, AxialCoordinates startingPosition) : __role(role), __currentPosition(startingPosition), __hasQuaffle(false){
 	Broomstick broomstick = player.getBroomstick();
 	int tmp;
 	for (int i=0;i<5;++i){

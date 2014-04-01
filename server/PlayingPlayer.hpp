@@ -8,6 +8,7 @@
 #include "ManagedPlayer.hpp"
 //#include "Ball.hpp"
 #include <cstring> //memcpy
+#include <iostream> 
 
 
 

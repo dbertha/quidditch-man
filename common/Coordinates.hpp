@@ -6,9 +6,13 @@
 #include <algorithm> //min() max()
 #include <vector>
 #include <cstdlib>
+#include <iostream>
 #include <ctime>
+//test only
+#include "Defines.hpp"
 
 #define MATRIX_SIZE 27 // nombre impair pour obtenir un centre unique en [MATRIX_SIZE/2][MATRIX_SIZE/2], qui correspondra à [0][0] en coordonnées axiales
+
 
 //Q : classe parente pour utiliser le polymorphisme ?
 
@@ -163,13 +167,18 @@ std::vector<Move> AxialCoordinates::getMovesTo(AxialCoordinates destination){
 
 AxialCoordinates AxialCoordinates::getRandomDestination(int distance){
     srand(int(time(0)));
-    int minRow = getLineOnMatrix() - distance;
-    int maxRow = getLineOnMatrix() + distance;
-    int indexRow = (rand() % (maxRow+1-minRow))+minRow;
-    int minCol = getColOnMatrix() - distance + std::max(0, getLineOnMatrix() - indexRow);
-    int maxCol = getColOnMatrix() + distance - std::max(0, indexRow - getLineOnMatrix());
-    int indexCol = (rand() % (maxCol+1-minCol))+minCol;
-    return AxialCoordinates(indexCol - (MATRIX_SIZE / 2), indexRow - (MATRIX_SIZE / 2));
+    AxialCoordinates result;
+    int minRow, maxRow, indexRow, minCol, maxCol, indexCol;
+    do{
+        minRow = getLineOnMatrix() - distance;
+        maxRow = getLineOnMatrix() + distance;
+        indexRow = (rand() % (maxRow+1-minRow))+minRow;
+        minCol = getColOnMatrix() - distance + std::max(0, getLineOnMatrix() - indexRow);
+        maxCol = getColOnMatrix() + distance - std::max(0, indexRow - getLineOnMatrix());
+        indexCol = (rand() % (maxCol+1-minCol))+minCol;
+        result = AxialCoordinates(indexCol - (MATRIX_SIZE / 2), indexRow - (MATRIX_SIZE / 2));
+    }while(not result.isOnField());
+    return result;
 }
     
 
