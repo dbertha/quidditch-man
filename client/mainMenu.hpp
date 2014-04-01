@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QGridLayout>
 #include <QGroupBox>
 #include "mainGui.hpp"
 class MainGui;
@@ -21,7 +22,7 @@ private:
     QPushButton *buildingsButton;
     QPushButton *buyAPButton;
     QPushButton *freeAPButton;
-    QVBoxLayout *menuLayout;
+    QGridLayout *menuLayout;
     QGroupBox *groupBox;
     MainGui *parent_;
 };
