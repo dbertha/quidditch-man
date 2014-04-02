@@ -5,6 +5,8 @@ client.out: Makefile.client \
 			client/Client.cpp \
 			client/Client.hpp \
 			client/ClientMain.cpp \
+			client/TerminalGame.hpp \
+			client/TerminalGame.cpp \
 			common/Coordinates.hpp \
 			common/Defines.hpp \
 			common/HexagonalField.hpp \
@@ -122,4 +124,7 @@ clean:
 	make clean -f Makefile.server
 	make clean -f Makefile.client
 	make clean -f Makefile.GUI
+	rm Makefile.server
+	rm Makefile.client
+	rm Makefile.GUI
 

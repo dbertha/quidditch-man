@@ -48,5 +48,5 @@ SOURCES += client/clientMatchHandler.cpp \
            client/AuctionsDialog.cpp \
            client/auctionWindow.cpp \
            client/MatchWindow.cpp \
-           client/HexagonalCase.cpp
+           client/HexagonalCase.cpp 
 

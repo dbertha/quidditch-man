@@ -1,4 +1,4 @@
-#include "Client.hpp"
+#include "TerminalGame.hpp"
 
 //TODO : utiliser buildConnexion de NetworkBase
 int main(int argc, char* argv[]) {
@@ -51,8 +51,10 @@ int main(int argc, char* argv[]) {
 		std::cout<<"Le serveur est absent."<<std::endl;
 		return EXIT_FAILURE;
 	}
-
-	Client ourClient=Client(sockfd_);
-	ourClient.run();
+	TerminalGame game(sockfd_);
+	game.mainLoop();
+	//~ Client ourClient=Client(sockfd_);
+	//~ ourClient.run();
+	close(sockfd_);
 	return EXIT_SUCCESS;
 }
