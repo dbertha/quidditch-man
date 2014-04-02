@@ -4,7 +4,6 @@ int choosePartner(Client * client, QWidget *parent) {
     int pos = NO_CHOICE;
     std::vector<int> IDList;
     std::vector<std::string> namesList;
-    if (client->getManagersList()==0) return BAD_CONNECTION;
     client->receiveManagersIDandNames(&IDList,&namesList);
     QStringList items;
     char username[USERNAME_LENGTH];
@@ -26,7 +25,6 @@ int choosePartner(Client * client, QWidget *parent) {
 std::vector<int> chooseTeamForMatch(Client * client, QWidget *parent){
     int pos = NO_CHOICE;
     std::vector<int> chosenPlayersIndexes;
-    if (client->askForPlayersList()==0) return chosenPlayersIndexes;
     std::vector<std::string> playersList = client->receivePlayersList();
     QStringList allNames, remainingNames, orderedRoles;
     

@@ -4,7 +4,7 @@
 #include "auctionMgr.hpp"
 
 MainGui::MainGui(int sockfd,QMainWindow *parent) : 
-parent_(parent), __client(new Client(sockfd, true)), __pushesNotifier(new QSocketNotifier(sockfd, QSocketNotifier::Read, this)) {
+parent_(parent), __client(new Client(sockfd)), __pushesNotifier(new QSocketNotifier(sockfd, QSocketNotifier::Read, this)) {
     __pushesNotifier->setEnabled(false); //genère le signal
     connect(__pushesNotifier,SIGNAL(activated(int)),this,SLOT(pushesHandler()));
     setFixedSize(800,640);

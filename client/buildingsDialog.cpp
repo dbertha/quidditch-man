@@ -36,8 +36,7 @@ void BuildingsDialog::select() {
     //interacts when the selectButton is clicked
     row = selectionModel->currentIndex().row();
     if(row<0 || row >=vAxe.length()) return;
-    __client->askForBuildingInfos(row+1);
-    buildingInfos = __client->receiveBuildingInfos();
+    buildingInfos = __client->receiveBuildingInfos(row+1);
     //is the cost not too high ?
     //is this building not undergoing an upgrade ?
     //has the manager enough action points ?
@@ -63,8 +62,7 @@ void BuildingsDialog::showInfo() {
     //updates the data presented by the model
 //    std::cout<<"**buildingsDialog "<<i<<" ";
     for (int j=0;j<vAxe.length();++j) {
-        __client->askForBuildingInfos(j+1);
-        buildingInfos = __client->receiveBuildingInfos();
+        buildingInfos = __client->receiveBuildingInfos(j+1);
         loadedData[j].clear();
         for (int k=0;k<hAxe.length()-1;++k) {
             if (k!=2 || (j==0 || j==3)) {

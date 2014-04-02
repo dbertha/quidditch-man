@@ -6,7 +6,7 @@ BuyAPDialog::BuyAPDialog(Client * client, QWidget *parent): QDialog(parent), __c
     validator = new QIntValidator(1, 999, this);
 
     std::string msg = "How many action points do you want to buy ? ";
-    std::string msg2 ="(1 AP = " + client->intToString(GOLD_FOR_ONE_AP) +" gold) ";
+    std::string msg2 ="(1 AP = " + intToString(GOLD_FOR_ONE_AP) +" gold) ";
     label = new QLabel(tr(msg.c_str()));
     label2 = new QLabel(tr(msg2.c_str()));
     lineEdit = new QLineEdit;

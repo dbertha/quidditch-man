@@ -1,7 +1,7 @@
 #include "Client.hpp"
 // Documentation : voir Readme.txt
 
-using namespace std; //TODO : rajouter tous les spécificateurs de namespace
+using namespace std; 
 
 
 Client::Client(int sockfd): sockfd_(sockfd) {}
@@ -34,6 +34,18 @@ std::vector<int> Client::getTournamentList(){
     }
     return tournamentsList;
         
+}
+
+string intToString(int value) {
+    char buffer[800];
+    sprintf(buffer,"%d",value);
+    string tmp = "";
+    int i = 0;
+    while (buffer[i] != '\0') {
+        tmp+=buffer[i];
+        ++i;
+    }
+    return tmp;
 }
 
 

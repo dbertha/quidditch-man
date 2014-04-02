@@ -116,6 +116,6 @@ public :
     int receiveNumOfTeam();
 };
 
-
+std::string intToString(int value);
 
 #endif

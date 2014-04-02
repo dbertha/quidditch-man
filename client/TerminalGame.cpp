@@ -1219,14 +1219,4 @@ void *auctionPrice(void* data) {
   }
 }
 
-string intToString(int value) {
-    char buffer[800];
-    sprintf(buffer,"%d",value);
-    string tmp = "";
-    int i = 0;
-    while (buffer[i] != '\0') {
-        tmp+=buffer[i];
-        ++i;
-    }
-    return tmp;
-}
+

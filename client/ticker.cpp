@@ -14,11 +14,11 @@ Ticker::Ticker(Client * client, QSocketNotifier * notifier, MainGui *parent)
 }
 void Ticker::showInfo() {
     move(0,50-counter%5); //this is to show its activity
-    if(__client->askForManagerInfos()==0) {
-        QErrorMessage *errorMessageDialog = new QErrorMessage(this);
-        errorMessageDialog->showMessage(tr("No connection with the server."));
-        close();
-    }
+    //~ if(__client->askForManagerInfos()==0) {
+        //~ QErrorMessage *errorMessageDialog = new QErrorMessage(this);
+        //~ errorMessageDialog->showMessage(tr("No connection with the server."));
+        //~ close();
+    //~ }
     __client->receiveManagerInfos(&nbPlayers,&money,&nbFans,&actionPoints);
     parent_->setMoney(money);
     parent_->setNbPlayers(nbPlayers);

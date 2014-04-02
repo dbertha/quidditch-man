@@ -4,7 +4,6 @@
 
 int choosePlayer(Client * client, QWidget *parent) {
     int pos = NO_CHOICE;
-    if (client->askForPlayersList()==0) return BAD_CONNECTION;
     std::vector<std::string> playersList = client->receivePlayersList();
     QStringList items;
     char username[2*USERNAME_LENGTH+1];

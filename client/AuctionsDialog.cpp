@@ -48,10 +48,8 @@ AuctionsDialog::AuctionsDialog(Client * client, int auctionID, int startingPrice
 }
 void AuctionsDialog::getInfo() {
     //loads the data presented by the model
-    if(__client->askForManagerInfos()==0) return badConnection();
     __client->receiveManagerInfos(&nbPlayers,&money,&nbFans,&actionPoints);
-    if(__client->askForAuctionInfos(auctionID_)==0) return badConnection();
-    playerInfos = __client->receivePlayerInfo();
+    playerInfos = __client->receivePlayerInfo(auctionID_);
     int len=vAxe.length();
     for (int j=0;j<len;++j) {
         loadedData[j].clear();

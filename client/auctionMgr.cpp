@@ -4,7 +4,6 @@
 
 int chooseAuction(Client * client, QWidget *parent) {
     int pos = NO_CHOICE;
-    if (client->getAuctionsList()==0) return BAD_CONNECTION;
     std::vector<std::string> auctionsList = client->receiveAuctionsList();
     QStringList items;
     QString qLine;

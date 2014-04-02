@@ -6,7 +6,6 @@ int chooseTournament(Client * client, const int role, QWidget *parent) {
     QString _str="A tournament starts when all places are taken.";
     QMessageBox::information(parent,QMessageBox::tr("Tournaments"),_str,QMessageBox::Ok);
     int _pos = NO_CHOICE;
-    if (client->askForTournamentList()==0) return BAD_CONNECTION;
     std::vector<int> _list;
     _list = client->getTournamentList();
     QStringList items;

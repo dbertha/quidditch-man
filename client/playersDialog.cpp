@@ -68,10 +68,8 @@ PlayersDialog::PlayersDialog(Client * client, const int player, const int functi
 }
 void PlayersDialog::getInfo() {
     //loads the data presented by the model
-    if(__client->askForManagerInfos()==0) return badConnection();
     __client->receiveManagerInfos(&nbPlayers,&money,&nbFans,&actionPoints);
-    if(__client->askForPlayerInfos(player_)==0) return badConnection();
-    playerInfos = __client->receivePlayerInfo();
+    playerInfos = __client->receivePlayerInfo(player_);
     int len=vAxe.length();
     for (int j=0;j<len;++j) {
         loadedData[j].clear();
@@ -130,8 +128,7 @@ void PlayersDialog::select(const int action) {
     QMessageBox::critical(this,tr("Upgrade"),str,QMessageBox::Ok);
 }
 void PlayersDialog::confirmation() {
-    if(__client->askForBuildingInfos(TRAININGCENTER)==0) return badConnection();
-    std::vector<int> Infos = __client->receiveBuildingInfos();
+    std::vector<int> Infos = __client->receiveBuildingInfos(TRAININGCENTER);
     QString str="Starting... It will be over in "+
         QString::number(Infos[2])+" minutes !";
     QMessageBox::information(this,tr("Upgrade"),str,QMessageBox::Ok);

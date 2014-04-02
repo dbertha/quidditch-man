@@ -99,7 +99,6 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	this->setLayout(layout);
 
 	__forfeitAndDrawNotifier->setEnabled(false);
-	__client->getAllPositions();
 	allPositions = __client->receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
 	
 
@@ -584,8 +583,7 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 				//recup info sur le joueur et afficher
 				//communication réseaux pour avoir info
 				__forfeitAndDrawNotifier->setEnabled(false);
-				__client->selectPlayer(caseJoueurSelect->getType());
-				attributs = __client->receiveSelectedPlayerInfos();
+				attributs = __client->receiveSelectedPlayerInfos(caseJoueurSelect->getType());
 				__forfeitAndDrawNotifier->setEnabled(true);
 				//attributs = { {3,5,3,4,5}, AxialCoordinates(iAxial,jAxial) ,1 };
 //*!!!!!!!!!!!! playerRole qui vas de 0 à 6
@@ -792,7 +790,6 @@ void MatchWindow::nextTurn(){
 		moves[i][3] = 10000;
 	}
 	//récupérer les positions
-	__client->getAllPositions();
     allPositions = __client->receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
 	//TODO: mieux gerer affichage
 	scoreEquipe->setText("\t score equipe 1 = "+QString::number(scoreTeam1) +"\n\t score equipe 2 = "+QString::number(scoreTeam2) );

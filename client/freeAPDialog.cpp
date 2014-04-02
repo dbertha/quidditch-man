@@ -6,7 +6,7 @@ FreeAPDialog::FreeAPDialog(Client * client, QWidget *parent): QDialog(parent), _
 
 
     std::string msg = "You have started a promotion campaign. ";
-    std::string msg2 ="(You will gain AP for every " + client->intToString(TIMESCALEACTIONPOINTS) +" minutes spent in here) ";
+    std::string msg2 ="(You will gain AP for every " + intToString(TIMESCALEACTIONPOINTS) +" minutes spent in here) ";
     label = new QLabel(tr(msg.c_str()));
     label2 = new QLabel(tr(msg2.c_str()));
     

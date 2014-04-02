@@ -102,7 +102,7 @@ private :
     
 };
 
-std::string intToString(int value);
+
 void *auctionTurn(void* data);
 void *auctionPrice(void* data);
 #endif
