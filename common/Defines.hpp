@@ -29,6 +29,7 @@
 
 #define AP_TRAINING 5
 #define AP_HOSPITAL 5
+#define AP_PLAYERMGR 6
 #define AP_UPGRADE 10
 #define AP_FRIENDLY_MATCH 15
 #define AP_AUCTION 3
