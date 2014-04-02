@@ -4,7 +4,7 @@
 #include "selectionDialog.hpp"
 //#include "common/NetworkInterface.hpp"
 #include "Client.hpp"
-
+#include "playersDialog.hpp"
 #define BAD_CONNECTION -1
 #define NO_CHOICE -2
 

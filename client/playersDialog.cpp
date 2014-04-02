@@ -1,6 +1,6 @@
 #include "playersDialog.hpp"
 
-PlayersDialog::PlayersDialog(Client * client, const int player, QWidget *parent)
+PlayersDialog::PlayersDialog(Client * client, const int player, const int function, QWidget *parent)
     : QDialog(parent), player_(player), __client(client) {
 
     buildingsModel=new BuildingsModel(this);
@@ -24,30 +24,43 @@ PlayersDialog::PlayersDialog(Client * client, const int player, QWidget *parent)
         blockedLabel = new QLabel(tr("This player is blocked."));
         mainLayout->addWidget(blockedLabel);
     }
-    else if (actionPoints<AP_AUCTION) {
-        blockedLabel = new QLabel(tr("Not enough action points to manage your player."));
-        mainLayout->addWidget(blockedLabel);
-        }
-        else {
-            trainButton = new QPushButton(tr("Train"));
-            trainButton->setDefault(true);
-            healButton = new QPushButton(tr("Heal"));
-            sellButton = new QPushButton(tr("Sell"));
-            broomstickButton = new QPushButton(tr("Broomstick"));
-            cancelButton= new QPushButton(tr("Cancel"));
-            bottomLayout = new QHBoxLayout;
-            bottomLayout->addWidget(trainButton);
-            if (playerInfos[13]<playerInfos[4]) bottomLayout->addWidget(healButton);
-            //this button is only needed if life is lesser than maximum
-            bottomLayout->addWidget(sellButton);
+    else if (function==AP_PLAYERMGR) {
+            if (actionPoints<AP_AUCTION) {
+                blockedLabel = new QLabel(tr("Not enough action points to manage your player."));
+                mainLayout->addWidget(blockedLabel);
+            }
+            else {
+                trainButton = new QPushButton(tr("Train"));
+                trainButton->setDefault(true);
+                healButton = new QPushButton(tr("Heal"));
+                sellButton = new QPushButton(tr("Sell"));
+                broomstickButton = new QPushButton(tr("Broomstick"));
+                cancelButton= new QPushButton(tr("Cancel"));
+                bottomLayout = new QHBoxLayout;
+                bottomLayout->addWidget(trainButton);
+                if (playerInfos[13]<playerInfos[4]) bottomLayout->addWidget(healButton);
+                //this button is only needed if life is lesser than maximum
+                bottomLayout->addWidget(sellButton);
 //            bottomLayout->addWidget(broomstickButton);
-            bottomLayout->addWidget(cancelButton);
-            connect(trainButton, SIGNAL(clicked()), this, SLOT(train()));
-            connect(healButton, SIGNAL(clicked()), this, SLOT(heal()));
-            connect(sellButton, SIGNAL(clicked()), this, SLOT(sell()));
-            connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-            mainLayout->addLayout(bottomLayout);
-            strActions<<"train "<<"heal "<<"sell ";
+                bottomLayout->addWidget(cancelButton);
+                connect(trainButton, SIGNAL(clicked()), this, SLOT(train()));
+                connect(healButton, SIGNAL(clicked()), this, SLOT(heal()));
+                connect(sellButton, SIGNAL(clicked()), this, SLOT(sell()));
+                connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+                mainLayout->addLayout(bottomLayout);
+                strActions<<"train "<<"heal "<<"sell ";
+            }
+    }
+    else {
+        OKButton = new QPushButton(tr("Yes"));
+        OKButton->setDefault(true);
+        NOButton = new QPushButton(tr("No"));
+        bottomLayout = new QHBoxLayout;
+        bottomLayout->addWidget(OKButton);
+        bottomLayout->addWidget(NOButton);
+        connect(OKButton,SIGNAL(clicked()),this,SLOT(accept()));
+        connect(NOButton,SIGNAL(clicked()),this,SLOT(reject()));
+        mainLayout->addLayout(bottomLayout);
     }
     mainLayout->addStretch();
     setLayout(mainLayout);

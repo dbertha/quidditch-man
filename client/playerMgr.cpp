@@ -19,7 +19,7 @@ int choosePlayer(Client * client, QWidget *parent) {
     if (selectionDialog->exec()==selectionDialog->Accepted) {
         pos = selectionDialog->getPosition();
         std::cout<<pos+1<<"eme joueur selectionne"<<std::endl;
-        PlayersDialog *playersDialog = new PlayersDialog(client,pos,parent);
+        PlayersDialog *playersDialog = new PlayersDialog(client,pos,AP_PLAYERMGR,parent);
         strncpy(username,playersList[2*pos].c_str(),USERNAME_LENGTH);
         strcat(username," ");
         strncat(username,playersList[2*pos+1].c_str(),USERNAME_LENGTH);

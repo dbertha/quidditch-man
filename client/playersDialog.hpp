@@ -22,7 +22,7 @@
 class PlayersDialog : public QDialog {
     Q_OBJECT
 public:
-    PlayersDialog(Client *, const int, QWidget *parent = 0);
+    PlayersDialog(Client *, const int, const int, QWidget *parent = 0);
 
 public slots:
     void train();
@@ -39,6 +39,8 @@ private:
     QPushButton *sellButton;
     QPushButton *broomstickButton;
     QPushButton *cancelButton;
+    QPushButton *OKButton;
+    QPushButton *NOButton;
     QHBoxLayout *bottomLayout;
     QVBoxLayout *mainLayout;
     QTableView *tableView;
