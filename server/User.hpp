@@ -91,6 +91,9 @@ private:
     void handleManagementRequest(SerializedObject *received);
     void handleMatchRequest(SerializedObject *received);
     void handleAuctionRequest(SerializedObject *received);
+    void writeIntVector(char * position, std::vector<int> list);
+    void writeStringVector(char * position, std::vector<std::string> list);
+    std::vector<int> readIntVector(char * position, int nbToRead);
 };
 
 #endif

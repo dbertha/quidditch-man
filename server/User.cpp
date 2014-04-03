@@ -175,7 +175,7 @@ void User::handleManagementRequest(SerializedObject *received){
             sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 
-		case GETMANAGERINFOS :
+		case GETMANAGERINFOS : {
 			//no detail to read
 #ifdef __DEBUG
 			std::cout<<"Demande des infos du manager reçue sur socket "<<getSockfd()<<std::endl;
@@ -192,6 +192,10 @@ void User::handleManagementRequest(SerializedObject *received){
 			nbFans = manager_->getNumberOfFans();
 			int actionPoints;
 			actionPoints = manager_->getActionPoints();
+			infos.push_back(nbPlayers);
+			infos.push_back(money);
+			infos.push_back(nbFans);
+			infos.push_back(actionPoints);
 #ifdef __DEBUG
 			std::cout<<"Number of players : "<<manager_->getNumberOfPlayers()<<std::endl;
 			std::cout<<"Money : "<<manager_->getMoney()<<std::endl;
@@ -201,16 +205,10 @@ void User::handleManagementRequest(SerializedObject *received){
 			DataBase::save(*manager_);
 			//construct answer
 			answer.typeOfInfos = MANAGERINFOS;
-			memcpy(answerPosition, &nbPlayers, sizeof(nbPlayers));
-			answerPosition += sizeof(nbPlayers);
-			memcpy(answerPosition, &money, sizeof(money));
-			answerPosition += sizeof(money);
-			memcpy(answerPosition, &nbFans, sizeof(nbFans));
-			answerPosition += sizeof(actionPoints);
-			memcpy(answerPosition, &actionPoints, sizeof(actionPoints));
+			writeIntVector(answerPosition, infos);
 			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
-
+		}
 		case GETPLAYERSLIST :
 			//no detail to read
 #ifdef __DEBUG
@@ -226,23 +224,13 @@ void User::handleManagementRequest(SerializedObject *received){
 			size = playersList.size();
 			memcpy(answerPosition, &size, sizeof(size)); //nb de noms à lire
 			answerPosition += sizeof(size);
-			for (unsigned int i=0;i<playersList.size() - 1;i+=2) { //un paquet par joueur
-				char playerFirstName[USERNAME_LENGTH], playerLastName[USERNAME_LENGTH];
+
 				//un managedPlayer dans la liste =
 				//indice dans la liste déductible par l'ordre en renvoi
 				//nom : char[30]
 				//prénom : char[30]
-				//on suppose le buffer assez grand
-				string firstname = playersList[i];
-				string lastname = playersList[i+1];
-				strcpy(playerFirstName, firstname.c_str());
-				strcpy(playerLastName, lastname.c_str());
-				memcpy(answerPosition, &playerFirstName, sizeof(playerFirstName));
-				answerPosition += sizeof(playerFirstName);
-				memcpy(answerPosition, &playerLastName, sizeof(playerLastName));
-				answerPosition += sizeof(playerLastName);
-				
-			}
+				//Attention : on suppose le buffer assez grand
+			writeStringVector(answerPosition, playersList);
 			calendar_->update();
 			DataBase::save(*manager_);
 			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
@@ -268,13 +256,7 @@ void User::handleManagementRequest(SerializedObject *received){
 			//1 int bonus du balais
 			//1 int capacity du balais
 			//TODO : ajouter la vie
-			std::cout << infos.size() << std::endl;
-			for(unsigned int i = 0; i < infos.size(); ++i){
-				int value;
-				value = infos[i];
-				memcpy(answerPosition, &value, sizeof(value));
-				answerPosition += sizeof(value);
-			}
+			writeIntVector(answerPosition, infos);
 			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			
 			break;
@@ -305,13 +287,7 @@ void User::handleManagementRequest(SerializedObject *received){
 			//construct answer
 
 			answer.typeOfInfos = BUILDINGINFOS;
-			for (unsigned int i=0;i<4;++i) {
-				//std::cout<<infos[i]<<std::endl;
-				int attr;
-				attr = infos[i];
-				memcpy(answerPosition, &attr, sizeof(attr));
-				answerPosition += sizeof(attr);
-			}
+			writeIntVector(answerPosition, infos);
 			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 			break;
 		case UPGRADE_BUILDING :
@@ -505,13 +481,7 @@ void User::handleMatchRequest(SerializedObject *received){
 			memcpy(&targetedUser, position, sizeof(targetedUser));
 
 			position += sizeof(targetedUser);
-			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
-			for(int i = 0; i < 7; ++i){
-				int value;
-				memcpy(&value,position, sizeof(value));
-				position += sizeof(value);
-				playersInTeam.push_back(value); //ajout à la liste
-			}
+			std::vector<int> playersInTeam = readIntVector(position, 7); //indice des ManagedPlayer à faire jouer
 #ifdef __DEBUG
 			std::cout<<"Demande de proposition d'un match reçue sur socket "<<getSockfd()<<std::endl;
 			std::cout<<"userID reçu : "<<targetedUser<<std::endl;
@@ -541,12 +511,7 @@ void User::handleMatchRequest(SerializedObject *received){
 			position += sizeof(confirmation);
 			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
 			if(confirmation){
-				for(int i = 0; i < 7; ++i){
-					int value;
-					memcpy(&value,position, sizeof(value));
-					position += sizeof(value);
-					playersInTeam.push_back(value); //ajout à la liste
-				}
+				playersInTeam = readIntVector(position, 7);
 			}
 #ifdef __DEBUG
 			std::cout<<"Demande d'acceptation d'un match reçue sur socket "<<getSockfd()<<std::endl;
@@ -583,28 +548,15 @@ void User::handleMatchRequest(SerializedObject *received){
 			//soit un joueur se déplace, soit un joueur fait se déplacer une balle, soit ne fait rien : nbmax de mouvements = nbtotal de mouvement = nbjoueurs = 7
 			//structure d'un mouvement : int playerID, int diagDest, int lineDest
 			
-			int diagDest;
-			int lineDest;
-			int specialAction;
-			for(int i = 0; i < 7; ++i){
-				memcpy(&targetedPlayer, position, sizeof(targetedPlayer));
-				position += sizeof(targetedPlayer);
-				memcpy(&specialAction, position, sizeof(specialAction));
-				position += sizeof(specialAction);
-				memcpy(&diagDest, position, sizeof(diagDest));
-				position += sizeof(diagDest);
-				memcpy(&lineDest, position, sizeof(lineDest));
-				position += sizeof(lineDest);
-				__moves[i][0] = targetedPlayer;
-				__moves[i][1] = specialAction;
-				__moves[i][2] = diagDest;
-				__moves[i][3] = lineDest;
+			std::vector<int> receivedMoves = readIntVector(position, 7 * 4);
+			for(unsigned int i = 0; i < receivedMoves.size(); i+=4){
+				__moves[i/4][0] = receivedMoves[i];
+				__moves[i/4][1] = receivedMoves[i+1];
+				__moves[i/4][2] = receivedMoves[i+2];
+				__moves[i/4][3] = receivedMoves[i+3];
 			}
 #ifdef __DEBUG
 			std::cout<<"Liste de déplacements reçue sur le socket "<<getSockfd()<<std::endl;
-			std::cout<<"1er mouvement reçu : playerID diagDestination lineDestination "<<__moves[0][0] << " " <<__moves[0][2]<< " " << __moves[0][3]<< std::endl;
-			std::cout<<"3eme mouvement reçu : playerID diagDestination lineDestination "<<__moves[2][0] << " " <<__moves[2][2]<< " " << __moves[2][3]<< std::endl;
-			std::cout<<"7eme mouvement reçu : playerID diagDestination lineDestination "<<__moves[6][0] << " " <<__moves[6][2]<< " " << __moves[6][3]<< std::endl;
 #endif
 			//handling demand and answering by the MatchesHandler
             __matchesHandler->recordMoves(this);
@@ -629,13 +581,7 @@ void User::handleMatchRequest(SerializedObject *received){
 		case PLAYTRAININGMATCH : {
 			//reading details
 			position = received->stringData;
-			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
-			for(int i = 0; i < 7; ++i){
-				int value;
-				memcpy(&value,position, sizeof(value));
-				position += sizeof(value);
-				playersInTeam.push_back(value); //ajout à la liste
-			}
+			std::vector<int> playersInTeam = readIntVector(position, 7); //indice des ManagedPlayer à faire jouer
 #ifdef __DEBUG
 			std::cout<<"Demande de début de match d'entrainement reçue sur socket "<<getSockfd()<<std::endl;
 #endif
@@ -725,13 +671,8 @@ case CREATE_TOURNAMENT : {
 		case STARTTOURNAMENTMATCH : {
 			//reading details
 			position = received->stringData;
-			std::vector<int> playersInTeam; //indice des ManagedPlayer à faire jouer
-			for(int i = 0; i < 7; ++i){
-				int value;
-				memcpy(&value,position, sizeof(value));
-				position += sizeof(value);
-				playersInTeam.push_back(value); //ajout à la liste
-			}
+			std::vector<int> playersInTeam = readIntVector(position, 7); //indice des ManagedPlayer à faire jouer
+
 			
 #ifdef __DEBUG
 			std::cout<<"Demande d'acceptation d'un match de tournoi reçue sur socket "<<getSockfd()<<std::endl;
@@ -908,13 +849,7 @@ void User::handleAuctionRequest(SerializedObject *received){
 			//1 int bonus du balais
 			//1 int capacity du balais
 			//TODO : ajouter la vie //done
-			std::cout << infos.size() << std::endl;
-			for(unsigned int i = 0; i < infos.size(); ++i){
-				int value;
-				value = infos[i];
-				memcpy(answerPosition, &value, sizeof(value));
-				answerPosition += sizeof(value);
-			}
+			writeIntVector(answerPosition, infos);
 			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
 				
 			break;
@@ -1125,4 +1060,33 @@ void User::handleEndOfTrainingMatch(int numTeam, int numWinningTeam, std::vector
 		_teamInMatch[i]->setLife(lifes[i]);
 	}
 	_teamInMatch.clear();
+}
+
+void User::writeIntVector(char * position, std::vector<int> list){
+	for(unsigned int i = 0; i < list.size(); ++i){
+		memcpy(position, &list[i], sizeof(int));
+		position += sizeof(int);
+	}
+}
+
+std::vector<int> User::readIntVector(char * position, int nbToRead){
+	int value;
+	std::vector<int> result;
+	for(int i = 0; i < nbToRead; ++i){
+		memcpy(&value, position, sizeof(int));
+		position += sizeof(int);
+		result.push_back(value);
+	}
+	return result;
+}
+
+void User::writeStringVector(char * position, std::vector<std::string> list){
+	//Attention : on suppose le buffer assez grand
+	for (unsigned int i=0;i<list.size() - 1;++i) {
+		char name[USERNAME_LENGTH];
+		string stringname = list[i];
+		strcpy(name, stringname.c_str());
+		memcpy(position, &name, sizeof(name));
+		position += sizeof(name);
+	}
 }
