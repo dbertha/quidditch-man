@@ -21,32 +21,23 @@ std::vector<int> Client::getTournamentList(){
     char * position = _serialized.stringData;
     memcpy(&nbOfTournaments, position, sizeof(nbOfTournaments));
     position += sizeof(nbOfTournaments);
-    for(int i = 0; i < nbOfTournaments; ++i){
-        memcpy(&startingNbOfPlayers, position, sizeof(startingNbOfPlayers));
-        position += sizeof(startingNbOfPlayers);
-        memcpy(&currentNbOfPlayers, position, sizeof(currentNbOfPlayers));
-        position += sizeof(currentNbOfPlayers);
-        memcpy(&startingPrice, position, sizeof(startingPrice));
-        position += sizeof(startingPrice);
-        tournamentsList.push_back(startingNbOfPlayers);
-        tournamentsList.push_back(currentNbOfPlayers);
-        tournamentsList.push_back(startingPrice);
+    std::vector<int> infos = receiveIntList(position, nbOfTournaments * 3); //3 entiers pour chaque tournoi
+    for(int i = 0; i < nbOfTournaments * 3; i +=3){
+        //~ memcpy(&startingNbOfPlayers, position, sizeof(startingNbOfPlayers));
+        //~ position += sizeof(startingNbOfPlayers);
+        //~ memcpy(&currentNbOfPlayers, position, sizeof(currentNbOfPlayers));
+        //~ position += sizeof(currentNbOfPlayers);
+        //~ memcpy(&startingPrice, position, sizeof(startingPrice));
+        //~ position += sizeof(startingPrice);
+        tournamentsList.push_back(infos[i]);
+        tournamentsList.push_back(infos[i+1]);
+        tournamentsList.push_back(infos[i+2]);
     }
     return tournamentsList;
         
 }
 
-string intToString(int value) {
-    char buffer[800];
-    sprintf(buffer,"%d",value);
-    string tmp = "";
-    int i = 0;
-    while (buffer[i] != '\0') {
-        tmp+=buffer[i];
-        ++i;
-    }
-    return tmp;
-}
+
 
 
 
@@ -218,12 +209,7 @@ std::vector<int> Client::receivePlayerInfo(int playerID){
 			//1 int capacity du balais
             //1 int life
             //1 int estimated value of player
-        for(int i = 0; i < 15; ++i){
-            int value;
-            memcpy(&value,position, sizeof(value));
-            position += sizeof(value);
-            playerInfos.push_back(value); //ajout à la liste
-        }
+        playerInfos = receiveIntList(position, 15);
     }
     return playerInfos;
 }
@@ -340,14 +326,26 @@ std::vector<AxialCoordinates> Client::receiveScoresAndPositions(int * winner, in
     position += sizeof(int);
     memcpy(scoreTeam2, position, sizeof(int));
     position += sizeof(int);
-    for(unsigned int i = 0; i < 18; ++i){ //positions des 18 objets
-        memcpy(&diag, position, sizeof(diag));
-        position += sizeof(diag);
-        memcpy(&line, position, sizeof(line));
-        position += sizeof(line);
-        orderedPositions.push_back(AxialCoordinates(diag, line));
+    std::vector<int> coordList = receiveIntList(position, 36); //18 coord de 2 entiers
+    for(unsigned int i = 0; i < 36; i+=2){ 
+        //~ memcpy(&diag, position, sizeof(diag));
+        //~ position += sizeof(diag);
+        //~ memcpy(&line, position, sizeof(line));
+        //~ position += sizeof(line);
+        orderedPositions.push_back(AxialCoordinates(coordList[i], coordList[i+1]));
     }
     return orderedPositions;
+}
+
+std::vector<int> Client::receiveIntList(char * position, int nbToRead){
+    std:vector<int> list;
+    int read;
+    for(int i = 0; i < nbToRead; ++i){
+        memcpy(&read, position, sizeof(read));
+        position += sizeof(read);
+        list.push_back(read);
+    }
+    return list;
 }
 
 int Client::selectPlayer(int playerID){
@@ -443,7 +441,6 @@ std::vector<std::string> Client::receiveAuctionsList(){
         int nbInfos;
         memcpy(&nbInfos,position, sizeof(nbInfos));
         position += sizeof(nbInfos);
-        std::cout << nbInfos << std::endl;
         for(int i = 0; i < nbInfos; ++i){
             char info[2*USERNAME_LENGTH];
             std::string strInfos;
@@ -509,7 +506,6 @@ int Client::getAuctionTimeLeft(){
     int result;
     _serialized = receiveOnSocket(sockfd_);
     char * position = _serialized.stringData;
-    //TODO : vérifier qu'il s'agit bien d'un message de confirmation
     memcpy(&result,position, sizeof(result));
     return result;
 }
@@ -553,4 +549,19 @@ int Client::askToJoinTournament(int tournamentID){
     char * position = _serialized.stringData;
     memcpy(position, &tournamentID, sizeof(tournamentID));
     return sendOnSocket(sockfd_, _serialized);
+}
+
+
+
+
+string intToString(int value) {
+    char buffer[800];
+    sprintf(buffer,"%d",value);
+    string tmp = "";
+    int i = 0;
+    while (buffer[i] != '\0') {
+        tmp+=buffer[i];
+        ++i;
+    }
+    return tmp;
 }

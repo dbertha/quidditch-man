@@ -53,6 +53,7 @@ private:
     int getAllPositions();
     int selectPlayer(int playerID);
     int getAuctionsList();
+    std::vector<int> receiveIntList(char * position, int nbToRead);
 public :
     int getSockfd() const {return sockfd_;}
 
