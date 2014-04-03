@@ -14,7 +14,7 @@ int Client::askForTournamentList(){
 
 std::vector<int> Client::getTournamentList(){
     //nbOfTournaments then __startingNbOfPlayers, __currentNbOfPlayers, __startingPrice for each
-    int nbOfTournaments, startingNbOfPlayers, currentNbOfPlayers, startingPrice;
+    int nbOfTournaments;
     askForTournamentList(); //demande au serveur
     std::vector<int> tournamentsList;
     _serialized = receiveOnSocket(sockfd_);
@@ -176,7 +176,6 @@ std::vector<std::string> Client::receivePlayersList(){
         int nbNames;
         memcpy(&nbNames,position, sizeof(nbNames));
         position += sizeof(nbNames);
-        std::cout << nbNames << std::endl;
         for(int i = 0; i < nbNames; ++i){
             char name[USERNAME_LENGTH];
             std::string strName;
@@ -318,8 +317,6 @@ std::vector<AxialCoordinates> Client::receiveScoresAndPositions(int * winner, in
     _serialized = receiveOnSocket(sockfd_);
     char * position = _serialized.stringData;
     std::vector<AxialCoordinates> orderedPositions;
-    int diag;
-    int line;
     memcpy(winner, position, sizeof(int));
     position += sizeof(int);
     memcpy(scoreTeam1, position, sizeof(int));
@@ -338,7 +335,7 @@ std::vector<AxialCoordinates> Client::receiveScoresAndPositions(int * winner, in
 }
 
 std::vector<int> Client::receiveIntList(char * position, int nbToRead){
-    std:vector<int> list;
+    std::vector<int> list;
     int read;
     for(int i = 0; i < nbToRead; ++i){
         memcpy(&read, position, sizeof(read));
@@ -392,7 +389,6 @@ int Client::sendMoves(int moves[][4]){
         specialAction = moves[i][1];
         diagDest = moves[i][2];
         lineDest = moves[i][3];
-        printf("%s : %d %d %d\n", "playerID diagDest lineDest", targetedPlayer, diagDest, lineDest);
         memcpy(position, &targetedPlayer,sizeof(targetedPlayer)); 
         position += sizeof(targetedPlayer);
         memcpy(position, &specialAction,sizeof(specialAction)); 

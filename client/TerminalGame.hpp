@@ -99,7 +99,7 @@ private :
     //void *auctionTurn(void* data); : extern
     void startMatch(int numTeam);
     void askAndSendMoves(int numTeam, HexagonalField &field, std::vector<AxialCoordinates> &positions);
-    
+    void handleAMatchAction(int playerRole, int numTeam, int * actualMove, Client &_client, HexagonalField &field, std::vector<AxialCoordinates> &positions);
 };
 
 
