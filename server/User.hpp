@@ -85,12 +85,12 @@ private:
 	Auction* auction_;
     int **__moves;
     struct tm timeOfStart_;
-    bool isAboutManagement(SerializedObject &received){ return (received.typeOfInfos <= MANAGEMENTINDEXEND) and (received.typeOfInfos >= MANAGEMENTINDEXSTART);}
-    bool isAboutMatch(SerializedObject &received){ return (received.typeOfInfos <= MATCHESINDEXEND) and (received.typeOfInfos >= MATCHESINDEXSTART);}
-    bool isAboutAuctions(SerializedObject &received){ return (received.typeOfInfos <= AUCTIONSINDEXEND) and (received.typeOfInfos >= AUCTIONSINDEXSTART);}
-    void handleManagementRequest(SerializedObject &received);
-    void handleMatchRequest(SerializedObject &received);
-    void handleAuctionRequest(SerializedObject &received);
+    bool isAboutManagement(SerializedObject *received){ return (received->typeOfInfos <= MANAGEMENTINDEXEND) and (received->typeOfInfos >= MANAGEMENTINDEXSTART);}
+    bool isAboutMatch(SerializedObject *received){ return (received->typeOfInfos <= MATCHESINDEXEND) and (received->typeOfInfos >= MATCHESINDEXSTART);}
+    bool isAboutAuctions(SerializedObject *received){ return (received->typeOfInfos <= AUCTIONSINDEXEND) and (received->typeOfInfos >= AUCTIONSINDEXSTART);}
+    void handleManagementRequest(SerializedObject *received);
+    void handleMatchRequest(SerializedObject *received);
+    void handleAuctionRequest(SerializedObject *received);
 };
 
 #endif

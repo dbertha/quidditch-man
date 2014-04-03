@@ -44,45 +44,45 @@ User::~User(){
 }
 
 void User::cmdHandler(SerializedObject *received) {
-	SerializedObject answer;
-	char * position;
-	char * answerPosition = answer.stringData;
+
 	
-	int targetedUser;
-	int targetedPlayer;
-	int resultOfUpgrade, resultOfAuction;
-	
-	int size;
-	
-	
-	
-	
-	
-	vector<string> playersList;
-	
-    
-	position = received->stringData;
 #ifdef __DEBUG
 	std::cout<<"En-tête reçu : "<<received->typeOfInfos<<std::endl;
 #endif
 	if(isAboutManagement(received)){
+#ifdef __DEBUG
+	std::cout<<"C'est une requête de Management."<<std::endl;
+#endif
 		handleManagementRequest(received);
 	}
 	else if (isAboutMatch(received)){
+#ifdef __DEBUG
+	std::cout<<"C'est une requête de Match."<<std::endl;
+#endif
 		handleMatchRequest(received);
 	}
 	else{
+#ifdef __DEBUG
+	std::cout<<"C'est une requête d'enchère."<<std::endl;
+#endif
 		handleAuctionRequest(received);
 	}
 }
 
-void User::handleManagementRequest(SerializedObject &received){
-	int targetedBuilding;
+void User::handleManagementRequest(SerializedObject *received){
+	int targetedBuilding, resultOfUpgrade, size;
 	int APGained;
 	int confirmation;
 	std::vector<int> IDList;
     std::vector<std::string> namesList;
     vector<int> infos;
+    SerializedObject answer;
+	char * position;
+	char * answerPosition = answer.stringData;
+	vector<string> playersList;
+	int targetedPlayer;
+	position = received->stringData;
+	int elapsedTime, amount, price;
 	switch(received->typeOfInfos){
 		//décodage du buffer en fonction de son entête
 		case LOGIN :
@@ -490,8 +490,13 @@ void User::handleManagementRequest(SerializedObject &received){
 }
 			
 			
-void User::handleMatchRequest(SerializedObject &received){
+void User::handleMatchRequest(SerializedObject *received){
 	int confirmation;
+	int targetedUser, targetedPlayer;
+	SerializedObject answer;
+	char * position;
+	char * answerPosition = answer.stringData;
+	position = received->stringData;
 	switch(received->typeOfInfos){
 		case PROPOSEMATCH : {
 			//reading details
@@ -758,15 +763,20 @@ case CREATE_TOURNAMENT : {
 	}
 }
 		
-void User::handleAuctionRequest(SerializedObject &received){
-	int confirmation;
-	int targetedAuction;
+void User::handleAuctionRequest(SerializedObject *received){
+	int confirmation, size;
+	int targetedAuction, targetedPlayer;
 	int isFinished;
 	int auctionPrice;
-	int elapsedTime;
-	int amount, price, currentPrice,auctionTimeLeft;
+	vector<int> infos;
+	int currentPrice,auctionTimeLeft;
 	ManagedPlayer tmpPlayer;
 	vector<string> auctionsList;
+	SerializedObject answer;
+	char * position;
+	char * answerPosition = answer.stringData;
+	//int resultOfAuction;
+	position = received->stringData;
 	switch(received->typeOfInfos){
 		case CREATEAUCTION : {
 			//reading details
