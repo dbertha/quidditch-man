@@ -45,7 +45,7 @@ class User {
 public:
 	User(Server *, MatchesHandler *, int, int);
 	~User();
-	void cmdHandler(SerializedObject *);
+	void cmdHandler();
 	void setDisconnection();
 	bool isDisconnecting();
 	int getSockfd();

@@ -2,7 +2,6 @@
 #define SERVER_H
 
 #include "../common/Defines.hpp"
-#include "../common/NetworkBase.hpp"
 #include "MatchesHandler.hpp"
 #include "User.hpp"
 #include "Auction.hpp"
@@ -22,15 +21,12 @@
 #include <arpa/inet.h>
 #include <string>
 
-class User;
-class Auction;
-class ManagedPlayer;
-class MatchesHandler;
+
+class ManagedPlayer; //TODO : supprimer cette dépendance
 class Server {
 public:
 	Server(int);
 	void run();
-	int sendToClient(User *, SerializedObject *); //TODO : transformer la modélisation pour conserver en private ou protected
 	std::vector<User*> usersList_;
 	std::vector<User*> GetUsersList();
 	std::vector<Auction*> auctionsList_;
@@ -62,7 +58,7 @@ private:
 	bool isNewConnection();
 	bool keyboard();
 	int newUser();
-	int receive(User *, SerializedObject *);
+	//int receive(User *, SerializedObject *); 
 	void removeUser(int);
 	void removeAllUsers();
 };

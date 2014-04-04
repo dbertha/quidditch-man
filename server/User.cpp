@@ -2,10 +2,9 @@
 
 #include "MatchesHandler.hpp" 
 #include "Auction.hpp"
-#include "Server.hpp"
+#include "Server.hpp" //TODO : supprimer cette dépendance
 #include "DataBase.hpp"
 	
-//TODO : éviter redondance des includes avec le hpp
 #include <string> 
 #include <sys/stat.h>
 #include <iostream>
@@ -43,8 +42,9 @@ User::~User(){
 	}
 }
 
-void User::cmdHandler(SerializedObject *received) {
-
+void User::cmdHandler() {
+	SerializedObject receivedObject = receiveOnSocket(sockfd_);
+	SerializedObject *received = &receivedObject;
 	
 #ifdef __DEBUG
 	std::cout<<"En-tête reçu : "<<received->typeOfInfos<<std::endl;

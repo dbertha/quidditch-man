@@ -1,13 +1,5 @@
 #include "Server.hpp"
 
-//#include "CommonMgr.hpp"
-//~ #include "User.hpp"
-//~ #include <netinet/in.h> //htons()  ntohs()
-//~ #include "../common/NetworkBase.h"
-//~ #include "../server/Auction.hpp"
-
-//TODO : pas de EXIT_SUCCESS ou EXIT_FAILURE pour d'autres méthodes que main()
-
 // Documentation : voir Readme.txt
 Server::Server(int port): __matchesHandler(), port_(port), max_(0), _nextuserID(0) {}
 // initialisations dans le constructeur
@@ -51,7 +43,7 @@ void Server::disconnect() {
 }
 
 int Server::mainLoop() {
-    SerializedObject received;
+    //SerializedObject received;
 	max_=sockfd_;
 #ifdef __DEBUG
 	std::cout<<"**mon socket : "<<sockfd_<<std::endl;
@@ -79,14 +71,14 @@ int Server::mainLoop() {
 		else {
 			for (unsigned int i=0;i<usersList_.size();++i) {
 				if (FD_ISSET(usersList_[i]->getSockfd(),&FDSet_)) {
-					int length = receive(usersList_[i],&received); //TODO : tester valeur
+					//int length = receive(usersList_[i],&received); //TODO : tester valeur
 					if(usersList_[i]->isDisconnecting()) {
 						std::cout<<"User "<<usersList_[i]->getUserID()<<" disappeared from socket "
 										<<usersList_[i]->getSockfd()<<std::endl;
 						removeUser(i);
 					}
 					else //traitement du message et envoi de la réponse
-						usersList_[i]->cmdHandler(&received);
+						usersList_[i]->cmdHandler();
 				}
 			}
 		}
@@ -127,35 +119,7 @@ int Server::newUser() {
 	return EXIT_SUCCESS;
 }
 
-int Server::receive(User * aUser, SerializedObject * received) {
-	int length=recv(aUser->getSockfd(),received,sizeof(SerializedObject),0);
-	if(length==0 || length==ERROR) {
-		aUser->setDisconnection();
-	}
-	else {
-		received->typeOfInfos = ntohs(received->typeOfInfos);
-#ifdef __DEBUG
-		std::cout<<"**got a SerializedObject on "<<aUser->getSockfd()<<std::endl;
-#endif
-	}
-	return length;
-}
 
-
-int Server::sendToClient(User * aUser, SerializedObject * toSend) {
-	toSend->typeOfInfos = htons(toSend->typeOfInfos);
-	if(send(aUser->getSockfd(),toSend,sizeof(SerializedObject),0)==ERROR) {
-		std::cerr<<aUser->getUserID()<<" message send error on socket "
-				<<aUser->getSockfd()<<std::endl;
-		return EXIT_FAILURE;
-	}
-	else {
-#ifdef __DEBUG
-		std::cout<<"**sent a SerializedObject to "<<clientSockfd_<<std::endl;
-#endif
-		return EXIT_SUCCESS;
-	}
-}
 
 void Server::removeUser(int pos) {
 	close(usersList_[pos]->getSockfd());
