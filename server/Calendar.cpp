@@ -133,7 +133,7 @@ bool Calendar::checkTime(char* line, bool isBlockCalendar) {
 	    if (compareToCurrentDate(day,month,hour,minute)) { //is the date of the end of construction/block is later or earlier than 'now' ?
 	    	//if it's earlier, construction/block is finished, so changement need to be made for the manager
 	    	if (isBlockCalendar) _manager->unlockPlayer(name); //if block, player has to be unlocked
-	    	else _manager->upgradeBuilding(name); //if construction, building has to be upgraded
+	    	else _manager->upgradeBuilding(atoi(name.c_str())); //if construction, building has to be upgraded
 	    	return true; //line is no longer required in the calendar file
 	    }
 	}

@@ -18,14 +18,12 @@ class DataBase {
  	static void saveManager(string file, Manager manager);
  	static void savePlayer(string file, ManagedPlayer player);
  	static void savePlayersList(string file,vector<ManagedPlayer> players);
- 	static void saveBuildings(string file, Stadium stadium, TrainingCenter trainingCenter, Hospital hospital, FanShop fanShop,\
- 							 PromotionCenter promotionCenter);
+ 	static void saveBuildings(string file, vector<Building*> buildings);
 
  	static void loadManager(string file, Manager& manager);
  	static ManagedPlayer* loadPlayer(string file);
  	static void loadPlayerFrom(string file, ManagedPlayer* toLoad);
- 	static void loadBuildings(string file, Stadium& stadium, TrainingCenter& trainingCenter, Hospital& hospital, FanShop& fanShop,\
- 							 PromotionCenter& promotionCenter);
+ 	static void loadBuildings(string file, vector<Building*>& buildings);
 
  	static string intToString(int value);
 

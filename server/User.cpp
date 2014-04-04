@@ -274,11 +274,7 @@ void User::handleManagementRequest(SerializedObject *received){
 			calendar_->update();
 			DataBase::save(*manager_);
 			//RecrutmentCenter inutilisé
-			if (targetedBuilding==STADIUM) infos=manager_->getStadiumInformations();
-			else if (targetedBuilding==TRAININGCENTER) infos=manager_->getTrainingCenterInformations();
-			else if (targetedBuilding==HOSPITAL) infos=manager_->getHospitalInformations();
-			else if (targetedBuilding==FANSHOP) infos=manager_->getFanShopInformations();
-			else /*if (targetedBuilding==PROMOTIONCENTER)*/ infos=manager_->getPromotionCenterInformations();
+			infos=manager_->getBuildingInformations(targetedBuilding);
 			
 
 			calendar_->update();
@@ -302,11 +298,7 @@ void User::handleManagementRequest(SerializedObject *received){
 			calendar_->update();
 			DataBase::save(*manager_);
 			confirmation = false;
-			if (targetedBuilding==STADIUM) resultOfUpgrade=manager_->startStadiumConstruction();
-			else if (targetedBuilding==TRAININGCENTER) resultOfUpgrade=manager_->startTrainingCenterConstruction();
-			else if (targetedBuilding==HOSPITAL) resultOfUpgrade=manager_->startHospitalConstruction();
-			else if (targetedBuilding==FANSHOP) resultOfUpgrade=manager_->startFanShopConstruction();
-			else if (targetedBuilding==PROMOTIONCENTER) resultOfUpgrade=manager_->startPromotionCenterConstruction();
+			resultOfUpgrade= manager_->startBuildingConstruction(targetedBuilding);
 			if (resultOfUpgrade==ALREADYINCONSTRUCTION) std::cout<<"Already in construction !"<<std::endl;
 			else if (resultOfUpgrade==NOTENOUGHMONEY) std::cout<<"Not enough money !"<<std::endl; //testé au niveau client
 			else if (resultOfUpgrade==NOTENOUGHAP) std::cout<<"Not enough action points !"<<std::endl;

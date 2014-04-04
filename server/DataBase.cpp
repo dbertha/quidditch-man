@@ -18,6 +18,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+
+
 using namespace std;
 
 void DataBase::save(Manager manager) {
@@ -55,7 +57,7 @@ void DataBase::save(Manager manager) {
 	savePlayersList(file,manager.getPlayers());
 
 	file = "server/Saves/"+login+"/buildings.txt";
-	saveBuildings(file,manager.getStadium(),manager.getTrainingCenter(),manager.getHospital(),manager.getFanShop(),manager.getPromotionCenter());
+	saveBuildings(file,manager.getBuildings());
 
 }
 
@@ -103,7 +105,7 @@ void DataBase::load(Manager& manager) {
 
 	if (result==-1) file = "server/Saves/"+login+"/buildings.txt";
 	else file = "server/Saves/defaultBuildings.txt";
-	loadBuildings(file,manager.getStadium(),manager.getTrainingCenter(),manager.getHospital(),manager.getFanShop(),manager.getPromotionCenter());
+	loadBuildings(file,manager.getBuildings());
 
 	save(manager);
 
@@ -209,78 +211,36 @@ void DataBase::savePlayersList(string file, vector<ManagedPlayer> players) {
 	close(fd);
 }
 
-void DataBase::saveBuildings(string file, Stadium stadium, TrainingCenter trainingCenter, Hospital hospital, FanShop fanShop,\
- 							 PromotionCenter promotionCenter) {
+void DataBase::saveBuildings(string file, vector<Building*> buildings) {
 	//string file = "server/Saves/"+managerLogin+"/buildings.txt";
 	int fd = open(file.c_str(),O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
 	if (fd==-1){
 		cerr<<"Error while opening file\n";
 	}
 	string toWrite;
-	toWrite=intToString(stadium.getLevel());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(stadium.getPriceForConstruction());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(stadium.getMaxPlacesAtFirstLevel());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(stadium.isUpgrading());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
 
-	toWrite=intToString(trainingCenter.getLevel());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(trainingCenter.getPriceForConstruction());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(trainingCenter.getTimeRequiredAtFirstLevel());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(trainingCenter.isUpgrading());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
+	for (int i=1;i<6;++i){
+		toWrite=intToString(buildings[i-1]->getLevel());
+		write(fd,toWrite.c_str(),toWrite.size());
+		write(fd,"\n",1);
 
-	toWrite=intToString(hospital.getLevel());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(hospital.getPriceForConstruction());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(hospital.getTimeRequiredAtFirstLevel());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(hospital.isUpgrading());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
+		toWrite=intToString(buildings[i-1]->getPriceForConstruction());
+		write(fd,toWrite.c_str(),toWrite.size());
+		write(fd,"\n",1);
 
-	toWrite=intToString(fanShop.getLevel());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(fanShop.getPriceForConstruction());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(fanShop.getMaxClientsAtFirstLevel());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(fanShop.isUpgrading());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
+		if (i==STADIUM) toWrite=intToString(dynamic_cast<Stadium*>(buildings[i-1])->getMaxPlacesAtFirstLevel());
+		else if (i==TRAININGCENTER) toWrite=intToString(dynamic_cast<TrainingCenter*>(buildings[i-1])->getTimeRequiredAtFirstLevel());
+		else if (i==HOSPITAL) toWrite=intToString(dynamic_cast<Hospital*>(buildings[i-1])->getTimeRequiredAtFirstLevel());
+		else if (i==FANSHOP) toWrite=intToString(dynamic_cast<FanShop*>(buildings[i-1])->getMaxClientsAtFirstLevel());
+		else if (i==PROMOTIONCENTER) toWrite=intToString(dynamic_cast<PromotionCenter*>(buildings[i-1])->getGainAtFirstLevel());
+		write(fd,toWrite.c_str(),toWrite.size());
+		write(fd,"\n",1);
 
-	toWrite=intToString(promotionCenter.getLevel());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(promotionCenter.getPriceForConstruction());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(promotionCenter.getGainAtFirstLevel());
-	write(fd,toWrite.c_str(),toWrite.size());
-	write(fd,"\n",1);
-	toWrite=intToString(promotionCenter.isUpgrading());
-	write(fd,toWrite.c_str(),toWrite.size());
-	
+		toWrite=intToString(buildings[i-1]->isUpgrading());
+		write(fd,toWrite.c_str(),toWrite.size());
+		write(fd,"\n",1);
+	}
+	cout<<"BAM BASTARD"<<endl;
 	close(fd);
 }
 
@@ -483,8 +443,7 @@ void DataBase::loadPlayerFrom(string file, ManagedPlayer * toLoad){
 	//return player;
 }
 
-void DataBase::loadBuildings(string file, Stadium& stadium, TrainingCenter& trainingCenter, Hospital& hospital, FanShop& fanShop,\
- 							 PromotionCenter& promotionCenter){
+void DataBase::loadBuildings(string file, vector<Building*>& buildings){
 	/*
 	This method reads the buildings informations in the buildings.txt file..
 	This file format is :
@@ -533,7 +492,7 @@ void DataBase::loadBuildings(string file, Stadium& stadium, TrainingCenter& trai
 	param3 = atoi(tmp3.c_str());
 	tmp4 = strtok(NULL,"\n");
 	param4 = atoi(tmp4.c_str());
-	stadium = Stadium(param1,param2,param3,param4);
+	buildings.push_back(new Stadium(param1,param2,param3,param4));
 
 	tmp1 = strtok(NULL,"\n");
 	param1 = atoi(tmp1.c_str());
@@ -543,7 +502,7 @@ void DataBase::loadBuildings(string file, Stadium& stadium, TrainingCenter& trai
 	param3 = atoi(tmp3.c_str());
 	tmp4 = strtok(NULL,"\n");
 	param4 = atoi(tmp4.c_str());
-	trainingCenter = TrainingCenter(param1,param2,param3,param4);
+	buildings.push_back(new TrainingCenter(param1,param2,param3,param4));
 
 	tmp1 = strtok(NULL,"\n");
 	param1 = atoi(tmp1.c_str());
@@ -553,7 +512,7 @@ void DataBase::loadBuildings(string file, Stadium& stadium, TrainingCenter& trai
 	param3 = atoi(tmp3.c_str());
 	tmp4 = strtok(NULL,"\n");
 	param4 = atoi(tmp4.c_str());
-	hospital = Hospital(param1,param2,param3,param4);
+	buildings.push_back(new Hospital(param1,param2,param3,param4));
 
 	tmp1 = strtok(NULL,"\n");
 	param1 = atoi(tmp1.c_str());
@@ -563,7 +522,7 @@ void DataBase::loadBuildings(string file, Stadium& stadium, TrainingCenter& trai
 	param3 = atoi(tmp3.c_str());
 	tmp4 = strtok(NULL,"\n");
 	param4 = atoi(tmp4.c_str());
-	fanShop = FanShop(param1,param2,param3,param4);
+	buildings.push_back(new FanShop(param1,param2,param3,param4));
 
 	tmp1 = strtok(NULL,"\n");
 	param1 = atoi(tmp1.c_str());
@@ -572,7 +531,8 @@ void DataBase::loadBuildings(string file, Stadium& stadium, TrainingCenter& trai
 	tmp3 = strtok(NULL,"\n");
 	param3 = atoi(tmp3.c_str());
 	param4 = atoi(tmp4.c_str());
-	promotionCenter = PromotionCenter(param1,param2,param3,param4);
+	buildings.push_back(new PromotionCenter(param1,param2,param3,param4));
+
 
 	close(fd);
 

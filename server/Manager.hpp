@@ -20,17 +20,13 @@ class Manager {
 
 	string _login;
 	vector<ManagedPlayer> _players;
+	vector<Building*> _buildings;
 
 	int _numberOfPlayers;
 	int _money;
 	int _numberOfFans;
 	int _actionPoints;
 
- 	Stadium _stadium;
-	TrainingCenter _trainingCenter;
-	Hospital _hospital;
-	FanShop _fanShop;
-	PromotionCenter _promotionCenter;
 
  public:
 
@@ -63,37 +59,26 @@ class Manager {
  	ManagedPlayer& getPlayer(int index);
  	vector<int> getPlayerInformations(int playerID);
 
- 	Stadium& getStadium();
- 	vector<int> getStadiumInformations();
+ 	vector<Building*>& getBuildings();
+ 	vector<int> getBuildingInformations(int buildingID);
+
  	gold getIncomeFromMatch(bool hasWon,bool wasHost);
 
- 	TrainingCenter& getTrainingCenter();
- 	vector<int> getTrainingCenterInformations();
  	bool trainPlayer(int playerID, int capacityNumber);
  	void lockPlayer(string name);
  	void unlockPlayer(string name);
  	bool isPlayerBlocked(int playerID);
  	bool isPlayerBlocked(string name);
 
- 	Hospital& getHospital();
- 	vector<int> getHospitalInformations();
  	bool healPlayer(int playerID);
 
- 	FanShop& getFanShop();
- 	vector<int> getFanShopInformations();
  	gold getIncomeFromFanShop();
 
- 	PromotionCenter& getPromotionCenter();
- 	vector<int> getPromotionCenterInformations();
  	void getGainFromPromotion();
 
- 	int startStadiumConstruction();
- 	int startTrainingCenterConstruction();
-	int startHospitalConstruction();
-	int startFanShopConstruction();
-	int startPromotionCenterConstruction();
+ 	int startBuildingConstruction(int buildingID);
 
-	void upgradeBuilding(string buildingName);
+	void upgradeBuilding(int buildingID);
 
  	void writeBlockInCalendar(string name,bool isTraining);
 	void writeInCalendar(string file, string name, int timeRequired);

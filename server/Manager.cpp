@@ -29,6 +29,7 @@
 #include "Manager.hpp"
 
 
+
 typedef int gold;
 
 using namespace std;
@@ -64,7 +65,7 @@ int Manager::payForActionPoints(int numberOfAP){
 	return amount;
 }
 int Manager::waitForActionPoints(int timeElapsed){
-	int gain = _promotionCenter.getActionPointsGain();
+	int gain = dynamic_cast<PromotionCenter*>(_buildings[PROMOTIONCENTER-1])->getActionPointsGain();
 	int APGained = gain * (timeElapsed/TIMESCALEACTIONPOINTS);
 	_actionPoints += APGained;
 	return APGained;
@@ -124,27 +125,27 @@ vector<int> Manager::getPlayerInformations(int playerID) {
 
 ////////////////////////////// METHODS ON BUILDINGS ///////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
-Stadium& Manager::getStadium() {return _stadium;}
-vector<int> Manager::getStadiumInformations() {return _stadium.getInformations();}
+vector<Building*>& Manager::getBuildings() {return _buildings;}
+
+vector<int> Manager::getBuildingInformations(int buildingID) {return _buildings[buildingID-1]->getInformations();}
+
 gold Manager::getIncomeFromMatch(bool hasWon,bool wasHost) {
 	gold money=0;
 	if (wasHost) { //Income from ticket sale. If manager has more fans than places in the stadium
 		//Stadium will always be full
-		if (_numberOfFans<_stadium.getMaxPlaces()) money+=_numberOfFans*TICKETPRICE;
-		else money+=_stadium.getMaxPlaces()*TICKETPRICE;
+		if (_numberOfFans<dynamic_cast<Stadium*>(_buildings[STADIUM-1])->getMaxPlaces()) money+=_numberOfFans*TICKETPRICE;
+		else money+=dynamic_cast<Stadium*>(_buildings[STADIUM-1])->getMaxPlaces()*TICKETPRICE;
 	}
 	if (hasWon) money+=VICTORYBONUS;
 	return money;
 }
 
-TrainingCenter& Manager::getTrainingCenter() {return _trainingCenter;}
-vector<int> Manager::getTrainingCenterInformations() {return _trainingCenter.getInformations();}
 bool Manager::trainPlayer(int playerID, int capacityNumber) {
 	if (isPlayerBlocked(playerID)) return false;
 	if (_actionPoints<AP_TRAINING) return false;
 	if (playerID>=_numberOfPlayers) throw "Index of player index out of range";
 	if (capacityNumber>=5) throw "Capacity index out of range";
-	_trainingCenter.train(_players[playerID],capacityNumber);
+	dynamic_cast<TrainingCenter*>(_buildings[TRAININGCENTER-1])->train(_players[playerID],capacityNumber);
 	string name = _players[playerID].getFirstName() + " " + _players[playerID].getLastName();
 	writeBlockInCalendar(name,true);
 	_actionPoints-=AP_TRAINING;
@@ -185,90 +186,33 @@ bool Manager::isPlayerBlocked(string name) {
 	return false;
 }
 
-Hospital& Manager::getHospital() {return _hospital;}
-vector<int> Manager::getHospitalInformations() {return _hospital.getInformations();}
 bool Manager::healPlayer(int playerID) {
 	if (isPlayerBlocked(playerID)) return false;
 	if (_actionPoints<AP_HOSPITAL) return false;
 	if (_players[playerID].getLife()==_players[playerID].getCapacity(4)) return false;
 	if (playerID>=_numberOfPlayers) throw "Index out of range";
-	_hospital.heal(_players[playerID]);
+	dynamic_cast<Hospital*>(_buildings[HOSPITAL-1])->heal(_players[playerID]);
 	string name = _players[playerID].getFirstName() + " " + _players[playerID].getLastName();
 	writeBlockInCalendar(name,false);
 	_actionPoints-=AP_HOSPITAL;
 	return true;
 }
 
-FanShop& Manager::getFanShop() {return _fanShop;}
-vector<int> Manager::getFanShopInformations() {return _fanShop.getInformations();}
-gold Manager::getIncomeFromFanShop() {return _fanShop.getIncome();}
+gold Manager::getIncomeFromFanShop() {return dynamic_cast<FanShop*>(_buildings[FANSHOP-1])->getIncome();}
 
-PromotionCenter& Manager::getPromotionCenter() {return _promotionCenter;}
-vector<int> Manager::getPromotionCenterInformations() {return _promotionCenter.getInformations();}
-
-int Manager::startStadiumConstruction() {
-	if (_money<_stadium.getPriceForNextLevel()) return NOTENOUGHMONEY;
-	if (_stadium.isUpgrading()) return ALREADYINCONSTRUCTION;
+int Manager::startBuildingConstruction(int buildingID){
+	if (_money<_buildings[buildingID-1]->getPriceForNextLevel()) return NOTENOUGHMONEY;
+	if (_buildings[buildingID-1]->isUpgrading()) return ALREADYINCONSTRUCTION;
 	if (_actionPoints<AP_UPGRADE) return NOTENOUGHAP;
-	pay(_stadium.getPriceForNextLevel());
-	_stadium.startConstruction();
+	pay(_buildings[buildingID-1]->getPriceForNextLevel());
+	_buildings[buildingID-1]->startConstruction();
 	string file = "server/Saves/"+_login+"/constructionCalendar.txt";
-	writeInCalendar(file,"Stadium", TIMESCALECONSTRUCTION*(1+_stadium.getLevel()));
-	_actionPoints-=AP_UPGRADE;
-	return CONSTRUCTIONSTARTED;
-}
-int Manager::startTrainingCenterConstruction() {
-	if (_money<_trainingCenter.getPriceForNextLevel()) return NOTENOUGHMONEY;
-	if (_trainingCenter.isUpgrading()) return ALREADYINCONSTRUCTION;
-	if (_actionPoints<AP_UPGRADE) return NOTENOUGHAP;
-	pay(_trainingCenter.getPriceForNextLevel());
-	_trainingCenter.startConstruction();
-	string file = "server/Saves/"+_login+"/constructionCalendar.txt";
-	writeInCalendar(file,"TrainingCenter", TIMESCALECONSTRUCTION*(1+_trainingCenter.getLevel()));
-	_actionPoints-=AP_UPGRADE;
-	return CONSTRUCTIONSTARTED;
-}
-int Manager::startHospitalConstruction() {
-	if (_money<_hospital.getPriceForNextLevel()) return NOTENOUGHMONEY;
-	if (_hospital.isUpgrading()) return ALREADYINCONSTRUCTION;
-	if (_actionPoints<AP_UPGRADE) return NOTENOUGHAP;
-	pay(_hospital.getPriceForNextLevel());
-	_hospital.startConstruction();
-	string file = "server/Saves/"+_login+"/constructionCalendar.txt";
-	writeInCalendar(file,"Hospital", TIMESCALECONSTRUCTION*(1+_hospital.getLevel()));
-	_actionPoints-=AP_UPGRADE;
-	return CONSTRUCTIONSTARTED;
-}
-int Manager::startFanShopConstruction() {
-	if (_money<_fanShop.getPriceForNextLevel()) return NOTENOUGHMONEY;
-	if (_fanShop.isUpgrading()) return ALREADYINCONSTRUCTION;
-	if (_actionPoints<AP_UPGRADE) return NOTENOUGHAP;
-	pay(_fanShop.getPriceForNextLevel());
-	_fanShop.startConstruction();
-	string file = "server/Saves/"+_login+"/constructionCalendar.txt";
-	writeInCalendar(file,"FanShop", TIMESCALECONSTRUCTION*(1+_fanShop.getLevel()));
-	_actionPoints-=AP_UPGRADE;
-	return CONSTRUCTIONSTARTED;
-}
-int Manager::startPromotionCenterConstruction() {
-	if (_money<_promotionCenter.getPriceForNextLevel()) return NOTENOUGHMONEY;
-	if (_promotionCenter.isUpgrading()) return ALREADYINCONSTRUCTION;
-	if (_actionPoints<AP_UPGRADE) return NOTENOUGHAP;
-	pay(_promotionCenter.getPriceForNextLevel());
-	_promotionCenter.startConstruction();
-	string file = "server/Saves/"+_login+"/constructionCalendar.txt";
-	writeInCalendar(file,"PromotionCenter", TIMESCALECONSTRUCTION*(1+_promotionCenter.getLevel()));
+	writeInCalendar(file,DataBase::intToString(buildingID), TIMESCALECONSTRUCTION*(1+_buildings[buildingID-1]->getLevel()));
 	_actionPoints-=AP_UPGRADE;
 	return CONSTRUCTIONSTARTED;
 }
 
-void Manager::upgradeBuilding(string buildingName) {
-	if (buildingName=="Stadium") _stadium.upgrade();
-	else if (buildingName=="TrainingCenter") _trainingCenter.upgrade();
-	else if (buildingName=="Hospital") _hospital.upgrade();
-	else if (buildingName=="FanShop") _fanShop.upgrade();
-	else if (buildingName=="PromotionCenter") _promotionCenter.upgrade();
-}
+void Manager::upgradeBuilding(int buildingID) {_buildings[buildingID-1]->upgrade();} 
 
 
 ////////////////////////////// METHODS ON CALENDARS ///////////////////////////////
@@ -276,8 +220,8 @@ void Manager::upgradeBuilding(string buildingName) {
 void Manager::writeBlockInCalendar(string name,bool isTraining) {
 	string file = "server/Saves/"+_login+"/blockCalendar.txt";
 	int timeRequired; //in minutes
-	if (isTraining) timeRequired = _trainingCenter.getTimeRequired();
-	else timeRequired = _hospital.getTimeRequired();
+	if (isTraining) timeRequired = dynamic_cast<TrainingCenter*>(_buildings[TRAININGCENTER])->getTimeRequired();
+	else timeRequired = dynamic_cast<Hospital*>(_buildings[HOSPITAL])->getTimeRequired();
 
 	writeInCalendar(file,name,timeRequired);
 
