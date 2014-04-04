@@ -3,7 +3,6 @@
 
 //#include "../common/HexagonalField.hpp"
 #include "../common/Defines.hpp"
-#include "../common/NetworkBase.hpp"
 #include "ManagedPlayer.hpp"
 //#include "PlayingPlayer.hpp"
 //#include "Ball.hpp"
@@ -16,7 +15,6 @@
 #include <cstring> //memcpy
 #include <string>
 
-//TODO : confier à l'user le soin d'envoyer les messages de sorte à gérer une éventuelle déco du client
 
 //quand lance un match, marque l'utilisateur comme occupé
 //quand reçoit une demande d'invitation, vérifie si l'invité n'est pas occupé
@@ -71,10 +69,10 @@ public :
     bool isInvited(User * user);
     int sendConfirmationTo(User * client, int answerCode);
     //~ int sendConfirmationTo(User * client, int answerCode, int numTeam);
-    void getScoresAndPositions(User * demander);
-    void getPlayerInfos(User * demander, int playerID);
+    void getScoresAndPositions(User * demander, char * position);
+    void getPlayerInfos(User * demander, int playerID, char * position);
     void recordMoves(User * demander);
-    int sendInvitation(User * invitor, User * invited);
+    void sendInvitation(User * invitor, User * invited);
     void forfeit(User * demander);
     int sendEndOfMatch(User * receiver, int code);
     void transmitDrawRequest(User * demander);
@@ -85,7 +83,7 @@ public :
     
     int createTournament(int nbOfParticipants, int startingPrice);
     int serializeTournaments(char * buffer);
-    int addPlayerToTournament(User * subscriber);
+    int addPlayerToTournament(User * subscriber, char * answerPosition);
     void launchNextTournamentTurn();
     int inviteForTournamentMatch(User * firstPlayer, User * secondPlayer);
     void handleEndOfTournamentMatch(User * winningUser);

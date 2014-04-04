@@ -16,11 +16,10 @@
 //TODO : réunit tous les define propres au match
 
 class Match {
-    //ne connait pas le réseau, la partie réseau est gérée par matchHandler
+    //ne connait pas le réseau, la partie réseau est gérée par matchHandler qui passe le message à User
 private :
     std::vector <PlayingPlayer> __players;
     std::vector <Ball> __balls;
-public : //test purpose only
     HexagonalField __field;
 private :
     int __winner; //0:no winner, 1:team1, 2:team2
