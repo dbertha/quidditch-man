@@ -184,6 +184,7 @@
     2.6 & David & 13/03/14 & Diagrammes pour la GUI \\
     2.7 & Hélène & 14/03/14 & Terminal graphique avec diagrammes détaillés\\
     3.0 & Manon & 14/03/14 & Relecture partielle \\
+    3.1 & Hélène & 04/04/14 & Terminal graphique avec nouveau diagramme\\
     \hline
   \end{tabular}
 
@@ -1154,8 +1155,8 @@ Les messages échangés entre la partie serveur et la partie client du projet so
 \end{itemize}
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.4]{uml/Serveur.png}
-    \caption{Diagramme d'activité : cycle de vie du serveur} \label{diag-serveur}
+    \includegraphics[scale=0.3]{uml/Client-serveur.jpeg}
+    \caption{Diagramme d'activité : schéma du dialogue client-serveur} \label{diag-serveur}
     \end{figure}
 Aucune des méthodes du serveur n'étant bloquante pendant plus d'une fraction de seconde (peu d'I/O) et compte tenu des délais très courts pour la mise en œuvre, nous avons opté à ce stade pour une solution mono-thread;
 travailler avec un seul thread supprime la nécessité de devoir gérer l'accès concurrent aux données (en mémoire ou sur disque) et la communication entre threads (arrêt du serveur par exemple) :
@@ -1175,12 +1176,7 @@ Jusqu'à présent nous allouons un buffer de taille fixe.
 
   \subsubsection{Synopsis du client}
 Comme le serveur, le client utilise la fonction select() afin de pouvoir capter indifféremment des messages d'origine différente,
- en l’occurrence en provenance du clavier ou du socket de communication, ceci pour pouvoir recevoir des messages non sollicités dans une solution mono-thread.
-      \begin{figure}[H]
-    \center
-    \includegraphics[scale=0.4]{uml/Client.png}
-    \caption{Diagramme d'activité : cycle de vie du client} \label{diag-client}
-    \end{figure}
+ en l’occurrence en provenance du clavier ou du socket de communication, ceci pour pouvoir recevoir des messages non sollicités dans une solution mono-thread.\\
  La disponibilité aux messages non sollicités ne peut exister que lorsque le client
  n'est pas dans un contexte verrouillé, c'est-à-dire dans les menus principaux ou au début du tour d'un match.
  
@@ -1345,6 +1341,16 @@ le joueur étant alors bloqué pour un certain temps, la fonction s'arrête ensu
 \emph{(Ce dialogue est géré par la classe "playersDialog", qui, pour le tableau de bord,
 met à nouveau en \oe uvre une construction model-viewer autour de la classe "BuildingsModel")}.
 Notons que l'achat d'un broomstick est prévu mais pas encore programmé.
+\subsection{Les matchs amicaux}
+Cette fonction \emph{("listMgrs()")} commence \emph{("choosePartner()")} par proposer une liste
+des managers disponibles \emph{(en utilisant la classe générique SelectionDialog)}.\\
+Ensuite, elle demande \emph{("chooseTeamForMatch()")} au manager d'assigner
+un joueur à chaque poste \emph{(à nouveau, la classe SelectionDialog est mise à contribution)}.
+A sept reprises, le manager est ainsi invité à séléctionner un joueur,
+et à chaque fois, le programme lui présente les caractéristiques du joueur
+et lui demande de confirmer son choix \emph{(la classe "playerDialog" est réutilisée ici...)}.\\
+A l'issue de cette quête, le manager adverse choisi est invité. S'il accepte l'invitation,
+il doit lui aussi choisir la composition de son équipe. Et le match peut ensuite commencer \emph{(classe "MatchWindow")}.
 \subsection{Les tournois}
 Cette fonction \emph{("tournaments()")} commence par un avertissement;
 ensuite, comme pour la gestion des joueurs, vient la présentation d'une liste 
