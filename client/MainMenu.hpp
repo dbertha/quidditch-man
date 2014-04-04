@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QGroupBox>
-#include "mainGui.hpp"
+#include "MainGui.hpp"
 class MainGui;
 class MainMenu : public QWidget {
     Q_OBJECT

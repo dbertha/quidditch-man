@@ -1,4 +1,4 @@
-#include "clientMatchHandler.hpp"
+#include "ClientMatchHandler.hpp"
 
 int choosePartner(Client * client, QWidget *parent) {
     int pos = NO_CHOICE;

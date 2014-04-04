@@ -6,47 +6,47 @@ QT += widgets
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 
 # Input
-HEADERS += client/clientMatchHandler.hpp \
-           client/loginDialog.hpp \
-           client/mainGui.hpp \
-           client/selectionDialog.hpp \
-           client/ticker.hpp \
-           client/buildingsDialog.hpp \
-           client/buildingsModel.hpp \
-           client/playerMgr.hpp \
+HEADERS += client/ClientMatchHandler.hpp \
+           client/LoginDialog.hpp \
+           client/MainGui.hpp \
+           client/SelectionDialog.hpp \
+           client/Ticker.hpp \
+           client/BuildingsDialog.hpp \
+           client/BuildingsModel.hpp \
+           client/PlayerMgr.hpp \
            client/Client.hpp \
-           client/mainMenu.hpp \
-           client/playersDialog.hpp \
-           client/tournamentDialog.hpp \
-           client/tournaments.hpp \
-           client/buyAPDialog.hpp \
-           client/freeAPDialog.hpp \
-           client/auctionMgr.hpp \
+           client/MainMenu.hpp \
+           client/PlayersDialog.hpp \
+           client/TournamentDialog.hpp \
+           client/Tournaments.hpp \
+           client/BuyAPDialog.hpp \
+           client/FreeAPDialog.hpp \
+           client/AuctionMgr.hpp \
            client/AuctionsDialog.hpp \
-           client/auctionWindow.hpp \
+           client/AuctionWindow.hpp \
            client/MatchWindow.hpp \
            client/HexagonalCase.hpp 
            
 
-SOURCES += client/clientMatchHandler.cpp \
-           client/loginDialog.cpp \
+SOURCES += client/ClientMatchHandler.cpp \
+           client/LoginDialog.cpp \
            client/GUImain.cpp \
-           client/mainGui.cpp \
-           client/selectionDialog.cpp \
-           client/ticker.cpp \
-           client/buildingsDialog.cpp \
-           client/buildingsModel.cpp \
-           client/playerMgr.cpp \
+           client/MainGui.cpp \
+           client/SelectionDialog.cpp \
+           client/Ticker.cpp \
+           client/BuildingsDialog.cpp \
+           client/BuildingsModel.cpp \
+           client/PlayerMgr.cpp \
            client/Client.cpp \
-           client/mainMenu.cpp \
-           client/playersDialog.cpp \
-           client/tournamentDialog.cpp \
-           client/tournaments.cpp \
-           client/buyAPDialog.cpp \
-           client/freeAPDialog.cpp \
-           client/auctionMgr.cpp \
+           client/MainMenu.cpp \
+           client/PlayersDialog.cpp \
+           client/TournamentDialog.cpp \
+           client/Tournaments.cpp \
+           client/BuyAPDialog.cpp \
+           client/FreeAPDialog.cpp \
+           client/AuctionMgr.cpp \
            client/AuctionsDialog.cpp \
-           client/auctionWindow.cpp \
+           client/AuctionWindow.cpp \
            client/MatchWindow.cpp \
            client/HexagonalCase.cpp 
 

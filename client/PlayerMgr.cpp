@@ -1,4 +1,4 @@
-#include "playerMgr.hpp"
+#include "PlayerMgr.hpp"
 #include "Defines.hpp"
 
 

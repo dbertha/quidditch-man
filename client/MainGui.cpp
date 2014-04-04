@@ -1,7 +1,7 @@
-#include "mainGui.hpp"
-#include "clientMatchHandler.hpp"
-#include "playerMgr.hpp"
-#include "auctionMgr.hpp"
+#include "MainGui.hpp"
+#include "ClientMatchHandler.hpp"
+#include "PlayerMgr.hpp"
+#include "AuctionMgr.hpp"
 
 MainGui::MainGui(int sockfd,QMainWindow *parent) : 
 parent_(parent), __client(new Client(sockfd)), __pushesNotifier(new QSocketNotifier(sockfd, QSocketNotifier::Read, this)) {

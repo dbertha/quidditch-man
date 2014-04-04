@@ -17,8 +17,8 @@
 #include <QShowEvent>
 #include <QHideEvent>
 #include "Client.hpp"
-#include "buildingsModel.hpp"
-#include "mainGui.hpp"
+#include "BuildingsModel.hpp"
+#include "MainGui.hpp"
 class MainGui;
 class BuildingsDialog : public QDialog {
     Q_OBJECT

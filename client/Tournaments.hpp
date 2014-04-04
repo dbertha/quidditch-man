@@ -15,7 +15,7 @@
 #include <QMessageBox>
 #include <QString>
 
-#include "tournamentDialog.hpp"
+#include "TournamentDialog.hpp"
 #include "Client.hpp"
 #include "../common/Defines.hpp"
 

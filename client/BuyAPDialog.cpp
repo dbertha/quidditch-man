@@ -1,4 +1,4 @@
-#include "buyAPDialog.hpp"
+#include "BuyAPDialog.hpp"
 
 BuyAPDialog::BuyAPDialog(Client * client, QWidget *parent): QDialog(parent), __client(client)
 {

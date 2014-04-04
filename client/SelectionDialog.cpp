@@ -1,4 +1,4 @@
-#include "selectionDialog.hpp"
+#include "SelectionDialog.hpp"
 
 SelectionDialog::SelectionDialog(const QStringList &items,QWidget *parent)
     : QDialog(parent), row(-1) {

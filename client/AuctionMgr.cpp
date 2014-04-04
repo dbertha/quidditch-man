@@ -1,4 +1,4 @@
-#include "auctionMgr.hpp"
+#include "AuctionMgr.hpp"
 #include "../common/Defines.hpp"
 
 

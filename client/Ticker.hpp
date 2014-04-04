@@ -13,7 +13,7 @@
 #include <QSocketNotifier>
 #include <iostream>
 #include "Client.hpp"
-#include "mainGui.hpp"
+#include "MainGui.hpp"
 class MainGui;
 class Ticker : public QWidget {
     Q_OBJECT

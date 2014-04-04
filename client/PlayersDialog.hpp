@@ -17,7 +17,7 @@
 #include <QInputDialog>
 #include <QErrorMessage>
 #include "Client.hpp"
-#include "buildingsModel.hpp"
+#include "BuildingsModel.hpp"
 
 class PlayersDialog : public QDialog {
     Q_OBJECT

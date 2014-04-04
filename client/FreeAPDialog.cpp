@@ -1,4 +1,4 @@
-#include "freeAPDialog.hpp"
+#include "FreeAPDialog.hpp"
 
 FreeAPDialog::FreeAPDialog(Client * client, QWidget *parent): QDialog(parent), __client(client)
 {

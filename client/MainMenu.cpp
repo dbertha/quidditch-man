@@ -1,4 +1,4 @@
-#include "mainMenu.hpp"
+#include "MainMenu.hpp"
 
 MainMenu::MainMenu(MainGui *parent) : QWidget(parent), parent_(parent) {
     matchButton = new QPushButton(tr("Friendly match"));

@@ -1,5 +1,5 @@
 #include "AuctionsDialog.hpp"
-#include "auctionWindow.hpp"
+#include "AuctionWindow.hpp"
 
 AuctionsDialog::AuctionsDialog(Client * client, int auctionID, int startingPrice, QWidget *parent)
     : QDialog(parent), __client(client),auctionID_(auctionID),startingPrice_(startingPrice) {

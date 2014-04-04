@@ -1,10 +1,10 @@
 #ifndef CLIENTMATCHHANDLER_HPP
 #define CLIENTMATCHHANDLER_HPP
 #include "Defines.hpp"
-#include "selectionDialog.hpp"
+#include "SelectionDialog.hpp"
 //#include "common/NetworkInterface.hpp"
 #include "Client.hpp"
-#include "playersDialog.hpp"
+#include "PlayersDialog.hpp"
 #define BAD_CONNECTION -1
 #define NO_CHOICE -2
 

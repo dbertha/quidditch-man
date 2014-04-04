@@ -16,9 +16,9 @@
 #include <QErrorMessage>
 #include <QSocketNotifier>
 #include "Client.hpp"
-#include "buildingsModel.hpp"
+#include "BuildingsModel.hpp"
 
-#include "auctionWindow.hpp"
+#include "AuctionWindow.hpp"
 
 class AuctionsDialog : public QDialog {
     Q_OBJECT

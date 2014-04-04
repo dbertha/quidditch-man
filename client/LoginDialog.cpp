@@ -1,4 +1,4 @@
-#include "loginDialog.hpp"
+#include "LoginDialog.hpp"
 
 LoginDialog::LoginDialog(Client * client, QWidget *parent): QDialog(parent), __client(client)
 {

@@ -240,7 +240,6 @@ void DataBase::saveBuildings(string file, vector<Building*> buildings) {
 		write(fd,toWrite.c_str(),toWrite.size());
 		write(fd,"\n",1);
 	}
-	cout<<"BAM BASTARD"<<endl;
 	close(fd);
 }
 

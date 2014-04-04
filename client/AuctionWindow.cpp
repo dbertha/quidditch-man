@@ -1,5 +1,5 @@
 
-#include "auctionWindow.hpp"
+#include "AuctionWindow.hpp"
 #include <QTimer>
 
 

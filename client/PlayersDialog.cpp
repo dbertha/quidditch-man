@@ -1,4 +1,4 @@
-#include "playersDialog.hpp"
+#include "PlayersDialog.hpp"
 
 PlayersDialog::PlayersDialog(Client * client, const int player, const int function, QWidget *parent)
     : QDialog(parent), player_(player), __client(client) {

@@ -1,4 +1,4 @@
-#include "tournamentDialog.hpp"
+#include "TournamentDialog.hpp"
 
 TournamentDialog::TournamentDialog(Client * client,const QStringList &items,const int role, QWidget *parent)
     : QDialog(parent), row(-1),role_(role), __client(client), __parent(parent) {

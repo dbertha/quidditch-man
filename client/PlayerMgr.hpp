@@ -1,9 +1,9 @@
 #ifndef PLAYERMGR_HPP
 #define PLAYERMGR_HPP
 #include "Defines.hpp"
-#include "selectionDialog.hpp"
+#include "SelectionDialog.hpp"
 #include "Client.hpp"
-#include "playersDialog.hpp"
+#include "PlayersDialog.hpp"
 //#include "common/NetworkInterface.hpp"
 
 

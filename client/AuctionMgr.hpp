@@ -1,7 +1,7 @@
 #ifndef AUCTIONMGR_HPP
 #define AUCTIONMGR_HPP
 #include "../common/Defines.hpp"
-#include "selectionDialog.hpp"
+#include "SelectionDialog.hpp"
 #include "Client.hpp"
 #include "AuctionsDialog.hpp"
 //#include "common/NetworkInterface.hpp"

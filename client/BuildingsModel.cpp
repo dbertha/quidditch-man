@@ -1,4 +1,4 @@
-#include "buildingsModel.hpp"
+#include "BuildingsModel.hpp"
 
 BuildingsModel::BuildingsModel(QWidget *parent) : QAbstractTableModel(parent) {}
 

@@ -13,13 +13,13 @@
 #include <QProgressDialog>
 #include <QSocketNotifier>
 #include "Client.hpp"
-#include "tournaments.hpp"
-#include "ticker.hpp"
-#include "loginDialog.hpp"
-#include "mainMenu.hpp"
-#include "buildingsDialog.hpp"
-#include "buyAPDialog.hpp"
-#include "freeAPDialog.hpp"
+#include "Tournaments.hpp"
+#include "Ticker.hpp"
+#include "LoginDialog.hpp"
+#include "MainMenu.hpp"
+#include "BuildingsDialog.hpp"
+#include "BuyAPDialog.hpp"
+#include "FreeAPDialog.hpp"
 #include "MatchWindow.hpp"
 
 

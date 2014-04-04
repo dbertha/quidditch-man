@@ -1,4 +1,4 @@
-#include "tournaments.hpp"
+#include "Tournaments.hpp"
 #include "Defines.hpp"
 
 

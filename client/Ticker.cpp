@@ -1,5 +1,5 @@
-#include "ticker.hpp"
-#include "mainGui.hpp"
+#include "Ticker.hpp"
+#include "MainGui.hpp"
 Ticker::Ticker(Client * client, QSocketNotifier * notifier, MainGui *parent)
     : QWidget(parent), parent_(parent), __client(client), __pushesNotifier(notifier) {
     myTimerId = 0; // no timer started yet

@@ -1,4 +1,4 @@
-#include "buildingsDialog.hpp"
+#include "BuildingsDialog.hpp"
 
 BuildingsDialog::BuildingsDialog(Client * client, MainGui *parent)
     : QDialog(parent),parent_(parent), row(-1), myTimerId(0), __client(client) {
