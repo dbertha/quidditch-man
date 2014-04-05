@@ -2,10 +2,9 @@
 
 #include "MatchesHandler.hpp" 
 #include "Auction.hpp"
-#include "Server.hpp"
+#include "Server.hpp" //TODO : supprimer cette dépendance
 #include "DataBase.hpp"
 	
-//TODO : éviter redondance des includes avec le hpp
 #include <string> 
 #include <sys/stat.h>
 #include <iostream>
@@ -43,8 +42,9 @@ User::~User(){
 	}
 }
 
-void User::cmdHandler(SerializedObject *received) {
-
+void User::cmdHandler() {
+	SerializedObject receivedObject = receiveOnSocket(sockfd_);
+	SerializedObject *received = &receivedObject;
 	
 #ifdef __DEBUG
 	std::cout<<"En-tête reçu : "<<received->typeOfInfos<<std::endl;
@@ -77,9 +77,9 @@ void User::handleManagementRequest(SerializedObject *received){
 	std::vector<int> IDList;
     std::vector<std::string> namesList;
     vector<int> infos;
-    SerializedObject answer;
+     
 	char * position;
-	char * answerPosition = answer.stringData;
+	char * answerPosition = _answer.stringData;
 	vector<string> playersList;
 	int targetedPlayer;
 	position = received->stringData;
@@ -133,11 +133,11 @@ void User::handleManagementRequest(SerializedObject *received){
 				std::cout<<"WRONG LOGIN/PASSWORD"<<std::endl;
 				confirmation = LOGIN_FAILED;
 			}
-			//construct answer
-			answer.typeOfInfos = LOGIN_CONFIRM;
+			//construct _answer
+			_answer.typeOfInfos = LOGIN_CONFIRM;
 
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
-            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+            sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			
 			break;
 
@@ -170,10 +170,10 @@ void User::handleManagementRequest(SerializedObject *received){
 				state_=FREE;
 				confirmation = NORMAL_LOGIN;
 			}
-			//construct answer
-			answer.typeOfInfos = LOGIN_CONFIRM;
+			//construct _answer
+			_answer.typeOfInfos = LOGIN_CONFIRM;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
-            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+            sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			break;
 
 		case GETMANAGERINFOS : {
@@ -204,10 +204,10 @@ void User::handleManagementRequest(SerializedObject *received){
 #endif
 			calendar_->update();
 			DataBase::save(*manager_);
-			//construct answer
-			answer.typeOfInfos = MANAGERINFOS;
+			//construct _answer
+			_answer.typeOfInfos = MANAGERINFOS;
 			writeIntVector(answerPosition, infos);
-			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+			sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			break;
 		}
 		case GETPLAYERSLIST :
@@ -220,8 +220,8 @@ void User::handleManagementRequest(SerializedObject *received){
 			calendar_->update();
 			DataBase::save(*manager_);
 			playersList = manager_->getPlayersList();
-			//construct answer 
-			answer.typeOfInfos = PLAYERSLIST;
+			//construct _answer 
+			_answer.typeOfInfos = PLAYERSLIST;
 			size = playersList.size();
 			
 			for (i=0;i<size;i+=2){
@@ -238,7 +238,7 @@ void User::handleManagementRequest(SerializedObject *received){
 			writeStringVector(answerPosition, playersList);
 			calendar_->update();
 			DataBase::save(*manager_);
-			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+			sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			
 			break;
 
@@ -253,8 +253,8 @@ void User::handleManagementRequest(SerializedObject *received){
 			//for (unsigned int i=0;i<infos.size();++i) {std::cout<<infos[i]<<std::endl;}
 			calendar_->update();
 			DataBase::save(*manager_);
-			//construct answer
-			answer.typeOfInfos = PLAYERINFOS;
+			//construct _answer
+			_answer.typeOfInfos = PLAYERINFOS;
 			//5 attributs int
 			//5 états d'entrainements d'attribut int
 			//1 int blocked
@@ -262,7 +262,7 @@ void User::handleManagementRequest(SerializedObject *received){
 			//1 int capacity du balais
 			//TODO : ajouter la vie
 			writeIntVector(answerPosition, infos);
-			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+			sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			
 			break;
 
@@ -285,11 +285,11 @@ void User::handleManagementRequest(SerializedObject *received){
 			calendar_->update();
 			DataBase::save(*manager_);
 	
-			//construct answer
+			//construct _answer
 
-			answer.typeOfInfos = BUILDINGINFOS;
+			_answer.typeOfInfos = BUILDINGINFOS;
 			writeIntVector(answerPosition, infos);
-			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+			sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			break;
 		case UPGRADE_BUILDING :
 			//reading details
@@ -313,10 +313,10 @@ void User::handleManagementRequest(SerializedObject *received){
 			}
 			calendar_->update();
 			DataBase::save(*manager_);
-			//construct answer
-			answer.typeOfInfos = UPGRADE_CONFIRM;
+			//construct _answer
+			_answer.typeOfInfos = UPGRADE_CONFIRM;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
-            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+            sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			break;
 			
 		case TRAIN_PLAYER :
@@ -338,10 +338,10 @@ void User::handleManagementRequest(SerializedObject *received){
 			calendar_->update();
 			DataBase::save(*manager_);
 
-			//construct answer
-			answer.typeOfInfos = TRAINING_STARTED;
+			//construct _answer
+			_answer.typeOfInfos = TRAINING_STARTED;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
-            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+            sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			break;	
 
 		case HEAL_PLAYER :
@@ -359,10 +359,10 @@ void User::handleManagementRequest(SerializedObject *received){
 			calendar_->update();
 			DataBase::save(*manager_);
 
-			//construct answer
-			answer.typeOfInfos = HEAL_STARTED;
+			//construct _answer
+			_answer.typeOfInfos = HEAL_STARTED;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
-            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+            sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			break;
 
 		case BUY_ACTION_POINTS :
@@ -378,10 +378,10 @@ void User::handleManagementRequest(SerializedObject *received){
 			calendar_->update();
 			DataBase::save(*manager_);
 
-			//construct answer
-			answer.typeOfInfos = PRICE_FOR_AP;
+			//construct _answer
+			_answer.typeOfInfos = PRICE_FOR_AP;
 			memcpy(answerPosition, &price, sizeof(price));
-            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+            sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			break;
 
 		case START_PROMOTION :
@@ -398,10 +398,10 @@ void User::handleManagementRequest(SerializedObject *received){
 			
 			/*confirmation = true;
 			
-			//construct answer
-			answer.typeOfInfos = HEAL_STARTED;
+			//construct _answer
+			_answer.typeOfInfos = HEAL_STARTED;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
-            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour*/
+            sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour*/
 			break;
 
 		case END_PROMOTION :
@@ -418,10 +418,10 @@ void User::handleManagementRequest(SerializedObject *received){
 			DataBase::save(*manager_);
 
 			std::cout<<" ACTION POINTS GAINED : "<<APGained<<endl;
-			//construct answer
-			answer.typeOfInfos = RESULT_PROMOTION;
+			//construct _answer
+			_answer.typeOfInfos = RESULT_PROMOTION;
 			memcpy(answerPosition, &APGained, sizeof(APGained));
-            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+            sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			break;
 			
 		case GETMANAGERSLIST : {
@@ -442,8 +442,8 @@ void User::handleManagementRequest(SerializedObject *received){
                     namesList.push_back(server_->usersList_[i]->getUserName());
                 }
             }
-            //construct answer
-			answer.typeOfInfos = MANAGERSLIST;
+            //construct _answer
+			_answer.typeOfInfos = MANAGERSLIST;
 			memcpy(answerPosition, &counter, sizeof(counter));
             answerPosition += sizeof(counter);
             for(int i = 0; i < counter; ++i){
@@ -456,7 +456,7 @@ void User::handleManagementRequest(SerializedObject *received){
 				memcpy(answerPosition, &name, sizeof(name));
 				answerPosition += sizeof(name);
             }
-            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+            sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			break;
 		}
 	}
@@ -466,9 +466,9 @@ void User::handleManagementRequest(SerializedObject *received){
 void User::handleMatchRequest(SerializedObject *received){
 	int confirmation;
 	int targetedUser, targetedPlayer;
-	SerializedObject answer;
+	 
 	char * position;
-	char * answerPosition = answer.stringData;
+	char * answerPosition = _answer.stringData;
 	position = received->stringData;
 	switch(received->typeOfInfos){
 		case PROPOSEMATCH : {
@@ -497,7 +497,7 @@ void User::handleMatchRequest(SerializedObject *received){
                 }
             }
                
-            __matchesHandler->proposeForMatch(this, invited, team1, __moves); //matchesHandler handle the answer
+            __matchesHandler->proposeForMatch(this, invited, team1, __moves); //matchesHandler handle the _answer
 			break;
         }
 		case ACCEPTMATCH : {
@@ -534,10 +534,10 @@ void User::handleMatchRequest(SerializedObject *received){
 			//handle demand
 			bool confirmation = __matchesHandler->isInvited(this); //TODO : récupérer ID et name de l'invitant
 			
-			//construct answer
-			answer.typeOfInfos = MATCH_WAITING;
+			//construct _answer
+			_answer.typeOfInfos = MATCH_WAITING;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
-            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+            sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			break;
 		}
 		case MAKEMOVES : {
@@ -589,7 +589,7 @@ void User::handleMatchRequest(SerializedObject *received){
 				_teamInMatch.push_back(&manager_->getPlayer(playersInTeam[i]));
 			}
                
-            __matchesHandler->playTrainingMatch(this, team1, __moves); //matchesHandler handle the answer
+            __matchesHandler->playTrainingMatch(this, team1, __moves); //matchesHandler handle the _answer
 			break;
 		}
 		
@@ -599,8 +599,8 @@ void User::handleMatchRequest(SerializedObject *received){
 			std::cout<<"Demande de la liste des positions sur le terrain reçue sur le socket "<<getSockfd()<<std::endl;
 #endif
 			//handle demand
-			__matchesHandler->getScoresAndPositions(this);
-			//construct answer
+			_answer.typeOfInfos = POSITIONS;
+			__matchesHandler->getScoresAndPositions(this, answerPosition); //appelera sendAnswer puis poursuivra son traitement
 			break;
 		case SELECTPLAYER :
 			//reading details
@@ -611,10 +611,11 @@ void User::handleMatchRequest(SerializedObject *received){
 			std::cout<<"targetedPlayer reçu : "<<targetedPlayer<<std::endl;
 #endif
 			//handle demand
-			__matchesHandler->getPlayerInfos(this, targetedPlayer);
-			//construct answer
+			_answer.typeOfInfos = PLAYERINFOS;
+			__matchesHandler->getPlayerInfos(this, targetedPlayer, answerPosition);
+			sendOnSocket(sockfd_, _answer);
 			break;
-case CREATE_TOURNAMENT : {
+		case CREATE_TOURNAMENT : {
 			//reading details
 			int nbOfPlayers;
 			int startingPrice;
@@ -630,10 +631,10 @@ case CREATE_TOURNAMENT : {
 			confirmation = __matchesHandler->createTournament(nbOfPlayers, startingPrice);
 			
 			//answering
-			//answer in confirmation
-			answer.typeOfInfos = NEWTOURNAMENT_CONFIRM;
+			//_answer in confirmation
+			_answer.typeOfInfos = NEWTOURNAMENT_CONFIRM;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
-            sendOnSocket(sockfd_, answer); 
+            sendOnSocket(sockfd_, _answer); 
 			break;
 		}
 		case GETTOURNAMENTSLIST : {
@@ -643,9 +644,9 @@ case CREATE_TOURNAMENT : {
 #endif
 			//handling request and answering
 
-			answer.typeOfInfos = TOURNAMENTSLIST;
+			_answer.typeOfInfos = TOURNAMENTSLIST;
 			confirmation = __matchesHandler->serializeTournaments(answerPosition); //always true ?
-			sendOnSocket(sockfd_, answer); 
+			sendOnSocket(sockfd_, _answer); 
 			break;
 		}
 		case JOINTOURNAMENT : {
@@ -658,11 +659,9 @@ case CREATE_TOURNAMENT : {
 			std::cout<<"tournamentID :  "<<tournamentID<< std::endl;
 #endif
 			//handling request
-			confirmation = __matchesHandler->addPlayerToTournament(this); //return -1 if already in list, 0 if not full, 1 if full after addition
-			
-			//TODO
-			//answering by matchesHandler to handle potential launch of the tournament
-			
+			_answer.typeOfInfos = JOINTOURNAMENT_CONFIRM;
+			confirmation = __matchesHandler->addPlayerToTournament(this, answerPosition); //return -1 if already in list, 0 if not full, 1 if full after addition
+						
 			break;
 		}
 		case STARTTOURNAMENTMATCH : {
@@ -710,9 +709,9 @@ void User::handleAuctionRequest(SerializedObject *received){
 	int currentPrice,auctionTimeLeft;
 	ManagedPlayer tmpPlayer;
 	vector<string> auctionsList;
-	SerializedObject answer;
+	 
 	char * position;
-	char * answerPosition = answer.stringData;
+	char * answerPosition = _answer.stringData;
 	//int resultOfAuction;
 	position = received->stringData;
 	switch(received->typeOfInfos){
@@ -742,9 +741,9 @@ void User::handleAuctionRequest(SerializedObject *received){
 				}
 			}
 			else confirmation=false;
-			answer.typeOfInfos = AUCTIONCREATION_CONFIRM;
+			_answer.typeOfInfos = AUCTIONCREATION_CONFIRM;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
-            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+            sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			break;
 		}
 		case JOINAUCTION :
@@ -765,12 +764,12 @@ void User::handleAuctionRequest(SerializedObject *received){
 				}
 				if (auction_==NULL) confirmation = false;
 				else confirmation = true;
-				//construct answer:
+				//construct _answer:
 			}
 			else confirmation=false;
-			answer.typeOfInfos = AUCTIONJOIN_CONFIRM;
+			_answer.typeOfInfos = AUCTIONJOIN_CONFIRM;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
-            sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+            sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			break;
 
 
@@ -794,8 +793,8 @@ void User::handleAuctionRequest(SerializedObject *received){
 					server_->auctionsList_[i]->endAuction();
 				}
 			}
-			//construct answer 
-			answer.typeOfInfos = AUCTIONSLIST;
+			//construct _answer 
+			_answer.typeOfInfos = AUCTIONSLIST;
 			size = auctionsList.size();
 			std::cout<<size<<std::endl;
 			memcpy(answerPosition, &size, sizeof(size)); //nb de noms à lire
@@ -821,7 +820,7 @@ void User::handleAuctionRequest(SerializedObject *received){
 				
 			}
 
-			sendOnSocket(sockfd_, answer);
+			sendOnSocket(sockfd_, _answer);
 			break;
 
 		case GETAUCTIONINFO :
@@ -839,7 +838,7 @@ void User::handleAuctionRequest(SerializedObject *received){
 					infos= server_->getPlayerSoldInfos(i);
 				}
 			}
-			answer.typeOfInfos = PLAYERINFOS;
+			_answer.typeOfInfos = PLAYERINFOS;
 			//5 attributs int
 			//5 états d'entrainements d'attribut int
 			//1 int blocked
@@ -847,7 +846,7 @@ void User::handleAuctionRequest(SerializedObject *received){
 			//1 int capacity du balais
 			//TODO : ajouter la vie //done
 			writeIntVector(answerPosition, infos);
-			sendOnSocket(sockfd_, answer); //TODO : tester valeur retour
+			sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 				
 			break;
 
@@ -861,11 +860,11 @@ void User::handleAuctionRequest(SerializedObject *received){
 			calendar_->update();
 			DataBase::save(*manager_);
 			auction_->bid(this);
-			//construct answer:
+			//construct _answer:
 			confirmation=true;
-			answer.typeOfInfos = BID_CONFIRM;
+			_answer.typeOfInfos = BID_CONFIRM;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
-			sendOnSocket(sockfd_, answer);
+			sendOnSocket(sockfd_, _answer);
 			break;
 
 		case END_AUCTION_TURN : {
@@ -900,10 +899,10 @@ void User::handleAuctionRequest(SerializedObject *received){
 			if (auction_->getNbOfEndOfTurn()==auction_->getNumberOfBidders()) {
 				auction_->resetBidders();
 			}
-			//construct answer:
-			answer.typeOfInfos = AUCTION_RESULT;
+			//construct _answer:
+			_answer.typeOfInfos = AUCTION_RESULT;
 			memcpy(answerPosition, &resultOfAuction, sizeof(resultOfAuction));
-            sendOnSocket(sockfd_, answer); 
+            sendOnSocket(sockfd_, _answer); 
 			break;	
 		}
 		case GET_AUCTION_PRICE : {
@@ -915,9 +914,9 @@ void User::handleAuctionRequest(SerializedObject *received){
 			//DataBase::save(*manager_);
 			currentPrice = auction_->getCurrentPrice();
 
-			answer.typeOfInfos = AUCTION_PRICE;
+			_answer.typeOfInfos = AUCTION_PRICE;
 			memcpy(answerPosition, &currentPrice, sizeof(currentPrice));
-            sendOnSocket(sockfd_, answer); 
+            sendOnSocket(sockfd_, _answer); 
 			break;	
 		}
 		case GET_AUCTION_TIME_LEFT : {
@@ -929,9 +928,9 @@ void User::handleAuctionRequest(SerializedObject *received){
 			//DataBase::save(*manager_);
 			auctionTimeLeft = auction_->getTimeBeforeFirstTurn();
 
-			answer.typeOfInfos = AUCTION_TIME_LEFT;
+			_answer.typeOfInfos = AUCTION_TIME_LEFT;
 			memcpy(answerPosition, &auctionTimeLeft, sizeof(auctionTimeLeft));
-            sendOnSocket(sockfd_, answer); 
+            sendOnSocket(sockfd_, _answer); 
 			break;	
 		}
 	}
@@ -1087,4 +1086,58 @@ void User::writeStringVector(char * position, std::vector<std::string> list){
 		memcpy(position, &name, sizeof(name));
 		position += sizeof(name);
 	}
+}
+
+
+int User::sendInvitation(int IDInvitor, std::string &nameInvitor){
+	SerializedObject toSend;
+	toSend.typeOfInfos = MATCH_INVITATION; //paquet header
+	char * position = toSend.stringData;
+	char name[USERNAME_LENGTH];
+	strcpy(name, nameInvitor.c_str());
+    memcpy(position, &IDInvitor, sizeof(IDInvitor));
+    position += sizeof(IDInvitor);
+    memcpy(position, &name, sizeof(name));
+    return sendOnSocket(sockfd_, toSend);
+}
+
+int User::inviteForTournamentMatch(int IDOpponent, std::string nameOpponent){
+	_answer.typeOfInfos = MATCH_TOURNAMENT_START;
+	char * position = _answer.stringData;
+	char name[USERNAME_LENGTH];
+	strcpy(name, nameOpponent.c_str());
+    memcpy(position, &IDOpponent, sizeof(IDOpponent));
+    position += sizeof(IDOpponent);
+    memcpy(position, &name, sizeof(name));
+    position += sizeof(name);
+    return sendOnSocket(sockfd_, _answer);
+}
+
+int User::sendEndOfMatch(int code){
+	SerializedObject toSend;
+	char * position = toSend.stringData;
+    if(code == FORFEIT){
+        toSend.typeOfInfos = OPPONENTFORFEIT;
+    }
+    else if(code == ASKFORDRAW){
+        toSend.typeOfInfos = OPPONENTASKFORDRAW;
+    }
+    else{
+        toSend.typeOfInfos = DRAW_CONFIRM;
+        memcpy(position, &code, sizeof(code)); //confirmation : DRAWACCEPTED or DRAWDENIED
+    }
+    return sendOnSocket(sockfd_, toSend);
+}
+
+int User::sendMatchConfirmation(int answerCode){
+	 
+    _answer.typeOfInfos = MATCH_CONFIRM;
+    char * answerPosition = _answer.stringData;
+    int confirmation = answerCode;
+    memcpy(answerPosition, &confirmation, sizeof(confirmation));
+    return sendOnSocket(sockfd_, _answer);
+}
+
+int User::sendAnswer(){
+	return sendOnSocket(sockfd_, _answer);
 }

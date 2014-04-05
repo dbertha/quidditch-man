@@ -45,7 +45,7 @@ class User {
 public:
 	User(Server *, MatchesHandler *, int, int);
 	~User();
-	void cmdHandler(SerializedObject *);
+	void cmdHandler();
 	void setDisconnection();
 	bool isDisconnecting();
 	int getSockfd();
@@ -67,7 +67,11 @@ public:
 	
 	void handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice, std::vector<int> lifes); //normal price + tournamentPrice
 	void handleEndOfTrainingMatch(int numTeam, int numWinningTeam, std::vector<int> lifes);
-
+	int sendInvitation(int IDInvitor, std::string &nameInvitor);
+	int sendEndOfMatch(int code);
+	int sendMatchConfirmation(int answerCode);
+	int sendAnswer();
+	int inviteForTournamentMatch(int IDOpponent, std::string nameOpponent);
 	std::string intToString(int value);
 
 private:
@@ -76,6 +80,7 @@ private:
 	//User* opponent_;
 	int sockfd_; //socket de communication du client
 	int userId_;
+	SerializedObject _answer;
 	std::string userName_;
 	std::string answer_; //TODO : inutilisé
 	std::string dataRequest_;

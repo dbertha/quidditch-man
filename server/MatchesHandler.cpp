@@ -2,7 +2,7 @@
 
 
 void MatchesHandler::proposeForMatch(User * invitor, User * invited, std::vector<ManagedPlayer> &team1, int **movesTeam1){
-    //TODO : tester si invited non null
+    //si invited non null, l'invité existe bien
 
     if((invitor->state_ == FREE) and (invited->state_ == FREE)){
 
@@ -20,19 +20,12 @@ void MatchesHandler::proposeForMatch(User * invitor, User * invited, std::vector
     }
 }
 
-int MatchesHandler::sendInvitation(User * invitor, User * invited){
-	SerializedObject toSend;
-	toSend.typeOfInfos = MATCH_INVITATION; //paquet header
-	char * position = toSend.stringData;
+void MatchesHandler::sendInvitation(User * invitor, User * invited){
+	
 	
 	int IDInvitor = invitor->getUserID();
 	std::string nameInvitor = invitor->getUserName();
-	char name[USERNAME_LENGTH];
-	strcpy(name, nameInvitor.c_str());
-    memcpy(position, &IDInvitor, sizeof(IDInvitor));
-    position += sizeof(IDInvitor);
-    memcpy(position, &name, sizeof(name));
-    return sendOnSocket(invited->getSockfd(), toSend);
+	invited->sendInvitation(IDInvitor, nameInvitor);
 }
 
 void MatchesHandler::forfeit(User * demander){
@@ -125,19 +118,7 @@ void MatchesHandler::confirmDraw(User * responder, int confirmation){
 }
 
 int MatchesHandler::sendEndOfMatch(User * receiver, int code){
-    SerializedObject toSend;
-	char * position = toSend.stringData;
-    if(code == FORFEIT){
-        toSend.typeOfInfos = OPPONENTFORFEIT;
-    }
-    else if(code == ASKFORDRAW){
-        toSend.typeOfInfos = OPPONENTASKFORDRAW;
-    }
-    else{
-        toSend.typeOfInfos = DRAW_CONFIRM;
-        memcpy(position, &code, sizeof(code)); //confirmation : DRAWACCEPTED or DRAWDENIED
-    }
-    return sendOnSocket(receiver->getSockfd(), toSend);
+	return receiver->sendEndOfMatch(code);
 }
 	
 
@@ -170,27 +151,11 @@ void MatchesHandler::respondToMatchProposal(User * invited, std::vector<ManagedP
 }
 
 int MatchesHandler::sendConfirmationTo(User * client, int answerCode){
-    SerializedObject answer;
-    answer.typeOfInfos = MATCH_CONFIRM;
-    char * answerPosition = answer.stringData;
-    int confirmation = answerCode;
-    memcpy(answerPosition, &confirmation, sizeof(confirmation));
-    return sendOnSocket(client->getSockfd(), answer); //TODO : tester valeur retour
+	return client->sendMatchConfirmation(answerCode);
 }
 
-//~ int MatchesHandler::sendConfirmationTo(User * client, int answerCode, int numTeam){
-    //~ //idem but with numTeam at the end of buffer
-    //~ SerializedObject answer;
-    //~ answer.typeOfInfos = MATCH_CONFIRM;
-    //~ char * answerPosition = answer.stringData;
-    //~ int confirmation = answerCode;
-    //~ memcpy(answerPosition, &confirmation, sizeof(confirmation));
-    //~ answerPosition += sizeof(confirmation));
-    //~ memcpy(answerPosition, &numTeam, sizeof(numTeam));
-    //~ return sendOnSocket(client->getSockfd(), answer); //TODO : tester valeur retour
-//~ }
 
-void MatchesHandler::getScoresAndPositions(User * demander){
+void MatchesHandler::getScoresAndPositions(User * demander, char * position){
     int winner;
     int matchIndex = std::find(inviteds.begin(), inviteds.end(), demander) - inviteds.begin();
     if(matchIndex > int(inviteds.size())-1){
@@ -199,10 +164,8 @@ void MatchesHandler::getScoresAndPositions(User * demander){
 #ifdef __DEBUG
     std::cout << "Demande des scores et des positions, index du match concerné : " << matchIndex << std::endl;
 #endif
-    SerializedObject answer;
-    answer.typeOfInfos = POSITIONS;
-    winner = matchesVector[matchIndex]->serializeScoreAndPositions(answer.stringData);
-    sendOnSocket(demander->getSockfd(), answer);
+    winner = matchesVector[matchIndex]->serializeScoreAndPositions(position);
+    demander->sendAnswer(); //on force l'envoi immédiat car un push pourrait immédiatement suivre
     if(winner != 0){ //si match terminé
 #ifdef __DEBUG
     std::cout << "Match terminé ! " << std::endl;
@@ -270,18 +233,15 @@ void MatchesHandler::handleEndOfTournamentMatch(User * winningUser){
 }
     
 
-void MatchesHandler::getPlayerInfos(User * demander, int playerID){
+void MatchesHandler::getPlayerInfos(User * demander, int playerID, char * position){
     int matchIndex = std::find(inviteds.begin(), inviteds.end(), demander) - inviteds.begin();
     if(matchIndex > int(inviteds.size())-1){
         matchIndex = std::find(invitors.begin(), invitors.end(), demander) - invitors.begin(); 
     }
 #ifdef __DEBUG
     std::cout << "Demande des informations d'un joueur, index du match concerné : " << matchIndex << std::endl;
-#endif
-    SerializedObject answer;
-    answer.typeOfInfos = PLAYERINFOS;
-    matchesVector[matchIndex]->serializePlayerAttr(playerID, answer.stringData);
-    sendOnSocket(demander->getSockfd(), answer);
+#endif    
+    matchesVector[matchIndex]->serializePlayerAttr(playerID, position);
 }
 
 void MatchesHandler::recordMoves(User * demander){
@@ -358,14 +318,11 @@ int MatchesHandler::serializeTournaments(char * buffer){
 }
 
 
-int MatchesHandler::addPlayerToTournament(User * subscriber){
+int MatchesHandler::addPlayerToTournament(User * subscriber, char * answerPosition){
     int result = __tournament->subscribeManager(subscriber);
-    SerializedObject answer;
-    char * answerPosition = answer.stringData;
     int answerResult = result + 1; //adaptation pour le client
-    answer.typeOfInfos = JOINTOURNAMENT_CONFIRM;
     memcpy(answerPosition, &answerResult, sizeof(answerResult));
-    sendOnSocket(subscriber->getSockfd(), answer); //TODO : tester retour
+    subscriber->sendAnswer();
     if(result == 1){ //tournament starts
         launchNextTournamentTurn();
     }
@@ -419,32 +376,18 @@ void MatchesHandler::respondToTournamentMatch(User * responder, std::vector<Mana
 }
 
 int MatchesHandler::inviteForTournamentMatch(User * firstPlayer, User * secondPlayer){
-	SerializedObject msgForFirstPlayer, msgForSecondPlayer;
-	msgForFirstPlayer.typeOfInfos = msgForSecondPlayer.typeOfInfos = MATCH_TOURNAMENT_START; //paquet header
+	int result;
     //first player oppose second player :
-	char * position = msgForFirstPlayer.stringData;
 	int IDOpponent = secondPlayer->getUserID();
 	std::string nameOpponent = secondPlayer->getUserName();
-	char name[USERNAME_LENGTH];
-    int  result;
-	strcpy(name, nameOpponent.c_str());
-    memcpy(position, &IDOpponent, sizeof(IDOpponent));
-    position += sizeof(IDOpponent);
-    memcpy(position, &name, sizeof(name));
-    position += sizeof(name);
+    result = firstPlayer->inviteForTournamentMatch(IDOpponent, nameOpponent);
     
     //second player oppose first player :
-    position = msgForSecondPlayer.stringData;
     IDOpponent = firstPlayer->getUserID();
     nameOpponent = firstPlayer->getUserName();
-    strcpy(name, nameOpponent.c_str());
-    memcpy(position, &IDOpponent, sizeof(IDOpponent));
-    position += sizeof(IDOpponent);
-    memcpy(position, &name, sizeof(name));
-    position += sizeof(name);
 
-    result = sendOnSocket(firstPlayer->getSockfd(), msgForFirstPlayer);
-    result = result and sendOnSocket(secondPlayer->getSockfd(), msgForSecondPlayer);
+    
+    result = result and secondPlayer->inviteForTournamentMatch(IDOpponent, nameOpponent);
     return result;
 }
 
