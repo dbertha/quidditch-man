@@ -3,8 +3,8 @@
 #include "PlayerMgr.hpp"
 #include "AuctionMgr.hpp"
 
-MainGui::MainGui(int sockfd,QMainWindow *parent) : 
-parent_(parent), __client(new Client(sockfd)), __pushesNotifier(new QSocketNotifier(sockfd, QSocketNotifier::Read, this)) {
+MainGui::MainGui(Client* client,int sockfd,MainWindow *parent) : 
+parent_(parent), __client(client), __pushesNotifier(new QSocketNotifier(sockfd, QSocketNotifier::Read, this)) {
     __pushesNotifier->setEnabled(false); //genère le signal
     connect(__pushesNotifier,SIGNAL(activated(int)),this,SLOT(pushesHandler()));
     setFixedSize(800,640);
@@ -13,7 +13,7 @@ parent_(parent), __client(new Client(sockfd)), __pushesNotifier(new QSocketNotif
     setWindowTitle(tr("Quidditch Manager 2014"));
     loginDialog = new LoginDialog(__client,this);
     nbPlayers=money=nbFans=nbActionPoints=0;
-    login();
+    //login();
 }
 
 MainGui::~ MainGui() {
@@ -250,7 +250,7 @@ void MainGui::createActions() {
 void MainGui::firstMenu() {
     // menu minimal - le mgr ne s'est pas encore identifie
         connect(aboutAction,SIGNAL(triggered()),this,SLOT(about()));
-        connect(exitAction,SIGNAL(triggered()),this,SLOT(close()));
+        connect(exitAction,SIGNAL(triggered()),this,SLOT(quit()));
         connect(loginAction,SIGNAL(triggered()),this,SLOT(login()));
 
         fileMenu=menuBar()->addMenu(tr("File"));
@@ -304,6 +304,11 @@ void MainGui::about() {
                "<p>HELENE PLISNIER"
                "<p>DAVID BERTHA"
                "<p>AUDRY DELESTREE");
+}
+
+void MainGui::quit() {
+    close();
+    //parent_->quit();
 }
 int MainGui::getMoney() {return money;}
 int MainGui::getNbPlayers() {return nbPlayers;}

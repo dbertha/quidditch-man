@@ -72,6 +72,7 @@ void User::cmdHandler(SerializedObject *received) {
 void User::handleManagementRequest(SerializedObject *received){
 	int targetedBuilding, resultOfUpgrade, size;
 	int APGained;
+	int i;
 	int confirmation;
 	std::vector<int> IDList;
     std::vector<std::string> namesList;
@@ -222,6 +223,10 @@ void User::handleManagementRequest(SerializedObject *received){
 			//construct answer 
 			answer.typeOfInfos = PLAYERSLIST;
 			size = playersList.size();
+			
+			for (i=0;i<size;i+=2){
+				std::cout<<playersList[i]<<" "<<playersList[i+1]<<std::endl;
+			}
 			memcpy(answerPosition, &size, sizeof(size)); //nb de noms à lire
 			answerPosition += sizeof(size);
 
@@ -1074,10 +1079,11 @@ std::vector<int> User::readIntVector(char * position, int nbToRead){
 
 void User::writeStringVector(char * position, std::vector<std::string> list){
 	//Attention : on suppose le buffer assez grand
-	for (unsigned int i=0;i<list.size() - 1;++i) {
+	for (unsigned int i=0;i<list.size() ;++i) {
 		char name[USERNAME_LENGTH];
 		string stringname = list[i];
 		strcpy(name, stringname.c_str());
+		std::cout<<"NOM :"<<name<<std::endl;
 		memcpy(position, &name, sizeof(name));
 		position += sizeof(name);
 	}

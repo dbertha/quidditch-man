@@ -21,9 +21,9 @@
 #include "BuyAPDialog.hpp"
 #include "FreeAPDialog.hpp"
 #include "MatchWindow.hpp"
+#include "MainWindow.hpp"
 
-
-
+class MainWindow;
 class MainMenu;
 class Ticker;
 class BuildingsDialog;
@@ -32,7 +32,7 @@ class BuyAPDialog;
 class MainGui : public QMainWindow {
     Q_OBJECT
 public:
-        MainGui(int,QMainWindow *parent=0);
+        MainGui(Client* client,int,MainWindow *parent);
         ~MainGui();
         int getMoney();
         int getNbPlayers();
@@ -42,7 +42,10 @@ public:
         void setNbPlayers(const int);
         void setNbFans(const int);
         void setActionPoints(const int);
+        int role, nbPlayers, money, nbFans, nbActionPoints;
+        void createMenu();
 public slots:
+        void quit();
         void listMgrs();
         void listPlayers();
         void buildings();
@@ -61,7 +64,6 @@ private:
         int badConnection();
         void createActions();
         void firstMenu();
-        void createMenu();
         void createButtons();
         QAction *loginAction;
         QAction *logoutAction;
@@ -88,8 +90,7 @@ private:
         BuyAPDialog *buyAPDialog;
         FreeAPDialog *freeAPDialog;
         LoginDialog *loginDialog;
-        int role, nbPlayers, money, nbFans, nbActionPoints;
-        QMainWindow parent_;
+        MainWindow* parent_;
         Client * __client;
         QSocketNotifier * __pushesNotifier;
 

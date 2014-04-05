@@ -25,7 +25,10 @@ HEADERS += client/ClientMatchHandler.hpp \
            client/AuctionsDialog.hpp \
            client/AuctionWindow.hpp \
            client/MatchWindow.hpp \
-           client/HexagonalCase.hpp 
+           client/HexagonalCase.hpp \ 
+    client/MainWindow.hpp \
+    client/ConnexionPage.hpp \
+    client/LoginPage.hpp
            
 
 SOURCES += client/ClientMatchHandler.cpp \
@@ -48,5 +51,11 @@ SOURCES += client/ClientMatchHandler.cpp \
            client/AuctionsDialog.cpp \
            client/AuctionWindow.cpp \
            client/MatchWindow.cpp \
-           client/HexagonalCase.cpp 
+           client/HexagonalCase.cpp \ 
+    client/MainWindow.cpp \
+    client/ConnexionPage.cpp \
+    client/LoginPage.cpp
+
+RESOURCES += \
+    ressources.qrc
 

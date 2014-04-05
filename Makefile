@@ -88,6 +88,9 @@ clientGUI.out: Makefile.GUI \
            client/AuctionWindow.hpp \
            client/MatchWindow.hpp \
            client/HexagonalCase.hpp \
+	   client/MainWindow.hpp \
+	   client/ConnexionPage.hpp \
+	   client/LoginPage.hpp \
            client/ClientMatchHandler.cpp \
            client/LoginDialog.cpp \
            client/GUImain.cpp \
@@ -108,7 +111,10 @@ clientGUI.out: Makefile.GUI \
            client/AuctionsDialog.cpp \
            client/AuctionWindow.cpp \
            client/MatchWindow.cpp \
-           client/HexagonalCase.cpp
+           client/HexagonalCase.cpp \
+	   client/MainWindow.cpp \
+	   client/ConnexionPage.cpp \
+	   client/LoginPage.cpp 
 	make -f Makefile.GUI
 	
 Makefile.client :
