@@ -61,11 +61,14 @@ void User::cmdHandler() {
 #endif
 		handleMatchRequest(received);
 	}
-	else{
+	else if (isAboutAuctions(received)){
 #ifdef __DEBUG
 	std::cout<<"C'est une requête d'enchère."<<std::endl;
 #endif
 		handleAuctionRequest(received);
+	}
+	else {
+		setDisconnection();
 	}
 }
 
@@ -140,7 +143,7 @@ void User::handleManagementRequest(SerializedObject *received){
             sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			
 			break;
-
+		
 		case CREATE_MANAGER :
 			//reading details
 			//char username[USERNAME_LENGTH], password[PASSWORD_LENGTH];
