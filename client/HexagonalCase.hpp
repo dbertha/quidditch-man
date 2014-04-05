@@ -73,6 +73,10 @@ class HexagonalCase : public QGraphicsObject
 
 		int getIAxial();
 		int getJAxial();
+
+		int getHauteur();
+		int getLargeur();
+
 		int getTypeMarkBall();
 
 		void rajouterBalle(int);
@@ -83,9 +87,7 @@ class HexagonalCase : public QGraphicsObject
 		void bloquerLeJoueur();
 
 		void isAGoal();
-
 		void isAccessible();
-
 
 		void isLine();
 		void isDiagonalGoBasDroite();
@@ -102,10 +104,14 @@ class HexagonalCase : public QGraphicsObject
 		bool ifBlocked();
 
 
-        //boudingRect => defnie la region frontiere de l'objet
-        QRectF boundingRect() const;
-        QPainterPath shape() const;
-//        QRegion boundingRegion( const QTransform & itemToDeviceTransform ) const;
+		//boudingRect + shape => defnie la region frontiere de l'objet
+		QRectF boundingRect() const;//def un rectangle qui entoure l'hexagone
+		QPainterPath shape() const;//restreint la region exactement a l'hexagone
+		//note fonctionnement QGraphicsItem (QGraphicsObject en herite):
+		//  on est obliger de d'abord definir un domaine rectangulaire qui englobe complemetenent l'Item
+		//  et apres on, on peut limiter ce domaine aux dimentione de l'objet grace a shape. Seulement les
+		//  clicke dans le domaine "shape" seront prit en compte
+
 
     public slots://reaction a un signal
         void changerCouleur();

@@ -1,6 +1,5 @@
 #include "MatchWindow.hpp"
 
-
 //note: code pas du tout optimise/"modualiser"/"umliser", grosse phase de refactoring necessaire
 
 MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDialog(parent),
@@ -8,7 +7,7 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	__field(), __client(client), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd(),  QSocketNotifier::Read, this))
 {
 
-	//initialisation : 
+	//initialisation liste de mouvement:
 
 	for(int i = 0; i < 7; ++i){
 	  moves[i][0] = i;
@@ -18,11 +17,9 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	}
 	connect(__forfeitAndDrawNotifier,SIGNAL(activated(int)),this,SLOT(pushesHandler()));
 
-	setFixedSize(680, 680);
+	setFixedSize(600, 600);//defini la taille de toute la fenetre (contient zone de jeux, description vie joueur, action possible,...)
 
 	//*****************************************************************************************
-//	texte = new QLabel("Zone texte \n Zone texte",this); //vas servir a afficher resultat
-
 	infoJoueur = new QLabel("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
 	infoJoueur->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
@@ -30,10 +27,7 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	//*****************************************************************************************
 	//création de la scene, zone principal où seront afficher les cases haxagonal
 	scene = new QGraphicsScene;
-	//def la taille de la scene
-	scene->setSceneRect(-200,-200,400,400); //(point x depart, point y depart, largeur,hauteur)
-
-
+	//note: la taille de la scene sera defini a sont initialisation
 	//création de la view qui vas contenir la scene
 	view = new QGraphicsView(scene);
 
@@ -49,12 +43,13 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 
 
 	deplacer->setChecked(true);
-	deplacer->setEnabled(false);
+	deplacer->setEnabled(false);//setEnabled => descative le bouton, le rend "grisé"
 	lancer->setEnabled(false);
 	taper->setEnabled(false);
 	recupSouaffle->setEnabled(false);
 	recupVifDOr->setEnabled(false);
-//	taper->setVisible(false);
+//	taper->setVisible(false); //TODO: choisir ou non si afficher action (setVisible vas masquer le bouton, on pourrai alors
+	// seulement afficher les action possible pour un joueur au lieu de "grisé" celle inacessible)
 
 	QVBoxLayout *vbox = new QVBoxLayout;
 	vbox->addWidget(deplacer);
@@ -112,6 +107,7 @@ void MatchWindow::initListeHexa(){
 	int idOccupant;
 	int indexRow;
 	int indexCol;
+
 	//crée les HexagonalCase selon ce qu'il doivent contenir et les connectes a la MatchWindow (this)
 	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){ //index de la diag
 		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){ //index de la ligne
@@ -120,12 +116,18 @@ void MatchWindow::initListeHexa(){
 			indexCol=AxialCoordinates(indexRowAxial,indexColAxial).getColOnMatrix();
 			ListeHexa[indexRow][indexCol] =new HexagonalCase(indexRowAxial,indexColAxial,idOccupant);
 			scene->addItem(ListeHexa[indexRow][indexCol]);
-//			QObject::connect(ListeHexa[indexRow][indexCol], SIGNAL(caseSelect(int,int))
-//					, this, SLOT(changerTexte(int,int)));
 			QObject::connect(ListeHexa[indexRow][indexCol], SIGNAL(caseSelect(int,int))
 					, this, SLOT(handlerMove(int,int)));
 		}
 	}
+	//defini la taille de la scene:
+	//  calculer a partir de nombre d'hexagone et de leur taille
+	int x_depart = (-MATRIX_SIZE/2) *ListeHexa[0][0]->getLargeur();
+	int y_depart = (-MATRIX_SIZE/2) *ListeHexa[0][0]->getHauteur();
+	int largeur = MATRIX_SIZE*ListeHexa[0][0]->getLargeur();
+	int hauteur = MATRIX_SIZE*ListeHexa[0][0]->getHauteur();
+	scene->setSceneRect(x_depart,y_depart,largeur,hauteur);
+
 
 	//defini les case qui sont des goal
 	indexRow=AxialCoordinates(GOAL1_SIDE1_DIAG,GOAL1_SIDE1_LINE).getLineOnMatrix();

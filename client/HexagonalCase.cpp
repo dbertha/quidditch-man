@@ -256,6 +256,15 @@ int HexagonalCase::getIAxial(){
 int HexagonalCase::getJAxial(){
 	return _indiceJ;
 }
+
+int HexagonalCase::getHauteur(){
+	return hauteur-4;
+}
+
+int HexagonalCase::getLargeur(){
+	return largeur+1;
+}
+
 int HexagonalCase::getTypeMarkBall(){
 	return _markTypeBalle;
 }
@@ -392,23 +401,18 @@ void HexagonalCase::changerCouleur(){//slots de reaction a un signal
 }
 
 
-
-
 void HexagonalCase::mousePressEvent(QGraphicsSceneMouseEvent *)
- {//test pour voir les reaction possible a un clickage
-	 //setCursor(Qt::ClosedHandCursor);
-	 //changerCouleur();
+ {//emet un signal si on clicke sur une case
 	 emit caseSelect(_indiceI,_indiceJ);
-
  }
 
 //----------------------------------------------------------------------------------------------
 //methode pour definir la zone d'interaction/definition des objets
 //(utiliser pour les clicke mais aussi par Qt pour reddessiner les objet)
 QRectF HexagonalCase::boundingRect() const
-{   //attention: ne peut ranvoyer qu'un rectangle
+{   //attention: ne peut renvoyer qu'un rectangle
 
-	qreal penWidth = 1;//pas sure que soit utile
+	qreal penWidth = 0;//pas sure que soit utile
 	return QRectF( -largeur/2+(_indiceI*pasIndiceI.x())+(_indiceJ*pasIndiceJ.x()) - penWidth / 2
 				  ,-hauteur/2+(_indiceI*pasIndiceI.y())+(_indiceJ*pasIndiceJ.y()) - penWidth / 2
 				  , largeur + penWidth

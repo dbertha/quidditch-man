@@ -15,6 +15,7 @@
 #include <QTimer>
 #include <QLabel>
 #include <QApplication>
+#include <QStackedWidget>
 #include <QtGui>
 #include "Client.hpp"
 #include "Tournaments.hpp"

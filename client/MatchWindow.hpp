@@ -31,14 +31,11 @@
 #include "Client.hpp" //network
 
 
-class MatchWindow : public QDialog // On hérite de QWidget //TODO : changer pour QDialog
+class MatchWindow : public QDialog
 {
 	Q_OBJECT //vas permettre de def ces propres slot (public slots:) et signaux (signals:)
 
     public:
-		
-		//MatchWindow(int idMaTeam);
-		//final :
 		MatchWindow(Client * client, int idTeam, QWidget * parent = 0);
 
     public slots:
@@ -52,7 +49,6 @@ class MatchWindow : public QDialog // On hérite de QWidget //TODO : changer pou
 
     signals:
 		void checkTour();
-//    void agrandissementMaxV2(int);//test perso pour renvoyé des valeur
 
     private:
 		int numMaTeam;
