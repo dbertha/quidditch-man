@@ -50,8 +50,8 @@ static const QColor _couleurFondSelect=Qt::cyan;
 static const QColor _couleurFondNoSelect=Qt::white;//Qt::NoBrush si on met image de fond
 static const QColor _couleurFondGoal=Qt::darkCyan;
 
-static const QColor _couleurEquipe1=Qt::blue;
-static const QColor _couleurEquipe2=Qt::black;
+static const QColor _couleurEquipe1=Qt::darkGreen;
+static const QColor _couleurEquipe2=Qt::blue;
 
 static const QColor _couleurQuaffle=QColor (222,184,135);//burlywood
 static const QColor _couleurGoldenSnitch=Qt::yellow;
@@ -163,6 +163,8 @@ class HexagonalCase : public QGraphicsObject
         QRectF rectangleInterne() const;
         QPointF centreHexagon() const;
 
+//variable test pour etre sure que je redessine pas les case en boucle
+		int test;
 
 };
 

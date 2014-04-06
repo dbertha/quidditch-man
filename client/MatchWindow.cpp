@@ -1,6 +1,6 @@
 #include "MatchWindow.hpp"
 
-//note: code pas du tout optimise/"modualiser"/"umliser", grosse phase de refactoring necessaire
+//TODO:note: code pas du tout optimise/"modualiser"/"umliser", grosse phase de refactoring necessaire
 
 MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDialog(parent),
 	numMaTeam(numTeam), iHaveASelection(false),  scoreTeam1(0), scoreTeam2(0), winner(0), currentMove(0), 
@@ -17,13 +17,28 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	}
 	connect(__forfeitAndDrawNotifier,SIGNAL(activated(int)),this,SLOT(pushesHandler()));
 
-	setFixedSize(600, 600);//defini la taille de toute la fenetre (contient zone de jeux, description vie joueur, action possible,...)
+	setFixedSize(800, 800);//defini la taille de toute la fenetre (contient zone de jeux, description vie joueur, action possible,...)
 
 	//*****************************************************************************************
 	infoJoueur = new QLabel("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
 	infoJoueur->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
-	scoreEquipe = new QLabel("\t score equipe 1 = 0 \n\t score equipe 2 = 0");
+	if(numMaTeam == 1){//on vas adapter le texter d'indication de score selon qu'on soit l'equipe 1 ou 2
+		texteEquipe1 = new QLabel(texteMaTeam);
+		texteEquipe2 = new QLabel(texteAutreTeam);
+	}else{
+		texteEquipe1 = new QLabel(texteAutreTeam);
+		texteEquipe2 = new QLabel(texteMaTeam);
+	}
+	//on colorie le texte selon les couleurs utiliser dans les hexagonalCase
+	QPalette* palette = new QPalette();
+	palette->setColor(QPalette::WindowText,_couleurEquipe1);
+	texteEquipe1->setPalette(*palette);
+	palette->setColor(QPalette::WindowText,_couleurEquipe2);
+	texteEquipe2->setPalette(*palette);
+
+	scoreEquipe1 = new QLabel(QString::number(0));
+	scoreEquipe2 = new QLabel(QString::number(0));
 	//*****************************************************************************************
 	//création de la scene, zone principal où seront afficher les cases haxagonal
 	scene = new QGraphicsScene;
@@ -86,11 +101,14 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	//initialisation d'un layout pour organniser le Qlabel,la view, radio bouton,....
 	layout = new QGridLayout;
 //	layout->addWidget(texte,3,0);
-	layout->addWidget(scoreEquipe,0,0);
-	layout->addWidget(view, 1, 0,1,3);//peut occuper 1 ligne et 3 colonne
-	layout->addWidget(infoJoueur,2,0);
-	layout->addWidget(groupbox,2,1);
-	layout->addLayout(layoutConformi,2,2);
+	layout->addWidget(texteEquipe1,0,0,Qt::AlignRight); //(nom_Widget_a_afficher,indexLigne, indexColonne)
+	layout->addWidget(scoreEquipe1,0,1,Qt::AlignLeft);
+	layout->addWidget(texteEquipe2,0,2,Qt::AlignRight);
+	layout->addWidget(scoreEquipe2,0,3,Qt::AlignLeft);
+	layout->addWidget(view, 1, 0,1,4);//peut occuper 1 ligne et 3 colonne
+	layout->addWidget(infoJoueur,2,0,1,2);
+	layout->addWidget(groupbox,2,2);
+	layout->addLayout(layoutConformi,2,3);
 	this->setLayout(layout);
 
 	__forfeitAndDrawNotifier->setEnabled(false);
@@ -108,7 +126,7 @@ void MatchWindow::initListeHexa(){
 	int indexRow;
 	int indexCol;
 
-	//crée les HexagonalCase selon ce qu'il doivent contenir et les connectes a la MatchWindow (this)
+	//initialise les HexagonalCase et les connectes a la MatchWindow (this)
 	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){ //index de la diag
 		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){ //index de la ligne
 			idOccupant=__field.getOccupant(AxialCoordinates(indexRowAxial,indexColAxial));
@@ -154,12 +172,12 @@ void MatchWindow::initListeHexa(){
 void MatchWindow::resetListeHexa(){
 	int indexRow;
 	int indexCol;
-	//crée les HexagonalCase selon ce qu'il doivent contenir et les connectes a la MatchWindow (this)
+	//reset le terrain (toutes les case redeviennent vide)
 	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){ //index de la diag
 		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){ //index de la ligne
 			indexRow=AxialCoordinates(indexRowAxial,indexColAxial).getLineOnMatrix();
 			indexCol=AxialCoordinates(indexRowAxial,indexColAxial).getColOnMatrix();
-			ListeHexa[indexRow][indexCol]->setType(-1);
+			ListeHexa[indexRow][indexCol]->setType(FREE_SPACE);
 		}
 	}
 }
@@ -168,13 +186,11 @@ void MatchWindow::updateListeHexa(){
 	//mets a jout les case HexagonalCases selon un vecteur allPositions
 	// allPosition[0]  contient les coord axial du joueur 0 de l'equipe 1 (TEAM1_KEEPER)
 	// les autre allPosition[x] vont dans le meme ordre qu'il sont decrit dans le fichier definie.hpp
-//	AxialCoordinates coord;
 	int indexRow;
 	int indexCol;
 
 	//i indique aussi la type de joueur ou balle (voir definie.hpp->TEAM1_KEEPER,...)
 	for(unsigned int i = 0; i < allPositions.size(); ++i){
-//		coord = allPositions[i];
 		indexRow=allPositions[i].getLineOnMatrix();
 		indexCol=allPositions[i].getColOnMatrix();
 		if(indexRow == 10000){
@@ -191,13 +207,14 @@ void MatchWindow::updateListeHexa(){
 			QMessageBox msgBox;
 			msgBox.setText(boxTxt);
 			msgBox.exec();
-		}else if(ListeHexa[indexRow][indexCol]->getType()==FREE_SPACE){//1 balle et un joueur peuvent se supperposer
+		}else if(ListeHexa[indexRow][indexCol]->getType()==FREE_SPACE){
+			//1 balle et un joueur peuvent se supperposer, si la case est vide, la case devient une case joueur ou balle
 			ListeHexa[indexRow][indexCol]->setType(i);
-		}else{//on rajoute une balle sur la casse du joueur
+		}else{//si la case n'est pas vide, on rajoute une balle sur la casse du joueur
 			if(i==QUAFFLE){
-				ListeHexa[indexRow][indexCol]->rajouterBalle(2);//TODO impplique qu'il connait num pour mettre Quaflla,pas bon
+				ListeHexa[indexRow][indexCol]->rajouterBalle(QUAFFLE);
 			}else{
-				ListeHexa[indexRow][indexCol]->rajouterBalle(1);
+				ListeHexa[indexRow][indexCol]->rajouterBalle(BLUDGER1);
 			}
 		}
 
@@ -573,7 +590,7 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 	}else{//aucune selection
 
 		//verifier si je peux selectionner l'objet
-		if( ListeHexa[indexRow][indexCol]->getType() != -1){//si pas une case vide (j'ai un joueur)
+		if( ListeHexa[indexRow][indexCol]->getType() != FREE_SPACE){//si pas une case vide (j'ai un joueur)
 			qDebug() << "j'ai une nouvelle selection de qlq chose";
 			if( (((ListeHexa[indexRow][indexCol]->getType() / 7) +1) == numMaTeam)
 					&& !(ListeHexa[indexRow][indexCol]->ifBlocked()) ){//je verif qu'il est a mon equipe
@@ -794,8 +811,8 @@ void MatchWindow::nextTurn(){
 	//récupérer les positions
     allPositions = __client->receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
 	//TODO: mieux gerer affichage
-	scoreEquipe->setText("\t score equipe 1 = "+QString::number(scoreTeam1) +"\n\t score equipe 2 = "+QString::number(scoreTeam2) );
-
+	scoreEquipe1->setText(QString::number(scoreTeam1));
+	scoreEquipe2->setText(QString::number(scoreTeam2));
 	//update affichage
 	resetListeHexa();
 	updateListeHexa();

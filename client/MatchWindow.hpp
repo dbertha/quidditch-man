@@ -30,6 +30,9 @@
 
 #include "Client.hpp" //network
 
+#define texteMaTeam "score de mon equipe : "
+#define texteAutreTeam "score de l'equipe adverse : "
+
 
 class MatchWindow : public QDialog
 {
@@ -65,7 +68,11 @@ class MatchWindow : public QDialog
 		int playerRole;
 
 		QLabel *infoJoueur;
-		QLabel *scoreEquipe;
+		QLabel *scoreEquipe1;
+		QLabel *scoreEquipe2;
+		QLabel *texteEquipe1;
+		QLabel *texteEquipe2;
+
 		QLabel *texte;
         QGridLayout *layout;
         QGraphicsScene *scene;

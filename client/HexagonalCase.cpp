@@ -1,5 +1,11 @@
 #include "HexagonalCase.hpp"
 
+//ATTENTION: l'utilisation de setZValue(z) peut provoquer le "repaint" d'un objet
+//  =>si mal placer, peut provoquer un repaint en boucle des objets
+
+//TODO: supprimer variable "test" avant push final
+//TODO: supprimer fonction test "changer couleur"
+
 //constructeur:
 HexagonalCase::HexagonalCase(int i, int j,int type, QGraphicsItem *parent) : QGraphicsObject(parent),
 	_typeCase(type),_indiceI(i),_indiceJ(j),_ifGoal(false),_ifSelect(false),_ifAccesible(false),
@@ -8,6 +14,10 @@ HexagonalCase::HexagonalCase(int i, int j,int type, QGraphicsItem *parent) : QGr
 	_ifSelectForAction=false;
 	_blocked=false;//note: un joueur bloquer ne peut etre debloquer que quand on redefini la case (setType)
 	_contientBalleEnPlus=0;
+	setZValue(0);//permet de joueur sur le niveau des case les une par rapport au autre
+	//les case vide sont niveau 0, les joueurs/balle niveau 1 et se dessine donc au-dessus des case vide
+	//(evite que les bords noirs des casses vides remplacent les bord colorés des cases joueurs)
+	test = 0;
 	//this->setCursor(QCursor(Qt::OpenHandCursor));//test pour changer le cursor
 	//setBoundingRegionGranularity(1);
 	//QObject::connect(this, SIGNAL(clicked()), qApp, SLOT(quit()));
@@ -73,22 +83,29 @@ void HexagonalCase::dessinerHexagone(QPainter *painter){
 		brush.setColor(Qt::gray);
 	}
 
+	//la couleur du bord s'adapte selon l'equipe ou qu'on ai selectionner une case
 	QColor couleurBord=Qt::black;
+	if(_typeCase>=TEAM1_KEEPER && _typeCase<= TEAM1_BEATER2){ //joueur extreme de l'equipe 1
+		couleurBord = _couleurEquipe1;
+		setZValue(10);
+		qDebug()<<"coloriage case selon equipe1";
+	}
+	if(_typeCase>=TEAM2_KEEPER && _typeCase<= TEAM2_BEATER2){ //joueur extreme de l'equipe 2
+		couleurBord = _couleurEquipe2;
+		setZValue(10);
+		qDebug()<<"coloriage case selon equipe2";
+	}
+
 	if(_ifSelectForAction){
 		couleurBord = Qt::green;
 	}
-
+//Test pour etre sure que je redessine pas les case en boucle
+	test+=1;
+	qDebug()<<test;
+	qDebug()<<_typeCase;
 
 	painter->setBrush(brush );
 	painter->setPen(QPen(couleurBord,2,Qt::SolidLine)); //defini le pinceaux qui dessine les contours
-
-	if(_contientBalleEnPlus==1){//bludger en plus sur case
-		dessinerBludger(painter);
-	}
-	if(_contientBalleEnPlus==2){//bludger en plus sur case
-		dessinerQuaffle(painter);
-	}
-
 
 	//2. dessiner l'HexagonalCase
 	painter->drawPolygon(caseBuilt());
@@ -96,6 +113,13 @@ void HexagonalCase::dessinerHexagone(QPainter *painter){
 }
 
 void HexagonalCase::dessinerType(QPainter *painter){
+	//si la case contient un joueur et une balle en plus, on dessine d'abord la balle et le desseins du joueur se superpose par dessus
+	if(_contientBalleEnPlus==BLUDGER1){//bludger en plus sur case
+		dessinerBludger(painter);
+	}
+	if(_contientBalleEnPlus==QUAFFLE){//Quaffle en plus sur case
+		dessinerQuaffle(painter);
+	}
 	//pas mal de joueur son dessiner de la meme maniere pour l'instant, certain case son donc inutile
 	//mais on garde pour pouvoir differencier joueur de meme type au sein d'une equipe
 	// (2 chaser n'ont pas forcement meme stat donc interresant de pouvoir les differencier)
@@ -244,6 +268,7 @@ void HexagonalCase::setType(int typeCase){
 	_typeCase = typeCase;
 	_blocked = false;
 	_contientBalleEnPlus=0;
+	setZValue(0);
 	update();
 }
 int HexagonalCase::getType(){
@@ -268,8 +293,8 @@ int HexagonalCase::getLargeur(){
 int HexagonalCase::getTypeMarkBall(){
 	return _markTypeBalle;
 }
-void HexagonalCase::rajouterBalle(int nbr){
-	_contientBalleEnPlus=nbr;
+void HexagonalCase::rajouterBalle(int type_balle){
+	_contientBalleEnPlus=type_balle;
 }
 
 //----------------------------------------------------------------------------------------------
