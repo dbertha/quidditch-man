@@ -1157,10 +1157,10 @@ Les messages échangés entre la partie serveur et la partie client du projet so
 \end{itemize}
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.3]{uml/Client-serveur.jpeg}
+    \includegraphics[scale=0.3]{uml/Clientserveur.png}
     \caption{Diagramme d'activité : schéma du dialogue client-serveur} \label{diag-serveur}
     \end{figure}
-Aucune des méthodes du serveur n'étant bloquante pendant plus d'une fraction de seconde (peu d'I/O) et compte tenu des délais très courts pour la mise en œuvre, nous avons opté à ce stade pour une solution mono-thread;
+Aucune des méthodes du serveur n'étant bloquante pendant plus d'une fraction de seconde (peu d'I/O) et compte tenu des délais très courts pour la mise en œuvre, nous avons opté pour une solution mono-thread;
 travailler avec un seul thread supprime la nécessité de devoir gérer l'accès concurrent aux données (en mémoire ou sur disque) et la communication entre threads (arrêt du serveur par exemple) :
 une solution multi-threads rendrait la gestion de ressources communes par les fonctions applicatives plus complexe (sérialisation de sections critiques), 
 tout en étant beaucoup plus gourmande en ressources CPU et présentant des risques de deadlocks (tests plus délicats à réaliser!). 
@@ -1175,6 +1175,12 @@ Sinon (par exemple pour une liste), deux solutions sont possibles :
   \item Utiliser de part et d'autre des zones de mémoire allouées dynamiquement et envoyer tout en un seul message, après un premier message indiquant au client la taille du buffer.
 \end{itemize}
 Jusqu'à présent nous allouons un buffer de taille fixe.
+
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.3]{uml/Serveur.png}
+    \caption{Cycle de vie du serveur}
+    \end{figure}
 
   \subsubsection{Synopsis du client}
 Comme le serveur, le client utilise la fonction select() afin de pouvoir capter indifféremment des messages d'origine différente,
@@ -1191,6 +1197,12 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
  
  De même, lorsque le client reçoit un message non sollicité, il entre dans un dialogue avec à la fois le serveur et le manager,
  sans qu'il puisse être interrompu par un autre message non sollicité ou par une autre demande du manager au clavier.
+ 
+  \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.3]{uml/Client.png}
+    \caption{Cycle de vie du client}
+  \end{figure}
  
   \subsubsection{Exemples}
     \begin{figure}[H]
