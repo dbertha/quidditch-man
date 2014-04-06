@@ -261,13 +261,14 @@ void MatchWindow::marquerCaseAccessibleDepuis(int rowAxial, int colAxial, int ma
 				qDebug()<<"---";
 				qDebug()<<indexRowAxial;
 				qDebug()<<indexColAxial;
-				ListeHexaAccessible<<ListeHexa[indexRow][indexCol];
+				ListeHexaMarquer<<ListeHexa[indexRow][indexCol];//stock la case qui est marquer pour pouvoir la demarquer
 			}
 		}
 	}
 	update();
 }
 
+//TODO: netoyer les commentaire
 void MatchWindow::demarquerToutesCase(){
 	//vas marquer toutes les casses non Accesible
 	//NOTE: pas optimal, faut s'arranger pour sauvergarder une liste de case qui ont
@@ -277,15 +278,15 @@ void MatchWindow::demarquerToutesCase(){
 //	int indexCol;
 	qDebug()<<"rentre dans non accessible1";
 
-	while(!ListeHexaAccessible.isEmpty()){
-		temp = ListeHexaAccessible.takeFirst();//supprime le 1er element et le renvoye
+	while(!ListeHexaMarquer.isEmpty()){
+		temp = ListeHexaMarquer.takeFirst();//supprime le 1er element et le renvoye
 		qDebug()<<"#####";
 		qDebug()<<temp->getIAxial();
 		qDebug()<<temp->getJAxial();
 		temp->isNonAccessible();
 
 	}
-/*
+/*//TODO: netoyer le code inutile
 
 	for (int indexRow = 0; indexRow < MATRIX_SIZE; ++indexRow){
 		for(int indexCol = 0; indexCol < MATRIX_SIZE; ++indexCol){
@@ -304,227 +305,40 @@ void MatchWindow::demarquerToutesCase(){
 	}*/
 }
 
-//TODO *!!!!!!!!!!!!!!!!!!! A refactorer, marquerFrappe + marquerLancer
-void MatchWindow::marquerFrappe(int iAxialDepart,int jAxialDepart,int maxDistance,int idBudlger){
+void MatchWindow::marquerUneDirection(int iAxialDepart,int jAxialDepart,int maxDistance,int idBudlger,int direction){
+	int i=1;
+	int iAxial=iAxialDepart+directionHexa[direction].pasI;
+	int jAxial=jAxialDepart+directionHexa[direction].pasJ;
+	int indexRow;
+	int indexCol;
+//	qDebug() << "////////TEST///////";
+//	for(int j=0; j< nbrDirectionHexa;j++){
+//		qDebug() << "** dir, pasi=" +QString::number(directionHexa2[j].pasI)+"pasj="+QString::number(directionHexa2[j].pasJ);
+//	}
+
+	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
+		qDebug() << "---- Marquage pas i:"+QString::number( directionHexa[direction].pasI)+" pas j:"+QString::number( directionHexa[direction].pasJ);
+		qDebug() << iAxial;
+		qDebug() << jAxial;
+		indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
+		indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
+		ListeHexa[indexRow][indexCol]->isMarkForBall(idBudlger,direction);
+		ListeHexaMarquer<<ListeHexa[indexRow][indexCol];//stock la case qui est marquer pour pouvoir la demarquer
+		i+=1;
+		iAxial = iAxial + directionHexa[direction].pasI;
+		jAxial = jAxial + directionHexa[direction].pasJ;
+	}
+}
+
+void MatchWindow::marquerBalle(int iAxialDepart,int jAxialDepart,int maxDistance,int idBalle){
 	qDebug()<<"Debut du marquage pour frappe, i,j,max";
 	qDebug()<<iAxialDepart;
 	qDebug()<<jAxialDepart;
 	qDebug()<<maxDistance;
-	int i;
-	int iAxial=iAxialDepart+1;
-	int jAxial=jAxialDepart+0;
-	int indexRow;
-	int indexCol;
 
-	//6 direction :
-	//(1,0) droite
-	i=1;
-	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
-		qDebug() << "test frappe droite";
-		qDebug() << iAxial;
-		qDebug() << jAxial;
-		indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
-		indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
-		ListeHexa[indexRow][indexCol]->isMarkForBludger(idBudlger);
-		ListeHexa[indexRow][indexCol]->isLine();
-		i+=1;
-		iAxial = iAxial + 1;
-		jAxial = jAxial + 0;
+	for(int j=0; j< nbrDirectionHexa;j++){
+		marquerUneDirection(iAxialDepart,jAxialDepart,maxDistance,idBalle,j);
 	}
-
-	//(0,1) bas-droite
-	iAxial=iAxialDepart+0;
-	jAxial=jAxialDepart+1;
-	i=1;
-	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
-		qDebug() << "test frappe bas-droite";
-		qDebug() << iAxial;
-		qDebug() << jAxial;
-		indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
-		indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
-		ListeHexa[indexRow][indexCol]->isMarkForBludger(idBudlger);
-		ListeHexa[indexRow][indexCol]->isDiagonalGoBasDroite();
-		i+=1;
-		iAxial = iAxial + 0;
-		jAxial = jAxial + 1;
-	}
-	//(-1,1) bas-gauche
-	iAxial=iAxialDepart-1;
-	jAxial=jAxialDepart+1;
-	i=1;
-	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
-		qDebug() << "test diagonal";
-		qDebug() << iAxial;
-		qDebug() << jAxial;
-		indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
-		indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
-		ListeHexa[indexRow][indexCol]->isMarkForBludger(idBudlger);
-		ListeHexa[indexRow][indexCol]->isDiagonalGohautDroite();
-		i+=1;
-		iAxial = iAxial - 1;
-		jAxial = jAxial + 1;
-	}
-
-	//(-1,0) gauche
-	iAxial=iAxialDepart-1;
-	jAxial=jAxialDepart+0;
-	i=1;
-	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
-		qDebug() << "test diagonal";
-		qDebug() << iAxial;
-		qDebug() << jAxial;
-		indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
-		indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
-		ListeHexa[indexRow][indexCol]->isMarkForBludger(idBudlger);
-		ListeHexa[indexRow][indexCol]->isLine();
-		i+=1;
-		iAxial = iAxial - 1;
-		jAxial = jAxial + 0;
-	}
-	//(0,-1) haut-gauche
-	iAxial=iAxialDepart+0;
-	jAxial=jAxialDepart-1;
-	i=1;
-	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
-		qDebug() << "test diagonal";
-		qDebug() << iAxial;
-		qDebug() << jAxial;
-		indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
-		indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
-		ListeHexa[indexRow][indexCol]->isMarkForBludger(idBudlger);
-		ListeHexa[indexRow][indexCol]->isDiagonalGoBasDroite();
-		i+=1;
-		iAxial = iAxial + 0;
-		jAxial = jAxial - 1;
-	}
-	//(1,-1) haut-droite
-	iAxial=iAxialDepart+1;
-	jAxial=jAxialDepart-1;
-	i=1;
-	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
-		qDebug() << "test diagonal";
-		qDebug() << iAxial;
-		qDebug() << jAxial;
-		indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
-		indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
-		ListeHexa[indexRow][indexCol]->isMarkForBludger(idBudlger);
-		ListeHexa[indexRow][indexCol]->isDiagonalGohautDroite();
-		i+=1;
-		iAxial = iAxial + 1;
-		jAxial = jAxial - 1;
-	}
-
-}
-
-void MatchWindow::marquerLancer(int iAxialDepart,int jAxialDepart,int maxDistance){
-	qDebug()<<"Debut du marquage pour Lancer, i,j,max";
-	qDebug()<<iAxialDepart;
-	qDebug()<<jAxialDepart;
-	qDebug()<<maxDistance;
-	int i;
-	int iAxial=iAxialDepart+1;
-	int jAxial=jAxialDepart+0;
-	int indexRow;
-	int indexCol;
-
-	//6 direction :
-	//(1,0) droite
-	i=1;
-	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
-		qDebug() << "test frappe droite";
-		qDebug() << iAxial;
-		qDebug() << jAxial;
-		indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
-		indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
-		ListeHexa[indexRow][indexCol]->isMarkForQuaffle();
-		ListeHexa[indexRow][indexCol]->isLine();
-		i+=1;
-		iAxial = iAxial + 1;
-		jAxial = jAxial + 0;
-	}
-
-	//(0,1) bas-droite
-	iAxial=iAxialDepart+0;
-	jAxial=jAxialDepart+1;
-	i=1;
-	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
-		qDebug() << "test frappe bas-droite";
-		qDebug() << iAxial;
-		qDebug() << jAxial;
-		indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
-		indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
-		ListeHexa[indexRow][indexCol]->isMarkForQuaffle();
-		ListeHexa[indexRow][indexCol]->isDiagonalGoBasDroite();
-		i+=1;
-		iAxial = iAxial + 0;
-		jAxial = jAxial + 1;
-	}
-	//(-1,1) bas-gauche
-	iAxial=iAxialDepart-1;
-	jAxial=jAxialDepart+1;
-	i=1;
-	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
-		qDebug() << "test diagonal";
-		qDebug() << iAxial;
-		qDebug() << jAxial;
-		indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
-		indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
-		ListeHexa[indexRow][indexCol]->isMarkForQuaffle();
-		ListeHexa[indexRow][indexCol]->isDiagonalGohautDroite();
-		i+=1;
-		iAxial = iAxial - 1;
-		jAxial = jAxial + 1;
-	}
-
-	//(-1,0) gauche
-	iAxial=iAxialDepart-1;
-	jAxial=jAxialDepart+0;
-	i=1;
-	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
-		qDebug() << "test diagonal";
-		qDebug() << iAxial;
-		qDebug() << jAxial;
-		indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
-		indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
-		ListeHexa[indexRow][indexCol]->isMarkForQuaffle();
-		ListeHexa[indexRow][indexCol]->isLine();
-		i+=1;
-		iAxial = iAxial - 1;
-		jAxial = jAxial + 0;
-	}
-	//(0,-1) haut-gauche
-	iAxial=iAxialDepart+0;
-	jAxial=jAxialDepart-1;
-	i=1;
-	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
-		qDebug() << "test diagonal";
-		qDebug() << iAxial;
-		qDebug() << jAxial;
-		indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
-		indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
-		ListeHexa[indexRow][indexCol]->isMarkForQuaffle();
-		ListeHexa[indexRow][indexCol]->isDiagonalGoBasDroite();
-		i+=1;
-		iAxial = iAxial + 0;
-		jAxial = jAxial - 1;
-	}
-	//(1,-1) haut-droite
-	iAxial=iAxialDepart+1;
-	jAxial=jAxialDepart-1;
-	i=1;
-	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
-		qDebug() << "test diagonal";
-		qDebug() << iAxial;
-		qDebug() << jAxial;
-		indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
-		indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
-		ListeHexa[indexRow][indexCol]->isMarkForQuaffle();
-		ListeHexa[indexRow][indexCol]->isDiagonalGohautDroite();
-		i+=1;
-		iAxial = iAxial + 1;
-		jAxial = jAxial - 1;
-	}
-
 }
 
 void MatchWindow::marquerAttraperSouaffle(int iAxial,int jAxial){
@@ -532,18 +346,20 @@ void MatchWindow::marquerAttraperSouaffle(int iAxial,int jAxial){
 	int indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
 	ListeHexa[indexRow][indexCol]->isMarkForQuaffle();
 	ListeHexa[indexRow][indexCol]->isForCatch();
+	ListeHexaMarquer<<ListeHexa[indexRow][indexCol];//stock la case qui est marquer pour pouvoir la demarquer
 
 }
+
 void MatchWindow::marquerAttraperVifDOr(int iAxial,int jAxial){
 	int indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
 	int indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
 	ListeHexa[indexRow][indexCol]->isMarkForGoldenSnitch();
 	ListeHexa[indexRow][indexCol]->isForCatch();
+	ListeHexaMarquer<<ListeHexa[indexRow][indexCol];//stock la case qui est marquer pour pouvoir la demarquer
 
 }
 
-
-
+//verifie qu'on ne sort pas du terrain de jeux
 bool MatchWindow::ifNotOut(int iAxial,int jAxial){
 	int indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
 	int indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
@@ -553,10 +369,6 @@ bool MatchWindow::ifNotOut(int iAxial,int jAxial){
 			 && ( (-MATRIX_SIZE/2) <=jAxial )
 			 && (jAxial < (MATRIX_SIZE/2 +1))
 			 && (ListeHexa[indexRow][indexCol]->getType() != NOT_ON_HEX_GRID) );
-
-/*	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){
-		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){
-*/
 }
 
 //------------------------------------------------------------------------------------------------------------
@@ -565,8 +377,8 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 	int indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
 	int indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
 	caseSelect = ListeHexa[indexRow][indexCol];
-//	if(iHaveASelection){//object deja selectionné
-	if(iHaveASelection){
+
+	if(iHaveASelection){//object deja selectionné
 		//TODO : construire moves[4][7], compter le nombre d'actions déjà réalisées
 		//TODO bouton pour finir le tour
 		//nextTurn()
@@ -687,7 +499,7 @@ void MatchWindow::handlerChoixAction(bool){
 	//--------------------------------------------------------------------------
 	if(lancer->isChecked()){
 		qDebug() << "    lancer choisi";
-		marquerLancer(caseJoueurSelect->getIAxial(),caseJoueurSelect->getJAxial(),attributs.attributes[STRENGTH]);
+		marquerBalle(caseJoueurSelect->getIAxial(),caseJoueurSelect->getJAxial(),attributs.attributes[STRENGTH],QUAFFLE);
 	}
 	//--------------------------------------------------------------------------
 	if(taper->isChecked()){
@@ -698,9 +510,9 @@ void MatchWindow::handlerChoixAction(bool){
 		qDebug() <<caseJoueurSelect->getIAxial();
 		qDebug() <<attributs.attributes[STRENGTH];
 		if(allPositions[BLUDGER1].getDistanceTo(AxialCoordinates(caseJoueurSelect->getIAxial(),caseJoueurSelect->getJAxial())) < 2)
-			marquerFrappe(allPositions[BLUDGER1].getDiagAxis(),allPositions[BLUDGER1].getLineAxis(),attributs.attributes[STRENGTH],BLUDGER1);
+			marquerBalle(allPositions[BLUDGER1].getDiagAxis(),allPositions[BLUDGER1].getLineAxis(),attributs.attributes[STRENGTH],BLUDGER1);
 		if(allPositions[BLUDGER2].getDistanceTo(AxialCoordinates(caseJoueurSelect->getIAxial(),caseJoueurSelect->getJAxial())) < 2)
-			marquerFrappe(allPositions[BLUDGER2].getDiagAxis(),allPositions[BLUDGER2].getLineAxis(),attributs.attributes[STRENGTH],BLUDGER2);
+			marquerBalle(allPositions[BLUDGER2].getDiagAxis(),allPositions[BLUDGER2].getLineAxis(),attributs.attributes[STRENGTH],BLUDGER2);
 	}
 	//--------------------------------------------------------------------------
 	if( recupSouaffle->isChecked() ){

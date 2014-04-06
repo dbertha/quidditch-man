@@ -101,7 +101,7 @@ class MatchWindow : public QDialog
 		HexagonalCase *temp;
         HexagonalCase *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
 
-		QList<HexagonalCase*> ListeHexaAccessible;
+		QList<HexagonalCase*> ListeHexaMarquer;
 
 		HexagonalField __field;
 
@@ -118,9 +118,8 @@ class MatchWindow : public QDialog
 
 		void marquerCaseAccessibleDepuis(int iAxial,int jAxial,int maxDistance);
 
-		void marquerFrappe(int iAxial,int jAxial,int maxDistance, int idBludger);
-		void marquerLancer(int iAxial,int jAxial,int maxDistance);
-
+		void marquerUneDirection(int iAxialDepart,int jAxialDepart,int maxDistance,int idBudlger,int direction);
+		void marquerBalle(int iAxial,int jAxial,int maxDistance, int idBalle);
 		void marquerAttraperSouaffle(int iAxial,int jAxial);
 		void marquerAttraperVifDOr(int iAxial,int jAxial);
 

@@ -57,6 +57,25 @@ static const QColor _couleurQuaffle=QColor (222,184,135);//burlywood
 static const QColor _couleurGoldenSnitch=Qt::yellow;
 static const QColor _couleurBludger=Qt::darkRed;
 
+//sauvegarder le pas d'indice (i,j) des directions possible
+static const int nbrDirectionHexa = 6;
+
+static const struct{
+	int pasI;
+	int pasJ;
+} directionHexa[nbrDirectionHexa] =  {{ 1, 0}, //droite
+						{ 0, 1}, //bas-droite
+						{-1, 1}, //bas-gauche
+						{-1, 0}, //gauche
+						{ 0,-1}, //haut-gauche
+						{ 1,-1}}; //haut-droite
+
+#define droite 0
+#define basDroite 1
+#define basGauche 2
+#define gauche 3
+#define hautGauche 4
+#define hautDroite 5
 
 class HexagonalCase : public QGraphicsObject
 {
@@ -95,6 +114,8 @@ class HexagonalCase : public QGraphicsObject
 		void isForCatch();
 
 		void isMarkForBludger(int);
+		void isMarkForBludger(int,int);
+		void isMarkForBall(int,int);
 		void isMarkForQuaffle();
 		void isMarkForGoldenSnitch();
 

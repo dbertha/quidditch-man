@@ -358,6 +358,32 @@ void HexagonalCase::isMarkForBludger(int idBludger){
 	update();
 }
 
+void HexagonalCase::isMarkForBludger(int idBludger,int direction){
+	_ifMarkForBludger=true;
+	_markTypeBalle=idBludger;
+	if(direction==droite || direction== gauche)
+		isLine();
+	if(direction==basDroite||direction==hautGauche)
+		isDiagonalGoBasDroite();
+	if(direction==basGauche||direction==hautDroite)
+		isDiagonalGohautDroite();
+	update();
+}
+
+void HexagonalCase::isMarkForBall(int idBall,int direction){
+	_ifMarkForBludger=true;
+	_markTypeBalle=idBall;
+	if(direction==droite || direction== gauche)
+		isLine();
+	if(direction==basDroite||direction==hautGauche)
+		isDiagonalGoBasDroite();
+	if(direction==basGauche||direction==hautDroite)
+		isDiagonalGohautDroite();
+	update();
+}
+
+
+
 void HexagonalCase::isMarkForQuaffle(){
 	_ifMarkForQuaffle=true;
 	_markTypeBalle=QUAFFLE;
@@ -383,7 +409,7 @@ void HexagonalCase::isNonAccessible(){
 	_ifMarkForQuaffle=false;
 	_ifMarkForGoldenSnitch=false;
 
-	_markTypeBalle=-7;
+	_markTypeBalle=0;
 
 	setZValue(0);
 	update();
