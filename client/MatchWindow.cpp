@@ -196,7 +196,7 @@ void MatchWindow::updateListeHexa(){
 		if(indexRow == 10000){
 			int playerRole = i;
             int playerTeam = 1;
-            if(i > TEAM2_KEEPER){
+			if(i >= TEAM2_KEEPER){//TODO: verif si c'est pas un >= qu'il faut (avant, c'etait juste i> )
 				playerTeam = 2;
                 playerRole = i - TEAM2_KEEPER;
 			}
@@ -224,7 +224,7 @@ void MatchWindow::updateListeHexa(){
 }
 
 
-
+//TODO: supprimier
 void MatchWindow::changerTexte(int i,int j){
 /*	int indexRow=AxialCoordinates(i,j).getLineOnMatrix();
 	int indexCol=AxialCoordinates(i,j).getColOnMatrix();
@@ -240,6 +240,8 @@ void MatchWindow::changerTexte(int i,int j){
 
 }
 
+
+//TODO:optimiser, back Tracking?
 void MatchWindow::marquerCaseAccessibleDepuis(int rowAxial, int colAxial, int maxDistance){
 	//crée le point de depart, celui par rapport au quel ont vas estimer la distance
 	AxialCoordinates pointDepart(rowAxial,colAxial);
@@ -247,7 +249,7 @@ void MatchWindow::marquerCaseAccessibleDepuis(int rowAxial, int colAxial, int ma
 	int indexRow;
 	int indexCol;
 	qDebug()<<"******";
-	//on vas comparer la distance entre le pointDepart et toutes les occases et marquer celle qui sont accesible
+	//on vas comparer la distance entre le pointDepart et toutes les cases et marquer celle qui sont accesible
 	for (int indexRowAxial = -MATRIX_SIZE/2; indexRowAxial < MATRIX_SIZE/2 +1; ++indexRowAxial){
 		for(int indexColAxial = -MATRIX_SIZE/2; indexColAxial < MATRIX_SIZE/2 +1; ++indexColAxial){
 			if( pointDepart.getDistanceTo(AxialCoordinates(indexRowAxial,indexColAxial)) <= maxDistance){ //TODO : optimiser
@@ -259,6 +261,7 @@ void MatchWindow::marquerCaseAccessibleDepuis(int rowAxial, int colAxial, int ma
 				qDebug()<<"---";
 				qDebug()<<indexRowAxial;
 				qDebug()<<indexColAxial;
+				ListeHexaAccessible<<ListeHexa[indexRow][indexCol];
 			}
 		}
 	}
@@ -272,7 +275,17 @@ void MatchWindow::demarquerToutesCase(){
 
 //	int indexRow;
 //	int indexCol;
-//	qDebug()<<"rentre dans non accessible1";
+	qDebug()<<"rentre dans non accessible1";
+
+	while(!ListeHexaAccessible.isEmpty()){
+		temp = ListeHexaAccessible.takeFirst();//supprime le 1er element et le renvoye
+		qDebug()<<"#####";
+		qDebug()<<temp->getIAxial();
+		qDebug()<<temp->getJAxial();
+		temp->isNonAccessible();
+
+	}
+/*
 
 	for (int indexRow = 0; indexRow < MATRIX_SIZE; ++indexRow){
 		for(int indexCol = 0; indexCol < MATRIX_SIZE; ++indexCol){
@@ -288,7 +301,7 @@ void MatchWindow::demarquerToutesCase(){
 			ListeHexa[indexRow][indexCol]->isNonAccessible();
 
 		}
-	}
+	}*/
 }
 
 //TODO *!!!!!!!!!!!!!!!!!!! A refactorer, marquerFrappe + marquerLancer
@@ -566,7 +579,7 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 				//marquer la case pour une action (l'encadrer ou autre)
 				caseSelect->selectForAction();
 				qDebug() << caseSelect->zValue();
-				caseSelect->setZValue(10);
+				caseSelect->setZValue(15);
 
 //				caseJoueurSelect->isSelected();
 				BoutonConfirm->setEnabled(true);

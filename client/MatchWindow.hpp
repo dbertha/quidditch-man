@@ -20,6 +20,7 @@
 #include <QRadioButton>
 #include <QSocketNotifier>
 #include <QMessageBox>
+#include <QList>
 
 #include <QDebug> //permet de dispose d'un affichage dans console debug
 
@@ -97,7 +98,10 @@ class MatchWindow : public QDialog
 
 		HexagonalCase *caseJoueurSelect;
 		HexagonalCase *caseSelect;
+		HexagonalCase *temp;
         HexagonalCase *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
+
+		QList<HexagonalCase*> ListeHexaAccessible;
 
 		HexagonalField __field;
 
