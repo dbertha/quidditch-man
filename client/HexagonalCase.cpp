@@ -39,6 +39,7 @@ void HexagonalCase::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 //----------------------------------------------------------------------------------------------
 //FONCTION POUR DESSINER LES DIFFERENTS ELEMENT D'UNE CASE
 void HexagonalCase::dessinerHexagone(QPainter *painter){
+	//  les joueur sont plus haut (leurs bords sont dessiner au dessus des bords cases vide)
 
 	//1. definir les options de coloriage = definir contour et fond utiliser
 	QBrush brush(_couleurFondNoSelect,Qt::SolidPattern);//vas servir a definir le fond
@@ -85,24 +86,27 @@ void HexagonalCase::dessinerHexagone(QPainter *painter){
 
 	//la couleur du bord s'adapte selon l'equipe ou qu'on ai selectionner une case
 	QColor couleurBord=Qt::black;
-	if(_typeCase>=TEAM1_KEEPER && _typeCase<= TEAM1_BEATER2){ //joueur extreme de l'equipe 1
-		couleurBord = _couleurEquipe1;
-		setZValue(10);
-		qDebug()<<"coloriage case selon equipe1";
-	}
-	if(_typeCase>=TEAM2_KEEPER && _typeCase<= TEAM2_BEATER2){ //joueur extreme de l'equipe 2
-		couleurBord = _couleurEquipe2;
-		setZValue(10);
-		qDebug()<<"coloriage case selon equipe2";
+	if(_ifSelectForAction){
+		setZValue(15);
+		couleurBord = Qt::green;
+	}else{
+		if(_typeCase>=TEAM1_KEEPER && _typeCase<= TEAM1_BEATER2){ //joueur extreme de l'equipe 1
+			couleurBord = _couleurEquipe1;
+			setZValue(10);
+			qDebug()<<"coloriage case selon equipe1";
+		}
+		if(_typeCase>=TEAM2_KEEPER && _typeCase<= TEAM2_BEATER2){ //joueur extreme de l'equipe 2
+			couleurBord = _couleurEquipe2;
+			setZValue(10);
+			qDebug()<<"coloriage case selon equipe2";
+		}
 	}
 
-	if(_ifSelectForAction){
-		couleurBord = Qt::green;
-	}
 //Test pour etre sure que je redessine pas les case en boucle
 	test+=1;
-	qDebug()<<test;
-	qDebug()<<_typeCase;
+	qDebug()<<"REDESSEIN("+QString::number(_indiceI)+","+QString::number(_indiceJ)+"):" +QString::number( test)+" type:"+QString::number( _typeCase)
+			  +" z:"+QString::number(zValue());
+
 
 	painter->setBrush(brush );
 	painter->setPen(QPen(couleurBord,2,Qt::SolidLine)); //defini le pinceaux qui dessine les contours
@@ -305,14 +309,20 @@ void HexagonalCase::select(){
 	update();
 }
 
+void HexagonalCase::unselect(){
+	_ifSelect = false;
+	setZValue(0);
+	update();
+}
+
 void HexagonalCase::selectForAction(){
 	_ifSelectForAction = true;
 	update();
 }
 
-
-void HexagonalCase::unselect(){
-	_ifSelect = false;
+void HexagonalCase::unselectForAction(){
+	_ifSelectForAction = false;
+	setZValue(0);
 	update();
 }
 

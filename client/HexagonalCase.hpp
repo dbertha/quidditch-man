@@ -100,9 +100,12 @@ class HexagonalCase : public QGraphicsObject
 
 		void rajouterBalle(int);
 
-        void select();
-		void selectForAction();
-        void unselect();
+		void select();//marque un joueur comme etant selectionné
+		void unselect();
+		void selectForAction();//marque la case pour dire qu'on peut la selectionner pour une action (deplacement,lancer,...)
+		void unselectForAction();
+
+
 		void bloquerLeJoueur();
 
 		void isAGoal();

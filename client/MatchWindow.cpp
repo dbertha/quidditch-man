@@ -6,7 +6,11 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	numMaTeam(numTeam), iHaveASelection(false),  scoreTeam1(0), scoreTeam2(0), winner(0), currentMove(0), 
 	__field(), __client(client), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd(),  QSocketNotifier::Read, this))
 {
-
+	//initialisation des cases hexagonals de travail (elles ne sont pas dessiner, servent juste
+	//  a manipuler les case) pour eviter tout probleme
+	caseJoueurSelect = new HexagonalCase();
+	caseSelect = new HexagonalCase();
+	temp = new HexagonalCase();
 	//initialisation liste de mouvement:
 
 	for(int i = 0; i < 7; ++i){
@@ -374,15 +378,32 @@ bool MatchWindow::ifNotOut(int iAxial,int jAxial){
 //------------------------------------------------------------------------------------------------------------
 //gestion des events
 void MatchWindow::handlerMove(int iAxial,int jAxial){
+	//--------------------------decription du Handler----------------------------
+	//si j'ai deja selection un joueur
+	//	l'ancien case est demarquer pour l'action (evite d'avoir plusieur case selection pour une action)
+	//  verif qu'on ne selection pas le meme joueur
+	//    si la case a été marquer: l'action selection(deplacement,attraper,lancer) peut-etre fait sur cette case
+	//      la case devient marquer pour l'action
+	//    sinon
+	//      deselectione le jouer + demarquer les case d'action + desactive les bouton d'action
+	//sinon (je n'ai pas encore selectionner un joueur)
+	//  verif si la case n'est pas une case vide
+	//    verif si le joueur a appartient a mon equipe
+	//      recup info du joueur + affichage
+	//      debloquer Action possible (deplacement+Action selon role)
+	//      afficher les casse accesible (action par defaut=deplacement)
+	//---------------------------------------------------------------------------
 	int indexRow=AxialCoordinates(iAxial,jAxial).getLineOnMatrix();
 	int indexCol=AxialCoordinates(iAxial,jAxial).getColOnMatrix();
-	caseSelect = ListeHexa[indexRow][indexCol];
+	temp = caseSelect; //on sauvegarde l'ancien case selectionner
+	caseSelect = ListeHexa[indexRow][indexCol];//represente la case sur laquel j'ai clicker
 
-	if(iHaveASelection){//object deja selectionné
+	if(iHaveASelection){//joueur deja selectionné
 		//TODO : construire moves[4][7], compter le nombre d'actions déjà réalisées
 		//TODO bouton pour finir le tour
 		//nextTurn()
 		qDebug() << "j'ai deja selection qlq chose";
+		temp->unselectForAction();//on demarque l'ancien case
 		if(iAxial==caseJoueurSelect->getIAxial() and jAxial==caseJoueurSelect->getJAxial()){
 			qDebug() << "je selection meme joueur";
 		}else{
@@ -390,8 +411,6 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 				qDebug() << "case marquer trouver";
 				//marquer la case pour une action (l'encadrer ou autre)
 				caseSelect->selectForAction();
-				qDebug() << caseSelect->zValue();
-				caseSelect->setZValue(15);
 
 //				caseJoueurSelect->isSelected();
 				BoutonConfirm->setEnabled(true);
@@ -451,6 +470,7 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 				deplacer->setEnabled(true);
 				marquerCaseAccessibleDepuis(iAxial,jAxial,attributs.attributes[SPEED]);
 
+				//debloque les actions selon le role du joueurs (et si les balles sont a bonne portée)
 				//si le jouer a le souaffle
 				if(attributs.hasQuaffle){
 					lancer->setEnabled(true); //debloquer action lancer souaffle
