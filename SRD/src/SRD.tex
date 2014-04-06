@@ -123,9 +123,9 @@
   % personnes qui vont bénéficier de la réalisation du projet.
   Le \gls{Quidditch}\index{Quidditch} \gls{manager}\index{manager} est un jeu multi-joueurs de gestion
   et de stratégie, se jouant en réseau.
-  Un manager (l'utilisateur) gère son équipe de \gls{joueur}s, qu'il peut entrainer
+  Un manager (l'utilisateur) gère son équipe de \gls{joueur}s, qu'il peut entraîner
   au travers des bâtiments construits sur la \index{parcelle}parcelle qui lui est attribuée. Certains de ces bâtiments permettent aussi de faire des achats et des ventes de balais ou de joueurs.
-  Le but pour le manager est de déveloper son \gls{club} aussi bien au niveau commercial
+  Le but pour le manager est de développer son \gls{club} aussi bien au niveau commercial
   que sportif.
   À travers la construction et l'évolution de ses bâtiments, le manager ouvre et
   augmente des possibilités de gestion du club, notamment la possibilité
@@ -136,7 +136,7 @@
   
   Ces matchs se déroulent
   dans un stade propre à un des managers et apportent une entrée d'argent
-  dûe notamment à la victoire d'une équipe mais aussi au nombre de tickets vendus.
+  due notamment à la victoire d'une équipe mais aussi au nombre de tickets vendus.
   Au cours du match, les managers en présence choisissent à chaque tour de jeu
   des déplacements pour leurs différents joueurs. Il existe quatre fonction possible
   pour un joueur lors d'un match. Un joueur peut être un \gls{attrapeur}\index{joueur!attrapeur}, un \gls{batteur}\index{joueur!batteur}, un \gls{gardien}\index{joueur!gardien}
@@ -185,6 +185,8 @@
     2.7 & Hélène & 14/03/14 & Terminal graphique avec diagrammes détaillés\\
     3.0 & Manon & 14/03/14 & Relecture partielle \\
     3.1 & Hélène & 04/04/14 & Terminal graphique avec nouveau diagramme\\
+    3.2 & Hélène & 05/04/14 & Relecture complète\\
+    3.3 & Hélène & 06/04/14 & Correction de diagrammes\\
     \hline
   \end{tabular}
 
@@ -342,14 +344,14 @@
     \includegraphics[scale=0.5]{uml/useCaseView/Encheres.png}
     \caption{Cas d'utilisation 4: Gestion de l'équipe}
   \end{figure}  
-    L'utilisateur n'étant pas obligé de se coltiner à vie son équipe de bras cassés, il peut acheter des joueurs mis aux enchères par d'autres utilisateurs, ou même se débarasser des siens en les mettant en vente. Pour participer à une enchère, l'utilisateur doit faire une première offre, il est alors inscrit au tour suivant. A chaque enchère faite par un participant, le prix d'achat augmente de 10\% du prix de départ. La vente se déroule par tour. A chacun de ces tours, les participants peuvent choisir d'enchérir ou non. S'ils enchérissent, ils sont inscrits pour le tour suivant, sinon, ils quittent la vente. Lorsqu'il n'y a qu'un seul participant qui enchérit au cours d'un tour, c'est lui qui remporte l'enchère. Si par contre aucun participant n'a enchéri avant la fin du tour actuel, c'est celui qui a enchéri en dernier au tour précédent qui remporte l'enchère. La transaction peut alors se faire. 
+    L'utilisateur n'étant pas obligé de se coltiner à vie son équipe de bras cassés, il peut acheter des joueurs mis aux enchères par d'autres utilisateurs, ou même se débarrasser des siens en les mettant en vente. Pour participer à une enchère, l'utilisateur doit faire une première offre, il est alors inscrit au tour suivant. A chaque enchère faite par un participant, le prix d'achat augmente de 10\% du prix de départ. La vente se déroule par tour. A chacun de ces tours, les participants peuvent choisir d'enchérir ou non. S'ils enchérissent, ils sont inscrits pour le tour suivant, sinon, ils quittent la vente. Lorsqu'il n'y a qu'un seul participant qui enchérit au cours d'un tour, c'est lui qui remporte l'enchère. Si par contre aucun participant n'a enchéri avant la fin du tour actuel, c'est celui qui a enchéri en dernier au tour précédent qui remporte l'enchère. La transaction peut alors se faire. 
 
     \subsubsection{Vendre un joueur aux enchères}
       \begin{itemize}
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Inclut Choisir un prix de départ.
         \item \textbf{Pré-conditions} : Le joueur que le client souhaite vendre n'est pas bloqué par un entraînement ou un séjour à l'hôpital.
         \item \textbf{Post-conditions} : Le joueur mis en vente est bloqué pour toute la durée de l'enchère.
-        \item \textbf{Cas général} : Le client souhaite vendre un joueur pour se débarasser de lui et gagner de l'argent.
+        \item \textbf{Cas général} : Le client souhaite vendre un joueur pour se débarrasser de lui et gagner de l'argent.
         \item \textbf{Cas exceptionnels} :
           \begin{itemize}
             \item Si la vente du joueur réussit et que le client a désormais moins de 7 joueurs dans son équipe, il ne pourra plus faire de matches tant qu'il n'aura pas racheté des joueurs pour compléter son équipe.
@@ -418,7 +420,7 @@
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Inclut S'inscrire au tournoi et Disputer match.
         \item \textbf{Pré-conditions} : Néant.
         \item \textbf{Post-conditions} : A chaque match gagné lors du tournoi, le client reçoit de l'argent en récompense.
-        \item \textbf{Cas général} : Le client s'est inscrit à un tournoi (créé par l'administrateur). Lorsqu'il y a suffisament d'inscrits, le tournoi démarre tous les matchs du premier tour. Dès qu'un tour est terminé, le tour suivant
+        \item \textbf{Cas général} : Le client s'est inscrit à un tournoi (créé par l'administrateur). Lorsqu'il y a suffisamment d'inscrits, le tournoi démarre tous les matchs du premier tour. Dès qu'un tour est terminé, le tour suivant
         commence (avec les joueurs ayant gagné leur match du tour précédent), jusqu'à ce qu'il n'y ait qu'un gagnant.
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
@@ -506,7 +508,7 @@
       \begin{itemize}
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Spécialise Faire une action particulière.
         \item \textbf{Pré-conditions} : Le joueur qui va faire la passe doit tenir le \gls{souafle}\index{balle!souafle} et doit être un \gls{poursuiveur}s \index{joueur!poursuiveur} ou un \gls{gardien}s \index{joueur!gardien}.
-        \item \textbf{Post-conditions} : Que la passe soit réussie ou ratée, le joueur ne possèdera plus le souafle.
+        \item \textbf{Post-conditions} : Que la passe soit réussie ou ratée, le joueur ne possédera plus le souafle.
         \item \textbf{Cas général} : Le client choisit l’endroit de destination de la passe. Les endroits possibles dépendent des compétences du joueur qui a le souafle. %Attraper le souafle suite à une passe ou l’intercepter (passe adverse) se fait de façon automatique par un poursuiveur se trouvant sur la trajectoire de la passe.
         \item \textbf{Cas exceptionnels} :
         \begin{itemize}
@@ -669,7 +671,7 @@
   L'expérience immersive de l'utilisateur doit être connectée à l'univers fixé, 
   à savoir la saga d'Harry Potter. Cela signifie, d'une part, 
   qu'il ne faut pas contrevenir aux droits d'auteur portant sur les oeuvres 
-  qui décrivent cet univers, et d'autre part, qu'il faut y ressembler suffisament pour que 
+  qui décrivent cet univers, et d'autre part, qu'il faut y ressembler suffisamment pour que 
   l'utilisateur, familier de ce même univers, y retrouve les éléments le composant.
 
 \chapter{Besoins du système}
