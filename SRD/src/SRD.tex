@@ -1,5 +1,5 @@
 % Installation environnement de compilation et packages : 
-% sudo apt-get install texlive-base texlive-lang-french texlive-latex-extra
+% sudo apt-get install texlive-base texlive-lang-french texlive-latex-extra texlive-science
 % Compilation :
 % depuis SRD/ :
 % pdflatex src/SRD.tex 
@@ -1157,7 +1157,7 @@ Les messages échangés entre la partie serveur et la partie client du projet so
 \end{itemize}
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.3]{uml/Clientserveur.png}
+    \includegraphics[scale=0.45]{uml/Clientserveur.png}
     \caption{Diagramme d'activité : schéma du dialogue client-serveur} \label{diag-serveur}
     \end{figure}
 Aucune des méthodes du serveur n'étant bloquante pendant plus d'une fraction de seconde (peu d'I/O) et compte tenu des délais très courts pour la mise en œuvre, nous avons opté pour une solution mono-thread;
@@ -1178,7 +1178,7 @@ Jusqu'à présent nous allouons un buffer de taille fixe.
 
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.3]{uml/Serveur.png}
+    \includegraphics[scale=0.5]{uml/Serveur.png}
     \caption{Cycle de vie du serveur}
     \end{figure}
 
@@ -1200,14 +1200,14 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
  
   \begin{figure}[H]
     \center
-    \includegraphics[scale=0.3]{uml/Client.png}
+    \includegraphics[scale=0.5]{uml/Client.png}
     \caption{Cycle de vie du client}
   \end{figure}
  
   \subsubsection{Exemples}
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.4]{uml/Activity_Login.png}
+    \includegraphics[scale=0.5]{uml/Activity_Login.png}
     \caption{Exemple d'interaction par diagramme d'activité : identification} \label{diag-login}
     \end{figure}
     Cas où le client prend l'initiative de la communication : le code client récupère les identifiants et les envoie au serveur.
@@ -1215,7 +1215,7 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
     En fonction de cette confirmation, le code client fera évoluer son contexte et affichera le menu adapté.
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.4]{uml/Activity_Tournamentmatch.png}
+    \includegraphics[scale=0.5]{uml/Activity_Tournamentmatch.png}
     \caption{Exemple d'interaction par diagramme d'activité : démarrage d'un tournoi} \label{diag-tournament}
     \end{figure}
     L'inscription et le démarrage d'un tournoi impliquent les deux modes du client : l'initiative et la sollicitation.
@@ -1376,25 +1376,13 @@ Par contre, si l'utilisateur est un administrateur, il peut créer un nouveau to
 nous avons eu recours ici, comme pour la vente d'un joueur, à une suite de questions,
 plutôt qu'à la construction d'une classe adhoc héritant de "QDialog")}.
 
-\section{Fonctionnalités futures envisagées}
-  \subsection{Log des actions au cours d'un match}
-    Lors de la gestion des déplacements au cours d'un match, le serveur enregistrerait 
-    toutes les actions intervenues (collisions, tentative d'attraper le vif d'or,...).
-    Il enverrait ce détail au client qui l'afficherait. Ainsi l'utilisateur aurait une
-    meilleure compréhension de ce qui se déroule entre deux tours.
-  \subsection{Ajouter des possibilités à l'administrateur}
-    L'administrateur disposerait d'un plus large panel d'options, dont par exemple :
-    \begin{itemize}
-      \item Bannir, bloquer, ou supprimer un compte utilisateur.
-      \item La création d'un compte utilisateur avec des caractéristiques de départ choisies.
-      \item La possibilité de créer un joueur avec des caractéristiques choisies 
-        et de l'attribuer à un utilisateur ou de le mettre aux enchères.
-      \item La possibilité de récupérer les données du serveur afin d'en faire une sauvegarde locale.
-    \end{itemize}
+\section{Fonctionnalités supplémentaire}
   \subsection{Des matchs d’entraînement}
     À l'aide d'une intelligence artificielle basique, permettre à l'utilisateur
     de jouer un match d'entraînement, ne rapportant pas d'argent mais
-    augmentant les capacités des joueurs en fonction de leurs succès.
+    augmentant les capacités des joueurs si l'utilisateur remporte la victoire.
+    L'IA n'effectue que des déplacements aléatoires et une tentative systématique d'attraper le vif d'or,
+    elle ne manipule pas les autres balles.
     
   
 
