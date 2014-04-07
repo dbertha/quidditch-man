@@ -105,14 +105,21 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	//initialisation d'un layout pour organniser le Qlabel,la view, radio bouton,....
 	layout = new QGridLayout;
 //	layout->addWidget(texte,3,0);
+    //view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //texteEquipe2->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    //scoreEquipe1->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    //scoreEquipe2->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    layout->setAlignment(Qt::AlignTop);
 	layout->addWidget(texteEquipe1,0,0,Qt::AlignRight); //(nom_Widget_a_afficher,indexLigne, indexColonne)
 	layout->addWidget(scoreEquipe1,0,1,Qt::AlignLeft);
 	layout->addWidget(texteEquipe2,0,2,Qt::AlignRight);
 	layout->addWidget(scoreEquipe2,0,3,Qt::AlignLeft);
-	layout->addWidget(view, 1, 0,1,4);//peut occuper 1 ligne et 3 colonne
-	layout->addWidget(infoJoueur,2,0,1,2);
-	layout->addWidget(groupbox,2,2);
-	layout->addLayout(layoutConformi,2,3);
+	layout->addWidget(view, 1, 0,4,4);//peut occuper 3 lignes et 3 colonnes
+	layout->addWidget(infoJoueur,1,5);
+	layout->addWidget(groupbox,2,5);
+	layout->addLayout(layoutConformi,3,5);
 	this->setLayout(layout);
 
 	__forfeitAndDrawNotifier->setEnabled(false);
