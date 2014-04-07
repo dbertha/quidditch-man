@@ -693,7 +693,9 @@ void MatchWindow::pushesHandler(){
 		case OPPONENTFORFEIT : {
 			QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("Opponent forfeited"),QMessageBox::Ok);
 			over = true;
-			delete _msgBox;
+			_parent->resume();
+			_parent->deblock();
+			if (_msgBox!=NULL) delete _msgBox;
 			break;
 		}
 		case OPPONENTASKFORDRAW : {
@@ -709,7 +711,11 @@ void MatchWindow::pushesHandler(){
 			if(ret == QMessageBox::Yes){
 				code = DRAWACCEPTED;
 				over = true;
-				delete _msgBox;
+
+				_parent->resume();
+				_parent->deblock();
+
+				if (_msgBox!=NULL) delete _msgBox;
 			}else{
 				code = DRAWDENIED;
 			}
@@ -718,9 +724,9 @@ void MatchWindow::pushesHandler(){
         }
     }
     if(over){
+		close();
     	_parent->resume();
     	_parent->deblock();
-		close();
 	}
 	else __forfeitAndDrawNotifier->setEnabled(true);
 }
@@ -728,11 +734,14 @@ void MatchWindow::pushesHandler(){
 void MatchWindow::endHandler(){
 	bool over = false;
 	if(winner != 0){
+		_parent->resume();
+		_parent->deblock();
 		QString str = QString("Winner is Team %1").arg(QString::number(winner));
 		QMessageBox::information(this,QMessageBox::tr("Match over !"),str,QMessageBox::Ok);
 		over = true;
 	}else{
 		int ret;
+		
 		_msgBox=new QMessageBox();
 		QString texte("Do you want to continue the match ?");
         _msgBox->setWindowTitle("Next turn starts !");
@@ -749,6 +758,8 @@ void MatchWindow::endHandler(){
 			__client->sendForfeit();
 			QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("You forfeited"),QMessageBox::Ok);
 			over = true;
+			_parent->resume();
+			_parent->deblock();
 		}else if(ret == QMessageBox::Cancel){
 			//ask for a draw
 			__forfeitAndDrawNotifier->setEnabled(false);
@@ -760,6 +771,9 @@ void MatchWindow::endHandler(){
 			if(result == DRAWACCEPTED){
 				QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("Draw accepted"),QMessageBox::Ok);
 				over = true;
+
+				_parent->resume();
+				_parent->deblock();
             }else{
 				QMessageBox::information(this,QMessageBox::tr("Draw"),QString("Draw refused"),QMessageBox::Ok);
             }

@@ -1,5 +1,5 @@
 % Installation environnement de compilation et packages : 
-% sudo apt-get install texlive-base texlive-lang-french texlive-latex-extra
+% sudo apt-get install texlive-base texlive-lang-french texlive-latex-extra texlive-science
 % Compilation :
 % depuis SRD/ :
 % pdflatex src/SRD.tex 
@@ -123,9 +123,9 @@
   % personnes qui vont bénéficier de la réalisation du projet.
   Le \gls{Quidditch}\index{Quidditch} \gls{manager}\index{manager} est un jeu multi-joueurs de gestion
   et de stratégie, se jouant en réseau.
-  Un manager (l'utilisateur) gère son équipe de \gls{joueur}s, qu'il peut entrainer
+  Un manager (l'utilisateur) gère son équipe de \gls{joueur}s, qu'il peut entraîner
   au travers des bâtiments construits sur la \index{parcelle}parcelle qui lui est attribuée. Certains de ces bâtiments permettent aussi de faire des achats et des ventes de balais ou de joueurs.
-  Le but pour le manager est de déveloper son \gls{club} aussi bien au niveau commercial
+  Le but pour le manager est de développer son \gls{club} aussi bien au niveau commercial
   que sportif.
   À travers la construction et l'évolution de ses bâtiments, le manager ouvre et
   augmente des possibilités de gestion du club, notamment la possibilité
@@ -136,7 +136,7 @@
   
   Ces matchs se déroulent
   dans un stade propre à un des managers et apportent une entrée d'argent
-  dûe notamment à la victoire d'une équipe mais aussi au nombre de tickets vendus.
+  due notamment à la victoire d'une équipe mais aussi au nombre de tickets vendus.
   Au cours du match, les managers en présence choisissent à chaque tour de jeu
   des déplacements pour leurs différents joueurs. Il existe quatre fonction possible
   pour un joueur lors d'un match. Un joueur peut être un \gls{attrapeur}\index{joueur!attrapeur}, un \gls{batteur}\index{joueur!batteur}, un \gls{gardien}\index{joueur!gardien}
@@ -171,8 +171,8 @@
     1.1 & Hélène & 07/02/14 & 1ère correction \\
     1.2 & Hélène & 20/02/14 & Communication réseau et Qt \\    
     1.3 & Audry & 21/02/14 & Nouveaux diagrammes de classes \\
-    1.4 & Manon & 21/02/14 & Commentaires par rapport aux Use Case \\
-    1.5 & Manon & 21/02/14 & Explications des diagrammes de classes \\
+    1.4 & Manon & 21/02/14 & Commentaires par rapport aux Use Cases \\
+    1.5 & Manon & 21/02/14 & Explications des diags de classes \\
     1.6 & Audry & 21/02/14 & Nouveaux diagrammes de classes (2) \\
     1.7 & Manon & 21/02/14 & Modif de certains commentaires de diag \\
     2.0 & Manon & 21/02/14 & Jeu sur terminal et Echange de messages \\
@@ -182,9 +182,14 @@
     2.4 & David & 12/03/14 & Diagramme de composants \\
     2.5 & David & 12/03/14 & Précisions sur le déroulement d'un match \\
     2.6 & David & 13/03/14 & Diagrammes pour la GUI \\
-    2.7 & Hélène & 14/03/14 & Terminal graphique avec diagrammes détaillés\\
+    2.7 & Hélène & 14/03/14 & GUI avec diags détaillés\\
     3.0 & Manon & 14/03/14 & Relecture partielle \\
     3.1 & Hélène & 04/04/14 & Terminal graphique avec nouveau diagramme\\
+    3.2 & Hélène & 05/04/14 & Relecture complète\\
+    3.3 & Hélène & 06/04/14 & Correction de diagrammes\\
+    3.4 & David & 07/04/14 & Mise à jour diags \\
+    3.5 & Manon & 07/04/14 & Diag classes nouvelle GUI \\
+    4.0 & Manon & 07/04/14 & Brèves explications nouvelle GUI \\
     \hline
   \end{tabular}
 
@@ -342,14 +347,14 @@
     \includegraphics[scale=0.5]{uml/useCaseView/Encheres.png}
     \caption{Cas d'utilisation 4: Gestion de l'équipe}
   \end{figure}  
-    L'utilisateur n'étant pas obligé de se coltiner à vie son équipe de bras cassés, il peut acheter des joueurs mis aux enchères par d'autres utilisateurs, ou même se débarasser des siens en les mettant en vente. Pour participer à une enchère, l'utilisateur doit faire une première offre, il est alors inscrit au tour suivant. A chaque enchère faite par un participant, le prix d'achat augmente de 10\% du prix de départ. La vente se déroule par tour. A chacun de ces tours, les participants peuvent choisir d'enchérir ou non. S'ils enchérissent, ils sont inscrits pour le tour suivant, sinon, ils quittent la vente. Lorsqu'il n'y a qu'un seul participant qui enchérit au cours d'un tour, c'est lui qui remporte l'enchère. Si par contre aucun participant n'a enchéri avant la fin du tour actuel, c'est celui qui a enchéri en dernier au tour précédent qui remporte l'enchère. La transaction peut alors se faire. 
+    L'utilisateur n'étant pas obligé de se coltiner à vie son équipe de bras cassés, il peut acheter des joueurs mis aux enchères par d'autres utilisateurs, ou même se débarrasser des siens en les mettant en vente. Pour participer à une enchère, l'utilisateur doit faire une première offre, il est alors inscrit au tour suivant. A chaque enchère faite par un participant, le prix d'achat augmente de 10\% du prix de départ. La vente se déroule par tour. A chacun de ces tours, les participants peuvent choisir d'enchérir ou non. S'ils enchérissent, ils sont inscrits pour le tour suivant, sinon, ils quittent la vente. Lorsqu'il n'y a qu'un seul participant qui enchérit au cours d'un tour, c'est lui qui remporte l'enchère. Si par contre aucun participant n'a enchéri avant la fin du tour actuel, c'est celui qui a enchéri en dernier au tour précédent qui remporte l'enchère. La transaction peut alors se faire. 
 
     \subsubsection{Vendre un joueur aux enchères}
       \begin{itemize}
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Inclut Choisir un prix de départ.
         \item \textbf{Pré-conditions} : Le joueur que le client souhaite vendre n'est pas bloqué par un entraînement ou un séjour à l'hôpital.
         \item \textbf{Post-conditions} : Le joueur mis en vente est bloqué pour toute la durée de l'enchère.
-        \item \textbf{Cas général} : Le client souhaite vendre un joueur pour se débarasser de lui et gagner de l'argent.
+        \item \textbf{Cas général} : Le client souhaite vendre un joueur pour se débarrasser de lui et gagner de l'argent.
         \item \textbf{Cas exceptionnels} :
           \begin{itemize}
             \item Si la vente du joueur réussit et que le client a désormais moins de 7 joueurs dans son équipe, il ne pourra plus faire de matches tant qu'il n'aura pas racheté des joueurs pour compléter son équipe.
@@ -418,7 +423,7 @@
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Inclut S'inscrire au tournoi et Disputer match.
         \item \textbf{Pré-conditions} : Néant.
         \item \textbf{Post-conditions} : A chaque match gagné lors du tournoi, le client reçoit de l'argent en récompense.
-        \item \textbf{Cas général} : Le client s'est inscrit à un tournoi (créé par l'administrateur). Lorsqu'il y a suffisament d'inscrits, le tournoi démarre tous les matchs du premier tour. Dès qu'un tour est terminé, le tour suivant
+        \item \textbf{Cas général} : Le client s'est inscrit à un tournoi (créé par l'administrateur). Lorsqu'il y a suffisamment d'inscrits, le tournoi démarre tous les matchs du premier tour. Dès qu'un tour est terminé, le tour suivant
         commence (avec les joueurs ayant gagné leur match du tour précédent), jusqu'à ce qu'il n'y ait qu'un gagnant.
         \item \textbf{Cas exceptionnels} : Néant.
       \end{itemize}
@@ -506,7 +511,7 @@
       \begin{itemize}
         \item \textbf{Relations avec d'autres cas d'utilisation}  : Spécialise Faire une action particulière.
         \item \textbf{Pré-conditions} : Le joueur qui va faire la passe doit tenir le \gls{souafle}\index{balle!souafle} et doit être un \gls{poursuiveur}s \index{joueur!poursuiveur} ou un \gls{gardien}s \index{joueur!gardien}.
-        \item \textbf{Post-conditions} : Que la passe soit réussie ou ratée, le joueur ne possèdera plus le souafle.
+        \item \textbf{Post-conditions} : Que la passe soit réussie ou ratée, le joueur ne possédera plus le souafle.
         \item \textbf{Cas général} : Le client choisit l’endroit de destination de la passe. Les endroits possibles dépendent des compétences du joueur qui a le souafle. %Attraper le souafle suite à une passe ou l’intercepter (passe adverse) se fait de façon automatique par un poursuiveur se trouvant sur la trajectoire de la passe.
         \item \textbf{Cas exceptionnels} :
         \begin{itemize}
@@ -669,7 +674,7 @@
   L'expérience immersive de l'utilisateur doit être connectée à l'univers fixé, 
   à savoir la saga d'Harry Potter. Cela signifie, d'une part, 
   qu'il ne faut pas contrevenir aux droits d'auteur portant sur les oeuvres 
-  qui décrivent cet univers, et d'autre part, qu'il faut y ressembler suffisament pour que 
+  qui décrivent cet univers, et d'autre part, qu'il faut y ressembler suffisamment pour que 
   l'utilisateur, familier de ce même univers, y retrouve les éléments le composant.
 
 \chapter{Besoins du système}
@@ -1088,15 +1093,25 @@ Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvo
       \begin{figure}[H]
           \center
           \includegraphics[scale=0.35]{uml/class/GUIClasses.png}
-         \caption{Diagramme des classes impliquées dans la GUI}
+         \caption{Diagramme des classes impliquées dans l'ancienne GUI}
       \end{figure}
       \end{landscape}
          
          Une fenêtre principale fait appel à différentes sous-fenêtres pour des interactions particulières.
          Si une fenêtre a besoin de communiquer avec le serveur, elle le fera à travers un pointeur de la classe Client,
          la fenêtre principale instanciant une classe client à sa construction.\\
+        
+      \begin{landscape}
+      \begin{figure}[H]
+          \center
+          \includegraphics[scale=0.35]{uml/class/NewGUI.png}
+         \caption{Diagramme des classes impliquées dans la nouvelle GUI}
+      \end{figure}
+      \end{landscape}
          
-    Pour une description plus élaborée de la partie graphique, le lecteur se reportera utilement au § \ref{diag-client-graphique}.
+         L'ensemble des actions sauf le match se déroule dans une seule fenêtre. Après s'être connecté (ce qui est très intuitif), le client peut à sa guise parcourir les menus Stadium, pour les matches et tournois, Manager office, pour la gestion des joueurs, points d'action et enchères, et Domain pour la gestion des bâtiments. Les matches se jouent dans une fenêtre dédiée, la même que dans l'ancienne interface.\\
+     
+    Pour une description plus élaborée de la partie graphique, le lecteur se reportera utilement au § \ref{diag-client-graphique} et au § \ref{diag-client-graphique2}.
     
 \subsection{Le réseau}
   L'interface réseau doit permettre une communication bidirectionnelle :
@@ -1155,10 +1170,10 @@ Les messages échangés entre la partie serveur et la partie client du projet so
 \end{itemize}
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.3]{uml/Client-serveur.jpeg}
+    \includegraphics[scale=0.45]{uml/Clientserveur.png}
     \caption{Diagramme d'activité : schéma du dialogue client-serveur} \label{diag-serveur}
     \end{figure}
-Aucune des méthodes du serveur n'étant bloquante pendant plus d'une fraction de seconde (peu d'I/O) et compte tenu des délais très courts pour la mise en œuvre, nous avons opté à ce stade pour une solution mono-thread;
+Aucune des méthodes du serveur n'étant bloquante pendant plus d'une fraction de seconde (peu d'I/O) et compte tenu des délais très courts pour la mise en œuvre, nous avons opté pour une solution mono-thread;
 travailler avec un seul thread supprime la nécessité de devoir gérer l'accès concurrent aux données (en mémoire ou sur disque) et la communication entre threads (arrêt du serveur par exemple) :
 une solution multi-threads rendrait la gestion de ressources communes par les fonctions applicatives plus complexe (sérialisation de sections critiques), 
 tout en étant beaucoup plus gourmande en ressources CPU et présentant des risques de deadlocks (tests plus délicats à réaliser!). 
@@ -1173,6 +1188,12 @@ Sinon (par exemple pour une liste), deux solutions sont possibles :
   \item Utiliser de part et d'autre des zones de mémoire allouées dynamiquement et envoyer tout en un seul message, après un premier message indiquant au client la taille du buffer.
 \end{itemize}
 Jusqu'à présent nous allouons un buffer de taille fixe.
+
+    \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.5]{uml/Serveur.png}
+    \caption{Cycle de vie du serveur}
+    \end{figure}
 
   \subsubsection{Synopsis du client}
 Comme le serveur, le client utilise la fonction select() afin de pouvoir capter indifféremment des messages d'origine différente,
@@ -1190,10 +1211,16 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
  De même, lorsque le client reçoit un message non sollicité, il entre dans un dialogue avec à la fois le serveur et le manager,
  sans qu'il puisse être interrompu par un autre message non sollicité ou par une autre demande du manager au clavier.
  
+  \begin{figure}[H]
+    \center
+    \includegraphics[scale=0.5]{uml/Client.png}
+    \caption{Cycle de vie du client}
+  \end{figure}
+ 
   \subsubsection{Exemples}
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.4]{uml/Activity_Login.png}
+    \includegraphics[scale=0.5]{uml/Activity_Login.png}
     \caption{Exemple d'interaction par diagramme d'activité : identification} \label{diag-login}
     \end{figure}
     Cas où le client prend l'initiative de la communication : le code client récupère les identifiants et les envoie au serveur.
@@ -1201,7 +1228,7 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
     En fonction de cette confirmation, le code client fera évoluer son contexte et affichera le menu adapté.
     \begin{figure}[H]
     \center
-    \includegraphics[scale=0.4]{uml/Activity_Tournamentmatch.png}
+    \includegraphics[scale=0.5]{uml/Activity_Tournamentmatch.png}
     \caption{Exemple d'interaction par diagramme d'activité : démarrage d'un tournoi} \label{diag-tournament}
     \end{figure}
     L'inscription et le démarrage d'un tournoi impliquent les deux modes du client : l'initiative et la sollicitation.
@@ -1257,7 +1284,7 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
     \end{figure}
 \newpage
 
-\section{Le client graphique} \label{diag-client-graphique}
+\section{Ancienne interface - Le client graphique} \label{diag-client-graphique}
 \subsection{Le login}
 Le client graphique s'ouvre sur un dialogue de login permettant à l'utilisateur de se connecter au serveur,
 soit avec un nom d'utilisateur existant, soit en se créant une nouvelle identité \emph{(checkbox "New User")}\footnote{Les détails techniques de mise en \oe uvre sont mis entre parenthèses.
@@ -1362,25 +1389,32 @@ Par contre, si l'utilisateur est un administrateur, il peut créer un nouveau to
 nous avons eu recours ici, comme pour la vente d'un joueur, à une suite de questions,
 plutôt qu'à la construction d'une classe adhoc héritant de "QDialog")}.
 
-\section{Fonctionnalités futures envisagées}
-  \subsection{Log des actions au cours d'un match}
-    Lors de la gestion des déplacements au cours d'un match, le serveur enregistrerait 
-    toutes les actions intervenues (collisions, tentative d'attraper le vif d'or,...).
-    Il enverrait ce détail au client qui l'afficherait. Ainsi l'utilisateur aurait une
-    meilleure compréhension de ce qui se déroule entre deux tours.
-  \subsection{Ajouter des possibilités à l'administrateur}
-    L'administrateur disposerait d'un plus large panel d'options, dont par exemple :
-    \begin{itemize}
-      \item Bannir, bloquer, ou supprimer un compte utilisateur.
-      \item La création d'un compte utilisateur avec des caractéristiques de départ choisies.
-      \item La possibilité de créer un joueur avec des caractéristiques choisies 
-        et de l'attribuer à un utilisateur ou de le mettre aux enchères.
-      \item La possibilité de récupérer les données du serveur afin d'en faire une sauvegarde locale.
-    \end{itemize}
+\section{Nouvelle interface - Le client graphique} \label{diag-client-graphique2}
+\subsection{Le login}
+Le client graphique s'ouvre sur une page qui lui propose de charger une partie, d'en créer une nouvelle ou de quitter le jeu. Si le client se connecte en tant qu'admin, la page deviendra celle propre à la session administrateur. Sinon, en cas de connexion classique ou de nouvelle partie, la page devient celle du menu principal : Stadium, Manager Office et Domain
+
+\subsection{Menu principal}
+\begin{itemize}
+        \item \textbf{Stadium} C'est le stade du manager, où il pourra jouer des matches, qu'ils soient amicaux, d'entraînement, ou dans le cadre d'un tournoi.
+        \item \textbf{Manager office} : C'est le bureau du manager, d'où il peut gérer ses joueurs, les vendre ou en acheter aux enchères, et récupérer des points d'action par achat immédiat ou par campagne de promotion.
+        \item \textbf{Domain} : C'est le domaine du manager, où se trouvent tous ses bâtiments qu'il peut inspecter et améliorer.
+      \end{itemize}
+\subsection{La barre d'information}
+Elle contient les informations importantes du manager, c'est-à-dire l'argent qu'il possède, le nombre de fans et ses points d'action.
+\subsection{La zone de manipulation}
+Les menus étant situés sur la droite de la page, la zone de gauche est réservée à afficher les actions correspondantes. Si par exemple on visite l'hôpital, la zone affichera les informations de ce bâtiment et la possitibilité de lancer un projet d'amélioration (bouton upgrade).
+\subsection{La zone de notification}
+En bas à gauche de la page, elle n'apparaît qu'en cas de message non sollicité du serveur, c'est-à-dire quand il y a une invitation pour un match amical et pour le début du tournoi auquel le client est inscrit.
+\subsection{Les matches}
+Comme dit plus haut, les matches de la nouvelle interface sont les mêmes que ceux de l'ancienne. La raison est bien simple, le code derrière étant beaucoup plus compliqué que celui pour le reste des fonctionnalités de l'interface, il aurait été idiot de ne pas se resservir d'un tel code.
+
+\section{Fonctionnalités supplémentaire}
   \subsection{Des matchs d’entraînement}
     À l'aide d'une intelligence artificielle basique, permettre à l'utilisateur
     de jouer un match d'entraînement, ne rapportant pas d'argent mais
-    augmentant les capacités des joueurs en fonction de leurs succès.
+    augmentant les capacités des joueurs si l'utilisateur remporte la victoire.
+    L'IA n'effectue que des déplacements aléatoires et une tentative systématique d'attraper le vif d'or,
+    elle ne manipule pas les autres balles.
     
   
 

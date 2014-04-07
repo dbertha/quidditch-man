@@ -5,3 +5,7 @@ MichaelHoward.txt
 XavierCook.txt
 NathanThomas.txt
 DavidAlexander.txt
+AustinLopez.txt
+BrandonBarnes.txt
+CooperBell.txt
+CooperTaylor.txt

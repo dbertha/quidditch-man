@@ -1,7 +1,0 @@
-DominicGriffin.txt
-AustinLopez.txt
-BrandonBarnes.txt
-JackGonzalez.txt
-JaxonJackson.txt
-CooperTaylor.txt
-CooperBell.txt
