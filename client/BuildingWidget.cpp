@@ -77,9 +77,10 @@ BuildingWidget::BuildingWidget(Client* client, QWidget* parent,int buildingID) :
 	_errorLabel = new QLabel();
 	_errorLabel->setVisible(false);
 	grid->addWidget(_errorLabel,5,0,Qt::AlignCenter);
+	_errorLabel->setAlignment(Qt::AlignCenter);
 	_timer = new QTimer();
 	connect(_timer, SIGNAL(timeout()),this,SLOT(updateLabels()));
-	_timer->setInterval(2*1000);
+	_timer->setInterval(1000);
 	_timer->start();
 
 	setFixedSize(500,220);
@@ -144,6 +145,8 @@ void BuildingWidget::upgrade(){
     	_errorLabel->setStyleSheet("QLabel{background-color: rgba(0,0,0,30);font: 16px \"Elegant Thin\", sans-serif;color:red;}");
     	_errorLabel->setText(error);
     }
+    
+	_errorLabel->setAlignment(Qt::AlignCenter);
     _errorLabel->setVisible(true);
     update();
 }

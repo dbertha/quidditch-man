@@ -41,7 +41,7 @@ public:
 
 	int _role;
 	QListWidget* _listTournaments;
-
+	bool _hasJoined;
 	QLabel* _currentParticipants;
 	QLabel* _startingPrice;
 	QLineEdit* _price, *_participants;

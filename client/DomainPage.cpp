@@ -77,8 +77,8 @@ DomainPage::DomainPage(Client* client, MainWindow* parent) : _client(client),_pa
 	_grid->addWidget(_promotionCenter, 6,2, Qt::AlignLeft );
 	_grid->addWidget(_returnButton,9,2,Qt::AlignLeft );
 
-	_infos = new InfosWidget(_client,this);
-	_grid->addWidget(_infos,0,0,1,2,Qt::AlignLeft);
+	//_infos = new InfosWidget(_client,this);
+	//_grid->addWidget(_infos,0,0,1,2,Qt::AlignLeft);
 	//580-780
 	//220
 	_grid->setVerticalSpacing(3);
@@ -129,19 +129,19 @@ void DomainPage::paintEvent(QPaintEvent *){
 }
 
 void DomainPage::pause() {
-	_infos->pause();
+	//_infos->pause();
 	for (int i=0;i<5;++i){
 		_buildingWidgets[i]->pause();
 	}
 }
 void DomainPage::resume() {
-	_infos->resume();
+	//_infos->resume();
 	for (int i=0;i<5;++i){
 		_buildingWidgets[i]->resume();
 	}
 }
 void DomainPage::hideStack() {_stack->setVisible(false);}
-void DomainPage::update() {_infos->updateLabels();}
+void DomainPage::update() {/*_infos->updateLabels();*/}
 void DomainPage::stadium(){
 	_stack->setCurrentIndex(STADIUM-1);
 	_stack->setVisible(true);

@@ -293,7 +293,7 @@ void User::handleManagementRequest(SerializedObject *received){
 			
 
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 	
 			//construct _answer
 
@@ -1082,7 +1082,7 @@ void User::handleEndOfMatch(int numTeam, int numWinningTeam){
 
 void User::handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice, std::vector<int> lifes){ //tournamentPrice = 0 if not in a tournament
 	int money = manager_->getIncomeFromMatch(numTeam == numWinningTeam, numTeam == 1); //host if team 1
-	manager_->addMoney(numTeam == numWinningTeam ? money + tournamentPrice : money);
+	if (numTeam==numWinningTeam) manager_->addMoney(money+tournamentPrice);
 	for(unsigned int i = 0; i < _teamInMatch.size(); ++i){
 		_teamInMatch[i]->setLife(lifes[i]);
 	}

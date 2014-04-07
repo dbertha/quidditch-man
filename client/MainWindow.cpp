@@ -7,26 +7,38 @@ MainWindow::MainWindow(int sockfd){
 	_stack = new QStackedWidget(this);
 	_connexionPage = new ConnexionPage(_client,this);
 	_stack->addWidget(_connexionPage);
-    this->setCentralWidget(_stack);
+    //this->setCentralWidget(_stack);
     _stack->setCurrentIndex(0);
 
     __pushesNotifier = new QSocketNotifier(_sockfd, QSocketNotifier::Read, this);
     __pushesNotifier->setEnabled(false); //genère le signal
     connect(__pushesNotifier,SIGNAL(activated(int)),this,SLOT(pushesHandler()));
     setWindowTitle(tr("QUIDDITH MANAGER"));
-    setFixedSize(800,640);
+    //setFixedSize(780,620);
 
-    setCentralWidget(_stack);
+    //setCentralWidget(_stack);
 
      QSignalMapper *mapper = new QSignalMapper(_stack);
 	connect(mapper, SIGNAL(mapped(int)), _stack, SLOT(setCurrentIndex(int)));
  
 	// Nav panel
 	QWidget *panel = new QWidget(this);
-	_stack->addWidget(panel); // index 0
-	 
-	QGridLayout *grid = new QGridLayout(this);
+    //panel->setFixedSize(800,640);
+	//_stack->addWidget(panel); // index 0
+	grid = new QGridLayout(this);
+    grid->setOriginCorner(Qt::TopLeftCorner);
+    panel->setFixedSize(800,640);
 	panel->setLayout(grid);
+
+
+    //setCentralWidget(panel);
+    //QVBoxLayout * mainLayout = new QVBoxLayout(this);
+    //QWidget* test = new QWidget();
+     //   test->setLayout(grid);
+         
+         
+       // setCentralWidget(test);
+    //setCentralWidget(panel);
 	/*
 	for (int r = 0; r < 3; ++r) {
 		for (int c = 0; c < 3; ++c) {
@@ -45,7 +57,17 @@ MainWindow::MainWindow(int sockfd){
 			//connect(navButton, SIGNAL(clicked()), mapper, SLOT(map()));
 		}
 	}
+
 	*/
+
+
+    grid->setRowMinimumHeight(0,100);
+    grid->setRowMinimumHeight(1,390);
+    grid->setRowMinimumHeight(2,150);
+    grid->setColumnMinimumWidth(0,800);
+
+    grid->addWidget(_stack,0,0,3,1,Qt::AlignLeft);
+
 }
 
 void MainWindow::displayWindow(QWidget* window){
@@ -60,7 +82,7 @@ void MainWindow::paintEvent(QPaintEvent *){
 }
 
 void MainWindow::quit(){
-	close();
+	reject();
 }
 
 void MainWindow::cancel(){
@@ -85,6 +107,11 @@ void MainWindow::connexion(int role){
 	close();
 	*/
     if (role==NORMAL_LOGIN){
+
+        _infos = new InfosWidget(_client,this);
+        _notification = new NotificationWidget(_client,this);
+        grid->addWidget(_infos,0,0,Qt::AlignLeft);
+        grid->addWidget(_notification,2,0,Qt::AlignLeft);
     	_mainPage = new MainPage(_client,this);
     	_stadiumPage= new StadiumPage(_client,this);
     	_officePage = new OfficePage(_client,this);
@@ -115,11 +142,13 @@ void MainWindow::mainPage(){
 	_mainPage->update();
 	_stack->setCurrentWidget(_mainPage);
 	_mainPage->resume();
+    _infos->setVisible(true);
 }
 
 void MainWindow::stadiumPage(){
 	_stadiumPage->resume();
 	_stack->setCurrentWidget(_stadiumPage);
+    _infos->setVisible(true);
 }
 
 void MainWindow::officePage(){
@@ -127,6 +156,7 @@ void MainWindow::officePage(){
 	_stack->setCurrentWidget(_officePage);
 	_domainPage->resume();
 	_domainPage->hideStack();
+    _infos->setVisible(true);
 }
 
 void MainWindow::domainPage(){
@@ -134,6 +164,7 @@ void MainWindow::domainPage(){
 	_stack->setCurrentWidget(_domainPage);
 	_officePage->resume();
 	_officePage->hideStack();
+    _infos->setVisible(true);
 }
 
 void MainWindow::pushesHandler(){
@@ -148,44 +179,25 @@ void MainWindow::pushesHandler(){
             int IDInvitor;
             char name[USERNAME_LENGTH];
             char * position = received.stringData;
-            bool confirmation;
+            
             QString texte;
             std::vector<int> playersInTeam;
             memcpy(&IDInvitor, position, sizeof(IDInvitor));
             position += sizeof(IDInvitor);
             memcpy(&name, position, sizeof(name));
-            //texte << "Do you want to fight against " << name << "with ID : " << QString::number(IDInvitor) << " ?";
-            texte = QString("%1, with ID %2 wants to play a match against you !").arg(name, QString::number(IDInvitor));
-            QMessageBox msgBox;
-            msgBox.setWindowTitle("You've got a match proposal !");
-            msgBox.setText(texte);
-            msgBox.setInformativeText("Do you accept the match ?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            msgBox.setDefaultButton(QMessageBox::Yes);
-            if(msgBox.exec() == QMessageBox::Yes){
-                confirmation = true;
-            }else {
-                confirmation = false;
-            }
-            
-            if(confirmation){
-                playersInTeam = chooseTeamForMatch(_client, this);
-            }
-            _client->answerMatchProposal(confirmation, playersInTeam);
-            //~ answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
-            if(_client->receiveMatchConfirmation() == MATCH_STARTING){
-                MatchWindow * matchWindow  = new MatchWindow(_client, 2, this);
-                matchWindow->show();
-                //~ //startMatch( 2); //invité a l'équipe 2
-            }
+
+            _notification->friendlyMatchNotification(name,IDInvitor);
+
             break;
         }
         case SERVER_DOWN : {
-            //badConnection();
+            badConnection();
             break;
         }
         case MATCH_TOURNAMENT_START : {
-            int IDOpponent, numTeam;
+            pause();
+            block();
+            int IDOpponent;
             char name[USERNAME_LENGTH];
             char * position = received.stringData;
             QString texte;
@@ -194,32 +206,20 @@ void MainWindow::pushesHandler(){
             position += sizeof(IDOpponent);
             memcpy(&name, position, sizeof(name));
             position += sizeof(name);
-            texte = QString("%1, with ID %2 is your opponent !").arg(name, QString::number(IDOpponent));
-            QMessageBox msgBox;
-            msgBox.setWindowTitle("A tournament match starts now !");
-            msgBox.setText(texte);
-            msgBox.setInformativeText("You have to accept.");
-            msgBox.setStandardButtons(QMessageBox::Ok);
-            msgBox.setDefaultButton(QMessageBox::Ok);
-            msgBox.exec();
+
+            _notification->tournamentNotification(name,IDOpponent);
             //forced to accept
-            std::vector<int> playersInTeam = chooseTeamForMatch(_client, this);
-            _client->sendTeamForMatchTournament(playersInTeam);
-            //bloquant, l'adversaire doit avoir répondu aussi :
-            numTeam = _client->receiveNumOfTeam();
-            if(numTeam > 0){ //first to answer is the team 1
-                MatchWindow * matchWindow = new MatchWindow(_client, numTeam, this);
-                matchWindow->show();
-                //~ startMatch(numTeam);
-            }
+
             break;
         }
 	}
     __pushesNotifier->setEnabled(true);
 }
 
+
 void MainWindow::pause(){
     __pushesNotifier->setEnabled(false);
+    _infos->pause();
     _mainPage->pause();
     _domainPage->pause();
     _stadiumPage->pause();
@@ -230,6 +230,7 @@ void MainWindow::pause(){
 
 void MainWindow::resume(){
     __pushesNotifier->setEnabled(true);
+    _infos->resume();
     _mainPage->resume();
     _domainPage->resume();
     _stadiumPage->resume();
@@ -249,4 +250,63 @@ void MainWindow::deblock(){
     _domainPage->deblockButtons();
     _officePage->deblockButtons();
     _stadiumPage->deblockButtons();
+}
+
+void MainWindow::friendlyMatch() {
+    pause();
+    block();
+    int res = choosePartner(_client,this);
+    if (res==BAD_CONNECTION) badConnection();
+    else if(res != NO_CHOICE){
+        std::vector<int> chosenPlayers;
+        chosenPlayers = chooseTeamForMatch(_client, this); //tous les rôles sont nécessairement remplis 
+        //(on suppose suffisament de joueurs)
+#ifdef __DEBUG
+        std::cout << "index choisi : " << std::endl;
+        for(unsigned int i = 0; i < chosenPlayers.size() ; ++i){
+            std::cout << chosenPlayers[i] << std::endl;
+        }      
+#endif
+        //send invitation
+        _client->proposeMatchTo(res,  chosenPlayers);
+
+        int confirmation = _client->receiveMatchConfirmation();
+        //~ progress->setValue(1);
+        if(confirmation == MATCH_STARTING){
+
+            block();
+            MatchWindow * matchWindow = new MatchWindow(_client, 1, this);
+            matchWindow->show();
+            //startMatch(1); //inviteur a l'équipe 1
+        }else{
+            _notification->friendlyMatchDeniedNotification();
+        }
+    }
+   // __pushesNotifier->setEnabled(true);
+    //_parent->deblock();
+    resume();
+}
+
+
+void MainWindow::trainingMatch() {
+    pause();
+    block();
+    std::vector<int> chosenPlayers;
+    chosenPlayers = chooseTeamForMatch(_client, this); //tous les rôles sont nécessairement remplis 
+    _client->sendTrainingMatchRequest(chosenPlayers);
+    int confirmation = _client->receiveMatchConfirmation();
+    if(confirmation == 1){
+        MatchWindow * matchWindow = new MatchWindow(_client, 1, this);
+        matchWindow->show();
+    }else{
+        _notification->trainingMatchImpossibleNotification();
+    }
+    //_parent->deblock();
+    resume();
+}
+
+int MainWindow::badConnection() {
+    pause();
+    _notification->noConnectionNotification();
+    return (0);
 }

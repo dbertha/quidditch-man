@@ -22,7 +22,7 @@
 class InfosWidget : public QWidget {
 	Q_OBJECT
 public:
-	InfosWidget(Client* client, QWidget* parent);
+	InfosWidget(Client* client, QWidget* parent=0);
 	void paintEvent(QPaintEvent*);
 	void pause();
 	void resume();

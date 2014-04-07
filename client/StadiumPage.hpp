@@ -19,8 +19,10 @@
 #include "Client.hpp"
 #include "MainWindow.hpp"
 #include "InfosWidget.hpp"
+#include "TournamentsWidget.hpp"
 	
 class InfosWidget;
+class TournamentsWidget;
 
 class StadiumPage : public QWidget {
 	Q_OBJECT
@@ -48,8 +50,10 @@ private:
 	QPushButton* _tournaments;
 	QPushButton* _trainingMatch;
 	QPushButton* _returnButton;
-
+	QStackedWidget* _stack;
+	
 	InfosWidget* _infos;
+	TournamentsWidget* _tournamentsWidget;
 };
 
 #endif

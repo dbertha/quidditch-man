@@ -43,7 +43,7 @@ TournamentsWidget::TournamentsWidget(Client* client, QWidget* parent, int role) 
 
 	_label = new QLabel();
 	grid->addWidget(_label,5,0,1,3,Qt::AlignCenter);
-
+	_label->setVisible(false);
 
 	if (role==ADMIN_LOGIN){
 		_price = new QLineEdit();
@@ -70,7 +70,7 @@ TournamentsWidget::TournamentsWidget(Client* client, QWidget* parent, int role) 
 	}
 	else {
 		_join=new QPushButton("Join");
-		grid->addWidget(_join,2,0,1,3,Qt::AlignCenter);
+		grid->addWidget(_join,4,0,1,3,Qt::AlignCenter);
 		connect(_join,SIGNAL(clicked()),this,SLOT(join()));
 	}
 	_timer = new QTimer();
@@ -97,6 +97,7 @@ void TournamentsWidget::resume() {_timer->start();}
 void TournamentsWidget::maskLabel(){
 	_currentParticipants->setVisible(false);
 	_startingPrice->setVisible(false);
+	_label->setVisible(false);
 }
 
 void TournamentsWidget::displayTournament(){
@@ -137,7 +138,19 @@ void TournamentsWidget::create(){
 }
 
 void TournamentsWidget::join(){
-
+	_join->setEnabled(false);
+	_hasJoined=true;
+	_client->askToJoinTournament();
+    int confirmation = _client->getConfirmation();
+    if(confirmation == 0){
+    	_label->setText(tr("Impossible to join this tournament !"));
+    	_label->setStyleSheet("QLabel{background-color: rgba(0,0,0,30);font: 16px \"Elegant Thin\", sans-serif;color:red;}");
+    }else{
+		_label->setText(tr("You have joined this tournament. Be ready."));
+		_label->setStyleSheet("QLabel{background-color: rgba(0,0,0,30);font: 16px \"Elegant Thin\", sans-serif;color:white;}");
+    }
+    update();
+    _label->setVisible(true);
 }
 
 void TournamentsWidget::updateLabels(){
@@ -145,6 +158,7 @@ void TournamentsWidget::updateLabels(){
 	if (infos.size()!=0){
 		_listTournaments->setVisible(true);
 		_listTournaments->clear();
+		if (!_hasJoined && _role==NORMAL_LOGIN) _join->setEnabled(true);
 		if (_role==ADMIN_LOGIN) _create->setEnabled(false);
 		for (int i=0;i<infos.size();i+=3){
 			_listTournaments->addItem(tr("Tournament"));
@@ -154,8 +168,12 @@ void TournamentsWidget::updateLabels(){
 		}
 	}
 	else{
+		_currentParticipants->setText("");
+		_label->setText("");
+		_startingPrice->setText("");
 		_listTournaments->clear();
 		maskLabel();
+		_hasJoined=false;
 		_listTournaments->setVisible(false);
 		if (_role==ADMIN_LOGIN) _create->setEnabled(true);
 	}

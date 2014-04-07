@@ -56,7 +56,7 @@ ListPlayersWidget::ListPlayersWidget(Client* client, QWidget* parent) : _client(
 
 	_timer = new QTimer();
 	connect(_timer, SIGNAL(timeout()),this,SLOT(update()));
-	_timer->setInterval(2*1000);
+	_timer->setInterval(1000);
 	_timer->start();
 	setFixedSize(500,340);
 

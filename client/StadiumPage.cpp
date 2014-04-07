@@ -62,8 +62,8 @@ StadiumPage::StadiumPage(Client* client, MainWindow* parent) : _client(client),_
 	grid->addWidget(_trainingMatch, 4,1, Qt::AlignLeft );
 	grid->addWidget(_returnButton,9,1,Qt::AlignLeft );
 
-	_infos = new InfosWidget(_client,this);
-	grid->addWidget(_infos,0,0,Qt::AlignLeft);
+	//_infos = new InfosWidget(_client,this);
+	//grid->addWidget(_infos,0,0,Qt::AlignLeft);
 	//580-780
 	//220
 	grid->setVerticalSpacing(3);
@@ -78,6 +78,12 @@ StadiumPage::StadiumPage(Client* client, MainWindow* parent) : _client(client),_
 		grid->setRowMinimumHeight(i,30);
 	}
 
+
+    _stack = new QStackedWidget();
+    _tournamentsWidget = new TournamentsWidget(_client,this,NORMAL_LOGIN);
+    _stack->addWidget(_tournamentsWidget);
+    _stack->setVisible(false);
+    grid->addWidget(_stack,2,0,10,1,Qt::AlignCenter);
 /*
     QVBoxLayout *_mainLayout = new QVBoxLayout;
     _mainLayout->addWidget(_registerButton);
@@ -102,78 +108,32 @@ void StadiumPage::paintEvent(QPaintEvent *){
 
 }
 
-void StadiumPage::pause() {_infos->pause();}
-void StadiumPage::resume() {_infos->resume();}
+void StadiumPage::pause() {
+    //_infos->pause();
+    _tournamentsWidget->pause();
+}
+void StadiumPage::resume() {
+    //_infos->resume();
+    _tournamentsWidget->resume();
+}
 
 void StadiumPage::friendlyMatch(){
-    //__pushesNotifier->setEnabled(false);
-    _parent->pause();
-    int res = choosePartner(_client,this);
-    if (res==BAD_CONNECTION) {} //badConnection();
-    else if(res != NO_CHOICE){
-        std::vector<int> chosenPlayers;
-        chosenPlayers = chooseTeamForMatch(_client, this); //tous les rôles sont nécessairement remplis 
-        //(on suppose suffisament de joueurs)
-#ifdef __DEBUG
-        std::cout << "index choisi : " << std::endl;
-        for(unsigned int i = 0; i < chosenPlayers.size() ; ++i){
-            std::cout << chosenPlayers[i] << std::endl;
-        }      
-#endif
-        //send invitation
-        _client->proposeMatchTo(res,  chosenPlayers);
-        //~ QProgressDialog *progress = new QProgressDialog("Waiting answer from opponent...", QString(), 0, 3, this);
-        //~ progress->setWindowModality(Qt::WindowModal);
-        //~ progress->show();
-        //~ progress->setValue(0);
-        //TODO : afficher un message d'attente (le programme se bloque)
-        int confirmation = _client->receiveMatchConfirmation();
-        //~ progress->setValue(1);
-        if(confirmation == MATCH_STARTING){
-
-            _parent->block();
-            MatchWindow * matchWindow = new MatchWindow(_client, 1, _parent);
-            matchWindow->show();
-            //startMatch(1); //inviteur a l'équipe 1
-        }else{
-            QMessageBox msgBox;
-            msgBox.setText("Invitation denied !");
-            msgBox.exec();
-            _parent->deblock();
-        }
-    }
-   // __pushesNotifier->setEnabled(true);
-    //_parent->deblock();
-    _parent->resume();
-
+    _stack->setVisible(false);
+    _parent->friendlyMatch();
 }
 
 void StadiumPage::tournaments(){
-	chooseTournament(_client,NORMAL_LOGIN,this);
+    _stack->setCurrentWidget(_tournamentsWidget);
+    _stack->setVisible(true);
 }
 
 void StadiumPage::trainingMatch(){
-	 _parent->pause();
-    _parent->block();
-    std::vector<int> chosenPlayers;
-    chosenPlayers = chooseTeamForMatch(_client, this); //tous les rôles sont nécessairement remplis 
-    _client->sendTrainingMatchRequest(chosenPlayers);
-    int confirmation = _client->receiveMatchConfirmation();
-    if(confirmation == 1){
-        MatchWindow * matchWindow = new MatchWindow(_client, 1, _parent);
-        matchWindow->show();
-    }else{
-        QMessageBox msgBox;
-        msgBox.setText("Training match not possible !");
-        msgBox.exec();
-    }
-    //_parent->deblock();
-    _parent->resume();
-
+    _stack->setVisible(false);
+    _parent->trainingMatch();
 }
 
 void StadiumPage::returnMenu(){
-	//pause();
+	_stack->setVisible(false);
 	_parent->mainPage();
 }
 

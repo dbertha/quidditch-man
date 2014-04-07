@@ -68,8 +68,8 @@ OfficePage::OfficePage(Client* client, MainWindow* parent) : _client(client),_pa
 	grid->addWidget(_gainAP, 5,2, Qt::AlignLeft );
 	grid->addWidget(_returnButton,9,2,Qt::AlignLeft );
 
-	_infos = new InfosWidget(_client,this);
-	grid->addWidget(_infos,0,0,1,2,Qt::AlignLeft);
+	//_infos = new InfosWidget(_client,this);
+	//grid->addWidget(_infos,0,0,1,2,Qt::AlignLeft);
 	//580-780
 	//220
 	grid->setVerticalSpacing(0);
@@ -126,12 +126,12 @@ void OfficePage::paintEvent(QPaintEvent *){
 }
 
 void OfficePage::pause() {
-	_infos->pause();
+	//_infos->pause();
 	_managePlayerWidget->pause();
 	_auctionWidget->pause();}
 
 void OfficePage::resume() {
-	_infos->resume();
+	//_infos->resume();
 	_managePlayerWidget->resume();
 	_auctionWidget->resume();}
 
@@ -144,7 +144,7 @@ void OfficePage::hideStack() {
 void OfficePage::showStack(){
 	_stack->setVisible(true);
 }
-void OfficePage::update() {_infos->updateLabels();}
+void OfficePage::update() {/*_infos->updateLabels();*/}
 
 void OfficePage::blockButtons(){
 	_players->setEnabled(false);

@@ -825,7 +825,10 @@ void MatchWindow::pushesHandler(){
 			if(ret == QMessageBox::Yes){
 				code = DRAWACCEPTED;
 				_parent->deblock();
+
+				_parent->resume();
 				over = true;
+				delete _msgBox;
 			}else{
 				code = DRAWDENIED;
 			}
@@ -846,6 +849,7 @@ void MatchWindow::endHandler(){
 		QMessageBox::information(this,QMessageBox::tr("Match over !"),str,QMessageBox::Ok);
 		over = true;
 		_parent->deblock();
+		_parent->resume();
 	}else{
 		int ret;
 		_msgBox=new QMessageBox();
@@ -865,6 +869,7 @@ void MatchWindow::endHandler(){
 			QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("You forfeited"),QMessageBox::Ok);
 			over = true;
 			_parent->deblock();
+			_parent->resume();
 		}else if(ret == QMessageBox::Cancel){
 			//ask for a draw
 			__forfeitAndDrawNotifier->setEnabled(false);
@@ -877,6 +882,7 @@ void MatchWindow::endHandler(){
 				QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("Draw accepted"),QMessageBox::Ok);
 				over = true;
 				_parent->deblock();
+				_parent->resume();
             }else{
 				QMessageBox::information(this,QMessageBox::tr("Draw"),QString("Draw refused"),QMessageBox::Ok);
             }

@@ -35,11 +35,12 @@
 #include "OfficePage.hpp"
 #include "DomainPage.hpp"
 #include "AdminPage.hpp"
+#include "InfosWidget.hpp"
+#include "NotificationWidget.hpp"
 
 class MainMenu;
 class ConnexionPage;
 class MainPage;
-//class StadiumPage;
 class Ticker;
 class BuildingsDialog;
 class BuyAPDialog;
@@ -47,8 +48,10 @@ class StadiumPage;
 class OfficePage;
 class DomainPage;
 class AdminPage;
+class InfosWidget;
+class NotificationWidget;
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QDialog {
     Q_OBJECT
 public:
 	MainWindow(int);
@@ -65,6 +68,11 @@ public:
 	void domainPage();
 	void block();
 	void deblock();
+
+	void friendlyMatch();
+	void trainingMatch();
+
+	int badConnection();
 
 public slots:
     void pushesHandler();
@@ -84,6 +92,9 @@ private:
     QSocketNotifier * __pushesNotifier;
     QTimer* _timerPause;
     QTimer* _timerResume;
+    InfosWidget* _infos;
+    NotificationWidget* _notification;
+    QGridLayout* grid;
 
 };
 #endif

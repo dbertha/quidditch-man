@@ -58,8 +58,8 @@ MainPage::MainPage(Client* client, MainWindow* parent) : _client(client),_parent
 	grid->addWidget(_domain, 4,1, Qt::AlignLeft );
 	grid->addWidget(_quit,9,1,Qt::AlignLeft);
 
-	_infos = new InfosWidget(_client,this);
-	grid->addWidget(_infos,0,0,Qt::AlignLeft);
+	//_infos = new InfosWidget(_client,this);
+	//grid->addWidget(_infos,0,0,Qt::AlignLeft);
 	//580-780
 	//220
 	grid->setVerticalSpacing(3);
@@ -99,8 +99,12 @@ void MainPage::paintEvent(QPaintEvent *){
 
 }
 
-void MainPage::pause() {_infos->pause();}
-void MainPage::resume() {_infos->resume();}
+void MainPage::pause() {
+	//_infos->pause();
+}
+void MainPage::resume() {
+	//_infos->resume();
+}
 
 void MainPage::enterStadium(){
 	//pause();
