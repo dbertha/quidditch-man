@@ -15,6 +15,7 @@
 #include <QTimer>
 #include <QLabel>
 #include <QApplication>
+#include <QStackedWidget>
 #include <QtGui>
 #include <QListWidget>
 #include <QStackedWidget>
@@ -68,7 +69,7 @@ public:
 	void trainingMatchImpossibleNotification();
 	void friendlyMatchDeniedNotification();
 	void hideSelect();
-
+	void hide();
 	void friendlyMatch();
 	void trainingMatch();
 

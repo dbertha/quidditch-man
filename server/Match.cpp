@@ -2,7 +2,7 @@
 
 
 Match::Match(std::vector<ManagedPlayer> &team1, int ** movesTeam1, bool tournament): 
-    __players(), __field(), __winner(0), __movesTeam1(movesTeam1), __movesTeam2(NULL), __isInTournament(tournament){
+    __players(), __field(), __winner(0), __scoreTeam1(0), __scoreTeam2(0), __movesTeam1(movesTeam1), __movesTeam2(NULL), __isInTournament(tournament){
 #ifdef __DEBUG
         std::cout << "Match généré à partir de la première équipe" << std::endl;
 #endif

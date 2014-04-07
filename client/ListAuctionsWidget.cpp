@@ -57,7 +57,7 @@ ListAuctionsWidget::ListAuctionsWidget(Client* client, QWidget* parent) : _clien
 	grid->addWidget(_stack,1,0,Qt::AlignCenter);
 
 	_timer = new QTimer();
-	connect(_timer, SIGNAL(timeout()),this,SLOT(update()));
+	connect(_timer, SIGNAL(timeout()),this,SLOT(updateLabels()));
 	_timer->setInterval(1*1000);
 	_timer->start();
 	setFixedSize(520,340);
@@ -80,6 +80,10 @@ void ListAuctionsWidget::displayAuction(){
 	dynamic_cast<AuctionWidget*>(_parent)->maskLabel();
 	dynamic_cast<AuctionWidget*>(_parent)->makeJoinable();
 	if (_listAuctions->currentRow()>=0) _stack->setCurrentWidget(_auctions[_listAuctions->currentRow()]);
+	else if (_listAuctions->count()!=0) {
+		_listAuctions->setCurrentRow(0);
+		_stack->setCurrentWidget(_auctions[_listAuctions->currentRow()]);
+	}
 	else _stack->setCurrentWidget(_noAuctionLabel);
 
 	if (_listAuctions->count()==0) {
@@ -89,7 +93,7 @@ void ListAuctionsWidget::displayAuction(){
 	}
 }
 
-void ListAuctionsWidget::update(){
+void ListAuctionsWidget::updateLabels(){
 	show();
 	std::vector<std::string> names =  _client->receiveAuctionsList();
 	std::vector<std::string> tmpList;

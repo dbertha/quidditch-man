@@ -67,19 +67,7 @@ void NotificationWidget::paintEvent(QPaintEvent *){
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 
 }
-void NotificationWidget::answerFriendlyMatch(bool choice){
-	setVisible(false);
-    std::vector<int> playersInTeam;
-    //if (choice) playersInTeam= chooseTeamForMatch(_client, this);
-    
-    _client->answerMatchProposal(choice, playersInTeam);
-    //~ answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
-    if(_client->receiveMatchConfirmation() == MATCH_STARTING){
-        MatchWindow * matchWindow  = new MatchWindow(_client, 2, _parent);
-        matchWindow->show();
-        //~ //startMatch( 2); //invité a l'équipe 2
-    }	
-}
+
 void NotificationWidget::acceptFriendlyMatch() {
 	setVisible(false);
 	_select->init(true,-1);
@@ -88,12 +76,16 @@ void NotificationWidget::acceptFriendlyMatch() {
 void NotificationWidget::refuseFriendlyMatch() {
 	setVisible(false);
 	std::vector<int> team;
+	_parent->pause();
 	_client->answerMatchProposal(false, team);
     //~ answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
     if(_client->receiveMatchConfirmation() == MATCH_STARTING){
         MatchWindow * matchWindow  = new MatchWindow(_client, 2, _parent);
         matchWindow->show();
     }
+    _parent->hideSelect();
+    _parent->resume();
+    _parent->deblock();
 }
 
 
@@ -101,6 +93,7 @@ void NotificationWidget::startMatch() {
 	setVisible(false);
 	//std::vector<int> playersInTeam = chooseTeamForMatch(_client, this);
 	_select->init(false,0);
+	//_parent->resume();
 }
 
 void NotificationWidget::quit(){
@@ -109,13 +102,14 @@ void NotificationWidget::quit(){
 
 void NotificationWidget::back(){
 	setVisible(false);
-	_parent->resume();
+	//_parent->resume();
 	_parent->deblock();
 }
 
 void NotificationWidget::tournamentNotification(char name[], int opponentID){
 	_parent->block();
 	_parent->hideSelect();
+	_parent->hide();
 	_yesButton->setVisible(false);
 	_noButton->setVisible(false);
 	_okButton->setVisible(true);
@@ -130,6 +124,8 @@ void NotificationWidget::tournamentNotification(char name[], int opponentID){
 void NotificationWidget::friendlyMatchNotification(char name[], int opponentID){
 	_parent->block();
 	_parent->hideSelect();
+	_parent->hide();
+	_parent->hide();
 	_yesButton->setVisible(true);
 	_noButton->setVisible(true);
 	_okButton->setVisible(false);
@@ -144,9 +140,10 @@ void NotificationWidget::friendlyMatchNotification(char name[], int opponentID){
 void NotificationWidget::trainingMatchImpossibleNotification(){
 	_parent->block();
 	_parent->hideSelect();
+	_parent->hide();
 	_yesButton->setVisible(false);
 	_noButton->setVisible(false);
-	_okButton->setVisible(true);
+	_okButton->setVisible(false);
 	_backButton->setVisible(true);
 	_quitButton->setVisible(false);
 	QString text = QString("You currently cannot play a training match.");
@@ -158,9 +155,10 @@ void NotificationWidget::trainingMatchImpossibleNotification(){
 void NotificationWidget::friendlyMatchDeniedNotification(){
 	_parent->block();
 	_parent->hideSelect();
+	_parent->hide();
 	_yesButton->setVisible(false);
 	_noButton->setVisible(false);
-	_okButton->setVisible(true);
+	_okButton->setVisible(false);
 	_backButton->setVisible(true);
 	_quitButton->setVisible(false);
 	QString text = QString("Invitation denied!");
@@ -172,6 +170,7 @@ void NotificationWidget::friendlyMatchDeniedNotification(){
 void NotificationWidget::noConnectionNotification(){
 	_parent->block();
 	_parent->hideSelect();
+	_parent->hide();
 	_yesButton->setVisible(false);
 	_noButton->setVisible(false);
 	_okButton->setVisible(false);

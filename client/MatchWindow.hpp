@@ -20,6 +20,7 @@
 #include <QRadioButton>
 #include <QSocketNotifier>
 #include <QMessageBox>
+#include <QList>
 
 #include <QDebug> //permet de dispose d'un affichage dans console debug
 
@@ -32,16 +33,15 @@
 
 #include "MainWindow.hpp"
 class MainWindow;
+#define texteMaTeam "score de mon equipe : "
+#define texteAutreTeam "score de l'equipe adverse : "
 
 
-class MatchWindow : public QDialog // On hérite de QWidget //TODO : changer pour QDialog
+class MatchWindow : public QDialog
 {
 	Q_OBJECT //vas permettre de def ces propres slot (public slots:) et signaux (signals:)
 
     public:
-		
-		//MatchWindow(int idMaTeam);
-		//final :
 		MatchWindow(Client * client, int idTeam, MainWindow * parent = 0);
 
     public slots:
@@ -52,10 +52,10 @@ class MatchWindow : public QDialog // On hérite de QWidget //TODO : changer pou
 		void handlerTour();
 		void handlerTourEnd();//TODO:ameliorer - correction derniere minute pour gerer bouton fin tour
 		void pushesHandler();
+		void nextTurn();
 
     signals:
 		void checkTour();
-//    void agrandissementMaxV2(int);//test perso pour renvoyé des valeur
 
     private:
 		int numMaTeam;
@@ -72,7 +72,12 @@ class MatchWindow : public QDialog // On hérite de QWidget //TODO : changer pou
 		int playerRole;
 
 		QLabel *infoJoueur;
-		QLabel *scoreEquipe;
+		QLabel *attenteJoueur;
+		QLabel *scoreEquipe1;
+		QLabel *scoreEquipe2;
+		QLabel *texteEquipe1;
+		QLabel *texteEquipe2;
+
 		QLabel *texte;
         QGridLayout *layout;
         QGraphicsScene *scene;
@@ -98,7 +103,10 @@ class MatchWindow : public QDialog // On hérite de QWidget //TODO : changer pou
 
 		HexagonalCase *caseJoueurSelect;
 		HexagonalCase *caseSelect;
+		HexagonalCase *temp;
         HexagonalCase *ListeHexa[MATRIX_SIZE][MATRIX_SIZE];
+
+		QList<HexagonalCase*> ListeHexaMarquer;
 
 		HexagonalField __field;
 
@@ -111,20 +119,21 @@ class MatchWindow : public QDialog // On hérite de QWidget //TODO : changer pou
 		void resetListeHexa();
 		void updateListeHexa();
 
-		void demarquerToutesCase();
+		void demarquerCase();
 
 		void marquerCaseAccessibleDepuis(int iAxial,int jAxial,int maxDistance);
 
-		void marquerFrappe(int iAxial,int jAxial,int maxDistance, int idBludger);
-		void marquerLancer(int iAxial,int jAxial,int maxDistance);
-
+		void marquerUneDirection(int iAxialDepart,int jAxialDepart,int maxDistance,int idBudlger,int direction);
+		void marquerBalle(int iAxial,int jAxial,int maxDistance, int idBalle);
 		void marquerAttraperSouaffle(int iAxial,int jAxial);
 		void marquerAttraperVifDOr(int iAxial,int jAxial);
 
 		bool ifNotOut(int iAxial, int jAxial);
 
+		void reset();
+
 		void endHandler();
-		void nextTurn();
+
 		Client * __client;
 		MainWindow* _parent;
 		QSocketNotifier * __forfeitAndDrawNotifier;

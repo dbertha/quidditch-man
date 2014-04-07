@@ -1,5 +1,4 @@
 #include "AdminPage.hpp"
-#include "Tournaments.hpp"
 
 AdminPage::AdminPage(Client* client, MainWindow* parent) : _client(client),_parent(parent){
 	setStyleSheet("AdminPage{background-image: url(Pictures/mainMenu.jpg)}");
@@ -88,7 +87,6 @@ void AdminPage::paintEvent(QPaintEvent *){
 
 void AdminPage::listTournaments(){
 	
-	chooseTournament(_client,ADMIN_LOGIN,this);
 }
 
 void AdminPage::createTournament(){

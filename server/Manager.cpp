@@ -45,6 +45,13 @@ Manager::Manager(string managerLogin): _login(managerLogin) {
 string Manager::getLogin() {return _login;}
 
 int Manager::getNumberOfPlayers() {return _numberOfPlayers;}
+int Manager::getNumberOfNonBlockedPlayers(){
+	int number=0;
+	for (int i=0;i<_players.size();++i){
+		if (!_players[i].isBlocked()) ++number;
+	}
+	return number;
+}
 void Manager::setNumberOfPlayers(int number) {_numberOfPlayers=number;}
 
 int Manager::getMoney() {return _money;}

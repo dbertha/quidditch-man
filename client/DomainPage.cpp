@@ -134,6 +134,11 @@ void DomainPage::pause() {
 		_buildingWidgets[i]->pause();
 	}
 }
+
+void DomainPage::hide() {
+	_stack->setVisible(false);
+}
+
 void DomainPage::resume() {
 	//_infos->resume();
 	for (int i=0;i<5;++i){

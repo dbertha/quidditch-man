@@ -34,7 +34,8 @@ public:
 	void startTurn();
 	void endOfTurn();
 	void makeJoinable();
-
+	void updateLabels();
+	
 public slots:
 	void init();
 	void join();
@@ -47,7 +48,7 @@ public slots:
 public:
 	Client* _client;
 	QWidget* _parent;
-
+	bool _inAuction;
 	ListAuctionsWidget* _listAuctionsWidget;
 	
 	QTimer* _endOfTurnTimer,*_nextTurnTimer,*_updater;

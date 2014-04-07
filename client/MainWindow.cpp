@@ -240,6 +240,7 @@ void MainWindow::pause(){
     _officePage->pause();
     _timerPause->stop();
     _timerResume->start();
+    _select->pause();
 }
 
 void MainWindow::resume(){
@@ -251,6 +252,7 @@ void MainWindow::resume(){
     _officePage->resume();
     _timerResume->stop();
     _timerPause->start();
+    _select->resume();
 }
 void MainWindow::block(){
     _mainPage->blockButtons();
@@ -285,4 +287,11 @@ void MainWindow::friendlyMatchDeniedNotification(){_notification->friendlyMatchD
 
 void MainWindow::hideSelect(){
     _select->setVisible(false);
+}
+
+void MainWindow::hide(){
+    _stadiumPage->hide();
+    _officePage->hide();
+    _domainPage->hide();
+
 }

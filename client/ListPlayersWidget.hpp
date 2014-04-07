@@ -26,7 +26,7 @@ class PlayerWidget;
 class ListPlayersWidget : public QWidget {
 	Q_OBJECT
 public:
-	ListPlayersWidget(Client* client, QWidget* parent);
+	ListPlayersWidget(Client* client, QWidget* parent, bool management=false);
 	void paintEvent(QPaintEvent*);
 	void pause();
 	void resume();
@@ -39,12 +39,12 @@ public:
 
 public slots:
 	void displayPlayer();
-	void update();
+	void updateLabels();
 
 public:
 	Client* _client;
 	QWidget* _parent;
-
+	bool _management;
 	QListWidget* _listPlayers;
 	QStackedWidget* _stack;
 	std::vector<std::string> _playersName;

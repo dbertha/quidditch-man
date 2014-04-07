@@ -31,6 +31,7 @@ public:
 	void pause();
 	void resume();
 	void maskLabel();
+	void updateLabels();
 
 public slots:
 	void train();

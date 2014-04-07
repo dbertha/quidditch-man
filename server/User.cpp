@@ -1078,11 +1078,13 @@ string User::intToString(int value) { //TODO : dans une classe générique ?
 void User::handleEndOfMatch(int numTeam, int numWinningTeam){
 	int money = manager_->getIncomeFromMatch(numTeam == numWinningTeam, numTeam == 1); //host if team 1
 	manager_->addMoney(money);
+	if (numTeam==numWinningTeam) manager_->setNumberOfFans(manager_->getNumberOfFans()+manager_->getNumberOfFans()/20);
 }
 
 void User::handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice, std::vector<int> lifes){ //tournamentPrice = 0 if not in a tournament
 	int money = manager_->getIncomeFromMatch(numTeam == numWinningTeam, numTeam == 1); //host if team 1
 	if (numTeam==numWinningTeam) manager_->addMoney(money+tournamentPrice);
+	if (numTeam==numWinningTeam) manager_->setNumberOfFans(manager_->getNumberOfFans()+manager_->getNumberOfFans()/10);
 	for(unsigned int i = 0; i < _teamInMatch.size(); ++i){
 		_teamInMatch[i]->setLife(lifes[i]);
 	}

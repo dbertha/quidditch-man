@@ -31,6 +31,7 @@ public:
 	DomainPage(Client* client,MainWindow* parent);
 	void paintEvent(QPaintEvent*);
 	void pause();
+	void hide();
 	void resume();
 	void hideStack();
 	void update();

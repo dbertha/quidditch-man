@@ -1,6 +1,7 @@
 #include "ListPlayersWidget.hpp"
 
-ListPlayersWidget::ListPlayersWidget(Client* client, QWidget* parent) : _client(client),_parent(parent){
+ListPlayersWidget::ListPlayersWidget(Client* client, QWidget* parent,bool management) : \
+_client(client),_parent(parent),_management(management){
 	
 	setStyleSheet("ListPlayersWidget{background-image: url(Pictures/transparent.png);}");
 	_noPlayerLabel = new QLabel("There isn't any player");
@@ -55,7 +56,7 @@ ListPlayersWidget::ListPlayersWidget(Client* client, QWidget* parent) : _client(
 	grid->addWidget(_stack,1,0,Qt::AlignCenter);
 
 	_timer = new QTimer();
-	connect(_timer, SIGNAL(timeout()),this,SLOT(update()));
+	connect(_timer, SIGNAL(timeout()),this,SLOT(updateLabels()));
 	_timer->setInterval(1000);
 	_timer->start();
 	setFixedSize(500,340);
@@ -75,12 +76,12 @@ void ListPlayersWidget::pause() {_timer->stop();}
 void ListPlayersWidget::resume() {_timer->start();}
 
 void ListPlayersWidget::displayPlayer(){
-	//dynamic_cast<ManagePlayerWidget*>(_parent)->maskLabel();
+	if (_management) dynamic_cast<ManagePlayerWidget*>(_parent)->maskLabel();
 	if (_listPlayers->currentRow()>=0) _stack->setCurrentWidget(_players[_listPlayers->currentRow()]);
 	else _stack->setCurrentWidget(_noPlayerLabel);
 }
 
-void ListPlayersWidget::update(){
+void ListPlayersWidget::updateLabels(){
 	std::vector<std::string> names =  _client->receivePlayersList();
 	std::vector<std::string> tmpList;
 	//std::vector<int> auctionIDs;

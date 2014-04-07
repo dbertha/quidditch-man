@@ -4,7 +4,7 @@ ManagePlayerWidget::ManagePlayerWidget(Client* client, QWidget* parent) : _clien
 	
 	setStyleSheet("ManagePlayerWidget{ background-color: rgba(255, 255, 255, 130);}");
 
-	_listPlayersWidget = new ListPlayersWidget(_client,this);
+	_listPlayersWidget = new ListPlayersWidget(_client,this,true);
 
 
 	_capacity = new QListWidget();
@@ -99,6 +99,7 @@ void ManagePlayerWidget::train() {
 		_errorLabel->setText(QString("No capacity selected"));
 		_errorLabel->setStyleSheet("QLabel{background-color: rgba(0,0,0,30);font: 16px \"Elegant Thin\", sans-serif;color:red;}");
 	}
+	update();
 	_errorLabel->setVisible(true);
 }
 void ManagePlayerWidget::heal() {
@@ -119,6 +120,7 @@ void ManagePlayerWidget::heal() {
 		_errorLabel->setText(QString("No capacity selected"));
 		_errorLabel->setStyleSheet("QLabel{background-color: rgba(0,0,0,30);font: 16px \"Elegant Thin\", sans-serif;color:red;}");
 	}
+	update();
 	_errorLabel->setVisible(true);
 }
 
@@ -151,9 +153,14 @@ void ManagePlayerWidget::sell() {
 		_errorLabel->setText(QString("No capacity selected"));
 		_errorLabel->setStyleSheet("QLabel{background-color: rgba(0,0,0,30);font: 16px \"Elegant Thin\", sans-serif;color:red;}");
 	}
+	update();
 	_errorLabel->setVisible(true);
 }
 
 void ManagePlayerWidget::maskLabel(){
 	_errorLabel->setVisible(false);
+}
+
+void ManagePlayerWidget::updateLabels(){
+	_listPlayersWidget->updateLabels();
 }

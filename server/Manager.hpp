@@ -36,6 +36,7 @@ class Manager {
  	string getLogin();
 
  	int getNumberOfPlayers();
+ 	int getNumberOfNonBlockedPlayers();
  	void setNumberOfPlayers(int number);
 
  	int getMoney();

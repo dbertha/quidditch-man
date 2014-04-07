@@ -1,5 +1,4 @@
 #include "StadiumPage.hpp"
-#include "Tournaments.hpp"
 #include "MatchWindow.hpp"
 
 StadiumPage::StadiumPage(Client* client, MainWindow* parent) : _client(client),_parent(parent){
@@ -111,6 +110,12 @@ void StadiumPage::pause() {
     //_infos->pause();
     _tournamentsWidget->pause();
 }
+
+void StadiumPage::hide() {
+	_stack->setVisible(false);
+}
+
+
 void StadiumPage::resume() {
     //_infos->resume();
     _tournamentsWidget->resume();
@@ -123,6 +128,7 @@ void StadiumPage::friendlyMatch(){
 
 void StadiumPage::tournaments(){
 	_parent->hideSelect();
+    _tournamentsWidget->updateLabels();
     _stack->setCurrentWidget(_tournamentsWidget);
     _stack->setVisible(true);
 }
@@ -134,6 +140,7 @@ void StadiumPage::trainingMatch(){
 
 void StadiumPage::returnMenu(){
 	_stack->setVisible(false);
+	_parent->hideSelect();
 	_parent->mainPage();
 }
 

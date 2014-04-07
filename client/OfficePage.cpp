@@ -130,6 +130,11 @@ void OfficePage::pause() {
 	_managePlayerWidget->pause();
 	_auctionWidget->pause();}
 
+void OfficePage::hide() {
+	_stack->setVisible(false);
+}
+
+
 void OfficePage::resume() {
 	//_infos->resume();
 	_managePlayerWidget->resume();
@@ -165,7 +170,7 @@ void OfficePage::deblockButtons(){
 
 void OfficePage::listPlayers(){
 	_auctionWidget->pause();
-	_managePlayerWidget->update();
+	_managePlayerWidget->updateLabels();
 	_managePlayerWidget->resume();
 	_stack->setCurrentWidget(_managePlayerWidget);
 	_stack->setVisible(true);
@@ -175,7 +180,7 @@ void OfficePage::listPlayers(){
 
 void OfficePage::listAuctions(){
 	_managePlayerWidget->pause();
-	_auctionWidget->update();
+	_auctionWidget->updateLabels();
 	_auctionWidget->resume();
 	_stack->setCurrentWidget(_auctionWidget);
 	_stack->setVisible(true);

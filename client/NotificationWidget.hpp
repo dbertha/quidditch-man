@@ -30,7 +30,6 @@ public:
 	void paintEvent(QPaintEvent*);
 	void tournamentNotification(char name[], int opponentID);
 	void friendlyMatchNotification(char name[], int opponentID);
-	void answerFriendlyMatch(bool choice);
 	void trainingMatchImpossibleNotification();
 	void friendlyMatchDeniedNotification();
 	void noConnectionNotification();

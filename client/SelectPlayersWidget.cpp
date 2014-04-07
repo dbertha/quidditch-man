@@ -71,7 +71,7 @@ _client(client),_parent(parent){
 	grid->addWidget(_listPlayersWidget,1,0,1,2,Qt::AlignCenter);
 	grid->addWidget(_noManagerLabel,1,0,1,2,Qt::AlignCenter);
 	grid->addWidget(_cancelButton,2,0,Qt::AlignCenter);
-	grid->addWidget(_confirmButton,2,1,Qt::AlignCenter);
+	grid->addWidget(_confirmButton,3,1,Qt::AlignCenter);
 
 	setFixedSize(500,500);
 
@@ -95,13 +95,21 @@ void SelectPlayersWidget::paintEvent(QPaintEvent *){
 
 }
 
-void SelectPlayersWidget::pause() {_listPlayersWidget->pause();}
-void SelectPlayersWidget::resume() {_listPlayersWidget->resume();}
+void SelectPlayersWidget::pause() {
+	_timer->stop();
+	_listPlayersWidget->pause();
+}
+void SelectPlayersWidget::resume() {
+	if (_ask&&(_opponentID==0)) _timer->start();
+	_listPlayersWidget->resume();
+}
 
 
 void SelectPlayersWidget::activateButton(){_friendlyMatch->setVisible(true);}
 
 void SelectPlayersWidget::updateListManagers() {
+	_IDList.clear();
+	_namesList.clear();
 	_client->receiveManagersIDandNames(&_IDList,&_namesList);
 
 	int previousRow = _listManagers->currentRow();
@@ -111,6 +119,12 @@ void SelectPlayersWidget::updateListManagers() {
 		QString name= QString(tr(_namesList[i].c_str()));
 				
 		_listManagers->addItem(name);
+
+	}
+
+	if (previousRow<_listManagers->count()) {
+		_listManagers->setCurrentRow(previousRow);
+		_noManagerLabel->setText("");
 	}
 	
 	if (_listManagers->count()!=0){
@@ -138,9 +152,9 @@ void SelectPlayersWidget::friendlyMatch(){
 	_opponentID=_IDList[_listManagers->currentRow()];
 	
 	//_listPlayersWidget->pause();
-	_listPlayersWidget->update();
+	_listPlayersWidget->updateLabels();
 	_listPlayersWidget->setVisible(true);
-	_team.clear();
+	
 	_roles[0]->setVisible(true);
 	_cancelButton->setVisible(true);
 	_friendlyMatch->setVisible(false);
@@ -156,6 +170,7 @@ void SelectPlayersWidget::choosePlayer(){
 		if (_team.size()<7) _roles[_team.size()]->setVisible(true);
 		else {
 			_listPlayersWidget->setVisible(false);
+			hideButtons();
 			_confirmButton->setVisible(true);
 		}
 	}
@@ -169,24 +184,25 @@ void SelectPlayersWidget::init(bool value, int opponentID) {
 	_ask=value;
 	_opponentID=opponentID;
 	_team.clear();
-	setVisible(true);
+		_listPlayersWidget->showPlayers();
 	if (value&&_opponentID==0){//asks 
+		updateListManagers();
 		_listManagers->setVisible(true);
-		_listManagers->update();
 		hideButtons();
 		_noManagerLabel->setVisible(true);
 		//_cancelButton->setVisible(true);
 		_timer->start();
 	}
 	else{ //answers or tournament or training
+		_timer->stop();
 		_listManagers->setVisible(false);
-		_listPlayersWidget->showPlayers();
 		_noManagerLabel->setVisible(false);
 		_listPlayersWidget->setVisible(true);
 		_roles[0]->setVisible(true);
 		_cancelButton->setVisible(false);
-		_timer->stop();
 	}
+
+	setVisible(true);
 
 }
 
@@ -202,7 +218,7 @@ void SelectPlayersWidget::hideButtons(){
 }
 
 void SelectPlayersWidget::cancel(){
-	_team.clear();
+	_listPlayersWidget->showPlayers();
 	init(_ask,0);
 
 }
@@ -210,7 +226,7 @@ void SelectPlayersWidget::cancel(){
 void SelectPlayersWidget::confirm(){
 	hideButtons();
 	setVisible(false);
-	if (!_ask&&_opponentID==-1){
+	if (!_ask&&(_opponentID==-1)){
         _parent->pause();
 	    _parent->block();
 	    //std::vector<int> chosenPlayers;
@@ -224,31 +240,39 @@ void SelectPlayersWidget::confirm(){
 	       _parent->trainingMatchImpossibleNotification();
 	    }
 	    //_parent->deblock();
-	    _parent->resume();
+	    //_parent->resume();
 	}
-	else if (!_ask&&_opponentID==0){
+	else if (!_ask&&(_opponentID==0)){
 
+        _parent->pause();
+	    _parent->block();
 		//std::vector<int> playersInTeam = chooseTeamForMatch(_client, this);
 		_client->sendTeamForMatchTournament(_team);
 		//bloquant, l'adversaire doit avoir répondu aussi :
 		int numTeam = _client->receiveNumOfTeam();
 		if(numTeam > 0){ //first to answer is the team 1
-		MatchWindow * matchWindow = new MatchWindow(_client, numTeam, _parent);
-		matchWindow->show();
+			MatchWindow * matchWindow = new MatchWindow(_client, numTeam, _parent);
+			matchWindow->show();
+		}
+		//_parent->resume();
 		//~ startMatch(numTeam);
 	}
-	else if (_ask&&_opponentID==-1)
+	else if (_ask&&(_opponentID==-1)) {
 		
+        _parent->pause();
+	    _parent->block();
 		_client->answerMatchProposal(true, _team);
 		//~ answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
 		if(_client->receiveMatchConfirmation() == MATCH_STARTING){
+       		_parent->pause();
+	   		_parent->block();
 			MatchWindow * matchWindow  = new MatchWindow(_client, 2, _parent);
 			matchWindow->show();
 			//~ //startMatch( 2); //invité a l'équipe 2
 		}
-		
+		//_parent->resume();
 	}
-	else {
+	else if (_ask&&(_opponentID>-1)) {
 		_parent->pause();
 		_parent->block();
 		_client->proposeMatchTo(_opponentID, _team);
@@ -256,7 +280,7 @@ void SelectPlayersWidget::confirm(){
 		int confirmation = _client->receiveMatchConfirmation();
 		//~ progress->setValue(1);
 		if(confirmation == MATCH_STARTING){
-
+			_parent->pause();
 			_parent->block();
 			MatchWindow * matchWindow = new MatchWindow(_client, 1, _parent);
 			matchWindow->show();
@@ -268,7 +292,7 @@ void SelectPlayersWidget::confirm(){
 		
 		// __pushesNotifier->setEnabled(true);
 		//_parent->deblock();
-		_parent->resume();
+		//_parent->resume();
 	}
 	setVisible(false);
 }

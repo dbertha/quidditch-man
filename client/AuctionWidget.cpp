@@ -3,7 +3,7 @@
 
 AuctionWidget::AuctionWidget(Client* client, QWidget* parent) : _client(client),_parent(parent){
 	
-	setStyleSheet("AuctionWidget{ background-color: rgba(255, 255, 255, 100);}");
+	setStyleSheet("AuctionWidget{ background-color: rgba(255, 255, 255, 130);}");
 	_currentTurn=1;
 	_listAuctionsWidget = new ListAuctionsWidget(_client,this);
 
@@ -11,7 +11,7 @@ AuctionWidget::AuctionWidget(Client* client, QWidget* parent) : _client(client),
 	_joinButton= new QPushButton(tr("Join"));
 	_bidButton = new QPushButton(tr("Bid"));
 	_quitButton = new QPushButton(tr("Quit"));
-	_joinButton->setEnabled(false);
+	_joinButton->setEnabled(true);
 	_joinButton->setVisible(false);
 	_joinButton->setMaximumWidth(45);
 	_bidButton->setMaximumWidth(45);
@@ -74,15 +74,16 @@ AuctionWidget::AuctionWidget(Client* client, QWidget* parent) : _client(client),
 
 }
 void AuctionWidget::init(){
-
+	_inAuction=false;
 	dynamic_cast<OfficePage*>(_parent)->deblockButtons();
-	_listAuctionsWidget->update();
+	_listAuctionsWidget->updateLabels();
 	_listAuctionsWidget->show();
 	_listAuctionsWidget->resume();
 	_updater->stop();
 	_endOfTurnTimer->stop();
 	_nextTurnTimer->stop();
 	_joinButton->setVisible(true);
+	_joinButton->setEnabled(true);
 	_bidButton->setEnabled(false);
 	_bidButton->setVisible(false);
 	_quitButton->setEnabled(false);
@@ -119,7 +120,8 @@ void AuctionWidget::paintEvent(QPaintEvent *){
 }
 
 void AuctionWidget::pause() {_listAuctionsWidget->pause();}
-void AuctionWidget::resume() {_listAuctionsWidget->resume();}
+void AuctionWidget::resume() {
+	if (!_inAuction) _listAuctionsWidget->resume();}
 
 void AuctionWidget::join() {
 	_auctionID = _listAuctionsWidget->getAuctionID();
@@ -128,6 +130,9 @@ void AuctionWidget::join() {
 	    int joinResult = _client->getConfirmation();
 	    if (joinResult==1){
 	    	dynamic_cast<OfficePage*>(_parent)->blockButtons();
+	    	_listAuctionsWidget->pause();
+	    	_inAuction=true;
+	    	_startingPrice = _listAuctionsWidget->getAuctionStartingPrice();
 	    	startTurn();
 	    }
 	    else {
@@ -264,7 +269,7 @@ void AuctionWidget::changeLabel(){
 }
 
 void AuctionWidget::startTurn() {
-	_listAuctionsWidget->hide();
+	//_listAuctionsWidget->hide();
 	_listAuctionsWidget->pause();
 
 	if (_currentTurn==1) {
@@ -274,7 +279,6 @@ void AuctionWidget::startTurn() {
 	else _timeBeforeEndOfTurn=30;
     _client->askCurrentPrice();
     _currentPrice=_client->getCurrentPrice();
-    _startingPrice = _listAuctionsWidget->getAuctionStartingPrice();
    	if (_currentTurn==1) _turnPrice=_startingPrice;
    	else _turnPrice = _currentPrice;
 
@@ -291,4 +295,8 @@ void AuctionWidget::startTurn() {
    	_errorLabel->setText("");
   	_errorLabel->setVisible(true);
     _endOfTurnTimer->start();
+}
+
+void AuctionWidget::updateLabels(){
+	_listAuctionsWidget->updateLabels();
 }

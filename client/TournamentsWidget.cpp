@@ -9,7 +9,7 @@ TournamentsWidget::TournamentsWidget(Client* client, QWidget* parent, int role) 
 	_listTournaments->setMaximumHeight(50);
 	_listTournaments->setMinimumWidth(150);
 
-	_listTournaments->setVisible(false);
+	_listTournaments->setVisible(true);
 	
 	_currentParticipants = new QLabel(tr("Participants : %1/%2").arg(0).arg(0));
 	_startingPrice = new QLabel(tr("Starting price : %1 gold").arg(0));
@@ -135,6 +135,7 @@ void TournamentsWidget::create(){
 		}
 	}
 	update();
+	_label->setVisible(true);
 }
 
 void TournamentsWidget::join(){
@@ -155,14 +156,15 @@ void TournamentsWidget::join(){
 
 void TournamentsWidget::updateLabels(){
 	std::vector<int> infos = _client->getTournamentList();
+
+	_listTournaments->clear();
 	if (infos.size()!=0){
-		_listTournaments->setVisible(true);
-		_listTournaments->clear();
-		_listTournaments->setCurrentRow(0);
+		//_listTournaments->setVisible(true);
 		if (!_hasJoined && _role==NORMAL_LOGIN) _join->setEnabled(true);
 		if (_role==ADMIN_LOGIN) _create->setEnabled(false);
 		for (int i=0;i<infos.size();i+=3){
 			_listTournaments->addItem(tr("Tournament"));
+			_listTournaments->setCurrentRow(0);
 			_currentParticipants->setText(tr("Participants : %1/%2").arg(infos[i+1]).arg(infos[i]));
 			_startingPrice->setText(tr("Starting price : %1 gold").arg(infos[i+2]));
 			update();
@@ -175,7 +177,7 @@ void TournamentsWidget::updateLabels(){
 		_listTournaments->clear();
 		maskLabel();
 		_hasJoined=false;
-		_listTournaments->setVisible(false);
+		//_listTournaments->setVisible(false);
 		if (_role==ADMIN_LOGIN) _create->setEnabled(true);
 	}
 }

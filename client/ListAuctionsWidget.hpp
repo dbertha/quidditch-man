@@ -37,7 +37,7 @@ public:
 
 public slots:
 	void displayAuction();
-	void update();
+	void updateLabels();
 
 public:
 	Client* _client;
