@@ -1,7 +1,5 @@
 #include "MatchWindow.hpp"
 
-//TODO:note: code pas du tout optimise/"modualiser"/"umliser", grosse phase de refactoring necessaire
-
 MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDialog(parent),
 	numMaTeam(numTeam), iHaveASelection(false),  scoreTeam1(0), scoreTeam2(0), winner(0), currentMove(0), 
 	__field(), __client(client), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd(),  QSocketNotifier::Read, this))
@@ -34,7 +32,7 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 		texteEquipe1 = new QLabel(texteAutreTeam);
 		texteEquipe2 = new QLabel(texteMaTeam);
 	}
-	//on colorie le texte selon les couleurs utiliser dans les hexagonalCase
+	//on colorie le texte selon les couleurs utiliser dans les hexagonalCase pour indiquer les joueurs des differents equipe
 	QPalette* palette = new QPalette();
 	palette->setColor(QPalette::WindowText,_couleurEquipe1);
 	texteEquipe1->setPalette(*palette);
@@ -73,8 +71,6 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	taper->setEnabled(false);
 	recupSouaffle->setEnabled(false);
 	recupVifDOr->setEnabled(false);
-//	taper->setVisible(false); //TODO: choisir ou non si afficher action (setVisible vas masquer le bouton, on pourrai alors
-	// seulement afficher les action possible pour un joueur au lieu de "grisé" celle inacessible)
 
 	QVBoxLayout *vbox = new QVBoxLayout;
 	vbox->addWidget(deplacer);
@@ -83,7 +79,6 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	vbox->addWidget(recupSouaffle);
 	vbox->addWidget(recupVifDOr);
 	groupbox->setLayout(vbox);
-//	QObject::connect(groupbox,SIGNAL(clicked(bool)),this,SLOT(handlerChoixAction(bool)));
 	QObject::connect(deplacer,SIGNAL(clicked(bool)),this,SLOT(handlerChoixAction(bool)));
 	QObject::connect(lancer,SIGNAL(clicked(bool)),this,SLOT(handlerChoixAction(bool)));
 	QObject::connect(taper,SIGNAL(clicked(bool)),this,SLOT(handlerChoixAction(bool)));
@@ -92,7 +87,6 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 
 	//*****************************************************************************************
 	layoutConformi = new QGridLayout;
-//	layoutConformi->setGeometry();
 	layoutConformi->setSizeConstraint(QLayout::SetMinimumSize);
 	BoutonConfirm = new QPushButton("OK");
 	BoutonConfirm->setMaximumSize ( 80, 30);
@@ -105,12 +99,11 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	layoutConformi->addWidget(BoutonConfirm,1,0,Qt::AlignTop);
 	layoutConformi->addWidget(BoutonFinirTour,2,0);
 	QObject::connect(BoutonConfirm,SIGNAL(clicked()),this,SLOT(handlerAction()));
-	QObject::connect(BoutonFinirTour,SIGNAL(clicked()),this,SLOT(nextTurn()));
+	QObject::connect(BoutonFinirTour,SIGNAL(clicked()),this,SLOT(nextTurn())); //le bouton finir tour est direct connect a nextTurn
 	//*****************************************************************************************
 
 	//initialisation d'un layout pour organniser le Qlabel,la view, radio bouton,....
 	layout = new QGridLayout;
-//	layout->addWidget(texte,3,0);
     //view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -213,7 +206,6 @@ void MatchWindow::updateListeHexa(){
 		indexRow=allPositions[i].getLineOnMatrix();
 		indexCol=allPositions[i].getColOnMatrix();
 		if(indexRow == 10000){
-			int playerRole = i;
             int playerTeam = 1;
 			if(i >= TEAM2_KEEPER){//TODO: verif si c'est pas un >= qu'il faut (avant, c'etait juste i> )
 				playerTeam = 2;
@@ -242,24 +234,6 @@ void MatchWindow::updateListeHexa(){
 	update();
 }
 
-
-//TODO: supprimier
-void MatchWindow::changerTexte(int i,int j){
-/*	int indexRow=AxialCoordinates(i,j).getLineOnMatrix();
-	int indexCol=AxialCoordinates(i,j).getColOnMatrix();
-
-	texte->setText("coord Axial: i= "+QString::number(i)+", j ="+QString::number(j) +"\n"
-				   +"coord standard: i="+QString::number(indexRow)+"j="+QString::number(indexCol));
-//	marquerCaseAccessibleDepuis(i,j,2);
-//	if(i==0 && j==0){
-//		qDebug()<<"rentre dans if acces";
-//		marquerToutesCaseNonAccessible();
-//	}
-	update();*/
-
-}
-
-
 //TODO:optimiser, back Tracking?
 void MatchWindow::marquerCaseAccessibleDepuis(int rowAxial, int colAxial, int maxDistance){
 	//crée le point de depart, celui par rapport au quel ont vas estimer la distance
@@ -287,15 +261,10 @@ void MatchWindow::marquerCaseAccessibleDepuis(int rowAxial, int colAxial, int ma
 	update();
 }
 
-//TODO: netoyer les commentaire
 void MatchWindow::demarquerCase(){
-	//vas marquer toutes les casses non Accesible
-	//NOTE: pas optimal, faut s'arranger pour sauvergarder une liste de case qui ont
-	//  été marquer accesible pour les dermarquer facilement
+	//vas marquer toutes les casses stocker dans ListeHexaMarquer comme etant non accesible
 
-//	int indexRow;
-//	int indexCol;
-	qDebug()<<"rentre dans non accessible1";
+	qDebug()<<"rentre dans demarquage des case";
 
 	while(!ListeHexaMarquer.isEmpty()){
 		temp = ListeHexaMarquer.takeFirst();//supprime le 1er element et le renvoye
@@ -305,23 +274,6 @@ void MatchWindow::demarquerCase(){
 		temp->isNonAccessible();
 
 	}
-/*//TODO: netoyer le code inutile
-
-	for (int indexRow = 0; indexRow < MATRIX_SIZE; ++indexRow){
-		for(int indexCol = 0; indexCol < MATRIX_SIZE; ++indexCol){
-//			qDebug()<<"---";
-//			qDebug()<<indexRowAxial;
-//			qDebug()<<indexColAxial;
-
-//			indexRow=AxialCoordinates(indexRowAxial,indexColAxial).getLineOnMatrix();
-//			indexCol=AxialCoordinates(indexRowAxial,indexColAxial).getColOnMatrix();
-//			qDebug()<<indexRow;
-//			qDebug()<<indexCol;
-
-			ListeHexa[indexRow][indexCol]->isNonAccessible();
-
-		}
-	}*/
 }
 
 void MatchWindow::marquerUneDirection(int iAxialDepart,int jAxialDepart,int maxDistance,int idBudlger,int direction){
@@ -330,10 +282,6 @@ void MatchWindow::marquerUneDirection(int iAxialDepart,int jAxialDepart,int maxD
 	int jAxial=jAxialDepart+directionHexa[direction].pasJ;
 	int indexRow;
 	int indexCol;
-//	qDebug() << "////////TEST///////";
-//	for(int j=0; j< nbrDirectionHexa;j++){
-//		qDebug() << "** dir, pasi=" +QString::number(directionHexa2[j].pasI)+"pasj="+QString::number(directionHexa2[j].pasJ);
-//	}
 
 	while(ifNotOut(iAxial,jAxial) && i<=maxDistance ){
 		qDebug() << "---- Marquage pas i:"+QString::number( directionHexa[direction].pasI)+" pas j:"+QString::number( directionHexa[direction].pasJ);
@@ -432,9 +380,6 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 	caseSelect = ListeHexa[indexRow][indexCol];//represente la case sur laquel j'ai clicker
 
 	if(iHaveASelection){//joueur deja selectionné
-		//TODO : construire moves[4][7], compter le nombre d'actions déjà réalisées
-		//TODO bouton pour finir le tour
-		//nextTurn()
 		qDebug() << "j'ai deja selection qlq chose";
 		temp->unselectForAction();//on demarque l'ancien case
 		if(iAxial==caseJoueurSelect->getIAxial() and jAxial==caseJoueurSelect->getJAxial()){
@@ -445,7 +390,6 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 				//marquer la case pour une action (l'encadrer ou autre)
 				caseSelect->selectForAction();
 
-//				caseJoueurSelect->isSelected();
 				BoutonConfirm->setEnabled(true);
 			}else{
 				qDebug() << "case NON-marquer trouver";
@@ -472,8 +416,8 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 				attributs = __client->receiveSelectedPlayerInfos(caseJoueurSelect->getType());
 				__forfeitAndDrawNotifier->setEnabled(true);
 				//attributs = { {3,5,3,4,5}, AxialCoordinates(iAxial,jAxial) ,1 };
-//*!!!!!!!!!!!! playerRole qui vas de 0 à 6
-//*!!!!!!!!!!!! et selectedPlayerID = playerRole + 7 si numMaTeam = 2 (de 0 à 6 ou de 7 à 13)
+				// playerRole qui vas de 0 à 6
+				// et selectedPlayerID = playerRole + 7 si numMaTeam = 2 (de 0 à 6 ou de 7 à 13)
 
 				playerRole = caseJoueurSelect->getType() %7; //playerRole est un attribut de la MatchWindow pour pas se perdre
 				qDebug() << "id du joueur";
@@ -641,25 +585,29 @@ void MatchWindow::handlerTour(){
 	}
 }
 
-void MatchWindow::handlerTourEnd(){//correction derniere minute pour gerer bouton fin tour
-	//check si toutes action fait -> si oui, envoyer donner serveur, recup allPosition et mettre a jour
-	qDebug()<<"FIN du tour provoquer par le joueur";
-	nextTurn();
-//	endHandler();
-}
-
 void MatchWindow::nextTurn(){
+	qDebug()<< "avant RESET";
 	reset();
+	qDebug()<< "apres RESET";
+//TODO: blocage, afficher qlq choise pour indiquer qu'il est bloquer
+/* //bug, la fenetre ne se met a jour qu'apres recu all positions
 	attenteJoueur->show();
 	layout->update();
+	layout->activate();
+	this->update();
+*/
+	qDebug()<< "avant desactivation du notifier";
 	__forfeitAndDrawNotifier->setEnabled(false);
+	qDebug()<< "apres";
 	//sendMoves
-
+	qDebug()<< "avant sendMoves";
 	__client->sendMoves(moves);
+	qDebug()<< "apres sendMoves";
 	//getConfirmation
-//TODO: blocage, afficher qlq choise pour indiquer qu'il est bloquer
 
+	qDebug()<<"avant getConfirmation";
 	__client->getConfirmation(); //Attention, bloquant si adversaire n'a pas encore répondu
+	qDebug()<<"apres getConfirmation";
 	//reset :
 	currentMove = 0;
 	for(int i = 0; i < 7; ++i){
@@ -669,10 +617,10 @@ void MatchWindow::nextTurn(){
 		moves[i][3] = 10000;
 	}
 	//récupérer les positions
+	qDebug()<<"avant allPositions";
     allPositions = __client->receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
-
-
-
+	qDebug()<<"apres allPositions";
+	//mise a jour score des equipes
 	scoreEquipe1->setText(QString::number(scoreTeam1));
 	scoreEquipe2->setText(QString::number(scoreTeam2));
 	//update affichage

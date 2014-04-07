@@ -2,9 +2,7 @@
 
 //ATTENTION: l'utilisation de setZValue(z) peut provoquer le "repaint" d'un objet
 //  =>si mal placer, peut provoquer un repaint en boucle des objets
-
-//TODO: supprimer variable "test" avant push final
-//TODO: supprimer fonction test "changer couleur"
+//  utilisation de testRepaint pour detecter d'eventuel repaint infini
 
 //constructeur:
 HexagonalCase::HexagonalCase(int i, int j,int type, QGraphicsItem *parent) : QGraphicsObject(parent),
@@ -17,7 +15,9 @@ HexagonalCase::HexagonalCase(int i, int j,int type, QGraphicsItem *parent) : QGr
 	setZValue(0);//permet de joueur sur le niveau des case les une par rapport au autre
 	//les case vide sont niveau 0, les joueurs/balle niveau 1 et se dessine donc au-dessus des case vide
 	//(evite que les bords noirs des casses vides remplacent les bord colorés des cases joueurs)
-	test = 0;
+
+//init de la variable test
+	testRepaint = 0;
 	//this->setCursor(QCursor(Qt::OpenHandCursor));//test pour changer le cursor
 	//setBoundingRegionGranularity(1);
 	//QObject::connect(this, SIGNAL(clicked()), qApp, SLOT(quit()));
@@ -103,10 +103,9 @@ void HexagonalCase::dessinerHexagone(QPainter *painter){
 	}
 
 //Test pour etre sure que je redessine pas les case en boucle
-	test+=1;
-	qDebug()<<"REDESSEIN("+QString::number(_indiceI)+","+QString::number(_indiceJ)+"):" +QString::number( test)+" type:"+QString::number( _typeCase)
+	testRepaint+=1;
+	qDebug()<<"REDESSEIN("+QString::number(_indiceI)+","+QString::number(_indiceJ)+"):" +QString::number( testRepaint)+" type:"+QString::number( _typeCase)
 			  +" z:"+QString::number(zValue());
-
 
 	painter->setBrush(brush );
 	painter->setPen(QPen(couleurBord,2,Qt::SolidLine)); //defini le pinceaux qui dessine les contours
@@ -362,23 +361,6 @@ void HexagonalCase::isForCatch(){
 	update();
 }
 
-void HexagonalCase::isMarkForBludger(int idBludger){
-	_ifMarkForBludger=true;
-	_markTypeBalle=idBludger;
-	update();
-}
-
-void HexagonalCase::isMarkForBludger(int idBludger,int direction){
-	_ifMarkForBludger=true;
-	_markTypeBalle=idBludger;
-	if(direction==droite || direction== gauche)
-		isLine();
-	if(direction==basDroite||direction==hautGauche)
-		isDiagonalGoBasDroite();
-	if(direction==basGauche||direction==hautDroite)
-		isDiagonalGohautDroite();
-	update();
-}
 
 void HexagonalCase::isMarkForBall(int idBall,int direction){
 	_ifMarkForBludger=true;
@@ -449,19 +431,6 @@ bool HexagonalCase::ifBlocked(){
 }
 
 //----------------------------------------------------------------------------------------------
-//fonction test pour voir la reaction a un signal
-void HexagonalCase::changerCouleur(){//slots de reaction a un signal
-
-	if(_ifSelect){
-		_ifSelect=false;
-	}else{
-		_ifSelect=true;
-	}
-
-	update();
-}
-
-
 void HexagonalCase::mousePressEvent(QGraphicsSceneMouseEvent *)
  {//emet un signal si on clicke sur une case
 	 emit caseSelect(_indiceI,_indiceJ);

@@ -1,16 +1,10 @@
 #ifndef FENETRE_HPP
 #define FENETRE_HPP
 
-//note: code pas du tout optimise/"modualiser"/"umliser", grosse phase de refactoring necessaire
-
 #include <QApplication>
 #include <QWidget>
 #include <QDialog>
 #include <QPushButton>
-//#include <QLCDNumber>
-//#include <QSlider>
-//#include <QPainter>
-
 #include <QLabel>
 #include <QGridLayout>
 #include <QGraphicsScene>
@@ -43,17 +37,15 @@ class MatchWindow : public QDialog
 		MatchWindow(Client * client, int idTeam, QWidget * parent = 0);
 
     public slots:
-		void changerTexte(int,int);
 		void handlerMove(int,int);
 		void handlerChoixAction(bool);
 		void handlerAction();
 		void handlerTour();
-		void handlerTourEnd();//TODO:ameliorer - correction derniere minute pour gerer bouton fin tour
 		void pushesHandler();
 		void nextTurn();
 
+
     signals:
-		void checkTour();
 
     private:
 		int numMaTeam;
@@ -93,10 +85,6 @@ class MatchWindow : public QDialog
 		QPushButton *BoutonConfirm;
 		QPushButton *BoutonFinirTour;
 
-		QGridLayout *layoutChoixMatch;
-		QPushButton *BoutonAbandon;
-		QPushButton *BoutonMatchNul;
-
 
 		HexagonalCase *caseJoueurSelect;
 		HexagonalCase *caseSelect;
@@ -106,11 +94,6 @@ class MatchWindow : public QDialog
 		QList<HexagonalCase*> ListeHexaMarquer;
 
 		HexagonalField __field;
-
-
-
-		void initFieldGuiWithHexagonalField();
-		void initHexagonalFieldWithDefine();
 
 		void initListeHexa();
 		void resetListeHexa();
@@ -133,14 +116,6 @@ class MatchWindow : public QDialog
 
 		Client * __client;
 		QSocketNotifier * __forfeitAndDrawNotifier;
-		
-
-//        AxialCoordinates coord;
-//    QPushButton *m_bouton;
-//    QLCDNumber *m_lcd;
-//    QLCDNumber *m_lcdTest;
-//    QSlider *m_slider;
-//    void paintEvent(QPaintEvent *);
 };
 
 #endif // FENETRE_HPP
