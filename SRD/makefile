@@ -3,7 +3,7 @@ LATEX = pdflatex -interaction=batchmode
 
 all : SRD.pdf
 	mv SRD.pdf pdf/SRD.pdf
-	make clean
+	
 SRD.pdf : ${SRC}.tex
 	${LATEX} $<
 	#compilation du glossaire

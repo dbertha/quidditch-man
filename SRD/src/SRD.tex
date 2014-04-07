@@ -188,6 +188,8 @@
     3.2 & Hélène & 05/04/14 & Relecture complète\\
     3.3 & Hélène & 06/04/14 & Correction de diagrammes\\
     3.4 & David & 07/04/14 & Mise à jour diags \\
+    3.5 & Manon & 07/04/14 & Diag classes nouvelle GUI \\
+    4.0 & Manon & 07/04/14 & Brèves explications nouvelle GUI \\
     \hline
   \end{tabular}
 
@@ -1091,15 +1093,25 @@ Nous allons ici décrire comment se déroule une partie sur terminal. Nous pouvo
       \begin{figure}[H]
           \center
           \includegraphics[scale=0.35]{uml/class/GUIClasses.png}
-         \caption{Diagramme des classes impliquées dans la GUI}
+         \caption{Diagramme des classes impliquées dans l'ancienne GUI}
       \end{figure}
       \end{landscape}
          
          Une fenêtre principale fait appel à différentes sous-fenêtres pour des interactions particulières.
          Si une fenêtre a besoin de communiquer avec le serveur, elle le fera à travers un pointeur de la classe Client,
          la fenêtre principale instanciant une classe client à sa construction.\\
+        
+      \begin{landscape}
+      \begin{figure}[H]
+          \center
+          \includegraphics[scale=0.35]{uml/class/NewGUI.png}
+         \caption{Diagramme des classes impliquées dans la nouvelle GUI}
+      \end{figure}
+      \end{landscape}
          
-    Pour une description plus élaborée de la partie graphique, le lecteur se reportera utilement au § \ref{diag-client-graphique}.
+         L'ensemble des actions sauf le match se déroule dans une seule fenêtre. Après s'être connecté (ce qui est très intuitif), le client peut à sa guise parcourir les menus Stadium, pour les matches et tournois, Manager office, pour la gestion des joueurs, points d'action et enchères, et Domain pour la gestion des bâtiments. Les matches se jouent dans une fenêtre dédiée, la même que dans l'ancienne interface.\\
+     
+    Pour une description plus élaborée de la partie graphique, le lecteur se reportera utilement au § \ref{diag-client-graphique} et au § \ref{diag-client-graphique2}.
     
 \subsection{Le réseau}
   L'interface réseau doit permettre une communication bidirectionnelle :
@@ -1272,7 +1284,7 @@ Comme le serveur, le client utilise la fonction select() afin de pouvoir capter 
     \end{figure}
 \newpage
 
-\section{Le client graphique} \label{diag-client-graphique}
+\section{Ancienne interface - Le client graphique} \label{diag-client-graphique}
 \subsection{Le login}
 Le client graphique s'ouvre sur un dialogue de login permettant à l'utilisateur de se connecter au serveur,
 soit avec un nom d'utilisateur existant, soit en se créant une nouvelle identité \emph{(checkbox "New User")}\footnote{Les détails techniques de mise en \oe uvre sont mis entre parenthèses.
@@ -1376,6 +1388,25 @@ Par contre, si l'utilisateur est un administrateur, il peut créer un nouveau to
 \emph{(Comme le nombre de données à introduire est limité,
 nous avons eu recours ici, comme pour la vente d'un joueur, à une suite de questions,
 plutôt qu'à la construction d'une classe adhoc héritant de "QDialog")}.
+
+\section{Nouvelle interface - Le client graphique} \label{diag-client-graphique2}
+\subsection{Le login}
+Le client graphique s'ouvre sur une page qui lui propose de charger une partie, d'en créer une nouvelle ou de quitter le jeu. Si le client se connecte en tant qu'admin, la page deviendra celle propre à la session administrateur. Sinon, en cas de connexion classique ou de nouvelle partie, la page devient celle du menu principal : Stadium, Manager Office et Domain
+
+\subsection{Menu principal}
+\begin{itemize}
+        \item \textbf{Stadium} C'est le stade du manager, où il pourra jouer des matches, qu'ils soient amicaux, d'entraînement, ou dans le cadre d'un tournoi.
+        \item \textbf{Manager office} : C'est le bureau du manager, d'où il peut gérer ses joueurs, les vendre ou en acheter aux enchères, et récupérer des points d'action par achat immédiat ou par campagne de promotion.
+        \item \textbf{Domain} : C'est le domaine du manager, où se trouvent tous ses bâtiments qu'il peut inspecter et améliorer.
+      \end{itemize}
+\subsection{La barre d'information}
+Elle contient les informations importantes du manager, c'est-à-dire l'argent qu'il possède, le nombre de fans et ses points d'action.
+\subsection{La zone de manipulation}
+Les menus étant situés sur la droite de la page, la zone de gauche est réservée à afficher les actions correspondantes. Si par exemple on visite l'hôpital, la zone affichera les informations de ce bâtiment et la possitibilité de lancer un projet d'amélioration (bouton upgrade).
+\subsection{La zone de notification}
+En bas à gauche de la page, elle n'apparaît qu'en cas de message non sollicité du serveur, c'est-à-dire quand il y a une invitation pour un match amical et pour le début du tournoi auquel le client est inscrit.
+\subsection{Les matches}
+Comme dit plus haut, les matches de la nouvelle interface sont les mêmes que ceux de l'ancienne. La raison est bien simple, le code derrière étant beaucoup plus compliqué que celui pour le reste des fonctionnalités de l'interface, il aurait été idiot de ne pas se resservir d'un tel code.
 
 \section{Fonctionnalités supplémentaire}
   \subsection{Des matchs d’entraînement}
