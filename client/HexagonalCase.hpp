@@ -116,8 +116,6 @@ class HexagonalCase : public QGraphicsObject
 		void isDiagonalGohautDroite();
 		void isForCatch();
 
-		void isMarkForBludger(int);
-		void isMarkForBludger(int,int);
 		void isMarkForBall(int,int);
 		void isMarkForQuaffle();
 		void isMarkForGoldenSnitch();
@@ -138,7 +136,6 @@ class HexagonalCase : public QGraphicsObject
 
 
     public slots://reaction a un signal
-        void changerCouleur();
 
     signals:
 		void caseSelect(int,int);
@@ -188,7 +185,7 @@ class HexagonalCase : public QGraphicsObject
         QPointF centreHexagon() const;
 
 //variable test pour etre sure que je redessine pas les case en boucle
-		int test;
+		int testRepaint;
 
 };
 
