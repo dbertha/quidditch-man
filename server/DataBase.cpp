@@ -29,6 +29,7 @@ void DataBase::save(Manager manager) {
 	file = "server/Saves/"+login+"/"+login+".txt";
 	saveManager(file,manager);
 
+	cout<<"Saving "<<login<<endl;
 	string directory = "server/Saves/"+login+"/Players";
 	mkdir(directory.c_str(),0777);
 	
@@ -50,15 +51,19 @@ void DataBase::save(Manager manager) {
 			ManagedPlayer player = manager.getPlayer(i);
 			file = "server/Saves/"+login+"/Players/"+player.getFirstName()+player.getLastName()+".txt";
 			savePlayer(file,player);
+
+			cout<<"Saving "<<login<<endl;
 		} catch (const char err[]) {cout<<err<<endl;}
 	}
 
 	file = "server/Saves/"+login+"/Players/players.txt";
 	savePlayersList(file,manager.getPlayers());
 
+	cout<<"Saving "<<login<<endl;
 	file = "server/Saves/"+login+"/buildings.txt";
 	saveBuildings(file,manager.getBuildings());
 
+	cout<<"Saving "<<login<<endl;
 }
 
 void DataBase::load(Manager& manager) {

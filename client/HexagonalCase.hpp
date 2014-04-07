@@ -48,15 +48,34 @@ static const QPointF pasIndiceJ(largeur/2,hauteurTiers);
 //defini les couleurs utilise pour le coloriage selon le type de case (vide,joueur,but,balle)
 static const QColor _couleurFondSelect=Qt::cyan;
 static const QColor _couleurFondNoSelect=Qt::white;//Qt::NoBrush si on met image de fond
-static const QColor _couleurFondGoal=Qt::darkCyan;
+static const QColor _couleurFondGoal=Qt::yellow;//avant derkCyan
 
-static const QColor _couleurEquipe1=Qt::blue;
-static const QColor _couleurEquipe2=Qt::black;
+static const QColor _couleurEquipe1=Qt::darkGreen;
+static const QColor _couleurEquipe2=Qt::blue;
 
 static const QColor _couleurQuaffle=QColor (222,184,135);//burlywood
 static const QColor _couleurGoldenSnitch=Qt::yellow;
 static const QColor _couleurBludger=Qt::darkRed;
 
+//sauvegarder le pas d'indice (i,j) des directions possible
+static const int nbrDirectionHexa = 6;
+
+static const struct{
+	int pasI;
+	int pasJ;
+} directionHexa[nbrDirectionHexa] =  {{ 1, 0}, //droite
+						{ 0, 1}, //bas-droite
+						{-1, 1}, //bas-gauche
+						{-1, 0}, //gauche
+						{ 0,-1}, //haut-gauche
+						{ 1,-1}}; //haut-droite
+
+#define droite 0
+#define basDroite 1
+#define basGauche 2
+#define gauche 3
+#define hautGauche 4
+#define hautDroite 5
 
 class HexagonalCase : public QGraphicsObject
 {
@@ -73,26 +92,31 @@ class HexagonalCase : public QGraphicsObject
 
 		int getIAxial();
 		int getJAxial();
+
+		int getHauteur();
+		int getLargeur();
+
 		int getTypeMarkBall();
 
 		void rajouterBalle(int);
 
-        void select();
-		void selectForAction();
-        void unselect();
+		void select();//marque un joueur comme etant selectionné
+		void unselect();
+		void selectForAction();//marque la case pour dire qu'on peut la selectionner pour une action (deplacement,lancer,...)
+		void unselectForAction();
+
+
 		void bloquerLeJoueur();
 
 		void isAGoal();
-
 		void isAccessible();
-
 
 		void isLine();
 		void isDiagonalGoBasDroite();
 		void isDiagonalGohautDroite();
 		void isForCatch();
 
-		void isMarkForBludger(int);
+		void isMarkForBall(int,int);
 		void isMarkForQuaffle();
 		void isMarkForGoldenSnitch();
 
@@ -102,13 +126,16 @@ class HexagonalCase : public QGraphicsObject
 		bool ifBlocked();
 
 
-        //boudingRect => defnie la region frontiere de l'objet
-        QRectF boundingRect() const;
-        QPainterPath shape() const;
-//        QRegion boundingRegion( const QTransform & itemToDeviceTransform ) const;
+		//boudingRect + shape => defnie la region frontiere de l'objet
+		QRectF boundingRect() const;//def un rectangle qui entoure l'hexagone
+		QPainterPath shape() const;//restreint la region exactement a l'hexagone
+		//note fonctionnement QGraphicsItem (QGraphicsObject en herite):
+		//  on est obliger de d'abord definir un domaine rectangulaire qui englobe complemetenent l'Item
+		//  et apres on, on peut limiter ce domaine aux dimentione de l'objet grace a shape. Seulement les
+		//  clicke dans le domaine "shape" seront prit en compte
+
 
     public slots://reaction a un signal
-        void changerCouleur();
 
     signals:
 		void caseSelect(int,int);
@@ -157,6 +184,8 @@ class HexagonalCase : public QGraphicsObject
         QRectF rectangleInterne() const;
         QPointF centreHexagon() const;
 
+//variable test pour etre sure que je redessine pas les case en boucle
+		int testRepaint;
 
 };
 

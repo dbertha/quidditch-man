@@ -13,10 +13,9 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include "MainGui.hpp"
-#include "LoginDialog.hpp"
 #include "common/Defines.hpp"
 #include <QApplication>
+#include "MainWindow.hpp"
 
 int main(int argc, char *argv[])
 {//   Q_INIT_RESOURCE(mdi);
@@ -50,8 +49,8 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
    }
     QApplication application(argc, argv);
-    MainGui * window=new MainGui(sockfd_);
+    MainWindow * window=new MainWindow(sockfd_);
     window->show();
     std::cout<<"Client GUI started"<<std::endl;
-    return application.exec();
+    return window->exec();
 }

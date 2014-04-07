@@ -37,7 +37,7 @@ using namespace std;
 Manager::Manager():_login(""),_numberOfPlayers(0),_money(0),_numberOfFans(0),_actionPoints(0) {}
 
 Manager::Manager(string managerLogin): _login(managerLogin) {
-	DataBase::load(*this);
+	if (managerLogin!="admin") DataBase::load(*this);
 }
 
 ////////////////////////////// METHODS ON ATTRIBUTES //////////////////////////////
@@ -45,6 +45,13 @@ Manager::Manager(string managerLogin): _login(managerLogin) {
 string Manager::getLogin() {return _login;}
 
 int Manager::getNumberOfPlayers() {return _numberOfPlayers;}
+int Manager::getNumberOfNonBlockedPlayers(){
+	int number=0;
+	for (int i=0;i<_players.size();++i){
+		if (!_players[i].isBlocked()) ++number;
+	}
+	return number;
+}
 void Manager::setNumberOfPlayers(int number) {_numberOfPlayers=number;}
 
 int Manager::getMoney() {return _money;}
@@ -82,6 +89,9 @@ void Manager::setPlayer(ManagedPlayer* player) {
 	ManagedPlayer tmp = *player;
 	_players.push_back(tmp);
 }
+
+void Manager::sellPlayer(int playerID) {_players[playerID].sellPlayer();}
+
 void Manager::removePlayer(ManagedPlayer& player) {
 	string playerName = player.getFirstName() + player.getLastName();
 	string tmp;
@@ -173,14 +183,14 @@ void Manager::unlockPlayer(string name) {
 }
 bool Manager::isPlayerBlocked(int playerID) {
 	if (playerID>=_numberOfPlayers) throw "Index out of range";
-	return _players[playerID].isBlocked();
+	return _players[playerID].isBlocked()||_players[playerID].isInAuction();
 }
 bool Manager::isPlayerBlocked(string name) {
 	string tmp;
 	for (unsigned i=0;i<_players.size();++i){
 		tmp = _players[i].getFirstName() + " " + _players[i].getLastName();
 		if (tmp==name) {
-			return _players[i].isBlocked();
+			return _players[i].isBlocked()||_players[i].isInAuction();
 		}
 	}
 	return false;
@@ -220,8 +230,8 @@ void Manager::upgradeBuilding(int buildingID) {_buildings[buildingID-1]->upgrade
 void Manager::writeBlockInCalendar(string name,bool isTraining) {
 	string file = "server/Saves/"+_login+"/blockCalendar.txt";
 	int timeRequired; //in minutes
-	if (isTraining) timeRequired = dynamic_cast<TrainingCenter*>(_buildings[TRAININGCENTER])->getTimeRequired();
-	else timeRequired = dynamic_cast<Hospital*>(_buildings[HOSPITAL])->getTimeRequired();
+	if (isTraining) timeRequired = dynamic_cast<TrainingCenter*>(_buildings[TRAININGCENTER-1])->getTimeRequired();
+	else timeRequired = dynamic_cast<Hospital*>(_buildings[HOSPITAL-1])->getTimeRequired();
 
 	writeInCalendar(file,name,timeRequired);
 
