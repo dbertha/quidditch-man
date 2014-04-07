@@ -70,6 +70,7 @@ class MatchWindow : public QDialog
 		int playerRole;
 
 		QLabel *infoJoueur;
+		QLabel *attenteJoueur;
 		QLabel *scoreEquipe1;
 		QLabel *scoreEquipe2;
 		QLabel *texteEquipe1;

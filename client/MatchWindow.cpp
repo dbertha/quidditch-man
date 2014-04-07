@@ -43,6 +43,12 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 
 	scoreEquipe1 = new QLabel(QString::number(0));
 	scoreEquipe2 = new QLabel(QString::number(0));
+
+	//permettra d'ajouter une indication pour signaler que le jeux attente que l'autre joueur ai fini son tour
+	attenteJoueur = new QLabel("Tour fini: attente de l'autre joueur");
+	attenteJoueur->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+	attenteJoueur->hide();
+	attenteJoueur->setAlignment(Qt::AlignCenter);
 	//*****************************************************************************************
 	//création de la scene, zone principal où seront afficher les cases haxagonal
 	scene = new QGraphicsScene;
@@ -120,11 +126,13 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	layout->addWidget(infoJoueur,1,5);
 	layout->addWidget(groupbox,2,5);
 	layout->addLayout(layoutConformi,3,5);
+	layout->addWidget(attenteJoueur,5,0,1,6);//peut occuper toutes la derniere lignes
 	this->setLayout(layout);
 
 	__forfeitAndDrawNotifier->setEnabled(false);
 	allPositions = __client->receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
-	
+	scoreEquipe1->setText(QString::number(scoreTeam1));
+	scoreEquipe2->setText(QString::number(scoreTeam2));
 
 	initListeHexa();
 	updateListeHexa();
@@ -642,13 +650,16 @@ void MatchWindow::handlerTourEnd(){//correction derniere minute pour gerer bouto
 
 void MatchWindow::nextTurn(){
 	reset();
+	attenteJoueur->show();
+	layout->update();
 	__forfeitAndDrawNotifier->setEnabled(false);
 	//sendMoves
+
 	__client->sendMoves(moves);
 	//getConfirmation
 //TODO: blocage, afficher qlq choise pour indiquer qu'il est bloquer
-	__client->getConfirmation(); //Attention, bloquant si adversaire n'a pas encore répondu
 
+	__client->getConfirmation(); //Attention, bloquant si adversaire n'a pas encore répondu
 	//reset :
 	currentMove = 0;
 	for(int i = 0; i < 7; ++i){
@@ -660,6 +671,8 @@ void MatchWindow::nextTurn(){
 	//récupérer les positions
     allPositions = __client->receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
 
+
+
 	scoreEquipe1->setText(QString::number(scoreTeam1));
 	scoreEquipe2->setText(QString::number(scoreTeam2));
 	//update affichage
@@ -667,6 +680,7 @@ void MatchWindow::nextTurn(){
 	updateListeHexa();
 	__forfeitAndDrawNotifier->setEnabled(true);
 	endHandler();
+	attenteJoueur->hide();
 }
 
 void MatchWindow::pushesHandler(){
