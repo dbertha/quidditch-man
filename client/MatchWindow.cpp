@@ -21,7 +21,7 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	}
 	connect(__forfeitAndDrawNotifier,SIGNAL(activated(int)),this,SLOT(pushesHandler()));
 
-	setFixedSize(800, 800);//defini la taille de toute la fenetre (contient zone de jeux, description vie joueur, action possible,...)
+	setFixedSize(800, 640);//defini la taille de toute la fenetre (contient zone de jeux, description vie joueur, action possible,...)
 
 	//*****************************************************************************************
 	infoJoueur = new QLabel("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
@@ -99,7 +99,7 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	layoutConformi->addWidget(BoutonConfirm,1,0,Qt::AlignTop);
 	layoutConformi->addWidget(BoutonFinirTour,2,0);
 	QObject::connect(BoutonConfirm,SIGNAL(clicked()),this,SLOT(handlerAction()));
-	QObject::connect(BoutonFinirTour,SIGNAL(clicked()),this,SLOT(handlerTourEnd()));
+	QObject::connect(BoutonFinirTour,SIGNAL(clicked()),this,SLOT(nextTurn()));
 	//*****************************************************************************************
 
 	//initialisation d'un layout pour organniser le Qlabel,la view, radio bouton,....
@@ -273,7 +273,7 @@ void MatchWindow::marquerCaseAccessibleDepuis(int rowAxial, int colAxial, int ma
 }
 
 //TODO: netoyer les commentaire
-void MatchWindow::demarquerToutesCase(){
+void MatchWindow::demarquerCase(){
 	//vas marquer toutes les casses non Accesible
 	//NOTE: pas optimal, faut s'arranger pour sauvergarder une liste de case qui ont
 	//  été marquer accesible pour les dermarquer facilement
@@ -375,6 +375,24 @@ bool MatchWindow::ifNotOut(int iAxial,int jAxial){
 			 && (ListeHexa[indexRow][indexCol]->getType() != NOT_ON_HEX_GRID) );
 }
 
+
+void MatchWindow::reset(){
+	//remet a zero toutes les options, case, variable utile
+	caseJoueurSelect->unselect();
+	iHaveASelection=false;
+	demarquerCase();
+	deplacer->setChecked(true);
+	deplacer->setEnabled(false);
+	lancer->setEnabled(false);
+	taper->setEnabled(false);
+	recupSouaffle->setEnabled(false);
+	recupVifDOr->setEnabled(false);
+	infoJoueur->setText("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
+	BoutonConfirm->setEnabled(false);
+
+
+}
+
 //------------------------------------------------------------------------------------------------------------
 //gestion des events
 void MatchWindow::handlerMove(int iAxial,int jAxial){
@@ -417,18 +435,8 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 			}else{
 				qDebug() << "case NON-marquer trouver";
 				//deselection le joueur, tout remettre a zero
-				//TODO: faire une belle fonction pour ça
-				caseJoueurSelect->unselect();
-				iHaveASelection=false;
-				demarquerToutesCase();
-				deplacer->setChecked(true);
-				deplacer->setEnabled(false);
-				lancer->setEnabled(false);
-				taper->setEnabled(false);
-				recupSouaffle->setEnabled(false);
-				recupVifDOr->setEnabled(false);
-				infoJoueur->setText("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
-				BoutonConfirm->setEnabled(false);
+				reset();
+
 			}
 		}
 	}else{//aucune selection
@@ -509,7 +517,7 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 
 void MatchWindow::handlerChoixAction(bool){
 	qDebug() << "--Bouton ratio clicker";
-	demarquerToutesCase();
+	demarquerCase();
 	//--------------------------------------------------------------------------
 	if(deplacer->isChecked()){
 		qDebug() << "    deplacer choisi";
@@ -604,21 +612,8 @@ void MatchWindow::handlerAction(){
 	qDebug() <<"ligne destination : " +QString::number( moves[currentMove][3]);
 	++currentMove;
 
-	//TODO: faire une belle fonction pour ça
-	caseJoueurSelect->unselect();
-	iHaveASelection=false;
-	demarquerToutesCase();
-	deplacer->setChecked(true);
-	deplacer->setEnabled(false);
-	lancer->setEnabled(false);
-	taper->setEnabled(false);
-	recupSouaffle->setEnabled(false);
-	recupVifDOr->setEnabled(false);
-	infoJoueur->setText("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
-	BoutonConfirm->setEnabled(false);
-
+	reset();
 	handlerTour();
-
 }
 
 
@@ -627,7 +622,7 @@ void MatchWindow::handlerTour(){
 	if(currentMove==7 || BoutonFinirTour->isChecked()){//le joueur a fait tout c'est deplacement
 		qDebug()<<"toutes les actions sont entrées";
 		nextTurn();
-		endHandler();
+//		endHandler();
 	}
 }
 
@@ -635,7 +630,7 @@ void MatchWindow::handlerTourEnd(){//correction derniere minute pour gerer bouto
 	//check si toutes action fait -> si oui, envoyer donner serveur, recup allPosition et mettre a jour
 	qDebug()<<"FIN du tour provoquer par le joueur";
 	nextTurn();
-	endHandler();
+//	endHandler();
 }
 
 void MatchWindow::nextTurn(){
@@ -643,6 +638,7 @@ void MatchWindow::nextTurn(){
 	//sendMoves
 	__client->sendMoves(moves);
 	//getConfirmation
+//TODO: blocage, afficher qlq choise pour indiquer qu'il est bloquer
 	__client->getConfirmation(); //Attention, bloquant si adversaire n'a pas encore répondu
 
 	//reset :
@@ -655,13 +651,14 @@ void MatchWindow::nextTurn(){
 	}
 	//récupérer les positions
     allPositions = __client->receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
-	//TODO: mieux gerer affichage
+
 	scoreEquipe1->setText(QString::number(scoreTeam1));
 	scoreEquipe2->setText(QString::number(scoreTeam2));
 	//update affichage
 	resetListeHexa();
 	updateListeHexa();
 	__forfeitAndDrawNotifier->setEnabled(true);
+	endHandler();
 }
 
 void MatchWindow::pushesHandler(){

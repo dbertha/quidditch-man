@@ -50,6 +50,7 @@ class MatchWindow : public QDialog
 		void handlerTour();
 		void handlerTourEnd();//TODO:ameliorer - correction derniere minute pour gerer bouton fin tour
 		void pushesHandler();
+		void nextTurn();
 
     signals:
 		void checkTour();
@@ -114,7 +115,7 @@ class MatchWindow : public QDialog
 		void resetListeHexa();
 		void updateListeHexa();
 
-		void demarquerToutesCase();
+		void demarquerCase();
 
 		void marquerCaseAccessibleDepuis(int iAxial,int jAxial,int maxDistance);
 
@@ -125,8 +126,10 @@ class MatchWindow : public QDialog
 
 		bool ifNotOut(int iAxial, int jAxial);
 
+		void reset();
+
 		void endHandler();
-		void nextTurn();
+
 		Client * __client;
 		QSocketNotifier * __forfeitAndDrawNotifier;
 		

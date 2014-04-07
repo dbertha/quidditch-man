@@ -4,7 +4,7 @@ TARGET = clientGui.out
 DEPENDPATH += . client common
 QT += widgets
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
-
+DEFINES += QT_NO_DEBUG_OUTPUT
 # Input
 HEADERS += client/ClientMatchHandler.hpp \
            client/LoginDialog.hpp \

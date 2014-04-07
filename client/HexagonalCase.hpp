@@ -48,7 +48,7 @@ static const QPointF pasIndiceJ(largeur/2,hauteurTiers);
 //defini les couleurs utilise pour le coloriage selon le type de case (vide,joueur,but,balle)
 static const QColor _couleurFondSelect=Qt::cyan;
 static const QColor _couleurFondNoSelect=Qt::white;//Qt::NoBrush si on met image de fond
-static const QColor _couleurFondGoal=Qt::darkCyan;
+static const QColor _couleurFondGoal=Qt::yellow;//avant derkCyan
 
 static const QColor _couleurEquipe1=Qt::darkGreen;
 static const QColor _couleurEquipe2=Qt::blue;
