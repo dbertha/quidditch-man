@@ -18,6 +18,9 @@
 #include <QtGui>
 #include "Client.hpp"
 #include "MainWindow.hpp"
+#include "TournamentsWidget.hpp"
+
+class TournamentsWidget;
 
 class AdminPage : public QWidget {
 	Q_OBJECT
@@ -34,11 +37,11 @@ private:
 	Client* _client;
 	MainWindow* _parent;
 	QPushButton* _listTournaments;
-	QPushButton* _createTournament;
 	QPushButton* _quitButton;
 	QLabel* _adminLabel;
 	QGridLayout* _grid;
 	QStackedWidget* _stack;
+	TournamentsWidget* _tournamentsWidget;
 };
 
 #endif

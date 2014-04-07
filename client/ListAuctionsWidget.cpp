@@ -48,7 +48,7 @@ ListAuctionsWidget::ListAuctionsWidget(Client* client, QWidget* parent) : _clien
 
 	grid->setRowMinimumHeight(0,30);
 	grid->setRowMinimumHeight(1,270);
-	grid->setColumnMinimumWidth(0,500);
+	grid->setColumnMinimumWidth(0,520);
 
 	grid->setVerticalSpacing(0);
 	grid->setHorizontalSpacing(0);
@@ -60,7 +60,7 @@ ListAuctionsWidget::ListAuctionsWidget(Client* client, QWidget* parent) : _clien
 	connect(_timer, SIGNAL(timeout()),this,SLOT(update()));
 	_timer->setInterval(1*1000);
 	_timer->start();
-	setFixedSize(500,340);
+	setFixedSize(520,340);
 
 	connect(_listAuctions,SIGNAL(itemSelectionChanged()),this,SLOT(displayAuction()));
 }

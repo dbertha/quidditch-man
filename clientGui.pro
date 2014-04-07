@@ -42,7 +42,8 @@ HEADERS += client/ClientMatchHandler.hpp \
     client/ManagePlayerWidget.hpp \
     client/ListAuctionsWidget.hpp \
     client/AuctionWidget.hpp \
-    client/AdminPage.hpp
+    client/AdminPage.hpp \
+    client/TournamentsWidget.hpp
            
 
 SOURCES += client/ClientMatchHandler.cpp \
@@ -82,7 +83,8 @@ SOURCES += client/ClientMatchHandler.cpp \
     client/ManagePlayerWidget.cpp \
     client/ListAuctionsWidget.cpp \
     client/AuctionWidget.cpp \
-    client/AdminPage.cpp
+    client/AdminPage.cpp \
+    client/TournamentsWidget.cpp
 
 RESOURCES += \
     ressources.qrc

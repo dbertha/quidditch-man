@@ -19,32 +19,36 @@
 #include <vector>
 #include "Client.hpp"
 #include "MainWindow.hpp"
-#include "ListTournamentsWidget.hpp"
-
-class ListTournamentsWidget;
 
 class TournamentsWidget : public QWidget {
 	Q_OBJECT
 public:
-	TournamentsWidget(Client* client, QWidget* parent);
+	TournamentsWidget(Client* client, QWidget* parent, int role);
 	void paintEvent(QPaintEvent*);
 	void pause();
 	void resume();
 	void maskLabel();
 
 public slots:
+	void displayTournament();
 	void create();
+	void join();
+	void updateLabels();
 
 public:
 	Client* _client;
 	QWidget* _parent;
 
-	ListTournamentsWidget* _listTournamentsWidget;
-	
-	int _price,_nbOfParticipants;
-	QLabel* _priceLabel, * _participantsLabel;
+	int _role;
+	QListWidget* _listTournaments;
 
-
+	QLabel* _currentParticipants;
+	QLabel* _startingPrice;
+	QLineEdit* _price, *_participants;
+	QTimer* _timer;
+	QLabel* _label;
+	QPushButton* _create;
+	QPushButton* _join;
 
 };
 #endif
