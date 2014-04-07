@@ -16,6 +16,8 @@
 #include <QLabel>
 #include <QApplication>
 #include <QtGui>
+#include <QListWidget>
+#include <QStackedWidget>
 #include "Client.hpp"
 
 #include "Tournaments.hpp"
