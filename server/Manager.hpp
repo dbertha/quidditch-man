@@ -53,6 +53,7 @@ class Manager {
 
  	void addPlayer(ManagedPlayer& player);
  	void setPlayer(ManagedPlayer* player);
+ 	void sellPlayer(int playerID);
  	void removePlayer(ManagedPlayer& player);
  	vector<string> getPlayersList();
  	vector<ManagedPlayer> getPlayers();

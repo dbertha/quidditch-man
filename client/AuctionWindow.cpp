@@ -3,9 +3,9 @@
 #include <QTimer>
 
 
-AuctionWindow::AuctionWindow(Client * client, int startingPrice, QWidget *parent)
-    : QDialog(parent), startingPrice_(startingPrice), __client(client),currentTurn_(1) {
-    __client->askAuctionTimeLeft();
+AuctionWindow::AuctionWindow(Client * client, int startingPrice, int auctionID, QWidget *parent)
+    : QDialog(parent), __client(client),startingPrice_(startingPrice),auctionID_(auctionID),currentTurn_(1) {
+    __client->askAuctionTimeLeft(auctionID_);
     timeLeft_=__client->getAuctionTimeLeft();
     bidButton = new QPushButton(tr("Bid"));
     bidButton->setDefault(true);

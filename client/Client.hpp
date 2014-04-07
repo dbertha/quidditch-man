@@ -71,6 +71,7 @@ public :
     std::vector<std::string> receivePlayersList();
     
     std::vector<int> receivePlayerInfo(int playerID);
+    std::vector<int> receiveAuctionPlayerInfo(int auctionID);
     int trainPlayer(int playerID, int capacity);
     int healPlayer(int playerID);
     
@@ -100,7 +101,7 @@ public :
     int checkAuction();
     int receiveAuctionResult();
 
-    int askAuctionTimeLeft();
+    int askAuctionTimeLeft(int targetedAuction);
     int getAuctionTimeLeft();
 
     int buyActionPoints(int amount);

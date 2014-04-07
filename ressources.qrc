@@ -2,5 +2,10 @@
     <qresource prefix="/">
         <file>Pictures/connexion.jpg</file>
         <file>Pictures/connexionPage.jpg</file>
+        <file>Pictures/mainMenu.jpg</file>
+        <file>Pictures/transparent.png</file>
+        <file>Pictures/eclairx30.png</file>
+        <file>Pictures/fansx30.png</file>
+        <file>Pictures/goldcoinx30.png</file>
     </qresource>
 </RCC>

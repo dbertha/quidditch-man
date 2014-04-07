@@ -58,7 +58,7 @@ void MainGui::pushesHandler(){
             __client->answerMatchProposal(confirmation, playersInTeam);
             //~ answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
             if(__client->receiveMatchConfirmation() == MATCH_STARTING){
-                MatchWindow * matchWindow  = new MatchWindow(__client, 2, this);
+                MatchWindow * matchWindow  = new MatchWindow(__client, 2, parent_);
                 matchWindow->show();
                 //~ //startMatch( 2); //invité a l'équipe 2
             }
@@ -92,7 +92,7 @@ void MainGui::pushesHandler(){
             //bloquant, l'adversaire doit avoir répondu aussi :
             numTeam = __client->receiveNumOfTeam();
             if(numTeam > 0){ //first to answer is the team 1
-                MatchWindow * matchWindow = new MatchWindow(__client, numTeam, this);
+                MatchWindow * matchWindow = new MatchWindow(__client, numTeam, parent_);
                 matchWindow->show();
                 //~ startMatch(numTeam);
             }
@@ -153,7 +153,7 @@ void MainGui::listMgrs() {
         int confirmation = __client->receiveMatchConfirmation();
         //~ progress->setValue(1);
         if(confirmation == MATCH_STARTING){
-            MatchWindow * matchWindow = new MatchWindow(__client, 1, this);
+            MatchWindow * matchWindow = new MatchWindow(__client, 1, parent_);
             matchWindow->show();
             //startMatch(1); //inviteur a l'équipe 1
         }else{
@@ -189,7 +189,7 @@ void MainGui::trainingMatchHandler(){
     __client->sendTrainingMatchRequest(chosenPlayers);
     int confirmation = __client->receiveMatchConfirmation();
     if(confirmation == 1){
-        MatchWindow * matchWindow = new MatchWindow(__client, 1, this);
+        MatchWindow * matchWindow = new MatchWindow(__client, 1, parent_);
         matchWindow->show();
     }else{
         QMessageBox msgBox;

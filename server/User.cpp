@@ -35,7 +35,8 @@ User::~User(){
     }
     delete[] __moves;
     if(manager_ != NULL){
-		delete manager_;
+		
+		delete manager_; //Problem if the user has created an auction and quits the game
 	}
 	if(calendar_ != NULL){
 		delete calendar_;
@@ -68,6 +69,12 @@ void User::cmdHandler() {
 		handleAuctionRequest(received);
 	}
 	else {
+		if (manager_!=NULL){
+			if (manager_->getLogin()!="admin"){
+				calendar_->update();
+				DataBase::save(*manager_);
+			}
+		}
 		setDisconnection();
 	}
 }
@@ -125,7 +132,7 @@ void User::handleManagementRequest(SerializedObject *received){
 					}else{
 						calendar_ = new Calendar(manager_);
 						calendar_->update();
-						DataBase::save(*manager_);
+						//DataBase::save(*manager_);
 					
 						state_=FREE;
 						confirmation = NORMAL_LOGIN;
@@ -167,7 +174,7 @@ void User::handleManagementRequest(SerializedObject *received){
 				manager_ = new Manager(username);
 				userName_=username;
 				//userId_=server_->usersList_.size();
-				DataBase::save(*manager_);
+				if (userName_ != "admin") DataBase::save(*manager_);
 				calendar_ = new Calendar(manager_);
 
 				state_=FREE;
@@ -187,7 +194,7 @@ void User::handleManagementRequest(SerializedObject *received){
 			//handle demand
 			
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			int nbPlayers;
 			nbPlayers = manager_->getNumberOfPlayers();
 			int money;
@@ -206,7 +213,7 @@ void User::handleManagementRequest(SerializedObject *received){
 			std::cout<<"Number of fans : "<<manager_->getNumberOfFans()<<std::endl;
 #endif
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			//construct _answer
 			_answer.typeOfInfos = MANAGERINFOS;
 			writeIntVector(answerPosition, infos);
@@ -221,7 +228,7 @@ void User::handleManagementRequest(SerializedObject *received){
 			//handle demand
 
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			playersList = manager_->getPlayersList();
 			//construct _answer 
 			_answer.typeOfInfos = PLAYERSLIST;
@@ -240,7 +247,7 @@ void User::handleManagementRequest(SerializedObject *received){
 				//Attention : on suppose le buffer assez grand
 			writeStringVector(answerPosition, playersList);
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			sendOnSocket(sockfd_, _answer); //TODO : tester valeur retour
 			
 			break;
@@ -255,7 +262,7 @@ void User::handleManagementRequest(SerializedObject *received){
 			infos= manager_->getPlayerInformations(targetedPlayer);
 			//for (unsigned int i=0;i<infos.size();++i) {std::cout<<infos[i]<<std::endl;}
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			//construct _answer
 			_answer.typeOfInfos = PLAYERINFOS;
 			//5 attributs int
@@ -280,7 +287,7 @@ void User::handleManagementRequest(SerializedObject *received){
 #endif
 			//handle demand:
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			//RecrutmentCenter inutilisé
 			infos=manager_->getBuildingInformations(targetedBuilding);
 			
@@ -304,7 +311,7 @@ void User::handleManagementRequest(SerializedObject *received){
 #endif
 			//handle demand:
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			confirmation = false;
 			resultOfUpgrade= manager_->startBuildingConstruction(targetedBuilding);
 			if (resultOfUpgrade==ALREADYINCONSTRUCTION) std::cout<<"Already in construction !"<<std::endl;
@@ -315,7 +322,7 @@ void User::handleManagementRequest(SerializedObject *received){
 				confirmation = true;
 			}
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			//construct _answer
 			_answer.typeOfInfos = UPGRADE_CONFIRM;
 			memcpy(answerPosition, &confirmation, sizeof(confirmation));
@@ -335,11 +342,11 @@ void User::handleManagementRequest(SerializedObject *received){
 #endif
 			//handle demand
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			confirmation = manager_->trainPlayer(targetedPlayer,capacityToTrain);
 			if (!confirmation) std::cout<<"This player is already blocked by a training or the hospital"<<std::endl;
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 
 			//construct _answer
 			_answer.typeOfInfos = TRAINING_STARTED;
@@ -356,11 +363,11 @@ void User::handleManagementRequest(SerializedObject *received){
 #endif
 			//handle demand
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			confirmation = manager_->healPlayer(targetedPlayer);
 			if (!confirmation) std::cout<<"This player is already blocked by a training or the hospital or is in full health"<<std::endl;
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 
 			//construct _answer
 			_answer.typeOfInfos = HEAL_STARTED;
@@ -376,10 +383,10 @@ void User::handleManagementRequest(SerializedObject *received){
 #endif
 			//handle demand
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			price = manager_->payForActionPoints(amount);
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 
 			//construct _answer
 			_answer.typeOfInfos = PRICE_FOR_AP;
@@ -394,7 +401,7 @@ void User::handleManagementRequest(SerializedObject *received){
 #endif
 			//handle demand
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			time_t secondes;
 			time(&secondes);
 			timeOfStart_ =*localtime(&secondes);
@@ -414,11 +421,11 @@ void User::handleManagementRequest(SerializedObject *received){
 #endif
 			//handle demand
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			elapsedTime = calendar_->getElapsedTime(timeOfStart_);
 			APGained = manager_->waitForActionPoints(elapsedTime);
 
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 
 			std::cout<<" ACTION POINTS GAINED : "<<APGained<<endl;
 			//construct _answer
@@ -734,10 +741,11 @@ void User::handleAuctionRequest(SerializedObject *received){
 			calendar_->update();
 			if (manager_->getActionPoints()>=AP_AUCTION) {
 				manager_->setActionPoints(manager_->getActionPoints()-AP_AUCTION);
-				DataBase::save(*manager_);
+				//DataBase::save(*manager_);
 				tmpPlayer = manager_->getPlayer(targetedPlayer);
 				if (tmpPlayer.isBlocked()) confirmation=false;
 				else {
+					manager_->sellPlayer(targetedPlayer);
 					manager_->lockPlayer(tmpPlayer.getFirstName()+" "+tmpPlayer.getLastName());
 					server_->createAuction(this,tmpPlayer,startingPrice);
 					confirmation=true;
@@ -761,7 +769,7 @@ void User::handleAuctionRequest(SerializedObject *received){
 			calendar_->update();
 			if (manager_->getActionPoints()>=AP_ENTER_AUCTION) {
 				manager_->setActionPoints(manager_->getActionPoints()-AP_ENTER_AUCTION);
-				DataBase::save(*manager_);
+				//DataBase::save(*manager_);
 				for (unsigned int i=0;i<server_->auctionsList_.size();++i) {
 					if (targetedAuction==server_->getAuctionID(i)) auction_ = server_->auctionsList_[i];
 				}
@@ -784,7 +792,7 @@ void User::handleAuctionRequest(SerializedObject *received){
 #endif
 			//handle demand:
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			for (unsigned int i=0;i<server_->auctionsList_.size();++i) {
 				if (server_->getAuctionTimeLeft(i)>0) {
 					auctionsList.push_back(intToString(server_->getAuctionID(i)));
@@ -835,7 +843,7 @@ void User::handleAuctionRequest(SerializedObject *received){
 #endif
 			//handle demand:
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			for (unsigned int i=0;i<server_->auctionsList_.size();++i) {
 				if (server_->getAuctionID(i)==targetedAuction) {
 					infos= server_->getPlayerSoldInfos(i);
@@ -861,7 +869,7 @@ void User::handleAuctionRequest(SerializedObject *received){
 #endif
 
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			auction_->bid(this);
 			//construct _answer:
 			confirmation=true;
@@ -877,7 +885,7 @@ void User::handleAuctionRequest(SerializedObject *received){
 #endif
 			auction_->endOfTurnAsked();
 			calendar_->update();
-			DataBase::save(*manager_);
+			//DataBase::save(*manager_);
 			isFinished = auction_->isAuctionFinished();
 			auctionPrice = auction_->getCurrentPrice();
 			int resultOfAuction=0;
@@ -885,14 +893,15 @@ void User::handleAuctionRequest(SerializedObject *received){
 				if (this==auction_->getAuctionCreator()) {
 					manager_->unlockPlayer(auction_->getPlayerName());
 				}
-				else if (auction_->getLastBidder()==this) {
+				if (auction_->getLastBidder()==this) {
 					resultOfAuction = -1;
 					if (manager_->getMoney()<auctionPrice) resultOfAuction = -2;
-					auctionWin(auction_->getManager(),auction_->getPlayer());
+					if (auction_->getAuctionCreator()==NULL) auctionWin(auction_,NULL,auction_->getPlayer());
+					else auctionWin(auction_,auction_->getManager(),auction_->getPlayer());
 				}
 				else {
 					calendar_->update();
-					DataBase::save(*manager_);
+					//DataBase::save(*manager_);
 				}
 			}
 			else {
@@ -923,14 +932,18 @@ void User::handleAuctionRequest(SerializedObject *received){
 			break;	
 		}
 		case GET_AUCTION_TIME_LEFT : {
+			position = received->stringData;
+			memcpy(&targetedAuction, position, sizeof(targetedAuction));
 			//no details to read : possible improvement : participation to several auctions at a same time. No.
 #ifdef __DEBUG
 			//std::cout<<"Montant de l'enchère demandé sur le socket "<<getSockfd()<<std::endl;
 #endif
 			//calendar_->update();
 			//DataBase::save(*manager_);
-			auctionTimeLeft = auction_->getTimeBeforeFirstTurn();
+			std::cout<<"here"<<std::endl;
+			auctionTimeLeft = server_->getAuctionTimeLeft(targetedAuction);
 
+			std::cout<<"there"<<std::endl;
 			_answer.typeOfInfos = AUCTION_TIME_LEFT;
 			memcpy(answerPosition, &auctionTimeLeft, sizeof(auctionTimeLeft));
             sendOnSocket(sockfd_, _answer); 
@@ -1006,20 +1019,48 @@ void User::addManager(char username[USERNAME_LENGTH], char password[PASSWORD_LEN
 
 Manager* User::getManager() {return manager_;}
 
-void User::auctionWin(Manager* manager, ManagedPlayer player) {
+void User::auctionWin(Auction* auction, Manager* manager, ManagedPlayer player) {
 	int amount = auction_->getCurrentPrice();
 	if (manager_->getMoney()<amount) {
-		manager->addMoney(manager_->getMoney()/33);
+		
 		manager_->pay(manager_->getMoney()/33);
+
+		if (manager==NULL){
+			Manager tmpManager = Manager(auction->getManagerLogin());
+			tmpManager.addMoney(manager_->getMoney()/33);
+			tmpManager.unlockPlayer(player.getFirstName()+" "+player.getLastName());
+			DataBase::save(tmpManager);
+
+		}
+		else{
+			manager->addMoney(manager_->getMoney()/33);
+			manager->unlockPlayer(player.getFirstName()+" "+player.getLastName());
+			
+			
+		}
 	}
 	else {
 		manager_->pay(amount);
-		manager->addMoney(amount);
 		manager_->addPlayer(player);
-		manager->removePlayer(player);
+		manager_->unlockPlayer(player.getFirstName()+" "+player.getLastName());
+		DataBase::save(*manager_);
+		if (manager==NULL){
+			Manager tmpManager = Manager(auction->getManagerLogin());
+			tmpManager.addMoney(amount);
+			tmpManager.unlockPlayer(player.getFirstName()+" "+player.getLastName());
+			tmpManager.removePlayer(player);
+			//DataBase::save(tmpManager);
+			
+		}
+		else{
+
+			manager->addMoney(amount);
+			manager->unlockPlayer(player.getFirstName()+" "+player.getLastName());
+			manager->removePlayer(player);
+		}
 	}
-	DataBase::save(*manager_);
-	DataBase::save(*manager);
+	//DataBase::save(*manager_);
+	//DataBase::save(*manager);
 }
 
 string User::intToString(int value) { //TODO : dans une classe générique ?
@@ -1085,7 +1126,6 @@ void User::writeStringVector(char * position, std::vector<std::string> list){
 		char name[USERNAME_LENGTH];
 		string stringname = list[i];
 		strcpy(name, stringname.c_str());
-		std::cout<<"NOM :"<<name<<std::endl;
 		memcpy(position, &name, sizeof(name));
 		position += sizeof(name);
 	}

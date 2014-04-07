@@ -66,7 +66,7 @@ void AuctionsDialog::join() {
     __client->joinAuction(auctionID_);
     int joinResult = __client->getConfirmation();
     if (joinResult==1){
-        auctionWindow = new AuctionWindow(__client,startingPrice_,this);
+        auctionWindow = new AuctionWindow(__client,startingPrice_,auctionID_,this);
         auctionWindow->exec();
     }
     else {

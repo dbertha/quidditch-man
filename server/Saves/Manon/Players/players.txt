@@ -1,7 +1,7 @@
-DavidAlexander.txt
-CooperBell.txt
-AustinLopez.txt
-MichaelHoward.txt
-XavierCook.txt
 JaxonJackson.txt
+DavidAlexander.txt
+DominicGriffin.txt
 CooperTaylor.txt
+AustinLopez.txt
+BrandonBarnes.txt
+JackGonzalez.txt

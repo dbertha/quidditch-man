@@ -3,9 +3,9 @@
 
 //note: code pas du tout optimise/"modualiser"/"umliser", grosse phase de refactoring necessaire
 
-MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDialog(parent),
+MatchWindow::MatchWindow(Client * client, int numTeam, MainWindow * parent) : QDialog(parent),
 	numMaTeam(numTeam), iHaveASelection(false),  scoreTeam1(0), scoreTeam2(0), winner(0), currentMove(0), 
-	__field(), __client(client), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd(),  QSocketNotifier::Read, this))
+	__field(), __client(client),_parent(parent), __forfeitAndDrawNotifier(new QSocketNotifier(client->getSockfd(),  QSocketNotifier::Read, this))
 {
 
 	//initialisation : 
@@ -23,10 +23,10 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	//*****************************************************************************************
 //	texte = new QLabel("Zone texte \n Zone texte",this); //vas servir a afficher resultat
 
-	infoJoueur = new QLabel("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
+	infoJoueur = new QLabel("Player informations \n Name, speed, strength, etc.");
 	infoJoueur->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
-	scoreEquipe = new QLabel("\t score equipe 1 = 0 \n\t score equipe 2 = 0");
+	scoreEquipe = new QLabel("\t Score Team 1 = 0 \n\t Score Team 2 = 0");
 	//*****************************************************************************************
 	//création de la scene, zone principal où seront afficher les cases haxagonal
 	scene = new QGraphicsScene;
@@ -39,13 +39,13 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 
 	//*****************************************************************************************
 	//création box de Radio bouton pour les choix action d'un joueur
-	groupbox = new QGroupBox("Action possible:");
+	groupbox = new QGroupBox("Actions:");
 
-	deplacer = new QRadioButton("Deplacement");
-	lancer = new QRadioButton("Lancer souaffle");
-	taper = new QRadioButton("Frapper le cognard");
-	recupSouaffle =  new QRadioButton("Tenter de récupérer le souaffle");
-	recupVifDOr = new QRadioButton("Tenter d'attraper le vif d'or");
+	deplacer = new QRadioButton("Move");
+	lancer = new QRadioButton("Throw quaffle");
+	taper = new QRadioButton("Beat bludger");
+	recupSouaffle =  new QRadioButton("Catch quaffle");
+	recupVifDOr = new QRadioButton("Catch golden snitch");
 
 
 	deplacer->setChecked(true);
@@ -77,10 +77,10 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	BoutonConfirm = new QPushButton("OK");
 	BoutonConfirm->setMaximumSize ( 80, 30);
 	BoutonConfirm->setEnabled(false);
-	BoutonFinirTour = new QPushButton("terminer le tour");
+	BoutonFinirTour = new QPushButton("End turn");
 	BoutonFinirTour->setMaximumSize ( 110, 30);
 
-	textConfirm = new QLabel("Confirmer action:");
+	textConfirm = new QLabel("Confirm action:");
 	layoutConformi->addWidget(textConfirm,0,0,Qt::AlignBottom);
 	layoutConformi->addWidget(BoutonConfirm,1,0,Qt::AlignTop);
 	layoutConformi->addWidget(BoutonFinirTour,2,0);
@@ -183,9 +183,9 @@ void MatchWindow::updateListeHexa(){
                 playerRole = i - TEAM2_KEEPER;
 			}
 			QStringList orderedRoles;
-			QString boxTxt("Le joueur ");
+			QString boxTxt("The player  ");
 			orderedRoles << "KEEPER" << "SEEKER" << "CHASER1" << "CHASER2" << "CHASER3" << "BEATER1" << "BEATER2";
-			boxTxt += orderedRoles[i] + "de l'équipe " + QString::number(playerTeam) + " a été abattu par les cognards.";
+			boxTxt += orderedRoles[i] + "of Team " + QString::number(playerTeam) + " has been incapacitated by a bludger.";
 			QMessageBox msgBox;
 			msgBox.setText(boxTxt);
 			msgBox.exec();
@@ -564,7 +564,7 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 				taper->setEnabled(false);
 				recupSouaffle->setEnabled(false);
 				recupVifDOr->setEnabled(false);
-				infoJoueur->setText("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
+				infoJoueur->setText("Player informations \n Name, speed, strength, etc.");
 				BoutonConfirm->setEnabled(false);
 			}
 		}
@@ -594,13 +594,13 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 				qDebug() << caseJoueurSelect->getType();
 				qDebug() << "role du joueur";
 				qDebug() << playerRole;
-				infoJoueur->setText("Atribut du joueur:\n Vitesse  : "
+				infoJoueur->setText("Player capacities:\n Speed: "
 									+ QString::number( attributs.attributes[SPEED]) +
-				"  Force:"+ QString::number( attributs.attributes[STRENGTH]) +
+				"  Strength:"+ QString::number( attributs.attributes[STRENGTH]) +
 				"\n Precision:"+ QString::number( attributs.attributes[PRECISION]) +
-				"  Reflexe:"+QString::number( attributs.attributes[REFLEX]) +
+				"  Reflex:"+QString::number( attributs.attributes[REFLEX]) +
 				"\n Resistance:"+QString::number( attributs.attributes[RESISTANCE]) + 
-				"  Vie restante :"+QString::number( attributs.life) );
+				"  Life:"+QString::number( attributs.life) );
 
 				//debloque action de deplacement et affiche casse accesible
 				deplacer->setChecked(true);
@@ -750,7 +750,7 @@ void MatchWindow::handlerAction(){
 	taper->setEnabled(false);
 	recupSouaffle->setEnabled(false);
 	recupVifDOr->setEnabled(false);
-	infoJoueur->setText("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
+	infoJoueur->setText("Player informations \n Name, speed, strength, etc.");
 	BoutonConfirm->setEnabled(false);
 
 	handlerTour();
@@ -792,7 +792,7 @@ void MatchWindow::nextTurn(){
 	//récupérer les positions
     allPositions = __client->receiveScoresAndPositions(&winner, &scoreTeam1, &scoreTeam2);
 	//TODO: mieux gerer affichage
-	scoreEquipe->setText("\t score equipe 1 = "+QString::number(scoreTeam1) +"\n\t score equipe 2 = "+QString::number(scoreTeam2) );
+	scoreEquipe->setText("\t Score Team 1 = "+QString::number(scoreTeam1) +"\n\t Score Team 2 = "+QString::number(scoreTeam2) );
 
 	//update affichage
 	resetListeHexa();
@@ -808,12 +808,14 @@ void MatchWindow::pushesHandler(){
 		case OPPONENTFORFEIT : {
 			QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("Opponent forfeited"),QMessageBox::Ok);
 			over = true;
+			delete _msgBox;
+			_parent->deblock();
 			break;
 		}
 		case OPPONENTASKFORDRAW : {
 			int ret, code;
 			QMessageBox msgBox;
-			QString texte("The opponent ask for a draw, do you accept ? ?");
+			QString texte("The opponent asks for a draw, do you accept ? ?");
 			msgBox.setWindowTitle("Draw proposal !");
 			msgBox.setText(texte);
 			
@@ -822,6 +824,7 @@ void MatchWindow::pushesHandler(){
 			ret = msgBox.exec();
 			if(ret == QMessageBox::Yes){
 				code = DRAWACCEPTED;
+				_parent->deblock();
 				over = true;
 			}else{
 				code = DRAWDENIED;
@@ -839,31 +842,33 @@ void MatchWindow::pushesHandler(){
 void MatchWindow::endHandler(){
 	bool over = false;
 	if(winner != 0){
-		QString str = QString("Winner is team %1").arg(QString::number(winner));
+		QString str = QString("Winner is Team %1").arg(QString::number(winner));
 		QMessageBox::information(this,QMessageBox::tr("Match over !"),str,QMessageBox::Ok);
 		over = true;
+		_parent->deblock();
 	}else{
 		int ret;
-		QMessageBox msgBox;
+		_msgBox=new QMessageBox();
 		QString texte("Do you want to continue the match ?");
-        msgBox.setWindowTitle("Next turn starts !");
-        msgBox.setText(texte);
-        msgBox.setInformativeText("abort to forfeit, cancel to ask for a draw ");
-        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Abort | QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Yes);
+        _msgBox->setWindowTitle("Next turn starts !");
+        _msgBox->setText(texte);
+        _msgBox->setInformativeText("abort to forfeit, cancel to ask for a draw ");
+        _msgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::Abort | QMessageBox::Cancel);
+        _msgBox->setDefaultButton(QMessageBox::Yes);
         //QPushButton *connectButton = msgBox.addButton(tr("Forfeit"), QMessageBox::ActionRole);
         //QPushButton *connectButton = msgBox.addButton(tr("AskForDraw"), QMessageBox::ActionRole);
-        ret = msgBox.exec();
+        ret = _msgBox->exec();
         if(ret == QMessageBox::Abort){
 			//forfeit
 			__forfeitAndDrawNotifier->setEnabled(false);
 			__client->sendForfeit();
 			QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("You forfeited"),QMessageBox::Ok);
 			over = true;
+			_parent->deblock();
 		}else if(ret == QMessageBox::Cancel){
 			//ask for a draw
 			__forfeitAndDrawNotifier->setEnabled(false);
-			QMessageBox::information(this,QMessageBox::tr("About draw"),QString("You are considered as the looser if you ask for a draw during a tournament and it's accepted"),QMessageBox::Ok); 
+			QMessageBox::information(this,QMessageBox::tr("About draw"),QString("You are considered the looser if you ask for a draw during a tournament and it's accepted"),QMessageBox::Ok); 
 			//TODO : chance de revenir en arrière
 			
 			__client->sendDrawRequest();
@@ -871,6 +876,7 @@ void MatchWindow::endHandler(){
 			if(result == DRAWACCEPTED){
 				QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("Draw accepted"),QMessageBox::Ok);
 				over = true;
+				_parent->deblock();
             }else{
 				QMessageBox::information(this,QMessageBox::tr("Draw"),QString("Draw refused"),QMessageBox::Ok);
             }

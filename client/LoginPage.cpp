@@ -40,11 +40,15 @@ LoginPage::LoginPage(Client *client, MainWindow* parent,bool registration) : _cl
     _confirmButton->setMinimumHeight(30);
     _confirmButton->setMaximumWidth(200);
     _confirmButton->setMaximumHeight(30);
+    _confirmButton->setDefault(true);
+    _confirmButton->setCursor(Qt::PointingHandCursor);
     _cancelButton = new QPushButton(tr("CANCEL"));
     _cancelButton->setMinimumWidth(200);
     _cancelButton->setMinimumHeight(30);
     _cancelButton->setMaximumWidth(200);
     _cancelButton->setMaximumHeight(30);
+    _cancelButton->setDefault(true);
+    _cancelButton->setCursor(Qt::PointingHandCursor);
     QColor col(209,173,77);
     if(col.isValid()) {
         QString qss = QString("background-color: %1;color: rgb(255, 255, 255)").arg(col.name());

@@ -44,8 +44,12 @@ int ManagedPlayer::getTrainingLeft(int capacityNumber) const {return _trainingLe
 void ManagedPlayer::setTrainingLeft(int capacityNumber, int value) {_trainingLeft[capacityNumber] = value;}
 
 void ManagedPlayer::lockPlayer() {_blocked = true;}
-void ManagedPlayer::unlockPlayer() {_blocked = false;}
+void ManagedPlayer::sellPlayer() {_inAuction = true;}
+void ManagedPlayer::unlockPlayer() {
+	_blocked = false;
+	_inAuction = false;}
 bool ManagedPlayer::isBlocked() const {return _blocked;}
+bool ManagedPlayer::isInAuction() const {return _inAuction;}
 
 Broomstick ManagedPlayer::getBroomstick() {return _broomstick;}
 

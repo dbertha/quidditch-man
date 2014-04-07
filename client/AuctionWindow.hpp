@@ -24,7 +24,7 @@
 class AuctionWindow : public QDialog {
 	Q_OBJECT
 public:
-    AuctionWindow(Client *, int, QWidget *parent = 0);
+    AuctionWindow(Client *, int, int,QWidget *parent = 0);
 
 public slots:
 	void bid();
@@ -41,6 +41,7 @@ private:
     QLabel *price, *bidders;
     Client * __client;
     int startingPrice_;
+    int auctionID_;
     int turnPrice_;
     int currentPrice_;
     int currentTurn_;

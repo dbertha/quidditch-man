@@ -10,18 +10,21 @@ ConnexionPage::ConnexionPage(Client *client, MainWindow* parent) : _client(clien
     _loginButton->setMinimumHeight(30);
     _loginButton->setMaximumWidth(200);
     _loginButton->setMaximumHeight(30);
+    _loginButton->setCursor(Qt::PointingHandCursor);
     _registerButton = new QPushButton(tr("NEW GAME"));
     _registerButton->setDefault(true);
     _registerButton->setMinimumWidth(200);
     _registerButton->setMinimumHeight(30);
     _registerButton->setMaximumWidth(200);
     _registerButton->setMaximumHeight(30);
+    _registerButton->setCursor(Qt::PointingHandCursor);
     _closeButton = new QPushButton(tr("QUIT"));
     _closeButton->setMinimumWidth(200);
     _closeButton->setMinimumHeight(30);
     _closeButton->setMaximumWidth(200);
     _closeButton->setMaximumHeight(30);
-    _closeButton->setEnabled(true);
+    _closeButton->setDefault(true);
+    _closeButton->setCursor(Qt::PointingHandCursor);
     QColor col(209,173,77);
     if(col.isValid()) {
         QString qss = QString("background-color: %1;color: rgb(255, 255, 255)").arg(col.name());

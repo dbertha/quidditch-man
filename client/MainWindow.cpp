@@ -1,5 +1,6 @@
 #include "MainWindow.hpp"
-
+#include "MatchWindow.hpp"
+#include "ClientMatchHandler.hpp"
 MainWindow::MainWindow(int sockfd){
 	_sockfd=sockfd;
 	_client=new Client(sockfd);
@@ -9,6 +10,9 @@ MainWindow::MainWindow(int sockfd){
     this->setCentralWidget(_stack);
     _stack->setCurrentIndex(0);
 
+    __pushesNotifier = new QSocketNotifier(_sockfd, QSocketNotifier::Read, this);
+    __pushesNotifier->setEnabled(false); //genère le signal
+    connect(__pushesNotifier,SIGNAL(activated(int)),this,SLOT(pushesHandler()));
     setWindowTitle(tr("QUIDDITH MANAGER"));
     setFixedSize(800,640);
 
@@ -45,11 +49,8 @@ MainWindow::MainWindow(int sockfd){
 }
 
 void MainWindow::displayWindow(QWidget* window){
-	QWidget* current = _stack->currentWidget();
-	_stack->removeWidget(current);
-	//_stack->addWidget(window);
 	_stack->setCurrentWidget(window);
-	delete current;
+	
 }
 void MainWindow::paintEvent(QPaintEvent *){
     QStyleOption opt;
@@ -76,9 +77,176 @@ void MainWindow::enterLogin(bool registration){
 }
 
 void MainWindow::connexion(int role){
+	/*
 	MainGui* mainGUI = new MainGui(_client,_sockfd,this);
 	mainGUI->show();
 	mainGUI->role=role;
 	mainGUI->createMenu();
 	close();
+	*/
+    if (role==NORMAL_LOGIN){
+    	_mainPage = new MainPage(_client,this);
+    	_stadiumPage= new StadiumPage(_client,this);
+    	_officePage = new OfficePage(_client,this);
+    	_domainPage = new DomainPage(_client,this);
+    	_stack->addWidget(_mainPage);
+    	_stack->addWidget(_stadiumPage);
+    	_stack->addWidget(_officePage);
+    	_stack->addWidget(_domainPage);
+    	_stack->setCurrentWidget(_mainPage);
+        
+        _timerPause = new QTimer();
+        _timerPause->setInterval(2000);
+        _timerResume = new QTimer();
+        _timerResume->setInterval(2000);
+        connect(_timerPause,SIGNAL(timeout()),this,SLOT(pause()));
+        connect(_timerResume,SIGNAL(timeout()),this,SLOT(resume()));
+        _timerPause->start();
+    }
+    if (role==ADMIN_LOGIN){
+        _adminPage = new AdminPage(_client,this);
+        _stack->addWidget(_adminPage);
+        _stack->setCurrentWidget(_adminPage);
+    }
+    
+}
+
+void MainWindow::mainPage(){
+	_mainPage->update();
+	_stack->setCurrentWidget(_mainPage);
+	_mainPage->resume();
+}
+
+void MainWindow::stadiumPage(){
+	_stadiumPage->resume();
+	_stack->setCurrentWidget(_stadiumPage);
+}
+
+void MainWindow::officePage(){
+	_domainPage->update();
+	_stack->setCurrentWidget(_officePage);
+	_domainPage->resume();
+	_domainPage->hideStack();
+}
+
+void MainWindow::domainPage(){
+	_officePage->update();
+	_stack->setCurrentWidget(_domainPage);
+	_officePage->resume();
+	_officePage->hideStack();
+}
+
+void MainWindow::pushesHandler(){
+   
+    __pushesNotifier->setEnabled(false);
+    //receive
+    SerializedObject received = receiveOnSocket(_sockfd);
+    
+    //handle
+    switch(received.typeOfInfos){
+		case MATCH_INVITATION : {
+            int IDInvitor;
+            char name[USERNAME_LENGTH];
+            char * position = received.stringData;
+            bool confirmation;
+            QString texte;
+            std::vector<int> playersInTeam;
+            memcpy(&IDInvitor, position, sizeof(IDInvitor));
+            position += sizeof(IDInvitor);
+            memcpy(&name, position, sizeof(name));
+            //texte << "Do you want to fight against " << name << "with ID : " << QString::number(IDInvitor) << " ?";
+            texte = QString("%1, with ID %2 wants to play a match against you !").arg(name, QString::number(IDInvitor));
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("You've got a match proposal !");
+            msgBox.setText(texte);
+            msgBox.setInformativeText("Do you accept the match ?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msgBox.setDefaultButton(QMessageBox::Yes);
+            if(msgBox.exec() == QMessageBox::Yes){
+                confirmation = true;
+            }else {
+                confirmation = false;
+            }
+            
+            if(confirmation){
+                playersInTeam = chooseTeamForMatch(_client, this);
+            }
+            _client->answerMatchProposal(confirmation, playersInTeam);
+            //~ answerMatchProposal(confirmation, playersInTeam); //liste vide = refus de l'invitation
+            if(_client->receiveMatchConfirmation() == MATCH_STARTING){
+                MatchWindow * matchWindow  = new MatchWindow(_client, 2, this);
+                matchWindow->show();
+                //~ //startMatch( 2); //invité a l'équipe 2
+            }
+            break;
+        }
+        case SERVER_DOWN : {
+            //badConnection();
+            break;
+        }
+        case MATCH_TOURNAMENT_START : {
+            int IDOpponent, numTeam;
+            char name[USERNAME_LENGTH];
+            char * position = received.stringData;
+            QString texte;
+            //~ cout << "A tournament turn starts now !" << endl;
+            memcpy(&IDOpponent, position, sizeof(IDOpponent));
+            position += sizeof(IDOpponent);
+            memcpy(&name, position, sizeof(name));
+            position += sizeof(name);
+            texte = QString("%1, with ID %2 is your opponent !").arg(name, QString::number(IDOpponent));
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("A tournament match starts now !");
+            msgBox.setText(texte);
+            msgBox.setInformativeText("You have to accept.");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            msgBox.exec();
+            //forced to accept
+            std::vector<int> playersInTeam = chooseTeamForMatch(_client, this);
+            _client->sendTeamForMatchTournament(playersInTeam);
+            //bloquant, l'adversaire doit avoir répondu aussi :
+            numTeam = _client->receiveNumOfTeam();
+            if(numTeam > 0){ //first to answer is the team 1
+                MatchWindow * matchWindow = new MatchWindow(_client, numTeam, this);
+                matchWindow->show();
+                //~ startMatch(numTeam);
+            }
+            break;
+        }
+	}
+    __pushesNotifier->setEnabled(true);
+}
+
+void MainWindow::pause(){
+    __pushesNotifier->setEnabled(false);
+    _mainPage->pause();
+    _domainPage->pause();
+    _stadiumPage->pause();
+    _officePage->pause();
+    _timerPause->stop();
+    _timerResume->start();
+}
+
+void MainWindow::resume(){
+    __pushesNotifier->setEnabled(true);
+    _mainPage->resume();
+    _domainPage->resume();
+    _stadiumPage->resume();
+    _officePage->resume();
+    _timerResume->stop();
+    _timerPause->start();
+}
+void MainWindow::block(){
+    _mainPage->blockButtons();
+    _domainPage->blockButtons();
+    _officePage->blockButtons();
+    _stadiumPage->blockButtons();
+}
+
+void MainWindow::deblock(){
+    _mainPage->deblockButtons();
+    _domainPage->deblockButtons();
+    _officePage->deblockButtons();
+    _stadiumPage->deblockButtons();
 }

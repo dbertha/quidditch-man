@@ -30,6 +30,9 @@
 
 #include "Client.hpp" //network
 
+#include "MainWindow.hpp"
+class MainWindow;
+
 
 class MatchWindow : public QDialog // On hérite de QWidget //TODO : changer pour QDialog
 {
@@ -39,7 +42,7 @@ class MatchWindow : public QDialog // On hérite de QWidget //TODO : changer pou
 		
 		//MatchWindow(int idMaTeam);
 		//final :
-		MatchWindow(Client * client, int idTeam, QWidget * parent = 0);
+		MatchWindow(Client * client, int idTeam, MainWindow * parent = 0);
 
     public slots:
 		void changerTexte(int,int);
@@ -91,6 +94,7 @@ class MatchWindow : public QDialog // On hérite de QWidget //TODO : changer pou
 		QPushButton *BoutonAbandon;
 		QPushButton *BoutonMatchNul;
 
+		QMessageBox* _msgBox;
 
 		HexagonalCase *caseJoueurSelect;
 		HexagonalCase *caseSelect;
@@ -122,6 +126,7 @@ class MatchWindow : public QDialog // On hérite de QWidget //TODO : changer pou
 		void endHandler();
 		void nextTurn();
 		Client * __client;
+		MainWindow* _parent;
 		QSocketNotifier * __forfeitAndDrawNotifier;
 		
 

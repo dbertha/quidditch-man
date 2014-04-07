@@ -213,6 +213,25 @@ std::vector<int> Client::receivePlayerInfo(int playerID){
     return playerInfos;
 }
 
+std::vector<int> Client::receiveAuctionPlayerInfo(int auctionID){
+    askForAuctionInfos(auctionID);
+    _serialized = receiveOnSocket(sockfd_);
+    char * position = _serialized.stringData;
+    std::vector<int> playerInfos;
+    if(_serialized.typeOfInfos == PLAYERINFOS){ //on suppose toujours vrai
+            //5 attributs int
+            //5 états d'entrainements d'attribut int
+            //1 int blocked
+            //1 int bonus du balais
+            //1 int capacity du balais
+            //1 int life
+            //1 int estimated value of player
+        playerInfos = receiveIntList(position, 15);
+    }
+    return playerInfos;
+
+}
+
 int Client::trainPlayer(int playerID, int capacity){
     char * position = _serialized.stringData;
     _serialized.typeOfInfos = TRAIN_PLAYER;
@@ -494,7 +513,9 @@ int Client::receiveAuctionResult() {
     return result;
 }
 
-int Client::askAuctionTimeLeft(){
+int Client::askAuctionTimeLeft(int targetedAuction){
+    char * position = _serialized.stringData;
+    memcpy(position, &targetedAuction, sizeof(targetedAuction));
     _serialized.typeOfInfos = GET_AUCTION_TIME_LEFT;
     return sendOnSocket(sockfd_, _serialized);
 }

@@ -1,4 +1,5 @@
 #include "Auction.hpp"
+#include "DataBase.hpp"
 
 #define TIMEOFTURNZERO 70 //en secondes.
 #define SECONDSINMINUTE 60
@@ -9,6 +10,7 @@ using namespace std;
 
 Auction::Auction(User* creator, ManagedPlayer player, int startingPrice, int ID): _auctionCreator(creator),_lastBidder(NULL), _player(player), \
 _startingPrice(startingPrice),_currentPrice(startingPrice),_currentTurn(0),_auctionID(ID),_nbOfEndOfTurn(0) {
+	_managerLogin=creator->getManager()->getLogin();
 	time_t secondes;
     time(&secondes);
     _instant=*localtime(&secondes);
@@ -18,10 +20,16 @@ void Auction::endAuction() {
 	try {
 		getManager()->unlockPlayer(getPlayerName());
 	} catch (const char err[]) {}
+	if (_auctionCreator==NULL || getManager()==NULL) {
+		Manager tmpManager = Manager(_managerLogin);
+		tmpManager.unlockPlayer(_player.getFirstName()+" "+_player.getLastName());
+		DataBase::save(tmpManager);
+	}
 }
 
 User* Auction::getAuctionCreator() {return _auctionCreator;}
 Manager* Auction::getManager() {return _auctionCreator->getManager();}
+std::string Auction::getManagerLogin() {return _managerLogin;}
 User* Auction::getLastBidder() {return _lastBidder;}
 void Auction::resetBidders() {
 	_nbOfEndOfTurn=0;

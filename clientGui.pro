@@ -28,7 +28,21 @@ HEADERS += client/ClientMatchHandler.hpp \
            client/HexagonalCase.hpp \ 
     client/MainWindow.hpp \
     client/ConnexionPage.hpp \
-    client/LoginPage.hpp
+    client/LoginPage.hpp \
+    client/MainPage.hpp \
+    client/InfosWidget.hpp \
+    client/StadiumPage.hpp \
+    client/OfficePage.hpp \
+    client/DomainPage.hpp \
+    client/BuildingWidget.hpp \
+    client/BuyAPWidget.hpp \
+    client/GainAPWidget.hpp \
+    client/PlayerWidget.hpp \
+    client/ListPlayersWidget.hpp \
+    client/ManagePlayerWidget.hpp \
+    client/ListAuctionsWidget.hpp \
+    client/AuctionWidget.hpp \
+    client/AdminPage.hpp
            
 
 SOURCES += client/ClientMatchHandler.cpp \
@@ -54,7 +68,21 @@ SOURCES += client/ClientMatchHandler.cpp \
            client/HexagonalCase.cpp \ 
     client/MainWindow.cpp \
     client/ConnexionPage.cpp \
-    client/LoginPage.cpp
+    client/LoginPage.cpp \
+    client/MainPage.cpp \
+    client/InfosWidget.cpp \
+    client/StadiumPage.cpp \
+    client/OfficePage.cpp \
+    client/DomainPage.cpp \
+    client/BuildingWidget.cpp \
+    client/BuyAPWidget.cpp \
+    client/GainAPWidget.cpp \
+    client/PlayerWidget.cpp \
+    client/ListPlayersWidget.cpp \
+    client/ManagePlayerWidget.cpp \
+    client/ListAuctionsWidget.cpp \
+    client/AuctionWidget.cpp \
+    client/AdminPage.cpp
 
 RESOURCES += \
     ressources.qrc

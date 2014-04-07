@@ -14,6 +14,7 @@ class User;
 class Auction {
 
 	User* _auctionCreator;
+	std::string _managerLogin;
 	vector<User*> _usersInAuction;
 	vector<User*> _bidders;
 	User* _lastBidder;
@@ -32,6 +33,7 @@ class Auction {
 
  	User* getAuctionCreator();
  	Manager* getManager();
+ 	std::string getManagerLogin();
  	User* getLastBidder();
  	void resetBidders();
  	ManagedPlayer getPlayer();

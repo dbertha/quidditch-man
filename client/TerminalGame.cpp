@@ -805,7 +805,7 @@ void TerminalGame::handleAuctions(){
             cout<<" -----> ";
             cin>>auctionToInspect;
             if (auctionToInspect!=0) {
-                vector<int> playerAuctionInfos = _client.receivePlayerInfo(auctionToInspect-1);
+                vector<int> playerAuctionInfos = _client.receiveAuctionPlayerInfo(auctionToInspect-1);
                 string timeLeft = displayAuctionInfos(auctionsList,playerAuctionInfos,auctionToInspect-1);
                 cout<<" ---- Entering an auction costs "<<AP_ENTER_AUCTION<<" action points ----"<<endl;
                 cout<<"Do you want to join this auction ? [1 to enter, 0 to quit] \n -----> ";
@@ -815,7 +815,7 @@ void TerminalGame::handleAuctions(){
                     _client.joinAuction(auctionToInspect-1);
                     int joinResult = _client.getConfirmation();
                     if (joinResult==1) {
-                        _client.askAuctionTimeLeft();
+                        _client.askAuctionTimeLeft(auctionToInspect-1);
                         int auctionTimeLeft=_client.getAuctionTimeLeft();
                         mainAuction(auctionToInspect-1,auctionTimeLeft);
                     }

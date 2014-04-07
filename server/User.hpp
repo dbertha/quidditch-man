@@ -62,7 +62,7 @@ public:
 	void addManager(char username[USERNAME_LENGTH], char password[PASSWORD_LENGTH]);
 	Manager* getManager();
 
-	void auctionWin(Manager* manager, ManagedPlayer player);
+	void auctionWin(Auction* auction,Manager* manager, ManagedPlayer player);
 	void handleEndOfMatch(int numTeam, int numWinningTeam);
 	
 	void handleEndOfMatch(int numTeam, int numWinningTeam, int tournamentPrice, std::vector<int> lifes); //normal price + tournamentPrice

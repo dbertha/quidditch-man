@@ -13,6 +13,7 @@ class ManagedPlayer : public Player {
 
     int _trainingLeft[5];
     bool _blocked;
+    bool _inAuction;
 
     Broomstick _broomstick;
 
@@ -26,8 +27,10 @@ class ManagedPlayer : public Player {
     void setTrainingLeft(int capacityNumber, int value);
 
     void lockPlayer();
+    void sellPlayer();
     void unlockPlayer();
     bool isBlocked() const;
+    bool isInAuction() const;
 
     Broomstick getBroomstick();
 
