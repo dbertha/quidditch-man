@@ -24,7 +24,7 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	setFixedSize(800, 640);//defini la taille de toute la fenetre (contient zone de jeux, description vie joueur, action possible,...)
 
 	//*****************************************************************************************
-	infoJoueur = new QLabel("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
+	infoJoueur = new QLabel("Info sur le joueur selection \n vitesse, force,....");
 	infoJoueur->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
 	if(numMaTeam == 1){//on vas adapter le texter d'indication de score selon qu'on soit l'equipe 1 ou 2
@@ -57,7 +57,7 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	deplacer = new QRadioButton("Deplacement");
 	lancer = new QRadioButton("Lancer souaffle");
 	taper = new QRadioButton("Frapper le cognard");
-	recupSouaffle =  new QRadioButton("Tenter de récupérer le souaffle");
+	recupSouaffle =  new QRadioButton("Tenter d'attraper le souaffle");
 	recupVifDOr = new QRadioButton("Tenter d'attraper le vif d'or");
 
 
@@ -116,7 +116,7 @@ MatchWindow::MatchWindow(Client * client, int numTeam, QWidget * parent) : QDial
 	layout->addWidget(scoreEquipe1,0,1,Qt::AlignLeft);
 	layout->addWidget(texteEquipe2,0,2,Qt::AlignRight);
 	layout->addWidget(scoreEquipe2,0,3,Qt::AlignLeft);
-	layout->addWidget(view, 1, 0,4,4);//peut occuper 3 lignes et 3 colonnes
+	layout->addWidget(view, 1, 0,4,4);//peut occuper 4 lignes et 4 colonnes
 	layout->addWidget(infoJoueur,1,5);
 	layout->addWidget(groupbox,2,5);
 	layout->addLayout(layoutConformi,3,5);
@@ -394,7 +394,7 @@ void MatchWindow::reset(){
 	taper->setEnabled(false);
 	recupSouaffle->setEnabled(false);
 	recupVifDOr->setEnabled(false);
-	infoJoueur->setText("Info sur le joueur selection \n nom, prenom, vitesse, force,....");
+	infoJoueur->setText("Info sur le joueur selection \n vitesse, force,....");
 	BoutonConfirm->setEnabled(false);
 
 
@@ -413,7 +413,7 @@ void MatchWindow::handlerMove(int iAxial,int jAxial){
 	//      deselectione le jouer + demarquer les case d'action + desactive les bouton d'action
 	//sinon (je n'ai pas encore selectionner un joueur)
 	//  verif si la case n'est pas une case vide
-	//    verif si le joueur a appartient a mon equipe
+	//    verif si le joueur appartient a mon equipe
 	//      recup info du joueur + affichage
 	//      debloquer Action possible (deplacement+Action selon role)
 	//      afficher les casse accesible (action par defaut=deplacement)
@@ -641,6 +641,7 @@ void MatchWindow::handlerTourEnd(){//correction derniere minute pour gerer bouto
 }
 
 void MatchWindow::nextTurn(){
+	reset();
 	__forfeitAndDrawNotifier->setEnabled(false);
 	//sendMoves
 	__client->sendMoves(moves);
