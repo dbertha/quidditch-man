@@ -158,6 +158,7 @@ void TournamentsWidget::updateLabels(){
 	if (infos.size()!=0){
 		_listTournaments->setVisible(true);
 		_listTournaments->clear();
+		_listTournaments->setCurrentRow(0);
 		if (!_hasJoined && _role==NORMAL_LOGIN) _join->setEnabled(true);
 		if (_role==ADMIN_LOGIN) _create->setEnabled(false);
 		for (int i=0;i<infos.size();i+=3){

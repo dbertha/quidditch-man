@@ -20,15 +20,7 @@
 #include <QStackedWidget>
 #include "Client.hpp"
 
-#include "Tournaments.hpp"
-#include "Ticker.hpp"
-#include "LoginDialog.hpp"
-#include "MainMenu.hpp"
-#include "BuildingsDialog.hpp"
-#include "BuyAPDialog.hpp"
-#include "FreeAPDialog.hpp"
 #include "MatchWindow.hpp"
-#include "MainGui.hpp"
 
 #include "ConnexionPage.hpp"
 #include "LoginPage.hpp"
@@ -39,6 +31,7 @@
 #include "AdminPage.hpp"
 #include "InfosWidget.hpp"
 #include "NotificationWidget.hpp"
+#include "SelectPlayersWidget.hpp"
 
 class MainMenu;
 class ConnexionPage;
@@ -52,6 +45,7 @@ class DomainPage;
 class AdminPage;
 class InfosWidget;
 class NotificationWidget;
+class SelectPlayersWidget;
 
 class MainWindow : public QDialog {
     Q_OBJECT
@@ -68,8 +62,12 @@ public:
 	void stadiumPage();
 	void officePage();
 	void domainPage();
+	void selectionPage();
 	void block();
 	void deblock();
+	void trainingMatchImpossibleNotification();
+	void friendlyMatchDeniedNotification();
+	void hideSelect();
 
 	void friendlyMatch();
 	void trainingMatch();
@@ -96,6 +94,7 @@ private:
     QTimer* _timerResume;
     InfosWidget* _infos;
     NotificationWidget* _notification;
+    SelectPlayersWidget* _select;
     QGridLayout* grid;
 
 };

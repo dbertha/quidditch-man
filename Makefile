@@ -107,6 +107,7 @@ clientGUI.out: Makefile.GUI \
 	   client/AdminPage.hpp \
 	   client/TournamentsWidget.hpp \
 	   client/NotificationWidget.hpp \
+	   client/SelectPlayersWidget.hpp \
            client/ClientMatchHandler.cpp \
            client/LoginDialog.cpp \
            client/GUImain.cpp \
@@ -146,7 +147,8 @@ clientGUI.out: Makefile.GUI \
 	   client/AuctionWidget.cpp \
 	   client/AdminPage.cpp \
 	   client/TournamentsWidget.cpp \
-	   client/NotificationWidget.cpp
+	   client/NotificationWidget.cpp \
+	   client/SelectPlayersWidget.cpp
 	make -f Makefile.GUI
 	
 Makefile.client :

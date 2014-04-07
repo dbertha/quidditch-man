@@ -13,8 +13,6 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-//#include "MainGui.hpp"
-#include "LoginDialog.hpp"
 #include "common/Defines.hpp"
 #include <QApplication>
 #include "MainWindow.hpp"

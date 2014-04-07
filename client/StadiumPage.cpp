@@ -1,7 +1,6 @@
 #include "StadiumPage.hpp"
 #include "Tournaments.hpp"
 #include "MatchWindow.hpp"
-#include "ClientMatchHandler.hpp"
 
 StadiumPage::StadiumPage(Client* client, MainWindow* parent) : _client(client),_parent(parent){
 	setStyleSheet("StadiumPage{background-image: url(Pictures/mainMenu.jpg)}");
@@ -123,6 +122,7 @@ void StadiumPage::friendlyMatch(){
 }
 
 void StadiumPage::tournaments(){
+	_parent->hideSelect();
     _stack->setCurrentWidget(_tournamentsWidget);
     _stack->setVisible(true);
 }

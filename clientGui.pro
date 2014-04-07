@@ -44,7 +44,8 @@ HEADERS += client/ClientMatchHandler.hpp \
     client/AuctionWidget.hpp \
     client/AdminPage.hpp \
     client/TournamentsWidget.hpp \
-    client/NotificationWidget.hpp
+    client/NotificationWidget.hpp \
+    client/SelectPlayersWidget.hpp
            
 
 SOURCES += client/ClientMatchHandler.cpp \
@@ -86,7 +87,8 @@ SOURCES += client/ClientMatchHandler.cpp \
     client/AuctionWidget.cpp \
     client/AdminPage.cpp \
     client/TournamentsWidget.cpp \
-    client/NotificationWidget.cpp
+    client/NotificationWidget.cpp \
+    client/SelectPlayersWidget.cpp
 
 RESOURCES += \
     ressources.qrc

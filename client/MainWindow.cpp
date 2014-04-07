@@ -1,6 +1,6 @@
 #include "MainWindow.hpp"
 #include "MatchWindow.hpp"
-#include "ClientMatchHandler.hpp"
+
 MainWindow::MainWindow(int sockfd){
 	_sockfd=sockfd;
 	_client=new Client(sockfd);
@@ -64,9 +64,10 @@ MainWindow::MainWindow(int sockfd){
     grid->setRowMinimumHeight(0,100);
     grid->setRowMinimumHeight(1,390);
     grid->setRowMinimumHeight(2,150);
-    grid->setColumnMinimumWidth(0,800);
+    grid->setColumnMinimumWidth(0,50);
+    grid->setColumnMinimumWidth(1,750);
 
-    grid->addWidget(_stack,0,0,3,1,Qt::AlignLeft);
+    grid->addWidget(_stack,0,0,3,2,Qt::AlignLeft);
 
 }
 
@@ -109,9 +110,11 @@ void MainWindow::connexion(int role){
     if (role==NORMAL_LOGIN){
 
         _infos = new InfosWidget(_client,this);
-        _notification = new NotificationWidget(_client,this);
-        grid->addWidget(_infos,0,0,Qt::AlignLeft);
-        grid->addWidget(_notification,2,0,Qt::AlignLeft);
+        _select = new SelectPlayersWidget(_client,this);
+        _notification = new NotificationWidget(_client,this,_select);
+        grid->addWidget(_infos,0,0,1,2,Qt::AlignLeft);
+        grid->addWidget(_notification,2,0,1,2,Qt::AlignLeft);
+        grid->addWidget(_select,1,1,Qt::AlignLeft);
     	_mainPage = new MainPage(_client,this);
     	_stadiumPage= new StadiumPage(_client,this);
     	_officePage = new OfficePage(_client,this);
@@ -165,6 +168,17 @@ void MainWindow::domainPage(){
 	_officePage->resume();
 	_officePage->hideStack();
     _infos->setVisible(true);
+}
+
+void MainWindow::selectionPage(){
+    _officePage->update();
+    _officePage->resume();
+    _officePage->hideStack();
+    _infos->setVisible(true);
+    _domainPage->update();
+    _domainPage->resume();
+    _domainPage->hideStack();
+    _stack->setCurrentWidget(_select);
 }
 
 void MainWindow::pushesHandler(){
@@ -253,60 +267,22 @@ void MainWindow::deblock(){
 }
 
 void MainWindow::friendlyMatch() {
-    pause();
-    block();
-    int res = choosePartner(_client,this);
-    if (res==BAD_CONNECTION) badConnection();
-    else if(res != NO_CHOICE){
-        std::vector<int> chosenPlayers;
-        chosenPlayers = chooseTeamForMatch(_client, this); //tous les rôles sont nécessairement remplis 
-        //(on suppose suffisament de joueurs)
-#ifdef __DEBUG
-        std::cout << "index choisi : " << std::endl;
-        for(unsigned int i = 0; i < chosenPlayers.size() ; ++i){
-            std::cout << chosenPlayers[i] << std::endl;
-        }      
-#endif
-        //send invitation
-        _client->proposeMatchTo(res,  chosenPlayers);
-
-        int confirmation = _client->receiveMatchConfirmation();
-        //~ progress->setValue(1);
-        if(confirmation == MATCH_STARTING){
-
-            block();
-            MatchWindow * matchWindow = new MatchWindow(_client, 1, this);
-            matchWindow->show();
-            //startMatch(1); //inviteur a l'équipe 1
-        }else{
-            _notification->friendlyMatchDeniedNotification();
-        }
-    }
-   // __pushesNotifier->setEnabled(true);
-    //_parent->deblock();
-    resume();
+    _select->init(true,0);
 }
 
 
 void MainWindow::trainingMatch() {
-    pause();
-    block();
-    std::vector<int> chosenPlayers;
-    chosenPlayers = chooseTeamForMatch(_client, this); //tous les rôles sont nécessairement remplis 
-    _client->sendTrainingMatchRequest(chosenPlayers);
-    int confirmation = _client->receiveMatchConfirmation();
-    if(confirmation == 1){
-        MatchWindow * matchWindow = new MatchWindow(_client, 1, this);
-        matchWindow->show();
-    }else{
-        _notification->trainingMatchImpossibleNotification();
-    }
-    //_parent->deblock();
-    resume();
+    _select->init(false,-1);
 }
 
 int MainWindow::badConnection() {
     pause();
     _notification->noConnectionNotification();
     return (0);
+}
+void MainWindow::trainingMatchImpossibleNotification(){_notification->trainingMatchImpossibleNotification();}
+void MainWindow::friendlyMatchDeniedNotification(){_notification->friendlyMatchDeniedNotification();}
+
+void MainWindow::hideSelect(){
+    _select->setVisible(false);
 }

@@ -30,7 +30,12 @@ public:
 	void paintEvent(QPaintEvent*);
 	void pause();
 	void resume();
+	int currentRow();
+	std::vector<std::string> getNamesList();
 	int getCurrentPlayer();
+	bool isPlayerBlocked(int row);
+	void hidePlayer(int row);
+	void showPlayers();
 
 public slots:
 	void displayPlayer();

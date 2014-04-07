@@ -75,7 +75,7 @@ void ListPlayersWidget::pause() {_timer->stop();}
 void ListPlayersWidget::resume() {_timer->start();}
 
 void ListPlayersWidget::displayPlayer(){
-	dynamic_cast<ManagePlayerWidget*>(_parent)->maskLabel();
+	//dynamic_cast<ManagePlayerWidget*>(_parent)->maskLabel();
 	if (_listPlayers->currentRow()>=0) _stack->setCurrentWidget(_players[_listPlayers->currentRow()]);
 	else _stack->setCurrentWidget(_noPlayerLabel);
 }
@@ -142,6 +142,33 @@ void ListPlayersWidget::update(){
 	
 }
 
+std::vector<std::string> ListPlayersWidget::getNamesList(){
+	return _playersName;
+}
 
+int ListPlayersWidget::currentRow(){
+	return _listPlayers->currentRow();
+}
+
+bool ListPlayersWidget::isPlayerBlocked(int row){
+	std::vector<int> infos=_client->receivePlayerInfo(row);
+	return infos[10];
+}
 
 int ListPlayersWidget::getCurrentPlayer(){return _listPlayers->currentRow();}
+
+void ListPlayersWidget::hidePlayer(int row){
+	_listPlayers->item(row)->setHidden(true);
+	for (int i=0;i<_listPlayers->count();++i){
+		if (!_listPlayers->item(i)->isHidden()) {
+			_listPlayers->setCurrentRow(i);
+			i=_listPlayers->count();
+		}
+	}
+}
+
+void ListPlayersWidget::showPlayers(){
+	for (int i=0;i<_listPlayers->count();++i){
+		_listPlayers->item(i)->setHidden(false);
+	}
+}

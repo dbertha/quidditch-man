@@ -34,8 +34,8 @@ public:
 	Client* _client;
 	QWidget* _parent;
 	std::vector<int> _infos;
-	int _playerID;
 	QString _name;
+	int _playerID;
 	QLabel* _nameLabel;
 	QLabel* _speed;
 	QLabel* _strength;

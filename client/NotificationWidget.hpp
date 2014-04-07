@@ -18,14 +18,15 @@
 #include <QtGui>
 #include "Client.hpp"
 #include "MainWindow.hpp"
-
+#include "SelectPlayersWidget.hpp"
 
 class MainWindow;
+class SelectPlayersWidget;
 
 class NotificationWidget : public QWidget {
 	Q_OBJECT
 public:
-	NotificationWidget(Client* client, MainWindow* parent=0);
+	NotificationWidget(Client* client, MainWindow* parent, SelectPlayersWidget* select);
 	void paintEvent(QPaintEvent*);
 	void tournamentNotification(char name[], int opponentID);
 	void friendlyMatchNotification(char name[], int opponentID);
@@ -44,7 +45,7 @@ public slots:
 public:
 	Client* _client;
 	MainWindow* _parent;
-
+	SelectPlayersWidget* _select;
 	int _money,_fans,_players,_actionPoints;
 	QTimer* _timer;
 	QLabel* _label;
