@@ -2,7 +2,7 @@
 
 BuildingWidget::BuildingWidget(Client* client, QWidget* parent,int buildingID) : _client(client),_parent(parent),_buildingID(buildingID){
 	
-	setStyleSheet("BuildingWidget{ background-color: rgba(255, 255, 255, 100);}");
+	setStyleSheet("BuildingWidget{ background-color: rgba(255, 255, 255, 130);}");
 
 	_infos=_client->receiveBuildingInfos(_buildingID);
 	_names.push_back("STADIUM");

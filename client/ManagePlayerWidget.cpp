@@ -2,7 +2,7 @@
 
 ManagePlayerWidget::ManagePlayerWidget(Client* client, QWidget* parent) : _client(client),_parent(parent){
 	
-	setStyleSheet("ManagePlayerWidget{ background-color: rgba(255, 255, 255, 100);}");
+	setStyleSheet("ManagePlayerWidget{ background-color: rgba(255, 255, 255, 130);}");
 
 	_listPlayersWidget = new ListPlayersWidget(_client,this);
 
