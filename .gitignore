@@ -27,7 +27,7 @@
 *.o
 moc*
 Makefile.*
-*.GUI
 Makefile.GUI
+qrc_ressources.cpp
 *.synctex.gz
 moc*
