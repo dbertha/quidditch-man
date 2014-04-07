@@ -641,7 +641,8 @@ void MatchWindow::pushesHandler(){
 		case OPPONENTFORFEIT : {
 			QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("Opponent forfeited"),QMessageBox::Ok);
 			over = true;
-			delete _msgBox;
+			_parent->resume();
+			_parent->deblock();
 			break;
 		}
 		case OPPONENTASKFORDRAW : {
@@ -657,7 +658,10 @@ void MatchWindow::pushesHandler(){
 			if(ret == QMessageBox::Yes){
 				code = DRAWACCEPTED;
 				over = true;
-				delete _msgBox;
+
+				_parent->resume();
+				_parent->deblock();
+
 			}else{
 				code = DRAWDENIED;
 			}
@@ -666,9 +670,9 @@ void MatchWindow::pushesHandler(){
         }
     }
     if(over){
+		close();
     	_parent->resume();
     	_parent->deblock();
-		close();
 	}
 	else __forfeitAndDrawNotifier->setEnabled(true);
 }
@@ -676,27 +680,32 @@ void MatchWindow::pushesHandler(){
 void MatchWindow::endHandler(){
 	bool over = false;
 	if(winner != 0){
+		_parent->resume();
+		_parent->deblock();
 		QString str = QString("Winner is Team %1").arg(QString::number(winner));
 		QMessageBox::information(this,QMessageBox::tr("Match over !"),str,QMessageBox::Ok);
 		over = true;
 	}else{
 		int ret;
-		_msgBox=new QMessageBox();
+		
+		QMessageBox msgBox;
 		QString texte("Do you want to continue the match ?");
-        _msgBox->setWindowTitle("Next turn starts !");
-        _msgBox->setText(texte);
-        _msgBox->setInformativeText("abort to forfeit, cancel to ask for a draw ");
-        _msgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::Abort | QMessageBox::Cancel);
-        _msgBox->setDefaultButton(QMessageBox::Yes);
+        msgBox.setWindowTitle("Next turn starts !");
+        msgBox.setText(texte);
+        msgBox.setInformativeText("abort to forfeit, cancel to ask for a draw ");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Abort | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Yes);
         //QPushButton *connectButton = msgBox.addButton(tr("Forfeit"), QMessageBox::ActionRole);
         //QPushButton *connectButton = msgBox.addButton(tr("AskForDraw"), QMessageBox::ActionRole);
-        ret = _msgBox->exec();
+        ret = msgBox.exec();
         if(ret == QMessageBox::Abort){
 			//forfeit
 			__forfeitAndDrawNotifier->setEnabled(false);
 			__client->sendForfeit();
 			QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("You forfeited"),QMessageBox::Ok);
 			over = true;
+			_parent->resume();
+			_parent->deblock();
 		}else if(ret == QMessageBox::Cancel){
 			//ask for a draw
 			__forfeitAndDrawNotifier->setEnabled(false);
@@ -708,6 +717,9 @@ void MatchWindow::endHandler(){
 			if(result == DRAWACCEPTED){
 				QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("Draw accepted"),QMessageBox::Ok);
 				over = true;
+
+				_parent->resume();
+				_parent->deblock();
             }else{
 				QMessageBox::information(this,QMessageBox::tr("Draw"),QString("Draw refused"),QMessageBox::Ok);
             }

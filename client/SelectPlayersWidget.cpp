@@ -105,7 +105,12 @@ void SelectPlayersWidget::resume() {
 }
 
 
-void SelectPlayersWidget::activateButton(){_friendlyMatch->setVisible(true);}
+void SelectPlayersWidget::activateButton(){
+	if (_listManagers->currentRow()>=0){
+		_friendlyMatch->setVisible(true);
+		_friendlyMatch->setEnabled(true);
+	}
+}
 
 void SelectPlayersWidget::updateListManagers() {
 	_IDList.clear();
@@ -158,6 +163,7 @@ void SelectPlayersWidget::friendlyMatch(){
 	_roles[0]->setVisible(true);
 	_cancelButton->setVisible(true);
 	_friendlyMatch->setVisible(false);
+	_friendlyMatch->setEnabled(false);
 }
 
 void SelectPlayersWidget::choosePlayer(){
@@ -185,10 +191,12 @@ void SelectPlayersWidget::init(bool value, int opponentID) {
 	_opponentID=opponentID;
 	_team.clear();
 		_listPlayersWidget->showPlayers();
-	if (value&&_opponentID==0){//asks 
+	if (value&&(_opponentID==0)){//asks 
 		updateListManagers();
 		_listManagers->setVisible(true);
 		hideButtons();
+		//_friendlyMatch->setVisible(true);
+		//_friendlyMatch->setEnabled(true);
 		_noManagerLabel->setVisible(true);
 		//_cancelButton->setVisible(true);
 		_timer->start();
@@ -212,6 +220,9 @@ void SelectPlayersWidget::hideButtons(){
 		_roles[i]->setVisible(false);
 	}
 	_friendlyMatch->setVisible(false);
+
+	_friendlyMatch->setEnabled(false);
+
 	_confirmButton->setVisible(false);
 	_cancelButton->setVisible(false);
 
