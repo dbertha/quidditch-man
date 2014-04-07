@@ -45,10 +45,7 @@ std::vector<int> chooseTeamForMatch(Client * client, QWidget *parent){
             pos = selectionDialog->getPosition();
             std::cout<<pos<<"eme joueur selectionne"<<std::endl;
             PlayersDialog *playersDialog = new PlayersDialog(client,pos,0,parent);
-            strncpy(username,playersList[2*pos].c_str(),USERNAME_LENGTH);
-            strcat(username," ");
-            strncat(username,playersList[2*pos+1].c_str(),USERNAME_LENGTH);
-            playersDialog->setWindowTitle("Select "+QString(username)+" as "+orderedRoles[i]+" ?");
+            playersDialog->setWindowTitle("Select "+remainingNames[pos]+" as "+orderedRoles[i]+" ?");
             if(playersDialog->exec() == playersDialog->Accepted) {
                 chosenPlayersIndexes.push_back(allNames.indexOf(remainingNames[pos]));
                 remainingNames.removeAt(pos); //on retire le joueur selectionne de la liste
