@@ -641,8 +641,8 @@ void MatchWindow::pushesHandler(){
 		case OPPONENTFORFEIT : {
 			QMessageBox::information(this,QMessageBox::tr("Match over !"),QString("Opponent forfeited"),QMessageBox::Ok);
 			over = true;
-			_parent->resume();
-			_parent->deblock();
+			//_parent->resume();
+			//_parent->deblock();
 			if (_msgBox!=NULL) delete _msgBox;
 			break;
 		}
@@ -660,8 +660,8 @@ void MatchWindow::pushesHandler(){
 				code = DRAWACCEPTED;
 				over = true;
 
-				_parent->resume();
-				_parent->deblock();
+				//_parent->resume();
+				//_parent->deblock();
 
 				if (_msgBox!=NULL) delete _msgBox;
 			}else{
@@ -672,9 +672,10 @@ void MatchWindow::pushesHandler(){
         }
     }
     if(over){
-		close();
+		
     	_parent->resume();
     	_parent->deblock();
+    	close();
 	}
 	else __forfeitAndDrawNotifier->setEnabled(true);
 }
@@ -682,6 +683,7 @@ void MatchWindow::pushesHandler(){
 void MatchWindow::endHandler(){
 	bool over = false;
 	if(winner != 0){
+		__forfeitAndDrawNotifier->setEnabled(false);
 		_parent->resume();
 		_parent->deblock();
 		QString str = QString("Winner is Team %1").arg(QString::number(winner));
@@ -724,8 +726,9 @@ void MatchWindow::endHandler(){
 				_parent->deblock();
             }else{
 				QMessageBox::information(this,QMessageBox::tr("Draw"),QString("Draw refused"),QMessageBox::Ok);
+				__forfeitAndDrawNotifier->setEnabled(true);
             }
-            __forfeitAndDrawNotifier->setEnabled(true);
+            
 		}
 	}
 	if(over){
